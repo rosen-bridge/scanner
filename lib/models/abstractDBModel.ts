@@ -1,8 +1,6 @@
 import { Block } from "../objects/interfaces";
 
 export abstract class AbstractDataBase<DataT>{
-    abstract dataSource: unknown;
-    abstract blockRepository: unknown;
 
     /**
      * get last saved block
