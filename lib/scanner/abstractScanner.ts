@@ -59,7 +59,7 @@ export abstract class AbstractScanner<DataT>{
             } else {
                 let forkPointer = lastSavedBlock!;
                 let blockFromNetwork = await this._networkAccess.getBlockAtHeight(forkPointer.block_height);
-                while (blockFromNetwork.hash !== forkPointer.hash) {
+                while (blockFromNetwork.hash !== forkPointer.hash && blockFromNetwork.parent_hash !== forkPointer.parent_hash) {
                     const block = await this._dataBase.getBlockAtHeight(forkPointer.block_height - 1);
                     if (block === undefined) {
                         break;
