@@ -3,8 +3,3 @@ export interface Block{
     hash: string,
     block_height: number,
 }
-
-export interface BlockData{
-    hash: string,
-    parent_hash: string,
-}
