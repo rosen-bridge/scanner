@@ -1,8 +1,8 @@
 import { AbstractNetworkConnector } from "../network/abstractNetworkConnector";
 import { AbstractDataBase } from "../models/abstractDBModel";
-import { Block } from "../objects/interfaces";
+import { Block, BlockData } from "../objects/interfaces";
 
-export abstract class AbstractScanner<DataT>{
+export abstract class AbstractScanner<DataT extends BlockData>{
     abstract _dataBase: AbstractDataBase<DataT>;
     abstract _networkAccess: AbstractNetworkConnector;
     abstract _initialHeight: number;
@@ -45,7 +45,7 @@ export abstract class AbstractScanner<DataT>{
                 for (height; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     const info = await this.getBlockInformation(block);
-                    if (block.parent_hash === lastSavedBlock?.hash) {
+                    if (block.parent_hash === lastSavedBlock?.hash && info.hash === block.hash) {
                         if (!await this._dataBase.saveBlock(block.block_height, block.hash, info)) {
                             break;
                         }
