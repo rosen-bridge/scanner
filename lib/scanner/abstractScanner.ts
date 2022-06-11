@@ -1,6 +1,6 @@
 import { AbstractNetworkConnector } from "../network/abstractNetworkConnector";
 import { AbstractDataBase } from "../models/abstractDBModel";
-import { Block, BlockData } from "../objects/interfaces";
+import { Block } from "../objects/interfaces";
 
 export abstract class AbstractScanner<DataT>{
     abstract _dataBase: AbstractDataBase<DataT>;
