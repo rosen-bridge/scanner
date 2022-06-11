@@ -15,10 +15,7 @@ export abstract class AbstractScanner<DataT>{
         const lastSavedBlock = await this._dataBase.getLastSavedBlock();
         if (lastSavedBlock !== undefined) {
             const lastSavedBlockFromNetwork = await this._networkAccess.getBlockAtHeight(lastSavedBlock.block_height);
-            return (
-                lastSavedBlockFromNetwork.hash !== lastSavedBlock.hash &&
-                lastSavedBlockFromNetwork.parent_hash !== lastSavedBlock.parent_hash
-            );
+            return (lastSavedBlockFromNetwork.hash !== lastSavedBlock.hash);
         } else {
             return false;
         }
@@ -48,7 +45,7 @@ export abstract class AbstractScanner<DataT>{
                 for (height; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     const info = await this.getBlockInformation(block);
-                    if (!await this.isForkHappen()) {
+                    if (block.parent_hash === lastSavedBlock?.hash) {
                         if (!await this._dataBase.saveBlock(block.block_height, block.hash, info)) {
                             break;
                         }
