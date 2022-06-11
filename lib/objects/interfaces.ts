@@ -6,4 +6,5 @@ export interface Block{
 
 export interface BlockData{
     hash: string,
+    parent_hash: string,
 }

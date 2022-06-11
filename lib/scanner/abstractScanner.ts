@@ -45,7 +45,7 @@ export abstract class AbstractScanner<DataT extends BlockData>{
                 for (height; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     const info = await this.getBlockInformation(block);
-                    if (block.parent_hash === lastSavedBlock?.hash && info.hash === block.hash) {
+                    if (info.parent_hash === lastSavedBlock?.hash) {
                         if (!await this._dataBase.saveBlock(block.block_height, block.hash, info)) {
                             break;
                         }
