@@ -1,0 +1,10 @@
+{
+  "cardano": {
+    "interval": 10,
+    "initialBlockHeight": 3471392,
+    "timeout": 10000,
+    "node": {
+      "URL": "https://testnet.koios.rest/api/v0"
+    }
+  }
+}
