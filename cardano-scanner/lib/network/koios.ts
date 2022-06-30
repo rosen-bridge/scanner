@@ -1,9 +1,8 @@
 import axios from "axios";
 import { Tx, TxMetaData, Utxo } from "./apiModels";
 
-import { Block } from "blockchain-scanner/lib";
 import { Config } from "../config/Config";
-import { AbstractNetworkConnector } from "blockchain-scanner/lib";
+import { AbstractNetworkConnector, Block } from "../../../dist/lib";
 
 const cardanoConfig = Config.getConfig();
 const URL = cardanoConfig.koiosURL;

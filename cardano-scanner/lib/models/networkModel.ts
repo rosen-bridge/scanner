@@ -3,8 +3,9 @@ import { BlockEntity } from "../entities/BlockEntity";
 import { CommitmentEntity, txStatus } from "../entities/CommitmentEntity";
 import { ObservationEntity } from "../entities/ObservationEntity";
 import { Commitment, Observation } from "../objects/interfaces";
-import { AbstractDataBase } from "blockchain-scanner/lib";
-import { Block } from "blockchain-scanner/lib";
+// import { AbstractDataBase } from "blockchain-scanner/lib";
+// import { Block } from "blockchain-scanner/lib";
+import { AbstractDataBase, Block } from "../../../dist/lib";
 
 export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
     dataSource: DataSource;
@@ -13,7 +14,7 @@ export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
     observationRepository: Repository<ObservationEntity>;
 
     private constructor(dataSource: DataSource) {
-        super()
+        super();
         this.dataSource = dataSource;
         this.blockRepository = this.dataSource.getRepository(BlockEntity);
         this.commitmentRepository = this.dataSource.getRepository(CommitmentEntity);

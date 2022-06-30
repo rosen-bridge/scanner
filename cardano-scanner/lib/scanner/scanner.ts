@@ -5,7 +5,7 @@ import { cardanoOrmConfig } from "../../config/ormconfig";
 import { NetworkDataBase } from "../models/networkModel";
 import { Block, Observation } from "../objects/interfaces";
 import { Config } from "../config/Config";
-import { AbstractScanner } from "blockchain-scanner/lib";
+import { AbstractScanner } from "../../../dist/lib";
 
 const cardanoConfig = Config.getConfig();
 
