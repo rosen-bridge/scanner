@@ -1,0 +1,29 @@
+{
+  "name": "bridge-scanner",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/config": "^0.0.41",
+    "@types/node": "^18.0.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "blockchain-scanner": "file:../abstract-scanner",
+    "config": "^3.3.7",
+    "ergo-lib-wasm-nodejs": "^0.17.0",
+    "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.0.8",
+    "typeorm": "^0.3.7"
+  }
+}
