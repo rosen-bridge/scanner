@@ -7,7 +7,7 @@ import { BridgeBlockInformation } from "../scanner/scanner";
 import { AbstractDataBase, Block } from "blockchain-scanner/dist/lib";
 
 
-export class BridgeDataBase extends AbstractDataBase<BridgeBlockEntity, BridgeBlockInformation> {
+export class BridgeDataBase extends AbstractDataBase<BridgeBlockInformation>{
     dataSource: DataSource
     blockRepository: Repository<BridgeBlockEntity>
     commitmentRepository: Repository<ObservedCommitmentEntity>
@@ -48,7 +48,7 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockEntity, BridgeBl
             take: 1
         });
         if (lastBlock.length !== 0) {
-            return {hash: lastBlock[0].hash, block_height: lastBlock[0].height};
+            return {hash: lastBlock[0].hash, block_height: lastBlock[0].height, parent_hash: lastBlock[0].parentHash};
         } else {
             return undefined;
         }
@@ -69,15 +69,17 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockEntity, BridgeBl
      * save blocks with observation of that block
      * @param height
      * @param blockHash
+     * @param parentHash
      * @param information
      * @return Promise<boolean>
      */
-    saveBlock = async (height: number, blockHash: string, information: BridgeBlockInformation): Promise<boolean> => {
+    saveBlock = async (height: number, blockHash: string, parentHash: string, information: BridgeBlockInformation): Promise<boolean> => {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         const block = new BridgeBlockEntity();
         block.height = height;
         block.hash = blockHash;
+        block.parentHash = parentHash;
         const commitmentsEntity = information.newCommitments
             .map((commitment) => {
                 const commitmentEntity = new ObservedCommitmentEntity();
@@ -159,7 +161,7 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockEntity, BridgeBl
             height: height,
         });
         if (blockHash !== null) {
-            return {hash: blockHash.hash, block_height: blockHash.height};
+            return {hash: blockHash.hash, block_height: blockHash.height, parent_hash: blockHash.parentHash};
         } else {
             return undefined;
         }

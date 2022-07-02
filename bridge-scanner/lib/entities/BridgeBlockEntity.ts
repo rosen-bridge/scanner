@@ -13,6 +13,12 @@ export class BridgeBlockEntity {
     })
     hash: string
 
+    @Column({
+        length: 64,
+        unique: true
+    })
+    parentHash: string
+
     @OneToMany(
         "ObservedCommitmentEntity",
         "block",

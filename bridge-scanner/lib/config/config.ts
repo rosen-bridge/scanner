@@ -8,6 +8,8 @@ const EXPLORER_URL: string | undefined = config.get?.('ergo.explorerUrl');
 const NODE_URL: string | undefined = config.get?.('ergo.nodeUrl');
 const ERGO_EXPLORER_TIMEOUT: number | undefined = config.get?.('ergo.explorerTimeout');
 const ERGO_NODE_TIMEOUT: number | undefined = config.get?.('ergo.nodeTimeout');
+const RWT_ID: string | undefined = config.get?.('ergo.RWTId');
+
 
 export class ErgoConfig{
     private static instance: ErgoConfig;
@@ -19,6 +21,8 @@ export class ErgoConfig{
     commitmentInitialHeight: number;
     commitmentHeightLimit: number;
     cleanupConfirmation: number;
+    RWTId: string;
+
 
     private constructor() {
         if (EXPLORER_URL === undefined) {
@@ -45,6 +49,9 @@ export class ErgoConfig{
         if (ERGO_NODE_TIMEOUT === undefined) {
             throw new Error("Ergo node timeout doesn't set correctly");
         }
+        if (RWT_ID === undefined) {
+            throw new Error("RWTId doesn't set in config file");
+        }
 
         this.explorerUrl = EXPLORER_URL;
         this.nodeUrl = NODE_URL;
@@ -54,6 +61,8 @@ export class ErgoConfig{
         this.commitmentInitialHeight = COMMITMENT_INITIAL_HEIGHT;
         this.commitmentHeightLimit = COMMITMENT_HEIGHT_LIMIT;
         this.cleanupConfirmation = CLEANUP_CONFIRMATION;
+        this.RWTId = RWT_ID;
+
     }
 
     static getConfig() {

@@ -13,12 +13,13 @@ export const nodeApi = axios.create({
 export class ErgoNetworkApi extends AbstractNetworkConnector{
     getBlockAtHeight = (height: number): Promise<Block> => {
         return nodeApi.get<Array<{ id: string }>>(
-            `/blocks/chainSlice`, {params: {fromHeight: height, toHeight: height}}
+            `/blocks/chainSlice`, {params: {fromHeight: height - 2, toHeight: height}}
         ).then(
             res => {
                 return {
-                    hash: res.data[0].id,
-                    block_height: height
+                    hash: res.data[1].id,
+                    block_height: height,
+                    parent_hash: res.data[0].id,
                 }
             }
         )
