@@ -3,9 +3,9 @@ import { CardanoUtils } from "./utils";
 import config, { IConfig } from "config";
 import { cardanoOrmConfig } from "../../config/ormconfig";
 import { NetworkDataBase } from "../models/networkModel";
-import { Block, Observation } from "../objects/interfaces";
+import { Observation } from "../objects/interfaces";
 import { Config } from "../config/Config";
-import { AbstractScanner } from "../../../dist/lib";
+import { AbstractScanner, Block } from "blockchain-scanner/dist/lib";
 
 const cardanoConfig = Config.getConfig();
 
@@ -21,6 +21,18 @@ export class Scanner extends AbstractScanner<Array<Observation>>{
         this._networkAccess = network;
         this._config = config;
         this._initialHeight = cardanoConfig.initialHeight;
+    }
+
+    first = async () => {
+        const block = await this._networkAccess.getBlockAtHeight(this._initialHeight);
+        const info = await this.getBlockInformation(block);
+        await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info);
+    }
+
+    updateRunner = (interval: number) => {
+        setTimeout(() => {
+            this.update(interval)
+        }, interval * 1000);
     }
 
     /**
@@ -41,5 +53,5 @@ export const main = async () => {
     const DB = await NetworkDataBase.init(cardanoOrmConfig);
     const koiosNetwork = new KoiosNetwork();
     const scanner = new Scanner(DB, koiosNetwork, config);
-    setInterval(scanner.update, cardanoConfig.interval * 1000);
+    scanner.updateRunner(cardanoConfig.interval)
 }

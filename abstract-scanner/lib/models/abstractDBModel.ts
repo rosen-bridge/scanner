@@ -2,6 +2,9 @@ import { Block } from "../objects/interfaces";
 
 export abstract class AbstractDataBase<DataT>{
 
+    protected constructor() {
+    }
+
     /**
      * get last saved block
      * @return Promise<Block or undefined>
@@ -22,7 +25,7 @@ export abstract class AbstractDataBase<DataT>{
      * @param data
      * @return Promise<boolean>
      */
-    abstract saveBlock(height: number, blockHash: string, data: DataT): Promise<boolean>;
+    abstract saveBlock(height: number, blockHash: string, parent_hash: string, data: DataT): Promise<boolean>;
 
     /**
      * get block hash and height

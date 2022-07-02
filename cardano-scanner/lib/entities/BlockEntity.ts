@@ -12,6 +12,12 @@ export class BlockEntity {
     })
     hash: string
 
+    @Column({
+        length: 64,
+        unique: true
+    })
+    parentHash: string
+
     @OneToMany(
         "ObservationEntity",
         "block",

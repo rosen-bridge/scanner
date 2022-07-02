@@ -1,3 +1,1 @@
-import { commitmentMain } from "./scanner/scanner";
-
-commitmentMain()
+export { commitmentMain } from "./scanner/scanner";

@@ -2,7 +2,7 @@ import axios from "axios";
 import { Tx, TxMetaData, Utxo } from "./apiModels";
 
 import { Config } from "../config/Config";
-import { AbstractNetworkConnector, Block } from "../../../dist/lib";
+import { AbstractNetworkConnector, Block } from "blockchain-scanner/dist/lib";
 
 const cardanoConfig = Config.getConfig();
 const URL = cardanoConfig.koiosURL;
@@ -14,13 +14,24 @@ export const koios = axios.create({
 });
 
 export class KoiosNetwork extends AbstractNetworkConnector{
-    getBlockAtHeight = (height: number): Promise<Block> => {
-        return koios.get<Array<Block>>(
+    constructor() {
+        super();
+    }
+
+    getBlockAtHeight = async (height: number): Promise<Block> => {
+        const currentBlock = await koios.get<Array<Block>>(
             '/blocks',
             {params: {block_height: `eq.${height}`, select: 'hash,block_height'}}
         ).then(
             res => res.data[0]
-        )
+        );
+        const parentBlock = await koios.get<Array<Block>>(
+            '/blocks',
+            {params: {block_height: `eq.${height - 1}`, select: 'hash,block_height'}}
+        ).then(
+            res => res.data[0]
+        );
+        return {hash: currentBlock.hash, block_height: currentBlock.block_height, parent_hash: parentBlock.hash}
     }
 
     getCurrentHeight = (): Promise<number> => {

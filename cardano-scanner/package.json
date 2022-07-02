@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "start" : "npm run build && node dist/lib/index.js",
+    "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,7 @@
     "blockchain-scanner": "file:../abstract-scanner",
     "config": "^3.3.7",
     "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.0.8",
     "typeorm": "^0.3.7"
   }
 }

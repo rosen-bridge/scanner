@@ -3,9 +3,8 @@ import { BlockEntity } from "../entities/BlockEntity";
 import { CommitmentEntity, txStatus } from "../entities/CommitmentEntity";
 import { ObservationEntity } from "../entities/ObservationEntity";
 import { Commitment, Observation } from "../objects/interfaces";
-// import { AbstractDataBase } from "blockchain-scanner/lib";
-// import { Block } from "blockchain-scanner/lib";
-import { AbstractDataBase, Block } from "../../../dist/lib";
+import { AbstractDataBase, Block } from "blockchain-scanner/dist/lib";
+
 
 export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
     dataSource: DataSource;
@@ -48,7 +47,7 @@ export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
             take: 1
         });
         if (lastBlock.length !== 0) {
-            return {hash: lastBlock[0].hash, block_height: lastBlock[0].height, parent_hash:"todo"};
+            return {hash: lastBlock[0].hash, block_height: lastBlock[0].height, parent_hash: lastBlock[0].parentHash};
         } else {
             return undefined;
         }
@@ -69,15 +68,17 @@ export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
      * save blocks with observation of that block
      * @param height
      * @param blockHash
+     * @param parentHash
      * @param observations
      * @return Promise<boolean>
      */
-    saveBlock = async (height: number, blockHash: string, observations: Array<Observation>): Promise<boolean> => {
+    saveBlock = async (height: number, blockHash: string, parentHash: string, observations: Array<Observation>): Promise<boolean> => {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         const block = new BlockEntity();
         block.height = height;
         block.hash = blockHash;
+        block.parentHash = parentHash;
         const observationsEntity = observations
             .map((observation) => {
                 const observationEntity = new ObservationEntity();
@@ -121,7 +122,7 @@ export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
             height: height,
         });
         if (blockHash !== null) {
-            return {hash: blockHash.hash, block_height: blockHash.height, parent_hash:"todo"};
+            return {hash: blockHash.hash, block_height: blockHash.height, parent_hash: blockHash.parentHash};
         } else {
             return undefined;
         }

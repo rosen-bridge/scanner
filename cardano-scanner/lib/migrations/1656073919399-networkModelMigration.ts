@@ -18,7 +18,8 @@ export class networkModelMigration1656073919399 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "block_entity" 
                 (
                     "height" integer PRIMARY KEY NOT NULL, 
-                    "hash" varchar(64) NOT NULL, 
+                    "hash" varchar(64) NOT NULL,
+                    "parentHash" varchar(64) NOT NULL, 
                     CONSTRAINT "UQ_57845dc6f88ffe08c94ea1a6aba" UNIQUE ("hash")
                 )`
         );

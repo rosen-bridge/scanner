@@ -7,6 +7,9 @@ export abstract class AbstractScanner<DataT>{
     abstract _networkAccess: AbstractNetworkConnector;
     abstract _initialHeight: number;
 
+    protected constructor() {
+    }
+
     /**
      * function that checks if fork is happen in the blockchain or not
      * @return Promise<Boolean>
@@ -23,35 +26,42 @@ export abstract class AbstractScanner<DataT>{
 
     abstract getBlockInformation(block: Block): Promise<DataT>;
 
+    abstract first(): Promise<void>;
+
+    abstract updateRunner(interval: number): void;
+
     /**
      * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
      * scenario in the blockchain and invalidate the database till the database synced again.
      */
-    update = async () => {
+    update = async (interval: number) => {
         try {
-            const lastSavedBlock = (await this._dataBase.getLastSavedBlock());
+            let lastSavedBlock = (await this._dataBase.getLastSavedBlock());
+            if (lastSavedBlock === undefined) {
+                await this.first();
+                this.updateRunner(interval);
+                return;
+            }
             if (!await this.isForkHappen()) {
                 const lastBlockHeight = await this._networkAccess.getCurrentHeight()
-                let height = null;
-                if (lastSavedBlock !== undefined) {
-                    height = lastSavedBlock.block_height + 1;
-                } else {
-                    if (this._initialHeight > lastBlockHeight) {
-                        console.log("scanner initial height is more than current block height!");
-                        return;
-                    }
-                    height = this._initialHeight;
+                if (this._initialHeight > lastBlockHeight) {
+                    console.log("scanner initial height is more than current block height!");
+                    this.updateRunner(interval);
+                    return;
                 }
+                let height = null;
+                height = lastSavedBlock.block_height + 1;
                 for (height; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     if (block.parent_hash === lastSavedBlock?.hash) {
                         const info = await this.getBlockInformation(block);
-                        if (!await this._dataBase.saveBlock(block.block_height, block.hash, info)) {
+                        if (!await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info)) {
                             break;
                         }
                     } else {
                         break;
                     }
+                    lastSavedBlock = (await this._dataBase.getLastSavedBlock());
                 }
             } else {
                 let forkPointer = lastSavedBlock!;
@@ -70,6 +80,7 @@ export abstract class AbstractScanner<DataT>{
         } catch (e) {
             console.log(e)
         }
+        this.updateRunner(interval);
     }
 
 }
