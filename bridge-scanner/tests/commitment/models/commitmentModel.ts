@@ -37,7 +37,7 @@ const thirdCommitment: Commitment = {
     commitmentBoxId: "a18dc1f812aa156037c47db5bd7fc9ef85646c97a1abb76b30045b8e5f7e31e2"
 }
 
-const firstPermitBox: SpecialBox = {
+export const firstPermitBox: SpecialBox = {
     boxId: "cea4dacf032e7e152ea0a5029fe6a84d685d22f42f7137ef2735ce90663192d7",
     type: BoxType.PERMIT,
     value: "10000000",
@@ -51,7 +51,7 @@ const secondPermitBox: SpecialBox = {
     boxJson: "fakeSample"
 }
 
-const firstWIDBox: SpecialBox ={
+export const firstWIDBox: SpecialBox ={
     boxId: "cd0e9ad2ae564768bc6bf74a350934117040686fd267f313fce27d7df00fe549",
     type: BoxType.WID,
     value: "100000000",
