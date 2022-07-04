@@ -28,37 +28,34 @@ export abstract class AbstractScanner<DataT>{
 
     abstract first(): Promise<void>;
 
-    abstract updateRunner(interval: number): void;
-
     /**
      * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
      * scenario in the blockchain and invalidate the database till the database synced again.
      */
-    update = async (interval: number) => {
+    update = async () => {
         try {
             let lastSavedBlock = (await this._dataBase.getLastSavedBlock());
             if (lastSavedBlock === undefined) {
                 await this.first();
-                this.updateRunner(interval);
                 return;
             }
             if (!await this.isForkHappen()) {
                 const lastBlockHeight = await this._networkAccess.getCurrentHeight()
-                if (this._initialHeight > lastBlockHeight) {
+                if (this._initialHeight >= lastBlockHeight) {
                     console.log("scanner initial height is more than current block height!");
-                    this.updateRunner(interval);
                     return;
                 }
-                let height = null;
-                height = lastSavedBlock.block_height + 1;
-                for (height; height <= lastBlockHeight; height++) {
+                console.log("last block height is", lastBlockHeight)
+                for (let height = lastSavedBlock.block_height + 1; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     if (block.parent_hash === lastSavedBlock?.hash) {
                         const info = await this.getBlockInformation(block);
                         if (!await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info)) {
+                            console.log("can't get this");
                             break;
                         }
                     } else {
+                        console.log("can't get that")
                         break;
                     }
                     lastSavedBlock = (await this._dataBase.getLastSavedBlock());
@@ -80,7 +77,6 @@ export abstract class AbstractScanner<DataT>{
         } catch (e) {
             console.log(e)
         }
-        this.updateRunner(interval);
     }
 
 }

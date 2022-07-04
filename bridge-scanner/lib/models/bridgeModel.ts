@@ -1,7 +1,7 @@
 import { DataSource, DeleteResult, In, MoreThanOrEqual, Repository } from "typeorm";
-import { BridgeBlockEntity } from "../entities/BridgeBlockEntity";
-import { ObservedCommitmentEntity } from "../entities/ObservedCommitmentEntity";
-import { BoxEntity, BoxType } from "../entities/BoxEntity";
+import { BridgeBlockEntity } from "../entities/bridge/BridgeBlockEntity";
+import { ObservedCommitmentEntity } from "../entities/bridge/ObservedCommitmentEntity";
+import { BoxEntity, BoxType } from "../entities/bridge/BoxEntity";
 import { SpecialBox } from "../objects/interfaces";
 import { BridgeBlockInformation } from "../scanner/scanner";
 import { AbstractDataBase, Block } from "blockchain-scanner/dist/lib";

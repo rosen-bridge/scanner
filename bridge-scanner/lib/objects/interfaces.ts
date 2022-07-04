@@ -1,4 +1,4 @@
-import { BoxType } from "../entities/BoxEntity";
+import { BoxType } from "../entities/bridge/BoxEntity";
 
 export interface SpecialBox{
     boxId: string,

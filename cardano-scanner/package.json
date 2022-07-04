@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
-    "test": "mocha --slow 3000",
+    "test": "rm -rf ./sqlite && mocha --slow 3000 && rm -rf ./sqlite",
     "build": "tsc"
   },
   "author": "",

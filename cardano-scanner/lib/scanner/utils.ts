@@ -4,7 +4,7 @@ import { BANK } from "./bankAddress";
 import { Observation } from "../objects/interfaces";
 import { KoiosNetwork } from "../network/koios";
 
-export class CardanoUtils {
+export class CardanoUtils{
 
     /**
      * check if the object is the rosen bridge data type or not
@@ -49,10 +49,12 @@ export class CardanoUtils {
             if (this.isRosenMetaData(metaData) && this.isRosenData(metaData["0"])) {
                 if (utxos[0].asset_list.length !== 0) {
                     const asset = utxos[0].asset_list[0];
-                    const assetFingerprint = AssetFingerprint.fromParts(
-                        Buffer.from(asset.policy_id, 'hex'),
-                        Buffer.from(asset.asset_name, 'hex'),
-                    );
+                    // const assetFingerprint = "todo";
+                    // TODO: should completed after new update
+                    // const assetFingerprint = AssetFingerprint.fromParts(
+                    //     Buffer.from(asset.policy_id, 'hex'),
+                    //     Buffer.from(asset.asset_name, 'hex'),
+                    // );
                     const data = metaData["0"];
                     // TODO: Request id should be digest of tx id
                     return {
@@ -60,7 +62,8 @@ export class CardanoUtils {
                         toChain: data.to,
                         fee: data.fee,
                         amount: asset.quantity,
-                        sourceChainTokenId: assetFingerprint.fingerprint(),
+                        // sourceChainTokenId: assetFingerprint.fingerprint(),
+                        sourceChainTokenId: "todo",
                         targetChainTokenId: data.targetChainTokenId,
                         sourceTxId: txHash,
                         sourceBlockId: blockHash,

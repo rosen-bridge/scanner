@@ -8,13 +8,22 @@
   "scripts": {
     "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "typeorm": "typeorm-ts-node-esm",
+    "test": "rm -rf ./sqlite && mocha --slow 3000 && rm -rf ./sqlite"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.3.1",
+    "@types/chai-spies": "^1.0.3",
     "@types/config": "^0.0.41",
+    "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.0",
+    "axios-mock-adapter": "^1.21.1",
+    "chai": "^4.3.6",
+    "chai-spies": "^1.0.0",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.8.2",
     "typescript": "^4.7.4"
   },
   "dependencies": {

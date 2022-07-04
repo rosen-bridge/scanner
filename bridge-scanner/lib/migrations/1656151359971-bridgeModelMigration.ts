@@ -9,7 +9,8 @@ export class bridgeModelMigration1656151359971 implements MigrationInterface {
                     "height" integer PRIMARY KEY NOT NULL,
                      "hash" varchar(64) NOT NULL,
                      "parentHash" varchar(64) NOT NULL,
-                     CONSTRAINT "UQ_704f5c9eafd1fcabc287feb19cc" UNIQUE ("hash")
+                     CONSTRAINT "UQ_704f5c9eafd1fcabc287feb19cc" UNIQUE ("hash"),
+                     CONSTRAINT "UQ_403f5c9eafd1fcabc287feb19cc" UNIQUE ("parentHash")
                 )`
         );
         await queryRunner.query(`CREATE TABLE "box_entity" 

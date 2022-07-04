@@ -1,6 +1,6 @@
 import { BridgeDataBase } from "../models/bridgeModel";
 import config, { IConfig } from "config";
-import {  Commitment, SpecialBox } from "../objects/interfaces";
+import { Commitment, SpecialBox } from "../objects/interfaces";
 import { bridgeOrmConfig } from "../../config/ormconfig";
 import { ErgoNetworkApi } from "../network/networkApi";
 import { CommitmentUtils } from "./utils";
@@ -20,14 +20,12 @@ export type BridgeBlockInformation = {
 export class Scanner extends AbstractScanner<BridgeBlockInformation>{
     _dataBase: BridgeDataBase;
     _networkAccess: ErgoNetworkApi;
-    _config: IConfig;
     _initialHeight: number;
 
-    constructor(db: BridgeDataBase, network: ErgoNetworkApi, config: IConfig) {
+    constructor(db: BridgeDataBase, network: ErgoNetworkApi) {
         super();
         this._dataBase = db;
         this._networkAccess = network;
-        this._config = config;
         this._initialHeight = ergoConfig.commitmentInitialHeight;
     }
 
@@ -68,12 +66,6 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
         await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info);
     }
 
-    updateRunner = (interval: number) => {
-        setTimeout(() => {
-            this.update(interval)
-        }, interval * 1000);
-    }
-
 }
 
 /**
@@ -82,7 +74,5 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
 export const commitmentMain = async () => {
     const DB = await BridgeDataBase.init(bridgeOrmConfig);
     const apiNetwork = new ErgoNetworkApi();
-    const scanner = new Scanner(DB, apiNetwork, config);
-    scanner.updateRunner(ergoConfig.commitmentInterval)
-    setInterval(scanner.removeOldCommitments, ergoConfig.commitmentInterval * 1000);
+    return new Scanner(DB, apiNetwork);
 }
