@@ -1,6 +1,5 @@
 import { KoiosNetwork } from "../network/koios";
 import { CardanoUtils } from "./utils";
-import config, { IConfig } from "config";
 import { cardanoOrmConfig } from "../../config/ormconfig";
 import { NetworkDataBase } from "../models/networkModel";
 import { Observation } from "../objects/interfaces";
@@ -21,6 +20,9 @@ export class Scanner extends AbstractScanner<Array<Observation>>{
         this._initialHeight = cardanoConfig.initialHeight;
     }
 
+    /**
+     * writing in database for the first run
+     */
     first = async () => {
         const block = await this._networkAccess.getBlockAtHeight(this._initialHeight);
         const info = await this.getBlockInformation(block);

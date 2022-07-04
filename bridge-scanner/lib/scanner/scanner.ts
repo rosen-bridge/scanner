@@ -1,5 +1,4 @@
 import { BridgeDataBase } from "../models/bridgeModel";
-import config, { IConfig } from "config";
 import { Commitment, SpecialBox } from "../objects/interfaces";
 import { bridgeOrmConfig } from "../../config/ormconfig";
 import { ErgoNetworkApi } from "../network/networkApi";
@@ -60,6 +59,9 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
         await this._dataBase.deleteCommitments(commitments.map(commitment => commitment.commitmentBoxId))
     }
 
+    /**
+     * writing in database for the first run
+     */
     first = async () => {
         const block = await this._networkAccess.getBlockAtHeight(this._initialHeight);
         const info = await this.getBlockInformation(block);
