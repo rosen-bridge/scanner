@@ -10,6 +10,7 @@ stages:
 cache:
   paths:
     - cardano-scanner/node_modules/
+    - bridge-scanner/node_modules/
     - abstract-scanner/dist
 
 abstract_scanner:
