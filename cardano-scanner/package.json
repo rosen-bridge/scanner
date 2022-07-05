@@ -8,6 +8,7 @@
   "scripts": {
     "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
     "test": "rm -rf ./sqlite && mocha --slow 3000 && rm -rf ./sqlite",
+    "coverage": "c8 npm run test",
     "build": "tsc"
   },
   "author": "",
@@ -18,6 +19,7 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.0",
     "axios-mock-adapter": "^1.21.1",
+    "c8": "^7.11.3",
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
     "ts-node": "^10.8.1",

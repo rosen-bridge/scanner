@@ -8,7 +8,6 @@
   "scripts": {
     "start": "npm run build && node --experimental-specifier-resolution=node dist/lib/index.js",
     "build": "tsc",
-    "typeorm": "typeorm-ts-node-esm",
     "test": "rm -rf ./sqlite && mocha --slow 3000 && rm -rf ./sqlite"
   },
   "author": "",

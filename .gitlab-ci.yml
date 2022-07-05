@@ -1,0 +1,25 @@
+image: node:latest
+
+stages:
+  - cardano-scanner-installation
+  - cardano-scannner-test
+
+cache:
+  paths:
+    - cardano-scanner/node_modules/
+
+install_dependencies:
+  stage: cardano-scanner-installation
+  script:
+    - cd ./cardano-scanner
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
+cardano-scannner-test:
+  script:
+    - cd ./cardano-scanner
+    - npm run coverage
+  artifacts:
+    reports:
+      cobertura: coverage/cobertura-coverage.xml

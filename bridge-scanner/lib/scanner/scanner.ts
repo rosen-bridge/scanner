@@ -71,7 +71,7 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
 }
 
 /**
- * main function that runs every `SCANNER_INTERVAL` time that sets in the config
+ * return scanner objects that can used to run scanner update function
  */
 export const commitmentMain = async () => {
     const DB = await BridgeDataBase.init(bridgeOrmConfig);
