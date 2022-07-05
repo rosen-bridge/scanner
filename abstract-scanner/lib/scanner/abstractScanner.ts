@@ -42,20 +42,16 @@ export abstract class AbstractScanner<DataT>{
             if (!await this.isForkHappen()) {
                 const lastBlockHeight = await this._networkAccess.getCurrentHeight()
                 if (this._initialHeight >= lastBlockHeight) {
-                    console.log("scanner initial height is more than current block height!");
                     return;
                 }
-                console.log("last block height is", lastBlockHeight)
                 for (let height = lastSavedBlock.block_height + 1; height <= lastBlockHeight; height++) {
                     const block = await this._networkAccess.getBlockAtHeight(height);
                     if (block.parent_hash === lastSavedBlock?.hash) {
                         const info = await this.getBlockInformation(block);
                         if (!await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info)) {
-                            console.log("can't get this");
                             break;
                         }
                     } else {
-                        console.log("can't get that")
                         break;
                     }
                     lastSavedBlock = (await this._dataBase.getLastSavedBlock());
