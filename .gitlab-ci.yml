@@ -16,6 +16,7 @@ abstract_scanner:
   stage: build-abstract-scanner
   script:
     - cd ./abstract-scanner
+    - npm run install
     - npm run build
 
 install_cardano_scanner_dependencies:
