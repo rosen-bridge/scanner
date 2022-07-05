@@ -17,6 +17,7 @@ install_dependencies:
     paths:
       - node_modules/
 cardano-scannner-test:
+  stage: cardano-scannner-test
   script:
     - cd ./cardano-scanner
     - npm run coverage
