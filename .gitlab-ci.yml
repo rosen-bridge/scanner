@@ -43,7 +43,7 @@ install_bridge_scanner_dependencies:
     paths:
       - node_modules/
 bridge_scanner_test:
-  stage: bridge-scannner-test
+  stage: bridge-scanner-test
   script:
     - cd ./bridge-scanner
     - npm run coverage
