@@ -28,10 +28,12 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@types/json-bigint": "^1.0.1",
     "axios": "^0.27.2",
     "blockchain-scanner": "file:../abstract-scanner",
     "config": "^3.3.7",
     "ergo-lib-wasm-nodejs": "^0.17.0",
+    "json-bigint": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.8",
     "typeorm": "^0.3.7"

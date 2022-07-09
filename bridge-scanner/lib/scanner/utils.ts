@@ -1,11 +1,14 @@
 import { Commitment, SpecialBox } from "../objects/interfaces";
-import { decodeCollColl, decodeStr } from "../utils/utils";
+import { decodeCollColl, decodeStr, uint8ArrayToHex } from "../utils/utils";
 import { NodeOutputBox, NodeTransaction } from "../network/ergoApiModels";
 import { BridgeDataBase } from "../models/bridgeModel";
 import { Address } from "ergo-lib-wasm-nodejs";
 import { rosenConfig } from "../config/rosenConfig";
 import { ErgoConfig } from "../config/config";
 import { BoxType } from "../entities/bridge/BoxEntity";
+import * as wasm from "ergo-lib-wasm-nodejs";
+import { ErgoNetwork } from "../network/ErgoNetwork";
+
 
 const ergoConfig = ErgoConfig.getConfig();
 
@@ -92,7 +95,7 @@ export class CommitmentUtils{
         for (const tx of txs) {
             tx.outputs.forEach(box => {
                 // Adding new permit boxes
-                if(box.ergoTree === permitErgoTree &&
+                if (box.ergoTree === permitErgoTree &&
                     box.assets.length > 0 &&
                     box.assets[0].tokenId == ergoConfig.RWTId) {
                     specialBoxes.push({
@@ -145,5 +148,55 @@ export class CommitmentUtils{
         }
         return spentBoxes
     }
+
+    /**
+     * getting repoBox from network with tracking mempool transactions
+     */
+    static getRepoBox = async (): Promise<wasm.ErgoBox> => {
+        const repoAddress = wasm.Address.from_base58(rosenConfig.RWTRepoAddress);
+        const repoNFTID = wasm.TokenId.from_str(rosenConfig.repoNFTID);
+        return await ErgoNetwork.trackMemPool(
+            await ErgoNetwork.getBoxWithToken(
+                repoAddress,
+                repoNFTID.to_str()
+            )
+        )
+    }
+
+    /**
+     * it gets repoBox users list and find the corresponding wid to the watcher and
+     *  returns it's wid or in case of no permits return empty string
+     * @param userAddress
+     * @param users
+     */
+    static getWID = async (userAddress: wasm.Address, users: Array<Uint8Array>): Promise<string> => {
+        // TODO: This function hasn't good performance
+        const usersWID = users.map(async (id) => {
+            const wid = uint8ArrayToHex(id);
+            try {
+                await ErgoNetwork.getBoxWithToken(userAddress, wid,);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        });
+        for (const [i, userWID] of usersWID.entries()) {
+            if (await userWID) {
+                return uint8ArrayToHex(users[i])
+            }
+        }
+        return "";
+    }
+
+    //TODO
+    static getAddressWID = async (userAddress: wasm.Address="todo") => {
+        const repoBox = await CommitmentUtils.getRepoBox();
+        const R4 = repoBox.register_value(4);
+        if (R4) {
+            const users = R4.to_coll_coll_byte();
+            return await this.getWID(userAddress, users);
+        }
+    }
+
 }
 
