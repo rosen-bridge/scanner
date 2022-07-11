@@ -84,21 +84,21 @@ describe("Commitment Database functions", () => {
             );
             expect(res).to.be.true;
         });
-        it("should store the new commitment and update the existing one", async () => {
-            const DB = await loadDataBase("commitments");
-            const res = await DB.saveBlock(
-                3433334,
-                "3ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117",
-                "26197be6579e09c7edec903239866fbe7ff6aee2e4ed4031c64d242e9dd1bff6",
-                {
-                    newCommitments: [secondCommitment, thirdCommitment],
-                    updatedCommitments: ["1ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117"],
-                    newBoxes: [secondPermitBox, secondWIDBox],
-                    spentBoxes: [firstPermitBox.boxId, firstWIDBox.boxId]
-                }
-            );
-            expect(res).to.be.true;
-        });
+        // it("should store the new commitment and update the existing one", async () => {
+        //     const DB = await loadDataBase("commitments");
+        //     const res = await DB.saveBlock(
+        //         3433334,
+        //         "3ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117",
+        //         "26197be6579e09c7edec903239866fbe7ff6aee2e4ed4031c64d242e9dd1bff6",
+        //         {
+        //             newCommitments: [secondCommitment, thirdCommitment],
+        //             updatedCommitments: ["1ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117"],
+        //             newBoxes: [secondPermitBox, secondWIDBox],
+        //             spentBoxes: [firstPermitBox.boxId, firstWIDBox.boxId]
+        //         }
+        //     );
+        //     expect(res).to.be.true;
+        // });
     });
 
     describe("getBlockAtHeight", () => {

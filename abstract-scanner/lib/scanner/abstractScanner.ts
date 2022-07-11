@@ -26,7 +26,7 @@ export abstract class AbstractScanner<DataT>{
 
     abstract getBlockInformation(block: Block): Promise<DataT>;
 
-    abstract first(): Promise<void>;
+    abstract init(): Promise<void>;
 
     /**
      * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
@@ -36,7 +36,7 @@ export abstract class AbstractScanner<DataT>{
         try {
             let lastSavedBlock = (await this._dataBase.getLastSavedBlock());
             if (lastSavedBlock === undefined) {
-                await this.first();
+                await this.init();
                 return;
             }
             if (!await this.isForkHappen()) {

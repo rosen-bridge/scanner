@@ -23,7 +23,7 @@ export class Scanner extends AbstractScanner<Array<Observation>>{
     /**
      * writing in database for the first run
      */
-    first = async () => {
+    init = async () => {
         const block = await this._networkAccess.getBlockAtHeight(this._initialHeight);
         const info = await this.getBlockInformation(block);
         await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info);

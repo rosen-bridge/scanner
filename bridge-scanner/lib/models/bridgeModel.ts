@@ -103,15 +103,16 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockInformation>{
             })
 
         const updatedCommitmentEntities: Array<ObservedCommitmentEntity> = []
-        for (const boxId of information.updatedCommitments) {
+        for (const spentCommitment of information.updatedCommitments) {
             const oldCommitment = await this.commitmentRepository.findOne({
-                where: {commitmentBoxId: boxId}
+                where: {commitmentBoxId: spentCommitment.boxId}
             })
             const newCommitment = new ObservedCommitmentEntity()
             Object.assign(newCommitment, {
                 ...oldCommitment,
                 ...{
-                    spendBlock: block
+                    spendBlock: block,
+                    spendReason: spentCommitment.spendReason
                 }
             })
             updatedCommitmentEntities.push(newCommitment)

@@ -1,21 +1,23 @@
 import { BridgeDataBase } from "../models/bridgeModel";
-import { Commitment, SpecialBox } from "../objects/interfaces";
+import { Commitment, SpecialBox, SpentBox } from "../objects/interfaces";
 import { bridgeOrmConfig } from "../../config/ormconfig";
 import { ErgoNetworkApi } from "../network/networkApi";
-import { CommitmentUtils } from "./utils";
 import { ErgoConfig } from "../config/config";
 import { rosenConfig } from "../config/rosenConfig";
 import { AbstractScanner, Block } from "blockchain-scanner/dist/lib";
 import { NodeOutputBox, NodeTransaction } from "../network/ergoApiModels";
 import { Address } from "ergo-lib-wasm-nodejs";
-import { decodeCollColl, decodeStr } from "../utils/utils";
+import { decodeCollColl, decodeStr, uint8ArrayToHex } from "../utils/utils";
 import { BoxType } from "../entities/bridge/BoxEntity";
+import * as wasm from "ergo-lib-wasm-nodejs";
+import { ErgoNetwork } from "../network/ErgoNetwork";
+import { SpendReason } from "../entities/bridge/ObservedCommitmentEntity";
 
 const ergoConfig = ErgoConfig.getConfig();
 
 export type BridgeBlockInformation = {
     newCommitments: Array<Commitment>
-    updatedCommitments: Array<string>
+    updatedCommitments: Array<SpentBox>
     newBoxes: Array<SpecialBox>
     spentBoxes: Array<string>
 }
@@ -24,12 +26,14 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
     _dataBase: BridgeDataBase;
     _networkAccess: ErgoNetworkApi;
     _initialHeight: number;
+    _userAddress: wasm.Address;
 
     constructor(db: BridgeDataBase, network: ErgoNetworkApi) {
         super();
         this._dataBase = db;
         this._networkAccess = network;
         this._initialHeight = ergoConfig.commitmentInitialHeight;
+        this._userAddress = wasm.Address.from_base58(ergoConfig.watcherAddress);
     }
 
     /**
@@ -38,26 +42,26 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @return Promise<Array<BridgeBlockInformation>>
      */
     getBlockInformation = async (block: Block): Promise<BridgeBlockInformation> => {
-        const addressWID = await CommitmentUtils.getAddressWID();
+        const addressWID = await this.getAddressWID();
         if (!addressWID) {
             console.log("Watcher WID is not set, can not run watcher tasks.")
             throw new Error("WID not found")
         }
         const txs = await this._networkAccess.getBlockTxs(block.hash);
-        const newCommitments = (await CommitmentUtils.extractCommitments(txs))
-        const updatedCommitments = await CommitmentUtils.updatedCommitments(
+        const newCommitments = (await this.extractCommitments(txs))
+        const updatedCommitments = await this.updatedCommitments(
             txs,
             this._dataBase,
             newCommitments.map(commitment => commitment.commitmentBoxId)
         )
-        const newBoxes = await CommitmentUtils.extractSpecialBoxes(
+        const newBoxes = await this.extractSpecialBoxes(
             txs,
             rosenConfig.watcherPermitAddress,
             //TODO
             "todo",
             addressWID
         )
-        const spentBoxes = await CommitmentUtils.spentSpecialBoxes(
+        const spentBoxes = await this.spentSpecialBoxes(
             txs,
             this._dataBase,
             newBoxes.map(box => box.boxId)
@@ -71,19 +75,9 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
     }
 
     /**
-     * removes old spent bridge older than block height limit config
-     */
-    removeOldCommitments = async () => {
-        const heightLimit = ergoConfig.commitmentHeightLimit;
-        const currentHeight = await this._networkAccess.getCurrentHeight()
-        const commitments = await this._dataBase.getOldSpentCommitments(currentHeight - heightLimit)
-        await this._dataBase.deleteCommitments(commitments.map(commitment => commitment.commitmentBoxId))
-    }
-
-    /**
      * writing in database for the first run
      */
-    first = async () => {
+    init = async () => {
         const block = await this._networkAccess.getBlockAtHeight(this._initialHeight);
         const info = await this.getBlockInformation(block);
         await this._dataBase.saveBlock(block.block_height, block.hash, block.parent_hash, info);
@@ -96,8 +90,8 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @param commitmentAddresses
      * @return Promise<commitment>
      */
-    static checkTx = async (tx: NodeTransaction,
-                            commitmentAddresses: Array<string>):
+    checkTx = async (tx: NodeTransaction,
+                     commitmentAddresses: Array<string>):
         Promise<Commitment | undefined> => {
         const commitmentErgoTrees: Array<string> = commitmentAddresses.map(ad => Address.from_base58(ad).to_ergo_tree().to_base16_bytes())
         const commitment: NodeOutputBox = tx.outputs.filter((box) =>
@@ -123,7 +117,7 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @param txs
      * @return Promise<Array<(Commitment | undefined)>>
      */
-    static extractCommitments = async (txs: NodeTransaction[]): Promise<Array<Commitment>> => {
+    extractCommitments = async (txs: NodeTransaction[]): Promise<Array<Commitment>> => {
         const commitments: Array<Commitment> = []
         for (let i = 0; i < txs.length; i++) {
             const c = await this.checkTx(txs[i], [rosenConfig.commitmentAddress])
@@ -139,9 +133,9 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @param newCommitments
      * @return list of updated commitment box ids
      */
-    static updatedCommitments = async (txs: Array<NodeTransaction>,
-                                       database: BridgeDataBase,
-                                       newCommitments: Array<string>) => {
+    updatedCommitments = async (txs: Array<NodeTransaction>,
+                                database: BridgeDataBase,
+                                newCommitments: Array<string>) => {
         const eventTriggerErgoTree = Address.from_base58(rosenConfig.eventTriggerAddress).to_ergo_tree().to_base16_bytes()
         const updatedCommitments: Array<SpentBox> = []
         for (const tx of txs) {
@@ -149,7 +143,7 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
             const foundCommitments = (await database.findCommitmentsById(inputBoxIds)).map(commitment => commitment.commitmentBoxId)
             const newUpdatedCommitments = inputBoxIds.filter(boxId => newCommitments.includes(boxId))
             let reason: SpendReason = SpendReason.REDEEM
-            if(tx.outputs[0].ergoTree.toString() === eventTriggerErgoTree) reason = SpendReason.MERGE
+            if (tx.outputs[0].ergoTree.toString() === eventTriggerErgoTree) reason = SpendReason.MERGE
             foundCommitments.forEach(box => updatedCommitments.push({boxId: box, spendReason: reason}))
             newUpdatedCommitments.forEach(box => updatedCommitments.push({boxId: box, spendReason: reason}))
         }
@@ -163,17 +157,17 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @param watcherAddress
      * @param WID
      */
-    static extractSpecialBoxes = async (txs: Array<NodeTransaction>,
-                                        permitAddress: string,
-                                        watcherAddress: string,
-                                        WID: string): Promise<Array<SpecialBox>> => {
+    extractSpecialBoxes = async (txs: Array<NodeTransaction>,
+                                 permitAddress: string,
+                                 watcherAddress: string,
+                                 WID: string): Promise<Array<SpecialBox>> => {
         const specialBoxes: Array<SpecialBox> = []
         const permitErgoTree = Address.from_base58(permitAddress).to_ergo_tree().to_base16_bytes()
         const watcherErgoTree = Address.from_base58(watcherAddress).to_ergo_tree().to_base16_bytes()
         for (const tx of txs) {
             tx.outputs.forEach(box => {
                 // Adding new permit boxesSample
-                if(box.ergoTree === permitErgoTree &&
+                if (box.ergoTree === permitErgoTree &&
                     box.assets.length > 0 &&
                     box.assets[0].tokenId == ergoConfig.RWTId) {
                     specialBoxes.push({
@@ -213,9 +207,9 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
      * @param database
      * @param newBoxes
      */
-    static spentSpecialBoxes = async (txs: Array<NodeTransaction>,
-                                      database: BridgeDataBase,
-                                      newBoxes: Array<string>) => {
+    spentSpecialBoxes = async (txs: Array<NodeTransaction>,
+                               database: BridgeDataBase,
+                               newBoxes: Array<string>) => {
         let spentBoxes: Array<string> = []
         for (const tx of txs) {
             const inputBoxIds: string[] = tx.inputs.map(box => box.boxId)
@@ -227,6 +221,54 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
         return spentBoxes
     }
 
+    /**
+     * getting repoBox from network with tracking mempool transactions
+     */
+    getRepoBox = async (): Promise<wasm.ErgoBox> => {
+        const repoAddress = wasm.Address.from_base58(rosenConfig.RWTRepoAddress);
+        const repoNFTID = wasm.TokenId.from_str(rosenConfig.repoNFTID);
+        return await ErgoNetwork.trackMemPool(
+            await ErgoNetwork.getBoxWithToken(
+                repoAddress,
+                repoNFTID.to_str()
+            )
+        )
+    }
+
+    /**
+     * it gets repoBox users list and find the corresponding wid to the watcher and
+     *  returns it's wid or in case of no permits return empty string
+     * @param users
+     */
+    getWID = async (users: Array<Uint8Array>): Promise<string> => {
+        // TODO: This function hasn't good performance
+        const usersWID = users.map(async (id) => {
+            const wid = uint8ArrayToHex(id);
+            try {
+                await ErgoNetwork.getBoxWithToken(this._userAddress, wid,);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        });
+        for (const [i, userWID] of usersWID.entries()) {
+            if (await userWID) {
+                return uint8ArrayToHex(users[i])
+            }
+        }
+        return "";
+    }
+
+    //TODO
+    getAddressWID = async () => {
+        const repoBox = await this.getRepoBox();
+        const R4 = repoBox.register_value(4);
+        if (R4) {
+            const users = R4.to_coll_coll_byte();
+            return await this.getWID(users);
+        }
+    }
+
 }
 
 /**
@@ -235,5 +277,7 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
 export const commitmentMain = async () => {
     const DB = await BridgeDataBase.init(bridgeOrmConfig);
     const apiNetwork = new ErgoNetworkApi();
-    return new Scanner(DB, apiNetwork);
+    const scanner = new Scanner(DB, apiNetwork);
+    setInterval(scanner.update, 10000);
+    return scanner;
 }

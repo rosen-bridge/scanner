@@ -4,6 +4,7 @@ const COMMITMENT_INTERVAL: number | undefined = config.get?.('commitmentScanner.
 const COMMITMENT_INITIAL_HEIGHT: number | undefined = config.get?.('commitmentScanner.initialBlockHeight');
 const COMMITMENT_HEIGHT_LIMIT: number | undefined = config.get?.('commitmentScanner.heightLimit');
 const CLEANUP_CONFIRMATION: number | undefined = config.get?.('commitmentScanner.cleanupConfirmation');
+const WATCHER_ADDRESS: string | undefined = config.get?.('ergo.watcherAddress');
 const EXPLORER_URL: string | undefined = config.get?.('ergo.explorerUrl');
 const NODE_URL: string | undefined = config.get?.('ergo.nodeUrl');
 const ERGO_EXPLORER_TIMEOUT: number | undefined = config.get?.('ergo.explorerTimeout');
@@ -15,6 +16,7 @@ export class ErgoConfig{
     private static instance: ErgoConfig;
     explorerUrl: string;
     nodeUrl: string;
+    watcherAddress: string;
     nodeTimeout: number;
     explorerTimeout: number;
     commitmentInterval: number;
@@ -30,6 +32,9 @@ export class ErgoConfig{
         }
         if (NODE_URL === undefined) {
             throw new Error("Ergo Node Url is not set in the config");
+        }
+        if (WATCHER_ADDRESS === undefined) {
+            throw new Error("Watcher Address is not set in the config");
         }
         if (COMMITMENT_INTERVAL === undefined) {
             throw new Error("Commitment scanner interval doesn't set correctly");
@@ -55,6 +60,7 @@ export class ErgoConfig{
 
         this.explorerUrl = EXPLORER_URL;
         this.nodeUrl = NODE_URL;
+        this.watcherAddress = WATCHER_ADDRESS;
         this.explorerTimeout = ERGO_EXPLORER_TIMEOUT;
         this.nodeTimeout = ERGO_NODE_TIMEOUT;
         this.commitmentInterval = COMMITMENT_INTERVAL;

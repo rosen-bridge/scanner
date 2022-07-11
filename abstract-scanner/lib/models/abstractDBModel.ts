@@ -22,6 +22,7 @@ export abstract class AbstractDataBase<DataT>{
      * save blocks with observation of that block
      * @param height
      * @param blockHash
+     * @param parent_hash
      * @param data
      * @return Promise<boolean>
      */

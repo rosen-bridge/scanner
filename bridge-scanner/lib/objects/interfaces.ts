@@ -1,4 +1,5 @@
 import { BoxType } from "../entities/bridge/BoxEntity";
+import { SpendReason } from "../entities/bridge/ObservedCommitmentEntity";
 
 export interface SpecialBox{
     boxId: string,
@@ -12,4 +13,9 @@ export interface Commitment{
     commitment: string,
     WID: string,
     commitmentBoxId: string
+}
+
+export interface SpentBox{
+    boxId: string,
+    spendReason: SpendReason
 }
