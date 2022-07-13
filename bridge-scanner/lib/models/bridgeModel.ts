@@ -26,15 +26,8 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockInformation>{
      * database should be init before any use
      */
     static init = async (dataSource: DataSource) => {
-        await dataSource
-            .initialize()
-            .then(async () => {
-                await dataSource.runMigrations()
-                console.log("Data Source has been initialized!");
-            })
-            .catch((err) => {
-                console.error("Error during Data Source initialization:", err);
-            });
+        await dataSource.initialize()
+        await dataSource.runMigrations();
         return new BridgeDataBase(dataSource);
     }
 
