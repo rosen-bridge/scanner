@@ -57,8 +57,7 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
         const newBoxes = await this.extractSpecialBoxes(
             txs,
             rosenConfig.watcherPermitAddress,
-            //TODO
-            "todo",
+            this._userAddress.to_base58(ergoConfig.networkType),
             addressWID
         )
         const spentBoxes = await this.spentSpecialBoxes(
@@ -259,7 +258,6 @@ export class Scanner extends AbstractScanner<BridgeBlockInformation>{
         return "";
     }
 
-    //TODO
     getAddressWID = async () => {
         const repoBox = await this.getRepoBox();
         const R4 = repoBox.register_value(4);

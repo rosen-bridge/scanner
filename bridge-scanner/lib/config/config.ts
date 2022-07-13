@@ -1,5 +1,7 @@
 import config from "config";
+import * as wasm from "ergo-lib-wasm-nodejs";
 
+const NETWORK_TYPE: string | undefined = config.get?.('ergo.networkType');
 const COMMITMENT_INTERVAL: number | undefined = config.get?.('commitmentScanner.interval');
 const COMMITMENT_INITIAL_HEIGHT: number | undefined = config.get?.('commitmentScanner.initialBlockHeight');
 const COMMITMENT_HEIGHT_LIMIT: number | undefined = config.get?.('commitmentScanner.heightLimit');
@@ -14,6 +16,7 @@ const RWT_ID: string | undefined = config.get?.('ergo.RWTId');
 
 export class ErgoConfig{
     private static instance: ErgoConfig;
+    networkType: wasm.NetworkPrefix;
     explorerUrl: string;
     nodeUrl: string;
     watcherAddress: string;
@@ -27,6 +30,19 @@ export class ErgoConfig{
 
 
     private constructor() {
+        let networkType: wasm.NetworkPrefix = wasm.NetworkPrefix.Testnet;
+        switch (NETWORK_TYPE) {
+            case "Mainnet": {
+                networkType = wasm.NetworkPrefix.Mainnet;
+                break;
+            }
+            case "Testnet": {
+                break;
+            }
+            default: {
+                throw new Error("Network type doesn't set correctly in config file");
+            }
+        }
         if (EXPLORER_URL === undefined) {
             throw new Error("Ergo Explorer Url is not set in the config");
         }
@@ -58,6 +74,7 @@ export class ErgoConfig{
             throw new Error("RWTId doesn't set in config file");
         }
 
+        this.networkType = networkType;
         this.explorerUrl = EXPLORER_URL;
         this.nodeUrl = NODE_URL;
         this.watcherAddress = WATCHER_ADDRESS;

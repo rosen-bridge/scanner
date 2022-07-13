@@ -34,6 +34,7 @@ export class bridgeModelMigration1656151359971 implements MigrationInterface {
                     "eventId" varchar NOT NULL,
                     "commitment" varchar NOT NULL,
                     "WID" varchar NOT NULL,
+                    "spendReason" varchar,
                     "commitmentBoxId" varchar NOT NULL,
                     "eventTriggerBoxId" varchar,
                     "blockHeight" integer,
