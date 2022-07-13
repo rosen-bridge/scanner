@@ -35,7 +35,7 @@ cardano_scannner_test:
     - npm run coverage
   artifacts:
     reports:
-      cobertura: coverage/cobertura-coverage.xml
+      cobertura: cardano-scanner/coverage/cobertura-coverage.xml
 install_bridge_scanner_dependencies:
   stage: bridge-scanner-installation
   script:
@@ -51,4 +51,4 @@ bridge_scanner_test:
     - npm run coverage
   artifacts:
     reports:
-      cobertura: coverage/cobertura-coverage.xml
+      cobertura: bridge-scanner/coverage/cobertura-coverage.xml

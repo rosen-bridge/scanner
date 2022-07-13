@@ -136,16 +136,6 @@ describe("Scanner test", () => {
     });
     describe("checkTx", () => {
         // TODO: AssetFingerprint.fromParts
-        // it("should be observation", async () => {
-        //     const koiosNetwork = new KoiosNetwork();
-        //     const observation = await CardanoUtils.checkTx(
-        //         "cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa"
-        //         , "93395496d590ec6db0f2fd13a7bcf91e82a9f230ef677f6216ea8c9f57df6ab3"
-        //         , ["addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re"]
-        //         , koiosNetwork
-        //     );
-        //     expect(observation).to.be.eql(sampleObservation);
-        // });
         it("should be undefined", async () => {
             const DB = await loadDataBase("cardanoUtils");
             const koiosNetwork = new KoiosNetwork();
@@ -162,13 +152,5 @@ describe("Scanner test", () => {
     describe("observationAtHeight", () => {
         const koiosNetwork = new KoiosNetwork();
         // TODO: Should be fix AssetFingerprint.fromParts
-        // it("first index should be undefined and second be observation", async () => {
-        //     const observations = await CardanoUtils.observationsAtHeight(
-        //         "93395496d590ec6db0f2fd13a7bcf91e82a9f230ef677f6216ea8c9f57df6ab3"
-        //         , koiosNetwork
-        //     );
-        //     expect(observations.length).to.be.equal(1);
-        //     expect(observations[0]).to.be.eql(sampleObservation);
-        // });
     })
 });

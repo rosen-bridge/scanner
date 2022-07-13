@@ -242,7 +242,7 @@ describe("Scanner test", () => {
         });
     });
     describe("getAddressWID", () => {
-        it("wid", async () => {
+        it("should get repoBox correctly", async () => {
             const DB = await loadDataBase("scanner-test");
             const ergoNetwork = new ErgoNetworkApi();
             const scanner = new Scanner(DB, ergoNetwork);
