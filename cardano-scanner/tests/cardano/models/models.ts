@@ -14,7 +14,9 @@ export const loadDataBase = async (name: string): Promise<NetworkDataBase> => {
         migrations: migrations,
         logging: false,
     });
-    return await NetworkDataBase.init(ormConfig);
+    await ormConfig.initialize();
+    await ormConfig.runMigrations();
+    return new NetworkDataBase(ormConfig);
 }
 
 export const firstObservations: Array<Observation> = [{

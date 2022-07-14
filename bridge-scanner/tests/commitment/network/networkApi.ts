@@ -1,17 +1,28 @@
 import { expect } from "chai";
-import { ErgoNetworkApi, nodeApi } from "../../../lib/network/networkApi"
+import { ErgoNetworkApi } from "../../../lib/network/networkApi"
 import { describe } from "mocha";
 import MockAdapter from "axios-mock-adapter";
-
 import blockAtHeight from "../dataset/blockAtHeight.json" assert { type: "json" }
 import secondBlockAtHeight from "../dataset/secondBlockAtHeight.json" assert { type: "json" }
 import blockTxs from "../dataset/blockTxs.json" assert { type: "json" }
 import info from "../dataset/info.json" assert { type: "json" }
 import { mockedResponse } from "./mockedResponse";
-import { explorerApi } from "../../../lib/network/ErgoNetwork";
+import axios from "axios";
+import { sampleScannerConfig } from "../../../lib/config/sampleConfig";
+
+
+export const nodeApi = axios.create({
+    baseURL: sampleScannerConfig.nodeUrl,
+    timeout: sampleScannerConfig.nodeTimeout
+});
+
+export const explorerApi = axios.create({
+    baseURL: sampleScannerConfig.explorerUrl,
+    timeout: sampleScannerConfig.nodeTimeout
+});
 
 const mockedAxios = new MockAdapter(nodeApi);
-const ergoNetwork = new ErgoNetworkApi();
+const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
 
 const mockedErgoNetwork = new MockAdapter(explorerApi);
 

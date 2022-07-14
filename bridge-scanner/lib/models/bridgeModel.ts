@@ -13,22 +13,12 @@ export class BridgeDataBase extends AbstractDataBase<BridgeBlockInformation>{
     commitmentRepository: Repository<ObservedCommitmentEntity>
     boxesRepository: Repository<BoxEntity>
 
-    private constructor(dataSource: DataSource) {
+    constructor(dataSource: DataSource) {
         super()
         this.dataSource = dataSource;
         this.blockRepository = this.dataSource.getRepository(BridgeBlockEntity);
         this.commitmentRepository = this.dataSource.getRepository(ObservedCommitmentEntity);
         this.boxesRepository = this.dataSource.getRepository(BoxEntity);
-    }
-
-    /**
-     * init database connection & running migrations'
-     * database should be init before any use
-     */
-    static init = async (dataSource: DataSource) => {
-        await dataSource.initialize()
-        await dataSource.runMigrations();
-        return new BridgeDataBase(dataSource);
     }
 
     /**

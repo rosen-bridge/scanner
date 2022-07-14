@@ -14,8 +14,9 @@ export const loadDataBase = async (name: string): Promise<BridgeDataBase> => {
         synchronize: true,
         logging: false,
     });
-    return await BridgeDataBase.init(ormConfig);
-}
+    await ormConfig.initialize();
+    await ormConfig.runMigrations();
+    return new BridgeDataBase(ormConfig);}
 
 export const firstCommitment: Commitment = {
     WID: "f875d3b916e56056968d02018133d1c122764d5c70538e70e56199f431e95e9b",

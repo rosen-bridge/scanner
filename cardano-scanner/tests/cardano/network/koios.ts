@@ -1,10 +1,12 @@
 import { expect } from "chai";
 import { KoiosNetwork } from "../../../lib/network/koios";
+import { koios } from "../objects/koiosAxios";
+import { sampleConfig } from "../../../lib/config/sampleConfig";
 
 describe("Koios Apis", () => {
     describe("getBlockAtHeight", () => {
         it("Should return a json with hash and block_height field", async () => {
-            const koiosNetwork = new KoiosNetwork();
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
             const data = await koiosNetwork.getBlockAtHeight(3433333);
             expect(data).to.eql({
                 "hash": "26197be6579e09c7edec903239866fbe7ff6aee2e4ed4031c64d242e9dd1bff6",
@@ -15,7 +17,7 @@ describe("Koios Apis", () => {
     });
     describe("getBlock", () => {
         it("get the last block offset=0 and limit=1", async () => {
-            const koiosNetwork = new KoiosNetwork();
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
             const data = await koiosNetwork.getCurrentHeight();
             expect(data).to.equal(3433334);
         });
@@ -23,7 +25,7 @@ describe("Koios Apis", () => {
     });
     describe("getBlockTxs", () => {
         it("get the block transactions with block hash", async () => {
-            const koiosNetwork = new KoiosNetwork();
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
             const data = await koiosNetwork.getBlockTxs(
                 "26197be6579e09c7edec903239866fbe7ff6aee2e4ed4031c64d242e9dd1bff6"
             );
@@ -41,7 +43,7 @@ describe("Koios Apis", () => {
     });
     describe("getTxUtxos", () => {
         it("get one tx utxos", async () => {
-            const koiosNetwork = new KoiosNetwork();
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
             const data = await koiosNetwork.getTxUtxos(["cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa"]);
             expect(data).to.be.eql(
                 [{
@@ -89,7 +91,7 @@ describe("Koios Apis", () => {
     });
     describe("getTxMetaData", () => {
         it("get one tx metaData", async () => {
-            const koiosNetwork = new KoiosNetwork();
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
             const data = await koiosNetwork.getTxMetaData(["cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa"]);
             expect(data[0]).to.be.eql({
                 "tx_hash": "cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa",

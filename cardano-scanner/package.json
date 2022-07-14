@@ -15,7 +15,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/chai": "^4.3.1",
-    "@types/config": "^0.0.41",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.0",
     "axios-mock-adapter": "^1.21.1",
@@ -29,7 +28,6 @@
     "@emurgo/cip14-js": "^3.0.1",
     "axios": "^0.27.2",
     "blockchain-scanner": "file:../abstract-scanner",
-    "config": "^3.3.7",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.8",
     "typeorm": "^0.3.7"

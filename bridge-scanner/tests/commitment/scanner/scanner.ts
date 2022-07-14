@@ -9,18 +9,21 @@ import { ErgoNetworkApi } from "../../../lib/network/networkApi";
 import { NodeTransaction } from "../../../lib/network/ergoApiModels";
 import tx from "../dataset/tx.json" assert { type: "json" };
 import commitmentTx from "../dataset/commitmentTx.json" assert { type: "json" };
-import { ErgoConfig } from "../../../lib/config/config";
 import { BoxType } from "../../../lib/entities/bridge/BoxEntity";
 import chai from "chai";
 import spies from "chai-spies";
+import { sampleScannerConfig } from "../../../lib/config/sampleConfig";
+import { explorerApi, nodeApi } from "../network/networkApi";
+import { sampleRosenConfig } from "../../../lib/config/sampleRosenConfig";
 
 chai.use(spies);
 
 const commitmentAddress = "EurZwDoNTXuraUu37sjKwpEPkoumCwXHrwk8jUZzRCVyrrDywfQsbXSfh4sD9KYuNw3sqJDyKqh9URkzGTKzpFU28hWx2uUJJVhJ6LigNANqfVVjEFf4g5kkwTqLES4CpAyNLv3v8tBgtB2kGzjMZpU3qbwpZ8eh4JQQUw5cztzXc715H61hqPTH13i1qfGdph8GLV8DkczLHGektosSWXNQRXJBRvH6DVuyPRYsEeyjYr4agBxyEZ5PTx7KgYwKGFWhKbgkdaLzySZjFV7bSZXArLGpykP1UgS62o6aBydg1oPM3PTFugHQJbtusQShDNGCu5V7XXfePtJ2ybhS32NT3vP15Lzf1sXwXerGbMWLiznyLc4op1TJd5LyWrCYtznhwmjEZ7iKBxNT49BuL5QBQ3RiFFmazkhXrLLQnnqmhBfH8s8yA6rQD8hmyFm5YCaTfBPTG1LznGWtw6G9h5pZnAMuqHBBsEnKjRArTTR7uabKTCBK11oaVo8bqh3JPpHumLv7YAiC1GDHYst7KoVct9vwF5kByEag6turXiWA1JH4KNayh4VVwz8PLcGx5eyThMLkNw6t1VApcgM6DehcMhCc5D5jW4MicKrvwwYTEU4qwfHjMQ1ftanb7pRZkDZPuL9qppvQZhDdM8DzgXdMGnJK44aXujkuWZFvzKVzpPVyswgqnaLyznPEQ9xt5PVQmGrVXe44TPw9UDdeeW9wEzyVx4BHkC36LgHkbhWM36mAAfSDvFAxrDaBEBGEPt3wrJct8A6C4osCpcvUDRqKCPg2PkgrcYuem"
 const permitAddress = "EE7687i4URb4YuSGSQXPCb6iAFxAd5s8H1DLbUFQnSrJ8rED2KXdq8kUPQZ3pcPVFD97wQ32PATufWyvyhvit6sokNfLUMPqCZeVN85foTQx6zae88o2T8V9B1LqKtuZsxKG94hKxSoWmTTVUhy9TYiYhJUackckhwWi8LzbLYaVmozJRFgq4RXgzsa4bRTcQrp5fZjBmfDxgfbTyUt4JaVATkdRsDL41QKcXaq5Sds49beNhBaV8KqhY4Rj9muYfLoEvf3T4yX56YwhwQibXSWHKZpbXKYasRZ6NooQyP6XnjLcfLx2KzGoNJSoZNHih5YR9Heo7v3CHYDUur1dC8KT2ibKkA21SYyYZ4i1dQgsSjqx3QwpV6Yo6k87T4tvPeKNoHj47G4bUmGk4kuKZo2NQQXLfBsXLyELaGqbWAMJtzVwvDUQXAhWTXUkgQo9VnzWAoXkkt9oDUE8qFh1FRRfqeKaXkMY1ZxvkJa9AeZnssfoYEoDzqgkt7Nfziw5xgMJDDCRgZyZgN1CC3qaDH319gnE6aCMib5pnyY"
-const watcherAddress = "9f5veZdZq1C15GCqm6uej3kpRPh3Eq1Mtk1TqWjQx3CzMEZHXNz"
-const WID = "f875d3b916e56056968d02018133d1c122764d5c70538e70e56199f431e95e9b"
-
+const watcherAddress = "9f5veZdZq1C15GCqm6uej3kpRPh3Eq1Mtk1TqWjQx3CzMEZHXNz";
+const WID = "f875d3b916e56056968d02018133d1c122764d5c70538e70e56199f431e95e9b";
+const RWTId = "3c6cb596273a737c3e111c31d3ec868b84676b7bad82f9888ad574b44edef267";
+const config = {config: sampleScannerConfig, rosenConfig: sampleRosenConfig};
 
 export const loadDataBase = async (name: string): Promise<BridgeDataBase> => {
     const ormConfig = new DataSource({
@@ -31,7 +34,9 @@ export const loadDataBase = async (name: string): Promise<BridgeDataBase> => {
         migrations: migrations,
         logging: false,
     });
-    return await BridgeDataBase.init(ormConfig);
+    await ormConfig.initialize();
+    await ormConfig.runMigrations();
+    return new BridgeDataBase(ormConfig);
 }
 
 describe("Scanner test", () => {
@@ -50,8 +55,8 @@ describe("Scanner test", () => {
                     spentBoxes: []
                 }
             );
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             expect(await scanner.isForkHappen()).to.equal(false);
         });
 
@@ -69,15 +74,15 @@ describe("Scanner test", () => {
                     spentBoxes: []
                 }
             );
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             expect(await scanner.isForkHappen()).to.be.true;
         });
 
         it("is undefined", async () => {
             const DB = await loadDataBase("scanner-empty");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             expect(await scanner.isForkHappen()).to.be.false;
         });
 
@@ -97,8 +102,8 @@ describe("Scanner test", () => {
                     spentBoxes: []
                 }
             );
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             await scanner.update();
             const lastBlock = await DB.getLastSavedBlock();
             expect(lastBlock?.block_height).to.be.equal(204105);
@@ -117,8 +122,8 @@ describe("Scanner test", () => {
                     spentBoxes: []
                 }
             );
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             await scanner.update();
             const lastBlock = await DB.getLastSavedBlock();
             expect(lastBlock).to.be.undefined;
@@ -127,16 +132,16 @@ describe("Scanner test", () => {
     describe("checkTx", () => {
         it("should be undefined", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             const commitment = await scanner.checkTx(<NodeTransaction><unknown>tx, [commitmentAddress]);
             expect(commitment).to.be.undefined
         });
         it("should be commitment", async () => {
             const DB = await loadDataBase("checkTx");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
-            commitmentTx.outputs[1].assets[0].tokenId = ErgoConfig.getConfig().RWTId
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
+            commitmentTx.outputs[1].assets[0].tokenId = RWTId;
             const commitment = await scanner.checkTx(<NodeTransaction><unknown>commitmentTx, [commitmentAddress]);
             expect(commitment).to.not.be.undefined;
             expect(commitment?.WID).to.eql("f875d3b916e56056968d02018133d1c122764d5c70538e70e56199f431e95e9b")
@@ -147,8 +152,8 @@ describe("Scanner test", () => {
     describe("commitmentAtHeight", () => {
         it("Should find one valid commitment", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             chai.spy.on(scanner, 'checkTx', () => [{}])
             const commitments = await scanner.extractCommitments(
                 [<NodeTransaction><unknown>commitmentTx]
@@ -159,8 +164,8 @@ describe("Scanner test", () => {
     describe("updatedCommitmentsAtHeight", () => {
         it("should find 1 updated commitment", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             chai.spy.on(DB, 'findCommitmentsById', () => [])
             const data = await scanner.updatedCommitments(
                 [<NodeTransaction><unknown>commitmentTx],
@@ -174,9 +179,9 @@ describe("Scanner test", () => {
     describe("specialBoxesAtHeight", () => {
         it("Should find one permit box and one WID box", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
-            commitmentTx.outputs[0].assets[0].tokenId = ErgoConfig.getConfig().RWTId
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
+            commitmentTx.outputs[0].assets[0].tokenId = RWTId;
             const specialBoxes = await scanner.extractSpecialBoxes(
                 [<NodeTransaction><unknown>commitmentTx],
                 permitAddress,
@@ -189,8 +194,8 @@ describe("Scanner test", () => {
         });
         it("Should find one plain watcher box", async () => {
             const DB = await loadDataBase("checkTx");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             const specialBoxes = await scanner.extractSpecialBoxes(
                 [<NodeTransaction><unknown>tx],
                 permitAddress,
@@ -204,8 +209,8 @@ describe("Scanner test", () => {
     describe("spentSpecialBoxesAtHeight", () => {
         it("should find 2 updated boxesSample", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             chai.spy.on(DB, 'findUnspentSpecialBoxesById', () => [{boxId: "cea4dacf032e7e152ea0a5029fe6a84d685d22f42f7137ef2735ce90663192d7"}])
             const data = await scanner.spentSpecialBoxes(
                 [<NodeTransaction><unknown>commitmentTx],
@@ -220,8 +225,8 @@ describe("Scanner test", () => {
     describe("getRepoBox", () => {
         it("should return repoBox(with tracking mempool)", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi, explorerApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             const repoBox = await scanner.getRepoBox();
             expect(repoBox.box_id().to_str()).to.be.equal("636c5fe2c9a58041699373b21edae447574d6590782ee653638b9d3f66295728");
         });
@@ -230,8 +235,8 @@ describe("Scanner test", () => {
         it("checks is there any wid in the usersBoxes", async () => {
             const sampleWID = "4911d8b1e96bccba5cbbfe2938578b3b58a795156518959fcbfc3bd7232b35a8";
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi, explorerApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             const usersHex = ["414441", sampleWID];
             const users: Array<Uint8Array> = [];
             for (const user of usersHex) {
@@ -244,8 +249,8 @@ describe("Scanner test", () => {
     describe("getAddressWID", () => {
         it("should get repoBox correctly", async () => {
             const DB = await loadDataBase("scanner-test");
-            const ergoNetwork = new ErgoNetworkApi();
-            const scanner = new Scanner(DB, ergoNetwork);
+            const ergoNetwork = new ErgoNetworkApi(sampleScannerConfig, nodeApi, explorerApi);
+            const scanner = new Scanner(DB, ergoNetwork, config);
             chai.spy.on(
                 scanner,
                 'getWID',

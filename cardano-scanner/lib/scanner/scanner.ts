@@ -1,24 +1,23 @@
 import { KoiosNetwork } from "../network/koios";
-import { cardanoOrmConfig } from "../../config/ormconfig";
 import { NetworkDataBase } from "../models/networkModel";
 import { Observation } from "../objects/interfaces";
-import { Config } from "../config/Config";
 import { AbstractScanner, Block } from "blockchain-scanner/dist/lib";
 import { MetaData, RosenData, Utxo } from "../network/apiModels";
 import { BANK } from "./bankAddress";
-
-const cardanoConfig = Config.getConfig();
+import { ScannerConfig } from "../config/interface";
 
 export class Scanner extends AbstractScanner<Array<Observation>>{
     _dataBase: NetworkDataBase;
     _networkAccess: KoiosNetwork;
     _initialHeight: number;
+    _config: ScannerConfig;
 
-    constructor(db: NetworkDataBase, network: KoiosNetwork) {
+    constructor(db: NetworkDataBase, network: KoiosNetwork, config: ScannerConfig) {
         super();
+        this._config = config;
         this._dataBase = db;
         this._networkAccess = network;
-        this._initialHeight = cardanoConfig.initialHeight;
+        this._initialHeight = this._config.initialBlockHeight;
     }
 
     /**
@@ -117,7 +116,7 @@ export class Scanner extends AbstractScanner<Array<Observation>>{
      * @return Promise<Array<(Observation | undefined)>>
      */
     observationsAtHeight = async (blockHash: string,
-                                         networkAccess: KoiosNetwork): Promise<Array<Observation>> => {
+                                  networkAccess: KoiosNetwork): Promise<Array<Observation>> => {
         const txs = await networkAccess.getBlockTxs(blockHash);
         const observations: Array<Observation> = []
         for (let i = 0; i < txs.length; i++) {
@@ -127,13 +126,4 @@ export class Scanner extends AbstractScanner<Array<Observation>>{
         return observations;
     }
 
-}
-
-/**
- * main function that returns scanner object
- */
-export const main = async () => {
-    const DB = await NetworkDataBase.init(cardanoOrmConfig);
-    const koiosNetwork = new KoiosNetwork();
-    return new Scanner(DB, koiosNetwork);
 }

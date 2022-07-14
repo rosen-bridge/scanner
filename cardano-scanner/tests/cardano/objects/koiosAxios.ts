@@ -1,5 +1,11 @@
 import MockAdapter from "axios-mock-adapter";
-import { koios } from "../../../lib/network/koios";
+import axios from "axios";
+
+export const koios = axios.create({
+    baseURL: "https://testnet.koios.rest/api/v0",
+    timeout: 10000,
+    headers: {"Content-Type": "application/json"}
+});
 
 const mockedAxios = new MockAdapter(koios);
 

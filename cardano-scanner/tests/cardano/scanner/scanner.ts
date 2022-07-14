@@ -2,20 +2,8 @@ import { expect } from "chai";
 import { Scanner } from "../../../lib/scanner/scanner";
 import { firstObservations, loadDataBase } from "../models/models";
 import { KoiosNetwork } from "../../../lib/network/koios";
-
-const sampleObservation = {
-    fromChain: 'CARDANO',
-    toChain: 'ERGO',
-    fee: '10000',
-    amount: '10',
-    sourceChainTokenId: 'asset12y0ewmxggeglymjpmp9mjf5qzh4kgwj9chtkpv',
-    targetChainTokenId: 'cardanoTokenId',
-    sourceTxId: 'cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa',
-    sourceBlockId: '93395496d590ec6db0f2fd13a7bcf91e82a9f230ef677f6216ea8c9f57df6ab3',
-    requestId: 'cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa',
-    toAddress: 'ergoAddress',
-    fromAddress: 'cardanoAddress',
-};
+import { koios } from "../objects/koiosAxios";
+import { sampleConfig } from "../../../lib/config/sampleConfig";
 
 describe("Scanner test", () => {
     describe("isForkHappen", () => {
@@ -28,8 +16,8 @@ describe("Scanner test", () => {
                 "1111111111111111111111111111111111111111111111111111111111111111",
                 firstObservations
             );
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             expect(await scanner.isForkHappen()).to.equal(false);
         });
 
@@ -42,15 +30,15 @@ describe("Scanner test", () => {
                 "1111111111111111111111111111111111111111111111111111111111111111",
                 firstObservations
             );
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             expect(await scanner.isForkHappen()).to.be.true;
         });
 
         it("is undefined", async () => {
             const DB = await loadDataBase("scanner-empty");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             expect(await scanner.isForkHappen()).to.be.false;
         });
 
@@ -65,8 +53,8 @@ describe("Scanner test", () => {
                 "1111111111111111111111111111111111111111111111111111111111111111",
                 firstObservations
             );
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             await scanner.update();
             const lastBlock = await DB.getLastSavedBlock();
             expect(lastBlock?.block_height).to.be.equal(3433334);
@@ -80,8 +68,8 @@ describe("Scanner test", () => {
                 "1111111111111111111111111111111111111111111111111111111111111111",
                 firstObservations
             );
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             await scanner.update();
             const lastBlock = await DB.getLastSavedBlock();
             expect(lastBlock).to.be.undefined;
@@ -90,8 +78,8 @@ describe("Scanner test", () => {
     describe("isRosenData", () => {
         it("should be Rosen Data", async () => {
             const DB = await loadDataBase("cardanoUtils");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             const validData = {
                 "to": "ERGO",
                 "fee": "10000",
@@ -104,8 +92,8 @@ describe("Scanner test", () => {
         });
         it("should not be Rosen Data", async () => {
             const DB = await loadDataBase("cardanoUtils");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             const invalidData = {
                 "to": "ERGO",
                 "fee": "10000",
@@ -117,8 +105,8 @@ describe("Scanner test", () => {
     describe("isRosenMetaData", () => {
         it("should be RosenMetaData", async () => {
             const DB = await loadDataBase("cardanoUtils");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             const validMetaData = {
                 0: {}
             }
@@ -126,8 +114,8 @@ describe("Scanner test", () => {
         });
         it("should not be RosenMetaData", async () => {
             const DB = await loadDataBase("cardanoUtils");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             const validMetaData = {
                 1: {}
             }
@@ -138,8 +126,8 @@ describe("Scanner test", () => {
         // TODO: AssetFingerprint.fromParts
         it("should be undefined", async () => {
             const DB = await loadDataBase("cardanoUtils");
-            const koiosNetwork = new KoiosNetwork();
-            const scanner = new Scanner(DB, koiosNetwork);
+            const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
+            const scanner = new Scanner(DB, koiosNetwork,sampleConfig);
             const observation = await scanner.checkTx(
                 "edce02f2f23ddc3270964d2ba74ff6375a5a78fd6caf1c66102565b83f5d3ca2"
                 , "93395496d590ec6db0f2fd13a7bcf91e82a9f230ef677f6216ea8c9f57df6ab3"
@@ -150,7 +138,7 @@ describe("Scanner test", () => {
         });
     });
     describe("observationAtHeight", () => {
-        const koiosNetwork = new KoiosNetwork();
+        const koiosNetwork = new KoiosNetwork(sampleConfig,koios);
         // TODO: Should be fix AssetFingerprint.fromParts
     })
 });

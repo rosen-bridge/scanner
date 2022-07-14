@@ -10,21 +10,11 @@ export class NetworkDataBase extends AbstractDataBase<Array<Observation>>{
     blockRepository: Repository<BlockEntity>;
     observationRepository: Repository<ObservationEntity>;
 
-    private constructor(dataSource: DataSource) {
+    constructor(dataSource: DataSource) {
         super();
         this.dataSource = dataSource;
         this.blockRepository = this.dataSource.getRepository(BlockEntity);
         this.observationRepository = this.dataSource.getRepository(ObservationEntity);
-    }
-
-    /**
-     * init database connection & running migrations'
-     * database should be init before any use
-     */
-    static init = async (dataSource: DataSource) => {
-        await dataSource.initialize()
-        await dataSource.runMigrations();
-        return new NetworkDataBase(dataSource);
     }
 
     /**

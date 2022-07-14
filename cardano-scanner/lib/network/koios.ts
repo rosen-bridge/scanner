@@ -1,31 +1,34 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { Tx, TxMetaData, Utxo } from "./apiModels";
-
-import { Config } from "../config/Config";
 import { AbstractNetworkConnector, Block } from "blockchain-scanner/dist/lib";
-
-const cardanoConfig = Config.getConfig();
-const URL = cardanoConfig.koiosURL;
-
-export const koios = axios.create({
-    baseURL: URL,
-    timeout: cardanoConfig.timeout,
-    headers: {"Content-Type": "application/json"}
-});
+import { ScannerConfig } from "../config/interface";
 
 export class KoiosNetwork extends AbstractNetworkConnector{
-    constructor() {
+    _config: ScannerConfig;
+    _koios: AxiosInstance;
+
+    constructor(config: ScannerConfig, koiosAxiosInstance?: AxiosInstance) {
         super();
+        this._config = config;
+        if (koiosAxiosInstance === undefined) {
+            this._koios = axios.create({
+                baseURL: this._config.node.URL,
+                timeout: this._config.timeout,
+                headers: {"Content-Type": "application/json"}
+            });
+        } else {
+            this._koios = koiosAxiosInstance;
+        }
     }
 
     getBlockAtHeight = async (height: number): Promise<Block> => {
-        const currentBlock = await koios.get<Array<Block>>(
+        const currentBlock = await this._koios.get<Array<Block>>(
             '/blocks',
             {params: {block_height: `eq.${height}`, select: 'hash,block_height'}}
         ).then(
             res => res.data[0]
         );
-        const parentBlock = await koios.get<Array<Block>>(
+        const parentBlock = await this._koios.get<Array<Block>>(
             '/blocks',
             {params: {block_height: `eq.${height - 1}`, select: 'hash,block_height'}}
         ).then(
@@ -35,7 +38,7 @@ export class KoiosNetwork extends AbstractNetworkConnector{
     }
 
     getCurrentHeight = (): Promise<number> => {
-        return koios.get<Array<Block>>(
+        return this._koios.get<Array<Block>>(
             '/blocks',
             {params: {offset: 0, limit: 1, select: 'hash,block_height'}}
         ).then(
@@ -44,7 +47,7 @@ export class KoiosNetwork extends AbstractNetworkConnector{
     }
 
     getBlockTxs = (blockHash: string): Promise<string[]> => {
-        return koios.get<Array<{ tx_hash: string }>>(
+        return this._koios.get<Array<{ tx_hash: string }>>(
             '/block_txs',
             {params: {_block_hash: blockHash}}
         ).then(res => {
@@ -55,7 +58,7 @@ export class KoiosNetwork extends AbstractNetworkConnector{
     }
 
     getTxUtxos = (txHashes: Array<string>): Promise<Array<Tx>> => {
-        return koios.post<Array<{ outputs: Array<Utxo> }>>(
+        return this._koios.post<Array<{ outputs: Array<Utxo> }>>(
             '/tx_utxos', {"_tx_hashes": txHashes}
         ).then(res => {
             return res.data.map((tx: { outputs: Array<Utxo> }) => {
@@ -67,7 +70,7 @@ export class KoiosNetwork extends AbstractNetworkConnector{
     }
 
     getTxMetaData = (txHashes: Array<string>): Promise<Array<TxMetaData>> => {
-        return koios.post<Array<TxMetaData>>("/tx_metadata", {"_tx_hashes": txHashes}).then(
+        return this._koios.post<Array<TxMetaData>>("/tx_metadata", {"_tx_hashes": txHashes}).then(
             res => res.data
         )
     }
