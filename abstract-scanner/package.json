@@ -6,15 +6,24 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "rm -rf ./sqlite && mocha --slow 3000 && rm -rf ./sqlite"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.3.1",
+    "@types/chai-spies": "^1.0.3",
+    "@types/mocha": "^9.1.1",
     "@types/node": "^17.0.41",
+    "chai": "^4.3.6",
+    "chai-spies": "^1.0.0",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.3"
   },
   "dependencies": {
+    "sqlite3": "^5.0.9",
+    "typeorm": "^0.3.7"
   }
 }

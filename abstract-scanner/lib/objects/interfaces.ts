@@ -1,5 +1,5 @@
 export interface Block{
-    parent_hash: string,
+    parentHash: string,
     hash: string,
-    block_height: number,
+    blockHeight: number,
 }
