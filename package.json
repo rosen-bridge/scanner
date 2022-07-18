@@ -1,8 +1,5 @@
 {
-  "devDependencies": {
-    "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.1",
-    "chai": "^4.3.6",
-    "mocha": "^10.0.0"
-  }
+  "name": "@rosen",
+  "version": "0.1.0",
+  "description": ""
 }

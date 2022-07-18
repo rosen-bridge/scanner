@@ -1,4 +1,4 @@
-import { Block } from "../objects/interfaces";
+import { Block } from "./Block";
 
 export abstract class AbstractDataBase<DataT>{
 

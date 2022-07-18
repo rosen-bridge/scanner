@@ -1,8 +1,8 @@
-import { AbstractNetworkConnector } from "../network/abstractNetworkConnector";
 import { DataSource, DeleteResult, MoreThanOrEqual, Repository } from "typeorm";
-import { BlockEntity } from "../entities/BlockEntity";
-import { AbstractExecutor } from "../../executor/abstractExecutor";
-import { Block } from "../objects/interfaces";
+import { BlockEntity, PROCEED, PROCESSING } from "./entities/BlockEntity";
+import { AbstractExecutor } from "./interfaces/abstractExecutor";
+import { AbstractNetworkConnector } from "./interfaces/abstractNetworkConnector";
+import { Block } from "./interfaces/Block";
 
 export abstract class AbstractScanner<TxT>{
     abstract _dataSource: DataSource;
@@ -17,7 +17,7 @@ export abstract class AbstractScanner<TxT>{
      */
     getLastSavedBlock = async (): Promise<BlockEntity | undefined> => {
         const lastBlock = await this._blockRepository.find({
-            where: {status: "PROCESSED"},
+            where: {status: PROCEED},
             order: {height: 'DESC'},
             take: 1
         });
@@ -34,7 +34,7 @@ export abstract class AbstractScanner<TxT>{
      * @param status
      * @return Promise<BlockEntity|undefined>
      */
-    getBlockAtHeight = async (height: number, status: string = "PROCESSED"): Promise<BlockEntity | undefined> => {
+    getBlockAtHeight = async (height: number, status: string = PROCEED): Promise<BlockEntity | undefined> => {
         const block = await this._blockRepository.findOneBy({
             status: status,
             height: height,
@@ -76,16 +76,16 @@ export abstract class AbstractScanner<TxT>{
         row.height = block.blockHeight;
         row.hash = block.hash;
         row.parentHash = block.parentHash;
-        row.status = "PROCESSING";
+        row.status = PROCESSING;
         return await this._blockRepository.save(row).catch(err => false);
     }
 
     updateBlockStatus = async (blockHeight: number): Promise<Boolean> => {
-        const block = await this.getBlockAtHeight(blockHeight, "PROCESSING");
+        const block = await this.getBlockAtHeight(blockHeight, PROCESSING);
         if (block === undefined) {
             return false;
         }
-        block.status = "PROCESSED";
+        block.status = PROCEED;
         return await this._blockRepository.save(block).then(res => true).catch(err => false);
     }
 

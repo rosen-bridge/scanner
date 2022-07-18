@@ -1,54 +1,27 @@
+
 image: node:latest
 
 stages:
-  - build-abstract-scanner
-  - cardano-scanner-installation
-  - cardano-scannner-test
-  - bridge-scanner-installation
-  - bridge-scanner-test
+  - installation
+  - test_abstract_scanner
 
 cache:
   paths:
-    - cardano-scanner/node_modules/
-    - bridge-scanner/node_modules/
-    - abstract-scanner/dist
+    - abstract-scanner/node_modules/
 
-abstract_scanner:
-  stage: build-abstract-scanner
+install_dependencies:
+  stage: installation
   script:
     - cd ./abstract-scanner
     - npm install
-    - npm run build
-
-install_cardano_scanner_dependencies:
-  stage: cardano-scanner-installation
-  script:
-    - cd ./cardano-scanner
-    - npm install
   artifacts:
     paths:
-      - node_modules/
-cardano_scannner_test:
-  stage: cardano-scannner-test
+      - abstract-scanner/node_modules/
+test_abstract_scanner:
+  stage: test_abstract_scanner
   script:
-    - cd ./cardano-scanner
+    - cd ./abstract-scanner
     - npm run coverage
   artifacts:
     reports:
-      cobertura: cardano-scanner/coverage/cobertura-coverage.xml
-install_bridge_scanner_dependencies:
-  stage: bridge-scanner-installation
-  script:
-    - cd ./bridge-scanner
-    - npm install
-  artifacts:
-    paths:
-      - node_modules/
-bridge_scanner_test:
-  stage: bridge-scanner-test
-  script:
-    - cd ./bridge-scanner
-    - npm run coverage
-  artifacts:
-    reports:
-      cobertura: bridge-scanner/coverage/cobertura-coverage.xml
+      cobertura: abstract-scanner/coverage/cobertura-coverage.xml

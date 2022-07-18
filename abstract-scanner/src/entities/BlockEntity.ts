@@ -1,7 +1,10 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
+const PROCESSING = "PROCESSING";
+const PROCEED = "PROCEED"
+
 @Entity()
-export class BlockEntity{
+export class BlockEntity {
     @PrimaryColumn({
         unique: true,
     })
@@ -21,4 +24,10 @@ export class BlockEntity{
 
     @Column()
     status: string
+}
+
+
+export {
+    PROCEED,
+    PROCESSING
 }
