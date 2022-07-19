@@ -1,8 +1,8 @@
 import { DataSource, Repository } from "typeorm";
-import { BlockEntity } from "./entities/BlockEntity";
+import { BlockEntity } from "./entities/blockEntity";
 import { AbstractExecutor } from "./interfaces/abstractExecutor";
 import { AbstractNetworkConnector } from "./interfaces/abstractNetworkConnector";
-import { Block } from "./interfaces/Block";
+import { Block } from "./interfaces/block";
 import { AbstractScanner } from "./abstractScanner";
 import { migrations } from "./migrations";
 
@@ -17,20 +17,20 @@ interface TestTransaction{
 }
 
 export class ExecutorTest extends AbstractExecutor<TestTransaction>{
-    _id: number;
+    id: number;
 
     constructor(id: number) {
         super();
-        this._id = id;
+        this.id = id;
     }
 
-    processTransactions(txs: TestTransaction): Promise<Boolean> {
+    processTransactions(txs: Array<TestTransaction>): Promise<Boolean> {
         return Promise.resolve(true);
     }
 
 }
 
-export class NetworkConnectorTest extends AbstractNetworkConnector{
+export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction>{
     getBlockAtHeight(height: number): Promise<Block> {
         return Promise.resolve({
             parentHash: "0",
@@ -42,22 +42,24 @@ export class NetworkConnectorTest extends AbstractNetworkConnector{
     getCurrentHeight(): Promise<number> {
         return Promise.resolve(0);
     }
+
+    getBlockTxs(blockHash: string): Promise<Array<TestTransaction>> {
+        return Promise.reject();
+    }
 }
 
 export class ScannerTest extends AbstractScanner<TestTransaction>{
-    _dataSource: DataSource;
-    _blockRepository: Repository<BlockEntity>;
-    _initialHeight: number;
-    _executors: Array<ExecutorTest>;
-    _networkAccess: NetworkConnectorTest;
+    blockRepository: Repository<BlockEntity>;
+    initialHeight: number;
+    executors: Array<ExecutorTest>;
+    networkAccess: NetworkConnectorTest;
 
     constructor(dataSource: DataSource, networkConnector: NetworkConnectorTest, initialHeight: number) {
         super();
-        this._dataSource = dataSource;
-        this._initialHeight = initialHeight;
-        this._blockRepository = this._dataSource.getRepository(BlockEntity);
-        this._networkAccess = networkConnector;
-        this._executors = [];
+        this.initialHeight = initialHeight;
+        this.blockRepository = dataSource.getRepository(BlockEntity);
+        this.networkAccess = networkConnector;
+        this.executors = [];
     }
 
 

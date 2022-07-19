@@ -1,5 +1,5 @@
 export abstract class AbstractExecutor<TxT>{
-    abstract _id: number;
+    abstract id: number;
 
-    abstract processTransactions(txs: TxT): Promise<Boolean>;
+    abstract processTransactions(txs: Array<TxT>): Promise<Boolean>;
 }
