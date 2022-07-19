@@ -2,9 +2,6 @@ import { Block } from "./block";
 
 export abstract class AbstractDataBase<DataT>{
 
-    protected constructor() {
-    }
-
     /**
      * get last saved block
      * @return Promise<Block or undefined>
