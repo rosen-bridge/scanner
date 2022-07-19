@@ -1,4 +1,3 @@
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import { AbstractScanner } from 'abstract-scanner'
 import { Repository } from 'typeorm'
 import { BlockEntity } from 'abstract-scanner/entities/blockEntity'

@@ -24,7 +24,7 @@ export class ExecutorTest extends AbstractExecutor<TestTransaction>{
         this.id = id;
     }
 
-    processTransactions(txs: Array<TestTransaction>): Promise<Boolean> {
+    processTransactions(txs: Array<TestTransaction>): Promise<boolean> {
         return Promise.resolve(true);
     }
 

@@ -60,7 +60,7 @@ export abstract class AbstractScanner<TransactionType>{
      * function that checks if fork is happen in the blockchain or not
      * @return Promise<Boolean>
      */
-    isForkHappen = async (): Promise<Boolean> => {
+    isForkHappen = async (): Promise<boolean> => {
         const lastSavedBlock = await this.getLastSavedBlock();
         if (lastSavedBlock !== undefined) {
             const lastSavedBlockFromNetwork = await this.networkAccess.getBlockAtHeight(lastSavedBlock.height);
@@ -79,7 +79,7 @@ export abstract class AbstractScanner<TransactionType>{
         return await this.blockRepository.save(row).catch(err => false);
     }
 
-    updateBlockStatus = async (blockHeight: number): Promise<Boolean> => {
+    updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
         const block = await this.getBlockAtHeight(blockHeight, PROCESSING);
         if (block === undefined) {
             return false;
