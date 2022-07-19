@@ -44,7 +44,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
     }
 
     getBlockTxs(blockHash: string): Promise<Array<TestTransaction>> {
-        return Promise.reject();
+        return Promise.resolve([]);
     }
 }
 

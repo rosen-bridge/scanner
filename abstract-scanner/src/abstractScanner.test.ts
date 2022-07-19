@@ -94,7 +94,7 @@ describe("Abstract Scanner Tests", () => {
             const network = new NetworkConnectorTest();
             const scanner = new ScannerTest(await loadDataBase("saveBlock"), network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toBe(false);
-            expect(await scanner._blockRepository.count()).toBe(1);
+            expect(await scanner.blockRepository.count()).toBe(1);
         });
     });
     describe("updateBlockStatus", () => {
@@ -111,7 +111,7 @@ describe("Abstract Scanner Tests", () => {
             const scanner = new ScannerTest(await loadDataBase("registerExecutor"), network, 1);
             const executor = new ExecutorTest(1);
             scanner.registerExecutor(executor);
-            expect(scanner._executors.length).toBe(1);
+            expect(scanner.executors.length).toBe(1);
         });
     });
     describe("removeExecutor", () => {
@@ -121,7 +121,7 @@ describe("Abstract Scanner Tests", () => {
             const executor = new ExecutorTest(1);
             scanner.registerExecutor(executor);
             scanner.removeExecutor(executor);
-            expect(scanner._executors.length).toBe(0);
+            expect(scanner.executors.length).toBe(0);
         });
     });
     describe("update", () => {
