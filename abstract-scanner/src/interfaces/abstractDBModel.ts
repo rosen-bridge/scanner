@@ -1,4 +1,4 @@
-import { Block } from "../objects/interfaces";
+import { Block } from "./block";
 
 export abstract class AbstractDataBase<DataT>{
 
@@ -19,10 +19,11 @@ export abstract class AbstractDataBase<DataT>{
      * save blocks with observation of that block
      * @param height
      * @param blockHash
+     * @param parent_hash
      * @param data
      * @return Promise<boolean>
      */
-    abstract saveBlock(height: number, blockHash: string, data: DataT): Promise<boolean>;
+    abstract saveBlock(height: number, blockHash: string, parent_hash: string, data: DataT): Promise<boolean>;
 
     /**
      * get block hash and height
