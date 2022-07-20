@@ -1,13 +1,13 @@
-import { DataSource, DeleteResult, MoreThanOrEqual, Repository } from "typeorm";
+import { DeleteResult, MoreThanOrEqual, Repository } from "typeorm";
 import { BlockEntity, PROCEED, PROCESSING } from "./entities/blockEntity";
-import { AbstractExecutor } from "./interfaces/abstractExecutor";
+import { AbstractExtractor } from "./interfaces/abstractExtractor";
 import { AbstractNetworkConnector } from "./interfaces/abstractNetworkConnector";
 import { Block } from "./interfaces/block";
 
-export abstract class AbstractScanner<TransactionType>{
+export abstract class AbstractScanner<TransactionType> {
     abstract readonly blockRepository: Repository<BlockEntity>;
     abstract readonly initialHeight: number;
-    abstract executors: Array<AbstractExecutor<TransactionType>>;
+    abstract extractors: Array<AbstractExtractor<TransactionType>>;
     abstract networkAccess: AbstractNetworkConnector<TransactionType>;
 
     /**
@@ -70,33 +70,51 @@ export abstract class AbstractScanner<TransactionType>{
         }
     }
 
+    /**
+     * store a block into database.
+     * @param block
+     */
     saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
         const row = new BlockEntity();
         row.height = block.blockHeight;
         row.hash = block.hash;
         row.parentHash = block.parentHash;
         row.status = PROCESSING;
-        return await this.blockRepository.save(row).catch(err => false);
+        return await this.blockRepository.save(row).catch(() => false);
     }
 
+    /**
+     * Update status of a block to proceed
+     * @param blockHeight: height of expected block
+     */
     updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
         const block = await this.getBlockAtHeight(blockHeight, PROCESSING);
         if (block === undefined) {
             return false;
         }
         block.status = PROCEED;
-        return await this.blockRepository.save(block).then(res => true).catch(err => false);
+        return await this.blockRepository.save(block).then(() => true).catch(() => false);
     }
 
-    registerExecutor = (executor: AbstractExecutor<TransactionType>): void => {
-        this.executors.push(executor);
+    /**
+     * register a nre extractor to scanner.
+     * @param extractor
+     */
+    registerExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
+        if (this.extractors.filter(extractorItem => extractorItem.id === extractor.id).length === 0) {
+            this.extractors.push(extractor);
+        }
     }
 
-    removeExecutor = (executor: AbstractExecutor<TransactionType>): void => {
-        const executorIndex = this.executors.findIndex((executor) => {
-            return executor.id === executor.id
+    /**
+     * remove an extractor from scanner
+     * @param extractor
+     */
+    removeExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
+        const extractorIndex = this.extractors.findIndex((extractorItem) => {
+            return extractorItem.id === extractor.id
         });
-        this.executors.splice(executorIndex, 1);
+        this.extractors.splice(extractorIndex, 1);
     }
 
     /**
@@ -110,9 +128,9 @@ export abstract class AbstractScanner<TransactionType>{
                 return false;
             }
             const txs = await this.networkAccess.getBlockTxs(block.hash);
-            const result = (await Promise.all(this.executors.map(
-                (executor) => {
-                    return executor.processTransactions(txs);
+            const result = (await Promise.all(this.extractors.map(
+                (extractor) => {
+                    return extractor.processTransactions(txs);
                 }))).reduce((prev, curr) => prev && curr, true);
             if (result && await this.updateBlockStatus(block.blockHeight)) {
                 return savedBlock;

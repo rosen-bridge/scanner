@@ -10,6 +10,7 @@
     "build": "rimraf dist && tsc"
   },
   "author": "",
+  "type": "module",
   "license": "ISC",
   "dependencies": {
     "abstract-scanner": "file:../abstract-scanner/dist",

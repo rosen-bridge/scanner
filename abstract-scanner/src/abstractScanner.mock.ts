@@ -1,6 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { BlockEntity } from "./entities/blockEntity";
-import { AbstractExecutor } from "./interfaces/abstractExecutor";
+import { AbstractExtractor } from "./interfaces/abstractExtractor";
 import { AbstractNetworkConnector } from "./interfaces/abstractNetworkConnector";
 import { Block } from "./interfaces/block";
 import { AbstractScanner } from "./abstractScanner";
@@ -16,15 +16,15 @@ interface TestTransaction{
     txs: Array<Tx>;
 }
 
-export class ExecutorTest extends AbstractExecutor<TestTransaction>{
-    id: number;
+export class ExtractorTest extends AbstractExtractor<TestTransaction>{
+    id: string;
 
-    constructor(id: number) {
+    constructor(id: string) {
         super();
         this.id = id;
     }
 
-    processTransactions(txs: Array<TestTransaction>): Promise<boolean> {
+    processTransactions(): Promise<boolean> {
         return Promise.resolve(true);
     }
 
@@ -35,7 +35,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
         return Promise.resolve({
             parentHash: "0",
             hash: "1",
-            blockHeight: 1
+            blockHeight: height
         });
     }
 
@@ -43,7 +43,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
         return Promise.resolve(0);
     }
 
-    getBlockTxs(blockHash: string): Promise<Array<TestTransaction>> {
+    getBlockTxs(): Promise<Array<TestTransaction>> {
         return Promise.resolve([]);
     }
 }
@@ -51,7 +51,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
 export class ScannerTest extends AbstractScanner<TestTransaction>{
     blockRepository: Repository<BlockEntity>;
     initialHeight: number;
-    executors: Array<ExecutorTest>;
+    extractors: Array<ExtractorTest>;
     networkAccess: NetworkConnectorTest;
 
     constructor(dataSource: DataSource, networkConnector: NetworkConnectorTest, initialHeight: number) {
@@ -59,7 +59,7 @@ export class ScannerTest extends AbstractScanner<TestTransaction>{
         this.initialHeight = initialHeight;
         this.blockRepository = dataSource.getRepository(BlockEntity);
         this.networkAccess = networkConnector;
-        this.executors = [];
+        this.extractors = [];
     }
 
 

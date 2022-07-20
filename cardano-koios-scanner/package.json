@@ -10,6 +10,7 @@
     "build": "rimraf dist && tsc"
   },
   "author": "",
+  "type": "module",
   "license": "ISC",
   "dependencies": {
     "@emurgo/cardano-serialization-lib-nodejs": "^10.2.0",

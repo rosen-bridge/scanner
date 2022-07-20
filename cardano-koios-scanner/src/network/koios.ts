@@ -34,7 +34,13 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
                     blockHeight: row.block_height,
                     parentHash: row.parent_hash
                 }
+            }).catch(exp => {
+                console.log(exp);
+                throw exp;
             })
+        }).catch(exp => {
+            console.log(exp)
+            throw exp
         })
     }
 
@@ -44,7 +50,10 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
             {params: {offset: 0, limit: 1, select: 'hash,block_height'}}
         ).then(
             res => res.data[0].block_height
-        )
+        ).catch(exp => {
+            console.log(exp)
+            throw exp
+        })
     }
 
     getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
@@ -56,6 +65,9 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
                 '/tx_info',
                 {params: {_tx_hashes: res.data[0].tx_hash}}
             ).then(ret => ret.data)
+        }).catch(exp => {
+            console.log(exp)
+            throw exp
         })
     }
 
