@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
 import { BlockEntity } from "../entities/blockEntity";
 import { Block, AbstractExtractor, AbstractNetworkConnector } from "../interfaces";
-import { AbstractScanner } from "./abstractScanner";
+import { Abstract } from "./abstract";
 import { migrations } from "../migrations";
 
 interface Tx {
@@ -50,7 +50,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
     }
 }
 
-export class ScannerTest extends AbstractScanner<TestTransaction> {
+export class ScannerTest extends Abstract<TestTransaction> {
     blockRepository: Repository<BlockEntity>;
     initialHeight: number;
     extractors: Array<ExtractorTest>;

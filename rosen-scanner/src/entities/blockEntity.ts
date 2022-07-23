@@ -24,6 +24,9 @@ export class BlockEntity {
 
     @Column()
     status: string
+
+    @Column()
+    scanner: string
 }
 
 

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { AbstractNetworkConnector, Block } from "abstract-scanner";
+import { AbstractNetworkConnector, Block } from "../../../interfaces";
 import { KoiosBlock, KoiosBlockInfo, KoiosTransaction } from "../interfaces/Koios";
 
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
