@@ -5,7 +5,7 @@ import { blake2b } from "blakejs";
 import { extractedObservation } from "../interfaces/extractedObservation";
 import { ObservationEntityAction } from "../actions/db";
 
-export abstract class AbstractExecutor{
+export abstract class AbstractExecutorErgo{
     id: string;
     private readonly dataSource: DataSource;
     private readonly actions: ObservationEntityAction;
@@ -38,7 +38,6 @@ export abstract class AbstractExecutor{
 
     processTransactions = (block: string, txs: Array<wasm.Transaction>): Promise<boolean> => {
         return new Promise((resolve, reject) => {
-
             try {
                 const observations: Array<extractedObservation> = [];
                 txs.forEach(transaction => {
