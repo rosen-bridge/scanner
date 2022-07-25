@@ -36,6 +36,12 @@ export abstract class AbstractExecutorErgo{
         return "f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3"
     }
 
+    /**
+     * gets block id and transactions corresponding to the block and saves if they are valid rosen
+     *  transactions and in case of success return true and in case of failure returns false
+     * @param block
+     * @param txs
+     */
     processTransactions = (block: string, txs: Array<wasm.Transaction>): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             try {

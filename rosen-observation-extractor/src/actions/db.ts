@@ -9,6 +9,11 @@ export class ObservationEntityAction{
         this.datasource = dataSource;
     }
 
+    /**
+     * It stores list of observations in the dataSource with block id
+     * @param observations
+     * @param block
+     */
     storeObservations = async (observations: Array<extractedObservation>, block: string) => {
         const observationEntity = observations.map((observation) => {
             const row = new ObservationEntity();
@@ -40,9 +45,7 @@ export class ObservationEntityAction{
         } finally {
             await queryRunner.release();
         }
-
         return error;
-
     }
 
 }
