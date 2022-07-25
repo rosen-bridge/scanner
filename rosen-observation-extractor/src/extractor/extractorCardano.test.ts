@@ -3,8 +3,7 @@ import { KoiosTransaction } from "../interfaces/koiosTransaction";
 import { cardanoTxValid, loadDataBase } from "./utils.mock";
 import { ObservationEntity } from "../entities/observationEntity";
 
-class ExecutorCardano extends AbstractExecutorCardano{
-}
+class ExecutorCardano extends AbstractExecutorCardano{}
 
 describe("extractorCardano", () => {
     describe('isRosenData', () => {

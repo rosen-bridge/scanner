@@ -32,15 +32,24 @@ const observations: Array<extractedObservation> = [{
     requestId: "reqId2",
 }];
 
+describe("ObservationEntityAction", () => {
+    describe("storeObservation", () => {
 
-test("storeObservation", async () => {
-    const dataSource = await loadDataBase("db");
-    const action = new ObservationEntityAction(dataSource);
-    const res = await action.storeObservations(observations, "1");
-    expect(res).toBe(true);
-    const repository = dataSource.getRepository(ObservationEntity);
-    const [, rowsCount] = await repository.findAndCount();
-    expect(rowsCount).toBe(2);
+        /**
+         * 2 valid Observations should save successfully
+         * Dependency: Nothing
+         * Scenario: 2 observation should save successfully
+         * Expected: storeObservations should returns true and database row count should be 2
+         */
+        it("checks observations saved successfully", async () => {
+            const dataSource = await loadDataBase("db");
+            const action = new ObservationEntityAction(dataSource);
+            const res = await action.storeObservations(observations, "1");
+            expect(res).toBe(true);
+            const repository = dataSource.getRepository(ObservationEntity);
+            const [, rowsCount] = await repository.findAndCount();
+            expect(rowsCount).toBe(2);
+        })
+
+    })
 })
-
-
