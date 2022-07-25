@@ -4,10 +4,13 @@ image: node:latest
 stages:
   - installation
   - test_abstract_scanner
+  - rosen_observation_installation
+  - test_rosen_observation_extractor
 
 cache:
   paths:
     - abstract-scanner/node_modules/
+    - rosen-observation-extractor/node_modules/
 
 install_dependencies:
   stage: installation
@@ -21,6 +24,22 @@ test_abstract_scanner:
   stage: test_abstract_scanner
   script:
     - cd ./abstract-scanner
+    - npm run coverage
+  artifacts:
+    reports:
+      cobertura: abstract-scanner/coverage/cobertura-coverage.xml
+rosen_observation_installation:
+  stage: rosen_observation_installation
+  script:
+    - cd ./rosen-observation-extractor
+    - npm install
+  artifacts:
+    paths:
+      - rosen-observation-extractor/node_modules/
+test_rosen_observation_extractor:
+  stage:test_rosen_observation_extractor
+  script:
+    - cd ./rosen-observation-extractor
     - npm run coverage
   artifacts:
     reports:
