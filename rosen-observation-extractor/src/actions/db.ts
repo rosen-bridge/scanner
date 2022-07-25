@@ -1,5 +1,5 @@
 import { ObservationEntity } from "../entities/observationEntity";
-import { DataSource, Repository } from "typeorm";
+import { DataSource } from "typeorm";
 import { extractedObservation } from "../interfaces/extractedObservation";
 
 export class ObservationEntityAction{
@@ -9,7 +9,7 @@ export class ObservationEntityAction{
         this.datasource = dataSource;
     }
 
-    storeObservations = async (observations: Array<extractedObservation>, block: string, extractor: string) => {
+    storeObservations = async (observations: Array<extractedObservation>, block: string) => {
         const observationEntity = observations.map((observation) => {
             const row = new ObservationEntity();
             row.block = block;
@@ -45,8 +45,4 @@ export class ObservationEntityAction{
 
     }
 
-
-    forkBlock = async (block: string) => {
-        // todo fork block elements
-    }
 }

@@ -5,7 +5,7 @@ import { extractedObservation } from "../interfaces/extractedObservation";
 import { ObservationEntityAction } from "../actions/db";
 import { KoiosTransaction, MetaData } from "../interfaces/koiosTransaction";
 
-export class AbstractExecutorCardano{
+export abstract class AbstractExecutorCardano{
     id: string;
     private readonly dataSource: DataSource;
     private readonly actions: ObservationEntityAction;
@@ -46,11 +46,17 @@ export class AbstractExecutorCardano{
                 try {
                     const observations: Array<extractedObservation> = [];
                     txs.forEach(transaction => {
-                        if (this.isRosenData(transaction.metadata)) {
+                        if (transaction.metadata !== undefined && this.isRosenData(transaction.metadata)) {
                             if (transaction.outputs[0].asset_list.length !== 0) {
                                 const asset = transaction.outputs[0].asset_list[0];
                                 const assetFingerprint = this.mockedFingerPrint(asset.policy_id, asset.asset_name);
-                                const data = transaction.metadata[0].json;
+                                const data = transaction.metadata[0].json as unknown as {
+                                    to: string,
+                                    targetChainTokenId: string,
+                                    bridgeFee: string,
+                                    networkFee: string,
+                                    toAddress: string
+                                };
                                 const requestId = Buffer.from(blake2b(transaction.tx_hash, undefined, 32)).toString("hex")
                                 observations.push({
                                     fromChain: 'CARDANO',
@@ -69,7 +75,7 @@ export class AbstractExecutorCardano{
                             }
                         }
                     })
-                    this.actions.storeObservations(observations, block, this.id).then(() => {
+                    this.actions.storeObservations(observations, block).then(() => {
                         resolve(true)
                     }).catch((e) => reject(e))
                 } catch

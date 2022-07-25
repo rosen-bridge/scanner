@@ -5,7 +5,7 @@ import { blake2b } from "blakejs";
 import { extractedObservation } from "../interfaces/extractedObservation";
 import { ObservationEntityAction } from "../actions/db";
 
-export class AbstractExecutorErgo{
+export abstract class AbstractExecutorErgo{
     id: string;
     private readonly dataSource: DataSource;
     private readonly actions: ObservationEntityAction;
@@ -65,10 +65,14 @@ export class AbstractExecutorErgo{
                         }
                     }
                 })
-                this.actions.storeObservations(observations, block, this.id).then(() => {
+                this.actions.storeObservations(observations, block).then(() => {
                     resolve(true)
-                }).catch((e) => reject(e))
+                }).catch((e) => {
+                    console.log(e);
+                    reject(e)
+                })
             } catch (e) {
+
                 reject(e);
             }
         });
