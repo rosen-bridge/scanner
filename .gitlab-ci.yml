@@ -11,6 +11,7 @@ cache:
   paths:
     - abstract-scanner/node_modules/
     - rosen-observation-extractor/node_modules/
+    - rosen-observation-extractor/coverage/
 
 install_dependencies:
   stage: installation
@@ -43,4 +44,4 @@ test_rosen_observation_extractor:
     - npm run coverage
   artifacts:
     reports:
-      cobertura: abstract-scanner/coverage/cobertura-coverage.xml
+      cobertura: rosen-observation-extractor/coverage/cobertura-coverage.xml
