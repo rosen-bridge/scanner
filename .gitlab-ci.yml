@@ -37,7 +37,7 @@ rosen_observation_installation:
     paths:
       - rosen-observation-extractor/node_modules/
 test_rosen_observation_extractor:
-  stage:test_rosen_observation_extractor
+  stage: test_rosen_observation_extractor
   script:
     - cd ./rosen-observation-extractor
     - npm run coverage
