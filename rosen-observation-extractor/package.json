@@ -14,6 +14,7 @@
   "dependencies": {
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.18.0",
+    "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"
   },

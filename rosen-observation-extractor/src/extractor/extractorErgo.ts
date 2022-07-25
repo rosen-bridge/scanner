@@ -5,7 +5,7 @@ import { blake2b } from "blakejs";
 import { extractedObservation } from "../interfaces/extractedObservation";
 import { ObservationEntityAction } from "../actions/db";
 
-export abstract class AbstractExecutorErgo{
+export class AbstractExecutorErgo{
     id: string;
     private readonly dataSource: DataSource;
     private readonly actions: ObservationEntityAction;
@@ -43,11 +43,11 @@ export abstract class AbstractExecutorErgo{
                 txs.forEach(transaction => {
                     for (let index = 0; index < transaction.outputs().len(); index++) {
                         const output = transaction.outputs().get(index);
-                        if (this.isRosenData(output)) {
-                            const R4 = output.register_value(wasm.NonMandatoryRegisterId.R4)?.to_coll_coll_byte()!;
+                        const R4 = output.register_value(wasm.NonMandatoryRegisterId.R4)?.to_coll_coll_byte();
+                        if (this.isRosenData(output) && R4 !== undefined) {
                             const token = output.tokens().get(0);
                             const inputAddress = "fromAddress";
-                            const requestId = Buffer.from(blake2b(Buffer.from(output.tx_id().to_str(), undefined, 32)).toString("hex");
+                            const requestId = Buffer.from(blake2b(output.tx_id().to_str(), undefined, 32)).toString("hex");
                             observations.push({
                                 fromChain: "Ergo",
                                 toChain: Buffer.from(R4[0]).toString(),

@@ -2,17 +2,47 @@ import { ObservationEntity } from "../entities/observationEntity";
 import { DataSource, Repository } from "typeorm";
 import { extractedObservation } from "../interfaces/extractedObservation";
 
-export class ObservationEntityAction {
-    private readonly repository: Repository<ObservationEntity>;
+export class ObservationEntityAction{
+    private readonly datasource: DataSource;
 
     constructor(dataSource: DataSource) {
-        this.repository = dataSource.getRepository(ObservationEntity)
+        this.datasource = dataSource;
     }
 
     storeObservations = async (observations: Array<extractedObservation>, block: string, extractor: string) => {
-        for (let observations of observations) {
-            await this.repository.save(observations)
+        const observationEntity = observations.map((observation) => {
+            const row = new ObservationEntity();
+            row.block = block;
+            row.bridgeFee = observation.bridgeFee;
+            row.amount = observation.amount;
+            row.fromAddress = observation.fromAddress;
+            row.fromChain = observation.fromChain;
+            row.networkFee = observation.networkFee;
+            row.requestId = observation.requestId;
+            row.sourceBlockId = observation.sourceBlockId;
+            row.sourceTxId = observation.sourceTxId;
+            row.toChain = observation.toChain;
+            row.sourceChainTokenId = observation.sourceChainTokenId;
+            row.targetChainTokenId = observation.targetChainTokenId;
+            row.toAddress = observation.toAddress;
+            return row;
+        });
+        let error = true;
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            await queryRunner.manager.save(observationEntity);
+            await queryRunner.commitTransaction();
+        } catch (e) {
+            await queryRunner.rollbackTransaction();
+            error = false;
+        } finally {
+            await queryRunner.release();
         }
+
+        return error;
+
     }
 
 

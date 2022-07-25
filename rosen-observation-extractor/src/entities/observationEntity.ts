@@ -48,6 +48,4 @@ export class ObservationEntity{
     @Column()
     block: string;
 
-    @Column()
-    txId: string;
 }

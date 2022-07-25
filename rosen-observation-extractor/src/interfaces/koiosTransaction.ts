@@ -1,16 +1,4 @@
 
-interface KoiosBlock {
-    hash: string;
-    block_height: number;
-}
-
-interface KoiosBlockInfo {
-    hash: string;
-    block_height: number;
-    parent_hash: string;
-    child_hash?: string
-}
-
 interface PaymentAddr {
     bech32: string;
     cred: string;
@@ -86,8 +74,6 @@ interface KoiosTransaction {
 }
 
 export {
-    KoiosBlock,
-    KoiosBlockInfo,
     KoiosTransaction,
     MetaData
 }
