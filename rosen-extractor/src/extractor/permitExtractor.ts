@@ -47,7 +47,6 @@ export abstract class AbstractExecutorPermit{
                     reject(e)
                 })
             } catch (e) {
-
                 reject(e);
             }
         });
