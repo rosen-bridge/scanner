@@ -7,7 +7,7 @@
     "declaration": true,
     "moduleResolution": "Node",
     "module": "esnext",                                /* Specify what module code is generated. */
-    "rootDir": "./src",                                    /* Specify the root folder within your source files. */
+    "rootDir": "./lib",                                    /* Specify the root folder within your source files. */
     "resolveJsonModule": true,                           /* Enable importing .json files */
     "allowJs": false,                                     /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
     "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
@@ -19,11 +19,11 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "src/**/*"
+    "lib/**/*"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "src/**/*.mock.ts"
+    "lib/**/*.spec.ts",
+    "lib/**/*.test.ts",
+    "lib/**/*.mock.ts"
   ]
 }
