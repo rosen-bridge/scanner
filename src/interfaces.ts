@@ -68,7 +68,13 @@ abstract class AbstractExtractor<TransactionType> {
     /**
      * get id for extractor. This id must be unique over all extractors.
      */
-    abstract getId: () => string;
+    abstract getId: (() => string);
+
+    /**
+     * fork one block and remove all stored information for this block
+     * @param hash: block hash
+     */
+    abstract forkBlock :(hash: string) => Promise<void>;
 }
 
 export {

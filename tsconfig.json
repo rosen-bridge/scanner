@@ -10,7 +10,7 @@
     "rootDir": "./src",                                    /* Specify the root folder within your source files. */
     "resolveJsonModule": true,                           /* Enable importing .json files */
     "allowJs": false,                                     /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
-    "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+    "outDir": "./rosen-scanner/dist",                                   /* Specify an output folder for all emitted files. */
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
     "strict": true,                                      /* Enable all strict type-checking options. */
@@ -18,10 +18,12 @@
     "strictPropertyInitialization": false,             /* Check for class properties that are declared but not set in the constructor. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*"],
+  "include": [
+    "../src/**/*"
+  ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "src/**/*.mock.ts",
+    "../src/**/*.spec.ts",
+    "../src/**/*.test.ts",
+    "../src/**/*.mock.ts"
   ]
 }
