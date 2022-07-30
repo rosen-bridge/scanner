@@ -82,7 +82,7 @@ export abstract class AbstractScanner<TransactionType> {
         row.status = PROCESSING;
         row.scanner = this.name()
         return await this.blockRepository.save(row).catch((exp) => {
-            console.log(exp)
+            console.error(exp)
             return false
         });
     }
