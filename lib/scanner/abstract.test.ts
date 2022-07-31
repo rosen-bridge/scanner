@@ -347,6 +347,6 @@ describe("Abstract Scanner Tests", () => {
             await scanner.updateBlockStatus(3)
             await scanner.update();
             expect(await scanner.blockRepository.count()).toBe(1)
-        }, 500000);
+        });
     });
 });
