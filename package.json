@@ -1,5 +1,5 @@
 {
-  "name": "rosen-scanner",
+  "name": "@rosen-bridge/scanner",
   "version": "0.1.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",

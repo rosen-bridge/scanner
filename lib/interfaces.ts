@@ -4,6 +4,7 @@ interface Block {
     blockHeight: number,
 }
 
+
 abstract class AbstractDataBase<DataT> {
 
     /**
@@ -37,6 +38,7 @@ abstract class AbstractDataBase<DataT> {
     abstract getBlockAtHeight: (height: number) => Promise<Block | undefined>;
 }
 
+
 abstract class AbstractNetworkConnector<TransactionType> {
     /**
      * get block header from height
@@ -55,6 +57,7 @@ abstract class AbstractNetworkConnector<TransactionType> {
      */
     abstract getBlockTxs: (blockHash: string) => Promise<Array<TransactionType>>;
 }
+
 
 abstract class AbstractExtractor<TransactionType> {
     /**
@@ -76,6 +79,7 @@ abstract class AbstractExtractor<TransactionType> {
      */
     abstract forkBlock :(hash: string) => Promise<void>;
 }
+
 
 export {
     AbstractDataBase,

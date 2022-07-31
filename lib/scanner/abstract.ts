@@ -9,7 +9,10 @@ export abstract class AbstractScanner<TransactionType> {
     abstract extractors: Array<AbstractExtractor<TransactionType>>;
     abstract networkAccess: AbstractNetworkConnector<TransactionType>;
 
+
     abstract name: () => string;
+
+
     /**
      * get last saved block
      * @return Promise<BlockEntity or undefined>
@@ -26,6 +29,7 @@ export abstract class AbstractScanner<TransactionType> {
             return undefined;
         }
     }
+
 
     /**
      * get block hash and height
@@ -45,6 +49,7 @@ export abstract class AbstractScanner<TransactionType> {
         }
     }
 
+
     /**
      * it deletes every block that more than or equal height
      * @param height
@@ -55,6 +60,7 @@ export abstract class AbstractScanner<TransactionType> {
             height: MoreThanOrEqual(height)
         });
     }
+
 
     /**
      * function that checks if fork is happen in the blockchain or not
@@ -70,6 +76,7 @@ export abstract class AbstractScanner<TransactionType> {
         }
     }
 
+
     /**
      * store a block into database.
      * @param block
@@ -82,10 +89,11 @@ export abstract class AbstractScanner<TransactionType> {
         row.status = PROCESSING;
         row.scanner = this.name()
         return await this.blockRepository.save(row).catch((exp) => {
-            console.error(exp)
+            console.error(`An error occured during save new block: ${exp}`)
             return false
         });
     }
+
 
     /**
      * Update status of a block to proceed
@@ -100,6 +108,7 @@ export abstract class AbstractScanner<TransactionType> {
         return await this.blockRepository.save(block).then(() => true).catch(() => false);
     }
 
+
     /**
      * register a nre extractor to scanner.
      * @param extractor
@@ -109,6 +118,7 @@ export abstract class AbstractScanner<TransactionType> {
             this.extractors.push(extractor);
         }
     }
+
 
     /**
      * remove an extractor from scanner
@@ -121,79 +131,105 @@ export abstract class AbstractScanner<TransactionType> {
         this.extractors.splice(extractorIndex, 1);
     }
 
+
+    /**
+     * process a block and execute all extractor on it.
+     * @param block
+     */
+    processBlock = async (block: Block) => {
+        const savedBlock = await this.saveBlock(block);
+        if (typeof savedBlock === "boolean") {
+            return false;
+        }
+        const txs = await this.networkAccess.getBlockTxs(block.hash);
+        const result = (await Promise.all(this.extractors.map(
+            (extractor) => {
+                return extractor.processTransactions(txs, block.hash);
+            }))).reduce((prev, curr) => prev && curr, true);
+        if (result && await this.updateBlockStatus(block.blockHeight)) {
+            return savedBlock;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * process forward in scanner. get blocks and store information from transactions.
+     * @param lastSavedBlock: last saved block entity in database
+     */
+    stepForward = async (lastSavedBlock: BlockEntity) => {
+        const currentHeight = await this.networkAccess.getCurrentHeight()
+        if (this.initialHeight >= currentHeight) {
+            return;
+        }
+        for (let height = lastSavedBlock.height + 1; height <= currentHeight; height++) {
+            const block = await this.networkAccess.getBlockAtHeight(height);
+            if (lastSavedBlock !== undefined) {
+                if (block.parentHash === lastSavedBlock?.hash) {
+                    const savedBlock = await this.processBlock(block);
+                    if (typeof savedBlock === "boolean") {
+                        break;
+                    } else {
+                        lastSavedBlock = savedBlock;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Step backward in blockchain and find forkpoint.
+     * then remove all forked blocks from database
+     * @param lastSavedBlock
+     */
+    stepBackward = async (lastSavedBlock: BlockEntity) => {
+        let forkPoint = lastSavedBlock;
+        let forkPointHeight = forkPoint.height;
+        let blockFromNetwork = await this.networkAccess.getBlockAtHeight(forkPointHeight);
+        while (blockFromNetwork.hash !== forkPoint.hash && blockFromNetwork.parentHash !== forkPoint.parentHash) {
+            let block = await this.getBlockAtHeight(forkPointHeight - 1);
+            if (block !== undefined && forkPointHeight > this.initialHeight) {
+                for (const extractor of this.extractors) {
+                    try {
+                        await extractor.forkBlock(forkPoint.hash)
+                    } catch (e) {
+                        console.log(`An error occured during fork block in extractor ${extractor.getId()}: ${e}`)
+                    }
+                }
+                forkPointHeight--;
+                block = await this.getBlockAtHeight(forkPointHeight - 1);
+            }
+            if (block !== undefined) {
+                forkPoint = block;
+                blockFromNetwork = await this.networkAccess.getBlockAtHeight(forkPointHeight - 1);
+            } else {
+                break;
+            }
+        }
+        await this.removeForkedBlocks(forkPointHeight);
+    }
+
+
     /**
      * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
      * scenario in the blockchain and invalidate the database till the database synced again.
      */
     update = async () => {
-        const processBlock = async (block: Block) => {
-            const savedBlock = await this.saveBlock(block);
-            if (typeof savedBlock === "boolean") {
-                return false;
-            }
-            const txs = await this.networkAccess.getBlockTxs(block.hash);
-            const result = (await Promise.all(this.extractors.map(
-                (extractor) => {
-                    return extractor.processTransactions(txs, block.hash);
-                }))).reduce((prev, curr) => prev && curr, true);
-            if (result && await this.updateBlockStatus(block.blockHeight)) {
-                return savedBlock;
-            } else {
-                return false;
-            }
-        }
         try {
-            let lastSavedBlock = (await this.getLastSavedBlock());
+            const lastSavedBlock = (await this.getLastSavedBlock());
             if (lastSavedBlock === undefined) {
                 const block = await this.networkAccess.getBlockAtHeight(this.initialHeight);
-                await processBlock(block);
+                await this.processBlock(block);
                 return;
             }
             if (!await this.isForkHappen()) {
-                const currentHeight = await this.networkAccess.getCurrentHeight()
-                if (this.initialHeight >= currentHeight) {
-                    return;
-                }
-                for (let height = lastSavedBlock.height + 1; height <= currentHeight; height++) {
-                    const block = await this.networkAccess.getBlockAtHeight(height);
-                    if (lastSavedBlock !== undefined) {
-                        if (block.parentHash === lastSavedBlock?.hash) {
-                            const savedBlock = await processBlock(block);
-                            if (typeof savedBlock === "boolean") {
-                                break;
-                            } else {
-                                lastSavedBlock = savedBlock;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
+                await this.stepForward(lastSavedBlock)
             } else {
-                let forkPoint = lastSavedBlock;
-                let forkPointHeight = forkPoint.height;
-                let blockFromNetwork = await this.networkAccess.getBlockAtHeight(forkPointHeight);
-                while (blockFromNetwork.hash !== forkPoint.hash && blockFromNetwork.parentHash !== forkPoint.parentHash) {
-                    let block = await this.getBlockAtHeight(forkPointHeight - 1);
-                    if (block !== undefined && forkPointHeight > this.initialHeight) {
-                        for (const extractor of this.extractors) {
-                            try {
-                                await extractor.forkBlock(forkPoint.hash)
-                            } catch (e) {
-                                console.log(e)
-                            }
-                        }
-                        forkPointHeight--;
-                        block = await this.getBlockAtHeight(forkPointHeight - 1);
-                    }
-                    if (block !== undefined) {
-                        forkPoint = block;
-                        blockFromNetwork = await this.networkAccess.getBlockAtHeight(forkPointHeight - 1);
-                    } else {
-                        break;
-                    }
-                }
-                await this.removeForkedBlocks(forkPointHeight);
+                await this.stepBackward(lastSavedBlock)
             }
         } catch (e) {
             console.log(e)
