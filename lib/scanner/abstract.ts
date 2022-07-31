@@ -175,10 +175,10 @@ export abstract class AbstractScanner<TransactionType> {
                 let blockFromNetwork = await this.networkAccess.getBlockAtHeight(forkPointHeight);
                 while (blockFromNetwork.hash !== forkPoint.hash && blockFromNetwork.parentHash !== forkPoint.parentHash) {
                     let block = await this.getBlockAtHeight(forkPointHeight - 1);
-                    while (block !== undefined && forkPointHeight > this.initialHeight) {
+                    if (block !== undefined && forkPointHeight > this.initialHeight) {
                         for (const extractor of this.extractors) {
                             try {
-                                await extractor.forkBlock(block.hash)
+                                await extractor.forkBlock(forkPoint.hash)
                             } catch (e) {
                                 console.log(e)
                             }
