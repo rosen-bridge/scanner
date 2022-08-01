@@ -1,22 +1,20 @@
 import { DataSource, Repository } from "typeorm";
-import { BlockEntity } from "./entities/blockEntity";
-import { AbstractExtractor } from "./interfaces/abstractExtractor";
-import { AbstractNetworkConnector } from "./interfaces/abstractNetworkConnector";
-import { Block } from "./interfaces/block";
-import { AbstractScanner } from "./abstractScanner";
-import { migrations } from "./migrations";
+import { BlockEntity } from "../entities/blockEntity";
+import { Block, AbstractExtractor, AbstractNetworkConnector } from "../interfaces";
+import { AbstractScanner } from "./abstract";
+import { migrations } from "../migrations";
 
-interface Tx{
+interface Tx {
     hash: string;
 }
 
-interface TestTransaction{
+interface TestTransaction {
     height: number;
     blockHash: string;
     txs: Array<Tx>;
 }
 
-export class ExtractorTest extends AbstractExtractor<TestTransaction>{
+export class ExtractorTest extends AbstractExtractor<TestTransaction> {
     id: string;
 
     constructor(id: string) {
@@ -24,14 +22,20 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction>{
         this.id = id;
     }
 
-    processTransactions(): Promise<boolean> {
+    processTransactions = (): Promise<boolean> => {
         return Promise.resolve(true);
     }
 
+    getId = (): string => {
+        return this.id;
+    }
+    forkBlock = (hash: string) => {
+        return Promise.resolve();
+    }
 }
 
-export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction>{
-    getBlockAtHeight(height: number): Promise<Block> {
+export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
+    getBlockAtHeight = (height: number): Promise<Block> => {
         return Promise.resolve({
             parentHash: "0",
             hash: "1",
@@ -39,16 +43,16 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
         });
     }
 
-    getCurrentHeight(): Promise<number> {
+    getCurrentHeight = (): Promise<number> => {
         return Promise.resolve(0);
     }
 
-    getBlockTxs(): Promise<Array<TestTransaction>> {
+    getBlockTxs = (): Promise<Array<TestTransaction>> => {
         return Promise.resolve([]);
     }
 }
 
-export class ScannerTest extends AbstractScanner<TestTransaction>{
+export class ScannerTest extends AbstractScanner<TestTransaction> {
     blockRepository: Repository<BlockEntity>;
     initialHeight: number;
     extractors: Array<ExtractorTest>;
@@ -62,6 +66,9 @@ export class ScannerTest extends AbstractScanner<TestTransaction>{
         this.extractors = [];
     }
 
+    name = () => {
+        return "mocked scanner name"
+    }
 
     getBlockTxs = (): Promise<TestTransaction> => {
         return Promise.resolve({

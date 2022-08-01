@@ -3,25 +3,23 @@ image: node:latest
 
 stages:
   - installation
-  - test_abstract_scanner
+  - test_scanner
 
 cache:
   paths:
-    - abstract-scanner/node_modules/
+    - node_modules/
 
 install_dependencies:
   stage: installation
   script:
-    - cd ./abstract-scanner
     - npm install
   artifacts:
     paths:
-      - abstract-scanner/node_modules/
+      - node_modules/
 test_abstract_scanner:
-  stage: test_abstract_scanner
+  stage: test_scanner
   script:
-    - cd ./abstract-scanner
     - npm run coverage
   artifacts:
     reports:
-      cobertura: abstract-scanner/coverage/cobertura-coverage.xml
+      cobertura: coverage/cobertura-coverage.xml

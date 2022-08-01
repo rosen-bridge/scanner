@@ -1,5 +1,5 @@
-import { ExtractorTest, loadDataBase, NetworkConnectorTest, ScannerTest } from "./abstractScanner.mock";
-import { PROCEED } from "./entities/blockEntity";
+import { ExtractorTest, loadDataBase, NetworkConnectorTest, ScannerTest } from "./abstract.mock";
+import { PROCEED } from "../entities/blockEntity";
 
 
 describe("Abstract Scanner Tests", () => {
@@ -340,8 +340,11 @@ describe("Abstract Scanner Tests", () => {
             const extractor = new ExtractorTest("1");
             scanner.registerExtractor(extractor);
             await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})
-            await scanner.saveBlock({blockHeight: 1, parentHash: "2", hash: "3"})
-            await scanner.saveBlock({blockHeight: 1, parentHash: "3", hash: "4"})
+            await scanner.saveBlock({blockHeight: 2, parentHash: "2", hash: "3"})
+            await scanner.saveBlock({blockHeight: 3, parentHash: "3", hash: "4"})
+            await scanner.updateBlockStatus(1)
+            await scanner.updateBlockStatus(2)
+            await scanner.updateBlockStatus(3)
             await scanner.update();
             expect(await scanner.blockRepository.count()).toBe(1)
         });

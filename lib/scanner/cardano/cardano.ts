@@ -1,10 +1,10 @@
-import { AbstractScanner } from 'abstract-scanner'
 import { Repository } from 'typeorm'
-import { BlockEntity } from 'abstract-scanner/entities/blockEntity'
-import { AbstractExtractor } from 'abstract-scanner/interfaces/abstractExtractor'
+import { AbstractScanner } from '../abstract'
 import { CardanoScannerConfig } from "./interfaces";
 import { KoiosNetwork } from "./network/koios";
 import { KoiosTransaction } from "./interfaces/Koios";
+import { BlockEntity } from "../../entities/blockEntity";
+import { AbstractExtractor } from "../../interfaces";
 
 class CardanoKoiosScanner extends AbstractScanner<KoiosTransaction> {
     readonly blockRepository: Repository<BlockEntity>;
@@ -12,7 +12,9 @@ class CardanoKoiosScanner extends AbstractScanner<KoiosTransaction> {
     readonly initialHeight: number;
     networkAccess: KoiosNetwork;
 
-    constructor(config: CardanoScannerConfig){
+    name = () => "cardano-koios";
+
+    constructor(config: CardanoScannerConfig) {
         super();
         this.blockRepository = config.dataSource.getRepository(BlockEntity);
         this.extractors = []

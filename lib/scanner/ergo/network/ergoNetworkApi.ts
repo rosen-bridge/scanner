@@ -1,5 +1,5 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { AbstractNetworkConnector, Block } from 'abstract-scanner'
+import { AbstractNetworkConnector, Block } from '../../../interfaces'
 import axios, { AxiosInstance } from "axios";
 import { NodeBlock } from "./types";
 
