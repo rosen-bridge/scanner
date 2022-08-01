@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,8 @@
     "lint": "eslint --fix .",
     "test": "rimraf sqlite; tsc --noEmit; npm run lint; jest",
     "coverage": "c8 npm run test",
-    "build": "rimraf dist && tsc"
+    "build": "rimraf dist && tsc",
+    "publish": "npm run test; npm run build; npm publish --access public"
   },
   "files": [
     "dist"
