@@ -1,3 +1,5 @@
+import { BlockEntity } from "./entities/blockEntity";
+
 interface Block {
     parentHash: string,
     hash: string,
@@ -66,7 +68,7 @@ abstract class AbstractExtractor<TransactionType> {
      * @param blockId: block id for transactions as hex encoded
      * @return Promise<boolean>: if no error occurred return true. otherwise, return false
      */
-    abstract processTransactions: (txs: Array<TransactionType>, blockId: string) => Promise<boolean>;
+    abstract processTransactions: (txs: Array<TransactionType>, block: BlockEntity) => Promise<boolean>;
 
     /**
      * get id for extractor. This id must be unique over all extractors.

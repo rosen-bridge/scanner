@@ -89,7 +89,7 @@ export abstract class AbstractScanner<TransactionType> {
         row.status = PROCESSING;
         row.scanner = this.name()
         return await this.blockRepository.save(row).catch((exp) => {
-            console.error(`An error occured during save new block: ${exp}`)
+            console.error(`An error occurred during save new block: ${exp}`)
             return false
         });
     }
@@ -144,7 +144,7 @@ export abstract class AbstractScanner<TransactionType> {
         const txs = await this.networkAccess.getBlockTxs(block.hash);
         const result = (await Promise.all(this.extractors.map(
             (extractor) => {
-                return extractor.processTransactions(txs, block.hash);
+                return extractor.processTransactions(txs, savedBlock);
             }))).reduce((prev, curr) => prev && curr, true);
         if (result && await this.updateBlockStatus(block.blockHeight)) {
             return savedBlock;
