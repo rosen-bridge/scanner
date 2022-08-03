@@ -9,7 +9,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "moduleResolution": "Node",
-    "module": "commonjs",                                /* Specify what module code is generated. */
+    "module": "nodenext",                                /* Specify what module code is generated. */
     "rootDir": "./lib",                                    /* Specify the root folder within your source files. */
     "resolveJsonModule": true,                           /* Enable importing .json files */
     "allowJs": false,                                     /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
