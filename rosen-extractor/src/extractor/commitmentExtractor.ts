@@ -1,9 +1,10 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { ExtractedCommitment } from "../interfaces/extractedCommitment";
+import { extractedCommitment } from "../interfaces/extractedCommitment";
 import { DataSource } from "typeorm";
 import { CommitmentEntityAction } from "../actions/commitmentDB";
+import { AbstractExtractor, BlockEntity } from "@rosen-bridge/scanner";
 
-export abstract class AbstractExecutor{
+export class AbstractExtractorCommitment extends AbstractExtractor<wasm.Transaction>{
     id: string;
     private readonly dataSource: DataSource;
     private readonly commitmentsErgoTrees: Array<string>;
@@ -11,16 +12,28 @@ export abstract class AbstractExecutor{
     private readonly actions: CommitmentEntityAction;
 
     constructor(id: string, addresses: Array<string>, RWTId: string, dataSource: DataSource) {
+        super();
         this.id = id;
         this.dataSource = dataSource;
         this.commitmentsErgoTrees = addresses.map(address => wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes())
         this.actions = new CommitmentEntityAction(dataSource);
     }
 
-    processTransactions = (block: string, txs: Array<wasm.Transaction>): Promise<boolean> => {
+    /**
+     * get Id for current extractor
+     */
+    getId = () => this.id;
+
+    /**
+     * gets block id and transactions corresponding to the block and saves if they are valid rosen
+     *  transactions and in case of success return true and in case of failure returns false
+     * @param txs
+     * @param block
+     */
+    processTransactions = (txs: Array<wasm.Transaction>, block: BlockEntity): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             try {
-                const commitments: Array<ExtractedCommitment> = [];
+                const commitments: Array<extractedCommitment> = [];
                 const spendIds: Array<string> = [];
                 txs.forEach(transaction => {
                     // process outputs
@@ -62,5 +75,13 @@ export abstract class AbstractExecutor{
                 reject(e)
             }
         })
+    }
+
+    /**
+     * fork one block and remove all stored information for this block
+     * @param hash: block hash
+     */
+    forkBlock = async (hash: string): Promise<void> => {
+        await this.actions.deleteBlockCommitment(hash, this.getId());
     }
 }

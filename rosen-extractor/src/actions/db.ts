@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { extractedBox } from "../interfaces/extractedBox";
 import { BoxEntity } from "../entities/BoxEntity";
+import { BlockEntity } from "@rosen-bridge/scanner";
 
 export class BoxEntityAction{
     private readonly datasource: DataSource;
@@ -14,12 +15,12 @@ export class BoxEntityAction{
      * @param observations
      * @param block
      */
-    storeBoxes = async (observations: Array<extractedBox>, block: string) => {
+    storeBoxes = async (observations: Array<extractedBox>, block: BlockEntity) => {
         const boxEntity = observations.map((box) => {
             const row = new BoxEntity();
             row.boxId = box.boxId;
-            row.boxJson = box.boxJson;
-            row.block = block;
+            row.boxSerialized = box.boxSerialized;
+            row.block = block.hash;
             return row;
         });
         let error = true;
@@ -36,6 +37,16 @@ export class BoxEntityAction{
             await queryRunner.release();
         }
         return error;
+    }
+
+    deleteBlockPermit = async (block: string, extractor: string) => {
+        await this.datasource.createQueryBuilder()
+            .delete()
+            .from(BoxEntity)
+            .where("extractor = :extractor AND block = :block", {
+                "block": block,
+                "extractor": extractor
+            }).execute()
     }
 
 }

@@ -6,10 +6,13 @@ export class BoxEntity{
     id: number
 
     @Column()
+    extractor: string;
+
+    @Column()
     boxId: string
 
     @Column()
-    boxJson: string
+    boxSerialized: string
 
     @Column()
     block: string
