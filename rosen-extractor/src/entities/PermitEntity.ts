@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-Entity()
-export class BoxEntity{
+@Entity()
+export class PermitEntity {
     @PrimaryColumn()
     id: number
 

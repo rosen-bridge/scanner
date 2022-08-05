@@ -1,9 +1,9 @@
 import { DataSource } from "typeorm";
 import { extractedBox } from "../interfaces/extractedBox";
-import { BoxEntity } from "../entities/BoxEntity";
+import { EventTriggerEntity } from "../entities/EventTriggerEntity";
 import { BlockEntity } from "@rosen-bridge/scanner";
 
-export class BoxEntityAction{
+export class EventTriggerDB {
     private readonly datasource: DataSource;
 
     constructor(dataSource: DataSource) {
@@ -11,13 +11,13 @@ export class BoxEntityAction{
     }
 
     /**
-     * It stores list of observations in the dataSource with block id
-     * @param observations
+     * It stores list of wids in the dataSource with block id
+     * @param wids
      * @param block
      */
-    storeBoxes = async (observations: Array<extractedBox>, block: BlockEntity) => {
-        const boxEntity = observations.map((box) => {
-            const row = new BoxEntity();
+    storeBoxes = async (wids: Array<extractedBox>, block: BlockEntity) => {
+        const widEntity = wids.map((box) => {
+            const row = new EventTriggerEntity();
             row.boxId = box.boxId;
             row.boxSerialized = box.boxSerialized;
             row.block = block.hash;
@@ -28,7 +28,7 @@ export class BoxEntityAction{
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
-            await queryRunner.manager.save(boxEntity);
+            await queryRunner.manager.save(widEntity);
             await queryRunner.commitTransaction();
         } catch (e) {
             await queryRunner.rollbackTransaction();
@@ -39,10 +39,10 @@ export class BoxEntityAction{
         return error;
     }
 
-    deleteBlockPermit = async (block: string, extractor: string) => {
+    deleteBlock = async (block: string, extractor: string) => {
         await this.datasource.createQueryBuilder()
             .delete()
-            .from(BoxEntity)
+            .from(EventTriggerEntity)
             .where("extractor = :extractor AND block = :block", {
                 "block": block,
                 "extractor": extractor
