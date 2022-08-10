@@ -82,16 +82,40 @@ export abstract class AbstractScanner<TransactionType> {
      * @param block
      */
     saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
-        const row = new BlockEntity();
-        row.height = block.blockHeight;
-        row.hash = block.hash;
-        row.parentHash = block.parentHash;
-        row.status = PROCESSING;
-        row.scanner = this.name()
-        return await this.blockRepository.save(row).catch((exp) => {
+        try {
+            const instance = await this.blockRepository.findOneBy({
+                height: block.blockHeight
+            })
+            if (!instance) {
+                const row = {
+                    height: block.blockHeight,
+                    hash: block.hash,
+                    parentHash: block.parentHash,
+                    status: PROCESSING,
+                    scanner: this.name()
+                }
+                await this.blockRepository.insert(row)
+            } else {
+                await this.blockRepository.createQueryBuilder().update()
+                    .set({
+                        hash: block.hash,
+                        parentHash: block.parentHash,
+                        status: PROCESSING,
+                        scanner: this.name()
+                    }).where({
+                        height: block.blockHeight,
+                        scanner: this.name()
+                    }).execute()
+            }
+            const res = await this.blockRepository.findOneBy({
+                height: block.blockHeight,
+                scanner: this.name()
+            })
+            return res ? res : false;
+        } catch (exp) {
             console.error(`An error occurred during save new block: ${exp}`)
             return false
-        });
+        }
     }
 
 
@@ -142,11 +166,15 @@ export abstract class AbstractScanner<TransactionType> {
             return false;
         }
         const txs = await this.networkAccess.getBlockTxs(block.hash);
-        const result = (await Promise.all(this.extractors.map(
-            (extractor) => {
-                return extractor.processTransactions(txs, savedBlock);
-            }))).reduce((prev, curr) => prev && curr, true);
-        if (result && await this.updateBlockStatus(block.blockHeight)) {
+        let success = true
+        for(let extractor of this.extractors){
+            const extractionResult = await extractor.processTransactions(txs, savedBlock);
+            if(!extractionResult){
+                success = false;
+                break;
+            }
+        }
+        if (success && await this.updateBlockStatus(block.blockHeight)) {
             return savedBlock;
         } else {
             return false;
