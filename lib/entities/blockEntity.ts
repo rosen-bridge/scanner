@@ -1,24 +1,26 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 const PROCESSING = "PROCESSING";
 const PROCEED = "PROCEED"
 
 @Entity()
+@Unique(['height', 'scanner'])
+@Unique(['hash', 'scanner'])
+@Unique(['parentHash', 'scanner'])
 export class BlockEntity {
-    @PrimaryColumn({
-        unique: true,
-    })
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
     height: number
 
     @Column({
         length: 64,
-        unique: true
     })
     hash: string
 
     @Column({
         length: 64,
-        unique: true
     })
     parentHash: string
 
