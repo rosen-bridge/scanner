@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { AbstractNetworkConnector, Block } from "../../../interfaces";
 import { KoiosBlock, KoiosBlockInfo, KoiosTransaction } from "../interfaces/Koios";
 
-export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction>{
+export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
     private readonly url: string;
     private readonly timeout: number;
     private koios: AxiosInstance;
