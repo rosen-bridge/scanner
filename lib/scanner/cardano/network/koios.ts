@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { AbstractNetworkConnector, Block } from "../../../interfaces";
 import { KoiosBlock, KoiosBlockInfo, KoiosTransaction } from "../interfaces/Koios";
 
-export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
+export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction>{
     private readonly url: string;
     private readonly timeout: number;
     private koios: AxiosInstance;
@@ -24,9 +24,9 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
             {params: {block_height: `eq.${height}`, select: 'hash,block_height'}}
         ).then(res => {
             const hash = res.data[0].hash
-            return this.koios.get<Array<KoiosBlockInfo>>(
+            return this.koios.post<Array<KoiosBlockInfo>>(
                 'block_info',
-                {params: {_block_hashes: [hash]}}
+                {_block_hashes: [hash]}
             ).then(info => {
                 const row = info.data[0]
                 return {
@@ -61,10 +61,16 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
             '/block_txs',
             {params: {_block_hash: blockHash}}
         ).then(res => {
-            return this.koios.get<Array<KoiosTransaction>>(
-                '/tx_info',
-                {params: {_tx_hashes: res.data[0].tx_hash}}
-            ).then(ret => ret.data)
+            if (res.data.length === 0) {
+                return []
+            } else {
+                return this.koios.post<Array<KoiosTransaction>>(
+                    '/tx_info',
+                    {_tx_hashes: res.data.map(obj => obj.tx_hash)}
+                ).then(ret => {
+                    return ret.data
+                })
+            }
         }).catch(exp => {
             console.log(exp)
             throw exp

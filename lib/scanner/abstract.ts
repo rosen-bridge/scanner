@@ -167,7 +167,7 @@ export abstract class AbstractScanner<TransactionType> {
         }
         const txs = await this.networkAccess.getBlockTxs(block.hash);
         let success = true
-        for(let extractor of this.extractors){
+        for(const extractor of this.extractors){
             const extractionResult = await extractor.processTransactions(txs, savedBlock);
             if(!extractionResult){
                 success = false;
