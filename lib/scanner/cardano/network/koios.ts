@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { AbstractNetworkConnector, Block } from "../../../interfaces";
 import { KoiosBlock, KoiosBlockInfo, KoiosTransaction } from "../interfaces/Koios";
 
-export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
+export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction>{
     private readonly url: string;
     private readonly timeout: number;
     private koios: AxiosInstance;
@@ -61,12 +61,16 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
             '/block_txs',
             {params: {_block_hash: blockHash}}
         ).then(res => {
-            return (res.data.length === 0 ?
-                [] :
-                this.koios.get<Array<KoiosTransaction>>(
+            if (res.data.length === 0) {
+                return []
+            } else {
+                return this.koios.post<Array<KoiosTransaction>>(
                     '/tx_info',
-                    {params: {_tx_hashes: res.data[0].tx_hash}}
-                ).then(ret => ret.data))
+                    {_tx_hashes: res.data.map(obj => obj.tx_hash)}
+                ).then(ret => {
+                    return ret.data
+                })
+            }
         }).catch(exp => {
             console.log(exp)
             throw exp
