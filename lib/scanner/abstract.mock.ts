@@ -52,32 +52,38 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
     }
 }
 
-export class ScannerTest extends AbstractScanner<TestTransaction> {
-    blockRepository: Repository<BlockEntity>;
-    initialHeight: number;
-    extractors: Array<ExtractorTest>;
-    networkAccess: NetworkConnectorTest;
+/**
+ * generating test scanner & scanner name takes from input
+ * @param name
+ */
+export const generateMockScanner = (name: string) => {
+    return class ScannerTest extends AbstractScanner<TestTransaction>{
+        blockRepository: Repository<BlockEntity>;
+        initialHeight: number;
+        extractors: Array<ExtractorTest>;
+        networkAccess: NetworkConnectorTest;
 
-    constructor(dataSource: DataSource, networkConnector: NetworkConnectorTest, initialHeight: number) {
-        super();
-        this.initialHeight = initialHeight;
-        this.blockRepository = dataSource.getRepository(BlockEntity);
-        this.networkAccess = networkConnector;
-        this.extractors = [];
+        constructor(dataSource: DataSource, networkConnector: NetworkConnectorTest, initialHeight: number) {
+            super();
+            this.initialHeight = initialHeight;
+            this.blockRepository = dataSource.getRepository(BlockEntity);
+            this.networkAccess = networkConnector;
+            this.extractors = [];
+        }
+
+        name = () => {
+            return name
+        }
+
+        getBlockTxs = (): Promise<TestTransaction> => {
+            return Promise.resolve({
+                height: 1,
+                blockHash: "1",
+                txs: [{hash: "11"}]
+            });
+        }
+
     }
-
-    name = () => {
-        return "mocked scanner name"
-    }
-
-    getBlockTxs = (): Promise<TestTransaction> => {
-        return Promise.resolve({
-            height: 1,
-            blockHash: "1",
-            txs: [{hash: "11"}]
-        });
-    }
-
 }
 
 export const loadDataBase = async (name: string): Promise<DataSource> => {

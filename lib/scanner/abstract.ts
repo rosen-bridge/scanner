@@ -86,7 +86,8 @@ export abstract class AbstractScanner<TransactionType> {
     saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
         try {
             const instance = await this.blockRepository.findOneBy({
-                height: block.blockHeight
+                height: block.blockHeight,
+                scanner: this.name(),
             })
             if (!instance) {
                 const row = {
