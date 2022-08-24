@@ -19,7 +19,7 @@ export abstract class AbstractScanner<TransactionType> {
      */
     getLastSavedBlock = async (): Promise<BlockEntity | undefined> => {
         const lastBlock = await this.blockRepository.find({
-            where: {status: PROCEED},
+            where: {status: PROCEED, scanner: this.name()},
             order: {height: 'DESC'},
             take: 1
         });
@@ -41,6 +41,7 @@ export abstract class AbstractScanner<TransactionType> {
         const block = await this.blockRepository.findOneBy({
             status: status,
             height: height,
+            scanner: this.name(),
         });
         if (block !== null) {
             return block;
@@ -57,7 +58,8 @@ export abstract class AbstractScanner<TransactionType> {
      */
     removeForkedBlocks = async (height: number): Promise<DeleteResult> => {
         return await this.blockRepository.delete({
-            height: MoreThanOrEqual(height)
+            height: MoreThanOrEqual(height),
+            scanner: this.name(),
         });
     }
 
