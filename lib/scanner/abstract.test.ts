@@ -1,21 +1,11 @@
 import { ExtractorTest, loadDataBase, NetworkConnectorTest, generateMockScanner } from "./abstract.mock";
 import { BlockEntity, PROCEED, PROCESSING } from "../entities/blockEntity";
-import { DataSource } from "typeorm";
 
 const firstScanner = generateMockScanner("first");
 const secondScanner = generateMockScanner("second");
-let lastSavedBlockDataBase: DataSource;
-let getBlockAtHeight: DataSource;
-let removeForkedBlock: DataSource;
-let isForkHappen: DataSource;
-let saveBlock: DataSource;
-let updateBlockStatus: DataSource;
-let registerExtractor: DataSource;
-let removeExtractor: DataSource;
-let update: DataSource;
 
 describe("Abstract Scanner Tests", () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
         const secondScannerBlocks =
             [
                 {
@@ -40,24 +30,12 @@ describe("Abstract Scanner Tests", () => {
                     scanner: "second",
                 }
             ];
-        lastSavedBlockDataBase = await loadDataBase("lastSavedBlock");
-        getBlockAtHeight = await loadDataBase("getBlockAtHeight");
-        removeForkedBlock = await loadDataBase("removeForkedBlocks");
-        isForkHappen = await loadDataBase("isForkHappen");
-        saveBlock = await loadDataBase("saveBlock");
-        updateBlockStatus = await loadDataBase("updateBlockStatus");
-        registerExtractor = await loadDataBase("registerExtractor")
-        removeExtractor = await loadDataBase("removeExtractor");
-        update = await loadDataBase("update");
-        await lastSavedBlockDataBase.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await getBlockAtHeight.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await removeForkedBlock.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await isForkHappen.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await saveBlock.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await updateBlockStatus.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await registerExtractor.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await removeExtractor.getRepository(BlockEntity).insert(secondScannerBlocks);
-        await update.getRepository(BlockEntity).insert(secondScannerBlocks);
+        const dataSource = await loadDataBase("abstractScanner")
+        await dataSource.getRepository(BlockEntity).createQueryBuilder()
+            .delete()
+            .execute()
+        await dataSource.getRepository(BlockEntity).insert(secondScannerBlocks);
+        await dataSource.destroy()
     })
 
     describe("get last saved block", () => {
@@ -70,7 +48,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return undefined when no saved blocks available", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(lastSavedBlockDataBase, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.getLastSavedBlock()).toEqual(undefined);
         })
 
@@ -84,7 +63,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return undefined when only processing blocks available in database", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(lastSavedBlockDataBase, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner.getLastSavedBlock()).toEqual(undefined);
         })
@@ -98,13 +78,15 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return last saved block when exists in database", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(lastSavedBlockDataBase, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner.updateBlockStatus(1)).toEqual(true);
             expect(await scanner.getLastSavedBlock()).toBeDefined();
         })
 
     });
+
 
     describe("getBlockAtHeight", () => {
 
@@ -116,7 +98,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return undefined When no block stored in database", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(getBlockAtHeight, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.getBlockAtHeight(1)).toEqual(undefined);
         });
 
@@ -130,7 +113,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return undefined when block at height is processing", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(getBlockAtHeight, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner.getBlockAtHeight(1)).toEqual(undefined);
         });
@@ -144,7 +128,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should return last saved block", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(getBlockAtHeight, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner.updateBlockStatus(1)).toEqual(true);
             expect(await scanner.getBlockAtHeight(1)).toBeDefined();
@@ -163,8 +148,9 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should remove forked blocks from fork height", async () => {
             const network = new NetworkConnectorTest();
-            const scanner1 = new firstScanner(removeForkedBlock, network, 1);
-            const scanner2 = new secondScanner(removeForkedBlock, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner1 = new firstScanner(dataSource, network, 1);
+            const scanner2 = new secondScanner(dataSource, network, 1);
             expect(await scanner1.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner1.saveBlock({blockHeight: 2, parentHash: "2", hash: "3"})).not.toEqual(false);
             expect(await scanner1.saveBlock({blockHeight: 3, parentHash: "3", hash: "4"})).not.toEqual(false);
@@ -191,7 +177,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("fork is not happened when database block and network block has same id", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(isForkHappen, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "0", hash: "1"})).not.toEqual(false);
             expect(await scanner.updateBlockStatus(1)).toEqual(true);
             expect(await scanner.isForkHappen()).toEqual(false);
@@ -211,7 +198,8 @@ describe("Abstract Scanner Tests", () => {
                 parentHash: "1",
                 hash: "22"
             })))
-            const scanner = new firstScanner(isForkHappen, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner.updateBlockStatus(1)).toEqual(true);
             expect(await scanner.isForkHappen()).toEqual(true);
@@ -229,7 +217,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should save block in the table", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(saveBlock, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             expect(await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect((await scanner.blockRepository.findAndCountBy({scanner: "first"}))[1]).toEqual(1);
         });
@@ -246,8 +235,9 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should update status block in the table", async () => {
             const network = new NetworkConnectorTest();
-            const scanner1 = new firstScanner(updateBlockStatus, network, 1);
-            const scanner2 = new secondScanner(updateBlockStatus, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner1 = new firstScanner(dataSource, network, 1);
+            const scanner2 = new secondScanner(dataSource, network, 1);
             expect(await scanner1.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})).not.toEqual(false);
             expect(await scanner1.updateBlockStatus(1)).not.toEqual(false);
             const instance = await scanner1.blockRepository.find()
@@ -267,7 +257,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should register extractor", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(registerExtractor, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor = new ExtractorTest("1");
             scanner.registerExtractor(extractor);
             expect(scanner.extractors.length).toEqual(1);
@@ -281,7 +272,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should register extractor", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(registerExtractor, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor = new ExtractorTest("1");
             scanner.registerExtractor(extractor);
             scanner.registerExtractor(extractor);
@@ -296,7 +288,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("should register extractor", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(registerExtractor, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor1 = new ExtractorTest("1");
             const extractor2 = new ExtractorTest("2");
             scanner.registerExtractor(extractor1);
@@ -317,7 +310,8 @@ describe("Abstract Scanner Tests", () => {
          */
         it("remove registered extractor", async () => {
             const network = new NetworkConnectorTest();
-            const scanner = new firstScanner(removeExtractor, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor1 = new ExtractorTest("1");
             const extractor2 = new ExtractorTest("2");
             scanner.registerExtractor(extractor1);
@@ -358,7 +352,8 @@ describe("Abstract Scanner Tests", () => {
                     }
                 });
             })
-            const scanner = new firstScanner(update, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor = new ExtractorTest("1");
             scanner.registerExtractor(extractor);
             await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})
@@ -396,7 +391,8 @@ describe("Abstract Scanner Tests", () => {
                 });
             })
             jest.spyOn(network, 'getCurrentHeight').mockImplementation().mockReturnValue(new Promise(resolve => resolve(3)))
-            const scanner = new firstScanner(update, network, 1);
+            const dataSource = await  loadDataBase("abstractScanner")
+            const scanner = new firstScanner(dataSource, network, 1);
             const extractor = new ExtractorTest("1");
             scanner.registerExtractor(extractor);
             await scanner.saveBlock({blockHeight: 1, parentHash: "1", hash: "2"})
