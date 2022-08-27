@@ -12,6 +12,10 @@
     "build": "rimraf dist && tsc",
     "release": "npm run test && npm run build && npm publish --access public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "files": [
     "dist"
   ],
