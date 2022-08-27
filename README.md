@@ -41,9 +41,9 @@ npm run build
 Ergo Scanner:
 ```javascript
 const ergoScannerConfig = {
-    nodeUrl: ergoConfig.nodeUrl,
-    timeout: ergoConfig.nodeTimeout,
-    initialHeight: ergoConfig.ergoInitialHeight,
+    nodeUrl: <node_url>,
+    timeout: <node_timeout>,
+    initialHeight: <ergo_initial_height>,
     dataSource: dataSource,
 }
 scanner = new ErgoScanner(ergoScannerConfig);
@@ -52,9 +52,9 @@ scanner = new ErgoScanner(ergoScannerConfig);
 Cardano Scanner:
 ```javascript
 const cardanoScannerConfig = {
-    koiosUrl: cardanoConfig.koiosURL,
-    timeout: cardanoConfig.timeout,
-    initialHeight: cardanoConfig.initialHeight,
+    koiosUrl: <koios_url>,
+    timeout: <api_timeout>,
+    initialHeight: <cardano_initial_height>,
     dataSource: dataSource,
 }
 cardanoScanner = new CardanoKoiosScanner(cardanoScannerConfig)
@@ -62,7 +62,7 @@ cardanoScanner = new CardanoKoiosScanner(cardanoScannerConfig)
 
 Registering data extractor:
 ```javascript
-const dataExtractor = new DataExtractor(dataSource, PARAMETERS)
+const dataExtractor = new DataExtractor(dataSource, <PARAMETERS>)
 scanner.registerExtractor(dataExtractor)
 ```
 
