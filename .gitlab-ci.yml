@@ -8,6 +8,7 @@ stages:
 cache:
   paths:
     - node_modules/
+    - packages/*/node_modules
 
 install_dependencies:
   stage: installation
@@ -16,10 +17,11 @@ install_dependencies:
   artifacts:
     paths:
       - node_modules/
+      - packages/*/node_modules
 test_abstract_scanner:
   stage: test_scanner
   script:
     - npm run coverage
   artifacts:
     reports:
-      cobertura: coverage/cobertura-coverage.xml
+      cobertura: packages/*/coverage/cobertura-coverage.xml
