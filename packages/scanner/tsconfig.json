@@ -1,15 +1,14 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": false, /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
-    "outDir": "./dist", /* Specify an output folder for all emitted files. */
-    "rootDir": "./lib", /* Specify the root folder within your source files. */
+    "outDir": "./dist",
+    "rootDir": "./lib",
   },
   "exclude": [
     "./lib/**/*.spec.ts",
     "./lib/**/*.test.ts",
     "./lib/**/*.mock.ts"
   ],
-  "extends": "../../tsconfig.base.json",
   "include": [
     "./lib/**/*"
   ]

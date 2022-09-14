@@ -2,7 +2,8 @@
   "bail": 1,
   "verbose": true,
   "testEnvironment": "node",
-  "transform": {
-    "^.+\\.ts?$": "ts-jest"
-  }
+  "preset": "ts-jest/presets/js-with-babel",
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@rosen-bridge\/scanner)/)"
+  ]
 }

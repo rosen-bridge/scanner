@@ -9,10 +9,6 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "lib": [
-      "es6",
-      "esnext.bigint"
-    ],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,

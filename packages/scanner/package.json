@@ -7,9 +7,9 @@
   "license": "GPL-3.0",
   "scripts": {
     "lint": "eslint --fix .",
-    "test": "rimraf sqlite; tsc --noEmit && npm run lint && jest; rimraf sqlite",
+    "test": "rimraf sqlite; tsc --build && npm run lint && jest; rimraf sqlite",
     "coverage": "c8 npm run test",
-    "build": "rimraf dist && tsc",
+    "build": "tsc --build",
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "repository": {
@@ -29,6 +29,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@babel/preset-env": "^7.19.0",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
