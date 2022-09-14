@@ -1,7 +1,7 @@
-interface extractedPermit{
-    boxId: string;
-    boxSerialized: string;
-    WID: string;
+interface extractedPermit {
+  boxId: string;
+  boxSerialized: string;
+  WID: string;
 }
 
 export { extractedPermit };

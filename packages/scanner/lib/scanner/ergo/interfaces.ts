@@ -1,8 +1,8 @@
-import { DataSource } from "typeorm";
+import { DataSource } from 'typeorm';
 
-export interface ErgoScannerConfig{
-    nodeUrl: string;
-    timeout: number;
-    dataSource: DataSource;
-    initialHeight: number;
+export interface ErgoScannerConfig {
+  nodeUrl: string;
+  timeout: number;
+  dataSource: DataSource;
+  initialHeight: number;
 }

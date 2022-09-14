@@ -1,62 +1,61 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
-@Unique(["boxId", "extractor"])
-class EventTriggerEntity{
-    @PrimaryGeneratedColumn()
-    id: number
+@Unique(['boxId', 'extractor'])
+class EventTriggerEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    extractor: string;
+  @Column()
+  extractor: string;
 
-    @Column()
-    boxId: string
+  @Column()
+  boxId: string;
 
-    @Column()
-    boxSerialized: string
+  @Column()
+  boxSerialized: string;
 
-    @Column()
-    block: string
+  @Column()
+  block: string;
 
-    @Column()
-    height: number
+  @Column()
+  height: number;
 
-    @Column()
-    fromChain: string
+  @Column()
+  fromChain: string;
 
-    @Column()
-    toChain: string
+  @Column()
+  toChain: string;
 
-    @Column()
-    fromAddress: string
+  @Column()
+  fromAddress: string;
 
-    @Column()
-    toAddress: string
+  @Column()
+  toAddress: string;
 
-    @Column()
-    amount: string
+  @Column()
+  amount: string;
 
-    @Column()
-    bridgeFee: string
+  @Column()
+  bridgeFee: string;
 
-    @Column()
-    networkFee: string
+  @Column()
+  networkFee: string;
 
-    @Column()
-    sourceChainTokenId: string
+  @Column()
+  sourceChainTokenId: string;
 
-    @Column()
-    targetChainTokenId: string
+  @Column()
+  targetChainTokenId: string;
 
-    @Column()
-    sourceTxId: string
+  @Column()
+  sourceTxId: string;
 
-    @Column()
-    sourceBlockId: string
+  @Column()
+  sourceBlockId: string;
 
-    @Column()
-    WIDs: string
-
+  @Column()
+  WIDs: string;
 }
 
 export default EventTriggerEntity;

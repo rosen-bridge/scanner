@@ -1,5 +1,5 @@
 export default class ExtractedBox {
-    boxId: string;
-    address: string;
-    serialized: string;
+  boxId: string;
+  address: string;
+  serialized: string;
 }

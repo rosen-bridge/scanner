@@ -1,40 +1,40 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
-@Unique(["boxId", "extractor"])
-class CommitmentEntity{
-    @PrimaryGeneratedColumn()
-    id: number;
+@Unique(['boxId', 'extractor'])
+class CommitmentEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    extractor: string;
+  @Column()
+  extractor: string;
 
-    @Column()
-    eventId: string;
+  @Column()
+  eventId: string;
 
-    @Column()
-    commitment: string;
+  @Column()
+  commitment: string;
 
-    @Column()
-    WID: string;
+  @Column()
+  WID: string;
 
-    @Column()
-    boxId: string;
+  @Column()
+  boxId: string;
 
-    @Column()
-    block: string;
+  @Column()
+  block: string;
 
-    @Column()
-    height: number
+  @Column()
+  height: number;
 
-    @Column()
-    boxSerialized: string;
+  @Column()
+  boxSerialized: string;
 
-    @Column({nullable: true})
-    spendBlock!: string;
+  @Column({ nullable: true })
+  spendBlock!: string;
 
-    @Column({nullable: true})
-    spendHeight?: number;
+  @Column({ nullable: true })
+  spendHeight?: number;
 }
 
 export default CommitmentEntity;

@@ -1,3 +1,3 @@
 export type NodeBlock = {
-    transactions: Array<JSON>
-}
+  transactions: Array<JSON>;
+};
