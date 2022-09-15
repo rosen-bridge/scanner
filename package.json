@@ -2,7 +2,9 @@
   "name": "rosen-bridge",
   "private": true,
   "workspaces": {
-    "packages": ["packages/*"]
+    "packages": [
+      "packages/*"
+    ]
   },
   "scripts": {
     "lint": "npm run lint --workspaces",
