@@ -1,8 +1,9 @@
-import { loadDataBase } from '../extractor/utilsFunctions.mock';
+import { clearDB, loadDataBase } from '../extractor/utilsFunctions.mock';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import EventTriggerDB from './EventTriggerDB';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { block } from '../extractor/utilsVariable.mock';
+import { DataSource } from 'typeorm';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
   WIDs: 'wid2',
@@ -47,7 +48,37 @@ const sampleEventTrigger4: ExtractedEventTrigger = {
   boxId: '4',
 };
 
+export const sampleEventEntity = {
+  extractor: 'extractorId',
+  boxId: 'id',
+  boxSerialized: 'boxSerialized',
+  block: 'hash',
+  height: 10,
+  toAddress: 'cardanoAddr2',
+  fromChain: 'ergo',
+  toChain: 'cardano',
+  fromAddress: 'address',
+  amount: '17',
+  bridgeFee: '34',
+  networkFee: '51',
+  sourceChainTokenId: 'sourceToken',
+  targetChainTokenId: 'targetToken',
+  sourceTxId: 'txId',
+  sourceBlockId: 'blockId',
+  WIDs: 'ff',
+};
+
+let dataSource: DataSource;
+
 describe('EventTrigger', () => {
+  beforeAll(async () => {
+    dataSource = await loadDataBase();
+  });
+
+  beforeEach(async () => {
+    await clearDB(dataSource);
+  });
+
   describe('storeEventTriggers', () => {
     /**
      * 2 valid EventTrigger Box should save successfully
@@ -56,7 +87,6 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and database row count should be 2
      */
     it('gets two EventBoxes and dataBase row should be 2', async () => {
-      const dataSource = await loadDataBase('eventTriggerStore');
       const eventTrigger = new EventTriggerDB(dataSource);
       const res = await eventTrigger.storeEventTriggers(
         [sampleEventTrigger1, sampleEventTrigger2],
@@ -93,7 +123,6 @@ describe('EventTrigger', () => {
      * Expected: eventTriggers should returns true and each saved eventTrigger should have valid fields
      */
     it('checks that eventTrigger saved successfully with two different extractor', async () => {
-      const dataSource = await loadDataBase('twoExtractor');
       const action = new EventTriggerDB(dataSource);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
@@ -148,7 +177,6 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and last eventTrigger fields should update
      */
     it('checks that duplicated eventTrigger updated with same extractor', async () => {
-      const dataSource = await loadDataBase('duplicatedFields');
       const action = new EventTriggerDB(dataSource);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
@@ -195,7 +223,6 @@ describe('EventTrigger', () => {
      *  each step and new eventTrigger should insert in the database
      */
     it('two eventTrigger with two different extractor but same boxId', async () => {
-      const dataSource = await loadDataBase('same-boxId');
       const action = new EventTriggerDB(dataSource);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
@@ -241,7 +268,6 @@ describe('EventTrigger', () => {
      *  each step and new eventTriggers should insert in the database
      */
     it('two eventTrigger with two different boxId but same extractor', async () => {
-      const dataSource = await loadDataBase('same-extractor');
       const action = new EventTriggerDB(dataSource);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
@@ -278,6 +304,31 @@ describe('EventTrigger', () => {
     });
   });
 
+  /**
+   * testing spendBlock row update works correctly
+   * Dependency:
+   *  1- adding eventTrigger to the database
+   * Scenario: 1 eventTrigger spendBlock should update successfully
+   * Expected: one eventTrigger spendBlock should be equal to 'hash'
+   */
+  describe('spendEventTriggers', () => {
+    it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
+      const eventTriggerAction = new EventTriggerDB(dataSource);
+      const repository = dataSource.getRepository(EventTriggerEntity);
+      await repository.insert([
+        sampleEventEntity,
+        { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
+      ]);
+      await eventTriggerAction.spendEventTriggers(['id'], block, 'extractorId');
+      expect(
+        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
+      ).toEqual(1);
+      expect(
+        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length
+      ).toEqual(0);
+    });
+  });
+
   describe('deleteBlock', () => {
     /**
      * deleting all EventTrigger correspond to a block hash
@@ -286,7 +337,6 @@ describe('EventTrigger', () => {
      * Expected: deleteBlock should call without no error and database row count should be 1
      */
     it('should deleted one row of the dataBase correspond to one block', async () => {
-      const dataSource = await loadDataBase('deleteBlock');
       const eventTrigger = new EventTriggerDB(dataSource);
       await eventTrigger.storeEventTriggers(
         [sampleEventTrigger1],

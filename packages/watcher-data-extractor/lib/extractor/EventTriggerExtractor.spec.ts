@@ -7,6 +7,7 @@ import EventTriggerExtractor from './EventTriggerExtractor';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
+import { sampleEventEntity } from '../actions/EventTrigger.spec';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -92,6 +93,8 @@ describe('EventTriggerExtractor', () => {
         sourceTxId: sampleEventData[0],
         sourceBlockId: sampleEventData[10],
         WIDs: 'ff',
+        spendBlock: null,
+        spendHeight: null,
       });
       expect(rowsCount).toBe(1);
     });
@@ -124,6 +127,43 @@ describe('EventTriggerExtractor', () => {
       );
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(EventTriggerEntity);
+      const [, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toBe(2);
+    });
+  });
+
+  describe('forkBlock', () => {
+    /**
+     * forkBlock should delete events with specific block and extractor from database
+     * Dependency:
+     *  1- sample event data should insert to the empty database
+     * Scenario: calling forkBlock with extractor with specific extractorId on the dataBase
+     * Expected: afterCalling forkBlock database row count should be 2
+     */
+    it('should remove only block with specific block id and extractor', async () => {
+      const extractor = new EventTriggerExtractor(
+        'extractorId',
+        dataSource,
+        eventTriggerAddress,
+        RWTId
+      );
+      const repository = dataSource.getRepository(EventTriggerEntity);
+      await repository.insert([
+        sampleEventEntity,
+        {
+          ...sampleEventEntity,
+          boxId: '22',
+          block: 'hash2',
+          id: 2,
+        },
+        {
+          ...sampleEventEntity,
+          boxId: '33',
+          extractor: 'secondExtractor',
+          id: 3,
+        },
+      ]);
+      await extractor.forkBlock('hash');
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
     });

@@ -2,6 +2,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
+import eventTriggerEntity from '../entities/EventTriggerEntity';
 
 class EventTriggerDB {
   private readonly datasource: DataSource;
@@ -81,6 +82,30 @@ class EventTriggerDB {
   };
 
   /**
+   * update spendBlock Column of the commitments in the dataBase
+   * @param spendId
+   * @param block
+   * @param extractor
+   */
+  spendEventTriggers = async (
+    spendId: Array<string>,
+    block: BlockEntity,
+    extractor: string
+  ): Promise<void> => {
+    for (const id of spendId) {
+      await this.datasource
+        .createQueryBuilder()
+        .update(eventTriggerEntity)
+        .set({ spendBlock: block.hash, spendHeight: block.height })
+        .where('boxId = :id AND extractor = :extractor', {
+          id: id,
+          extractor: extractor,
+        })
+        .execute();
+    }
+  };
+
+  /**
    * deleting all permits corresponding to the block(id) and extractor(id)
    * @param block
    * @param extractor
@@ -93,6 +118,15 @@ class EventTriggerDB {
       .where('extractor = :extractor AND block = :block', {
         block: block,
         extractor: extractor,
+      })
+      .execute();
+    //TODO: should handled null value in spendBlockHeight
+    await this.datasource
+      .createQueryBuilder()
+      .update(EventTriggerEntity)
+      .set({ spendBlock: undefined, spendHeight: 0 })
+      .where('spendBlock = :block AND block = :block', {
+        block: block,
       })
       .execute();
   };
