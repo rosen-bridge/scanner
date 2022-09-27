@@ -164,8 +164,10 @@ describe('EventTriggerExtractor', () => {
         },
       ]);
       await extractor.forkBlock('hash');
-      const [, rowsCount] = await repository.findAndCount();
+      const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
+      expect(rows[0].block).toBe('hash2');
+      expect(rows[1].extractor).toBe('secondExtractor');
     });
   });
 });
