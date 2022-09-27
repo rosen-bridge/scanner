@@ -12,6 +12,7 @@
     "test": "rimraf sqlite; tsc --build && npm run lint && jest --detectOpenHandles; rimraf sqlite",
     "coverage": "c8 npm run test",
     "build": "tsc --build",
+    "type-check": "tsc --noEmit",
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "files": [

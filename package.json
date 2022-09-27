@@ -11,6 +11,11 @@
     "test": "npm run test --workspaces",
     "coverage": "npm run coverage --workspaces",
     "build": "npm run build --workspaces",
-    "release": "npm run release --workspaces"
+    "type-check": "npm run type-check --workspaces",
+    "release": "npm run release --workspaces",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^8.0.0"
   }
 }
