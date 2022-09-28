@@ -84,6 +84,12 @@ abstract class AbstractExtractor<TransactionType> {
    * @param hash: block hash
    */
   abstract forkBlock: (hash: string) => Promise<void>;
+
+  /**
+   * Extractor box initialization
+   * No action needed in cardano extractors
+   */
+  abstract initializeBoxes: () => Promise<void>;
 }
 
 export { AbstractDataBase, AbstractExtractor, AbstractNetworkConnector, Block };

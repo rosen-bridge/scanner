@@ -116,6 +116,14 @@ class EventTriggerExtractor extends AbstractExtractor<wasm.Transaction> {
   forkBlock = async (hash: string) => {
     await this.actions.deleteBlock(hash, this.getId());
   };
+
+  /**
+   * Extractor box initialization
+   * No action needed in event trigger extractors
+   */
+  initializeBoxes = async () => {
+    return;
+  };
 }
 
 export default EventTriggerExtractor;

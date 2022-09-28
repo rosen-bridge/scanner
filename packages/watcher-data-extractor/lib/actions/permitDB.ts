@@ -1,5 +1,5 @@
 import { DataSource, In, Repository } from 'typeorm';
-import { extractedPermit } from '../interfaces/extractedPermit';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
@@ -13,6 +13,39 @@ class PermitEntityAction {
     this.permitRepository = dataSource.getRepository(PermitEntity);
   }
 
+  storeInitialPermits = async (
+    permits: Array<ExtractedPermit>,
+    extractor: string
+  ) => {
+    let success = true;
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const permit of permits) {
+        const entity = {
+          boxId: permit.boxId,
+          boxSerialized: permit.boxSerialized,
+          block: permit.block,
+          height: permit.height,
+          extractor: extractor,
+          WID: permit.WID,
+        };
+        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      console.log(
+        `An error occurred during storing initial permits action: ${e}`
+      );
+      await queryRunner.rollbackTransaction();
+      success = false;
+    } finally {
+      await queryRunner.release();
+    }
+    return success;
+  };
+
   /**
    * It stores list of permits in the dataSource with block id
    * @param permits
@@ -20,7 +53,7 @@ class PermitEntityAction {
    * @param extractor
    */
   storePermits = async (
-    permits: Array<extractedPermit>,
+    permits: Array<ExtractedPermit>,
     block: BlockEntity,
     extractor: string
   ) => {

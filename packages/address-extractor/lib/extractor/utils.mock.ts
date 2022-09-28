@@ -5,7 +5,7 @@ import { BlockEntity } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
-export const loadDataBase = async (name: string): Promise<DataSource> => {
+const loadDataBase = async (name: string): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
     database: `./sqlite/${name}-test.sqlite`,
@@ -21,7 +21,7 @@ export const loadDataBase = async (name: string): Promise<DataSource> => {
     });
 };
 
-export const generateBlockEntity = (
+const generateBlockEntity = (
   dataSource: DataSource,
   hash: string,
   parent?: string,
@@ -40,4 +40,50 @@ const tx1Bytes = Buffer.from(
   'base64'
 );
 
-export const tx1 = ergoLib.Transaction.sigma_parse_bytes(tx1Bytes);
+const tx1 = ergoLib.Transaction.sigma_parse_bytes(tx1Bytes);
+
+const addressBoxes = {
+  items: [
+    {
+      boxId: 'a620ace127594b5fcc97f7362c007d5141340a32be4acef3f6f628d9583ffd06',
+      transactionId:
+        'b50da7a13165ec2c2e50eb1fde8fb8b4a6ac444188b4f2531d3ad92541902b50',
+      blockId:
+        '63069a60bb76a163fbaf8d3af3adf4fdc2d092d679d246b7a3247201f61d2a46',
+      value: BigInt('9997800000'),
+      index: 2,
+      globalIndex: 632031,
+      creationHeight: 295127,
+      settlementHeight: 295129,
+      ergoTree:
+        '0008cd020751cba011559c7af3531d951319ad60a81b42415aa974efddf8f9d8aa197446',
+      address: '9eaHUvGekJKwEkMBvBY1h2iM9z2NijA7PRhFLGruwvff3Uc7WvZ',
+      assets: [
+        {
+          tokenId:
+            '3582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
+          index: 0,
+          amount: BigInt('1'),
+          name: null,
+          decimals: null,
+          type: null,
+        },
+        {
+          tokenId:
+            'a2a6c892c38d508a659caf857dbe29da4343371e597efd42e40f9bc99099a516',
+          index: 1,
+          amount: BigInt('900'),
+          name: 'RSN',
+          decimals: 0,
+          type: 'EIP-004',
+        },
+      ],
+      additionalRegisters: {},
+      spentTransactionId: null,
+      mainChain: true,
+    },
+  ],
+  total: 1,
+};
+
+export { loadDataBase, generateBlockEntity, tx1, addressBoxes };

@@ -274,6 +274,7 @@ export abstract class AbstractScanner<TransactionType> {
     try {
       const lastSavedBlock = await this.getLastSavedBlock();
       if (lastSavedBlock === undefined) {
+        this.extractors.forEach(extractor => extractor.initializeBoxes())
         const block = await this.networkAccess.getBlockAtHeight(
           this.initialHeight
         );

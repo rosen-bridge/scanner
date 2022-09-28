@@ -284,4 +284,27 @@ describe('BoxEntityAction', () => {
       expect(await repository.count()).toEqual(0);
     });
   });
+
+  describe('storeInitialBoxes', () => {
+    it('should store initial boxes in the database', async () => {
+      const dataSource = await loadDataBase('initialDb');
+      const action = new BoxEntityAction(dataSource);
+      const box: ExtractedBox = {
+        boxId: 'boxId',
+        serialized: 'serialized',
+        address: 'address',
+        blockId: 'blockId',
+        height: 100,
+      };
+      await action.storeInitialBoxes([box], 'extractor');
+      const repository = dataSource.getRepository(BoxEntity);
+      expect(await repository.count()).toEqual(1);
+      const stored = (await repository.find())[0];
+      expect(stored.address).toEqual('address');
+      expect(stored.boxId).toEqual('boxId');
+      expect(stored.serialized).toEqual('serialized');
+      expect(stored.creationHeight).toEqual(100);
+      expect(stored.createBlock).toEqual('blockId');
+    });
+  });
 });

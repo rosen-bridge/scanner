@@ -12,5 +12,9 @@
     "coverage": "npm run coverage --workspaces",
     "build": "npm run build --workspaces",
     "release": "npm run release --workspaces"
+  },
+  "dependencies": {
+    "@types/json-bigint": "^1.0.1",
+    "json-bigint": "^1.0.0"
   }
 }

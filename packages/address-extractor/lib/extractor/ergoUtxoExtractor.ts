@@ -5,21 +5,27 @@ import { BoxEntityAction } from '../actions/db';
 import { AbstractExtractor } from '@rosen-bridge/scanner';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
+import { ExplorerApi } from '../network/ergoNetworkApi';
+import { JsonBI } from '../network/parser';
 
 export class ErgoUTXOExtractor
   implements AbstractExtractor<ergoLib.Transaction>
 {
   private readonly dataSource: DataSource;
-  private readonly actions: BoxEntityAction;
+  readonly actions: BoxEntityAction;
   private readonly id: string;
   private readonly networkType: ergoLib.NetworkPrefix;
   private readonly ergoTree?: string;
   private readonly tokens: Array<string>;
+  readonly explorerApi: ExplorerApi;
+  private readonly initialHeight: number;
 
   constructor(
     dataSource: DataSource,
     id: string,
     networkType: ergoLib.NetworkPrefix,
+    explorerUrl: string,
+    initialHeight: number,
     address?: string,
     tokens?: Array<string>
   ) {
@@ -31,6 +37,8 @@ export class ErgoUTXOExtractor
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
+    this.explorerApi = new ExplorerApi(explorerUrl);
+    this.initialHeight = initialHeight;
   }
 
   /**
@@ -119,5 +127,43 @@ export class ErgoUTXOExtractor
    */
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockBoxes(hash, this.getId());
+  };
+
+  /**
+   * Initializes the database with older boxes related to the address
+   */
+  initializeBoxes = async () => {
+    if (this.ergoTree) {
+      const extractedBoxes: Array<ExtractedBox> = [];
+      let offset = 0,
+        total = 100;
+      while (offset < total) {
+        const boxes = await this.explorerApi.getBoxesForAddress(
+          this.ergoTree,
+          offset
+        );
+        boxes.items.forEach((boxJson) => {
+          if (boxJson.settlementHeight < this.initialHeight) {
+            const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+            extractedBoxes.push({
+              boxId: box.box_id().to_str(),
+              address: ergoLib.Address.recreate_from_ergo_tree(
+                ergoLib.ErgoTree.from_base16_bytes(
+                  box.ergo_tree().to_base16_bytes()
+                )
+              ).to_base58(this.networkType),
+              serialized: Buffer.from(box.sigma_serialize_bytes()).toString(
+                'base64'
+              ),
+              blockId: boxJson.blockId,
+              height: boxJson.settlementHeight,
+            });
+          }
+        });
+        total = boxes.total;
+        offset += 100;
+      }
+      await this.actions.storeInitialBoxes(extractedBoxes, this.getId());
+    }
   };
 }

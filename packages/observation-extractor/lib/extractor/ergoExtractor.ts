@@ -144,4 +144,12 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockObservation(hash, this.getId());
   };
+
+  /**
+   * Extractor box initialization
+   * No action needed in cardano extractors
+   */
+  initializeBoxes = async () => {
+    return;
+  };
 }

@@ -10,6 +10,35 @@ export class BoxEntityAction {
     this.datasource = dataSource;
   }
 
+  storeInitialBoxes = async (boxes: Array<ExtractedBox>, extractor: string) => {
+    let success = true;
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const box of boxes) {
+        const entity = {
+          address: box.address,
+          boxId: box.boxId,
+          createBlock: box.blockId,
+          creationHeight: box.height,
+          spendBlock: undefined,
+          serialized: box.serialized,
+          extractor: extractor,
+        };
+        await queryRunner.manager.getRepository(BoxEntity).insert(entity);
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      console.log(`An error occurred during store boxes action: ${e}`);
+      await queryRunner.rollbackTransaction();
+      success = false;
+    } finally {
+      await queryRunner.release();
+    }
+    return success;
+  };
+
   /**
    * It stores list of blocks in the dataSource with block id
    * @param boxes

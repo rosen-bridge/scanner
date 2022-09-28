@@ -36,6 +36,9 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   forkBlock = (hash: string) => {
     return Promise.resolve();
   };
+  initializeBoxes = () => {
+    return Promise.resolve();
+  };
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {

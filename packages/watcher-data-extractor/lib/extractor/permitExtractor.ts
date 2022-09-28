@@ -1,21 +1,29 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import PermitEntityAction from '../actions/permitDB';
-import { extractedPermit } from '../interfaces/extractedPermit';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { Buffer } from 'buffer';
+import { ExplorerApi } from '../network/ergoNetworkApi';
+import { JsonBI } from '../network/parser';
 
 class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
   id: string;
   private readonly dataSource: DataSource;
-  private readonly actions: PermitEntityAction;
+  readonly actions: PermitEntityAction;
   private readonly permitErgoTree: string;
   private readonly RWT: string;
+  readonly explorerApi: ExplorerApi;
+  private readonly initialHeight: number;
 
   constructor(
     id: string,
     dataSource: DataSource,
     address: string,
-    RWT: string
+    RWT: string,
+    explorerUrl: string,
+    initialHeight: number
   ) {
     super();
     this.id = id;
@@ -25,6 +33,8 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
+    this.explorerApi = new ExplorerApi(explorerUrl);
+    this.initialHeight = initialHeight;
   }
 
   getId = () => this.id;
@@ -41,7 +51,7 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
-        const boxes: Array<extractedPermit> = [];
+        const boxes: Array<ExtractedPermit> = [];
         const spendIds: Array<string> = [];
         txs.forEach((transaction) => {
           for (let index = 0; index < transaction.outputs().len(); index++) {
@@ -103,6 +113,46 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
 
   forkBlock = async (hash: string) => {
     await this.actions.deleteBlock(hash, this.getId());
+  };
+
+  /**
+   * Initializes the database with older permits related to the address
+   */
+  initializeBoxes = async () => {
+    const extractedBoxes: Array<ExtractedPermit> = [];
+    let offset = 0,
+      total = 100;
+    while (offset < total) {
+      const boxes = await this.explorerApi.getBoxesForAddress(
+        this.permitErgoTree,
+        offset
+      );
+      boxes.items.forEach((boxJson) => {
+        if (
+          boxJson.settlementHeight < this.initialHeight &&
+          boxJson.assets.length > 0 &&
+          boxJson.assets[0].tokenId == this.RWT
+        ) {
+          const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+          const r4 = box.register_value(4);
+          if (r4) {
+            const R4Serialized = r4.to_coll_coll_byte();
+            extractedBoxes.push({
+              boxId: box.box_id().to_str(),
+              boxSerialized: Buffer.from(box.sigma_serialize_bytes()).toString(
+                'base64'
+              ),
+              block: boxJson.blockId,
+              height: boxJson.settlementHeight,
+              WID: Buffer.from(R4Serialized[0]).toString('hex'),
+            });
+          }
+        }
+      });
+      total = boxes.total;
+      offset += 100;
+    }
+    await this.actions.storeInitialPermits(extractedBoxes, this.getId());
   };
 }
 
