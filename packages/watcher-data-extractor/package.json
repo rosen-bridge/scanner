@@ -11,7 +11,8 @@
     "lint": "eslint --fix . && npm run prettify",
     "test": "rimraf sqlite; tsc --build; npm run lint; jest --detectOpenHandles; rimraf sqlite",
     "coverage": "c8 npm run test",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "type-check": "tsc --noEmit"
   },
   "files": [
     "dist"
