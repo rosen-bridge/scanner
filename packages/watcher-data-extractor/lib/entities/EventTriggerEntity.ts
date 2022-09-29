@@ -56,6 +56,12 @@ class EventTriggerEntity {
 
   @Column()
   WIDs: string;
+
+  @Column({ nullable: true })
+  spendBlock!: string;
+
+  @Column({ nullable: true })
+  spendHeight?: number;
 }
 
 export default EventTriggerEntity;
