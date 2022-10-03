@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { AddressBoxes } from '../interfaces/types';
+import { Boxes } from '../interfaces/types';
 import { JsonBI } from './parser';
 
 export class ExplorerApi {
@@ -22,12 +22,40 @@ export class ExplorerApi {
     tree: string,
     offset = 0,
     limit = 100
-  ): Promise<AddressBoxes> => {
+  ): Promise<Boxes> => {
     return this.api
-      .get<AddressBoxes>(`/api/v1/boxes/unspent/byErgoTree/${tree}`, {
+      .get<Boxes>(`/api/v1/boxes/unspent/byErgoTree/${tree}`, {
         params: { offset: offset, limit: limit },
         transformResponse: (data) => JsonBI.parse(data),
       })
       .then((res) => res.data);
+  };
+
+  /**
+   * gets boxes containing tokenId
+   * @param tokenId the address ergoTree
+   * @param offset
+   * @param limit
+   */
+  getBoxesByTokenId = async (
+    tokenId: string,
+    offset = 0,
+    limit = 100
+  ): Promise<Boxes> => {
+    return this.api
+      .get<Boxes>(`/v1/boxes/unspent/byTokenId/${tokenId}`, {
+        params: { offset: offset, limit: limit },
+        transformResponse: (data) => JsonBI.parse(data),
+      })
+      .then((res) => res.data)
+      .catch((e) => {
+        console.log(
+          `An error occurred while getting boxes containing token [${tokenId}] from Ergo Explorer: [${e}]`
+        );
+        return {
+          items: [],
+          total: 0,
+        };
+      });
   };
 }

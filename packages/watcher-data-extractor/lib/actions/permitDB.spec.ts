@@ -334,6 +334,7 @@ describe('PermitEntityAction', () => {
       const permitEntity = new PermitEntityAction(dataSource);
       const res = await permitEntity.storeInitialPermits(
         [initialPermit],
+        100,
         'extractor1'
       );
       expect(res).toEqual(true);

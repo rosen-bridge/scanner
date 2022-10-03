@@ -7,6 +7,7 @@ import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
+import { ErgoBoxJson } from '../interfaces/types';
 
 export class ErgoUTXOExtractor
   implements AbstractExtractor<ergoLib.Transaction>
@@ -18,14 +19,12 @@ export class ErgoUTXOExtractor
   private readonly ergoTree?: string;
   private readonly tokens: Array<string>;
   readonly explorerApi: ExplorerApi;
-  private readonly initialHeight: number;
 
   constructor(
     dataSource: DataSource,
     id: string,
     networkType: ergoLib.NetworkPrefix,
     explorerUrl: string,
-    initialHeight: number,
     address?: string,
     tokens?: Array<string>
   ) {
@@ -38,9 +37,20 @@ export class ErgoUTXOExtractor
       : undefined;
     this.tokens = tokens ? tokens : [];
     this.explorerApi = new ExplorerApi(explorerUrl);
-    this.initialHeight = initialHeight;
   }
 
+  private extractBoxFromJson = (boxJson: ErgoBoxJson) => {
+    const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+    return {
+      boxId: box.box_id().to_str(),
+      address: ergoLib.Address.recreate_from_ergo_tree(
+        ergoLib.ErgoTree.from_base16_bytes(box.ergo_tree().to_base16_bytes())
+      ).to_base58(this.networkType),
+      serialized: Buffer.from(box.sigma_serialize_bytes()).toString('base64'),
+      blockId: boxJson.blockId,
+      height: boxJson.settlementHeight,
+    };
+  };
   /**
    * get Id for current extractor
    */
@@ -132,9 +142,9 @@ export class ErgoUTXOExtractor
   /**
    * Initializes the database with older boxes related to the address
    */
-  initializeBoxes = async () => {
+  initializeBoxes = async (initialHeight: number) => {
+    const extractedBoxes: Array<ExtractedBox> = [];
     if (this.ergoTree) {
-      const extractedBoxes: Array<ExtractedBox> = [];
       let offset = 0,
         total = 100;
       while (offset < total) {
@@ -143,27 +153,41 @@ export class ErgoUTXOExtractor
           offset
         );
         boxes.items.forEach((boxJson) => {
-          if (boxJson.settlementHeight < this.initialHeight) {
-            const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
-            extractedBoxes.push({
-              boxId: box.box_id().to_str(),
-              address: ergoLib.Address.recreate_from_ergo_tree(
-                ergoLib.ErgoTree.from_base16_bytes(
-                  box.ergo_tree().to_base16_bytes()
-                )
-              ).to_base58(this.networkType),
-              serialized: Buffer.from(box.sigma_serialize_bytes()).toString(
-                'base64'
-              ),
-              blockId: boxJson.blockId,
-              height: boxJson.settlementHeight,
-            });
+          if (this.tokens.length > 0) {
+            const boxTokens = boxJson.assets.map((token) => token.tokenId);
+            const requiredTokens = boxTokens.filter((token) =>
+              this.tokens.includes(token)
+            );
+            if (requiredTokens.length == 0) return;
+          }
+          if (boxJson.settlementHeight < initialHeight) {
+            extractedBoxes.push(this.extractBoxFromJson(boxJson));
           }
         });
         total = boxes.total;
         offset += 100;
       }
-      await this.actions.storeInitialBoxes(extractedBoxes, this.getId());
     }
+    if (!this.ergoTree && this.tokens.length > 0) {
+      for (const token of this.tokens) {
+        let offset = 0,
+          total = 100;
+        while (offset < total) {
+          const boxes = await this.explorerApi.getBoxesByTokenId(token, offset);
+          boxes.items.forEach((boxJson) => {
+            if (boxJson.settlementHeight < initialHeight) {
+              extractedBoxes.push(this.extractBoxFromJson(boxJson));
+            }
+          });
+          total = boxes.total;
+          offset += 100;
+        }
+      }
+    }
+    await this.actions.storeInitialBoxes(
+      extractedBoxes,
+      initialHeight,
+      this.getId()
+    );
   };
 }

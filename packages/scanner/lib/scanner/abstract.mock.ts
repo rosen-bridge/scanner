@@ -69,6 +69,7 @@ export const generateMockScanner = (name: string) => {
     initialHeight: number;
     extractors: Array<ExtractorTest>;
     networkAccess: NetworkConnectorTest;
+    extractorInitialization: Array<boolean>;
 
     constructor(
       dataSource: DataSource,
@@ -80,6 +81,7 @@ export const generateMockScanner = (name: string) => {
       this.blockRepository = dataSource.getRepository(BlockEntity);
       this.networkAccess = networkConnector;
       this.extractors = [];
+      this.extractorInitialization = [];
     }
 
     name = () => {

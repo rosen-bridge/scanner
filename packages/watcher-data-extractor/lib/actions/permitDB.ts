@@ -13,11 +13,17 @@ class PermitEntityAction {
     this.permitRepository = dataSource.getRepository(PermitEntity);
   }
 
+  /**
+   * stores initial permit boxes in the database
+   * @param permits
+   * @param initialHeight
+   * @param extractor
+   */
   storeInitialPermits = async (
     permits: Array<ExtractedPermit>,
+    initialHeight: number,
     extractor: string
   ) => {
-    let success = true;
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -39,11 +45,11 @@ class PermitEntityAction {
         `An error occurred during storing initial permits action: ${e}`
       );
       await queryRunner.rollbackTransaction();
-      success = false;
+      throw new Error('Initialization failed while storing initial permits');
     } finally {
       await queryRunner.release();
     }
-    return success;
+    return true;
   };
 
   /**

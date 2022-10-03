@@ -286,6 +286,12 @@ describe('BoxEntityAction', () => {
   });
 
   describe('storeInitialBoxes', () => {
+    /**
+     * store initial boxes in database
+     * Dependency: -
+     * Scenario: mock extracted box and store it on the database
+     * Expected: must store thr correct box
+     */
     it('should store initial boxes in the database', async () => {
       const dataSource = await loadDataBase('initialDb');
       const action = new BoxEntityAction(dataSource);
@@ -296,7 +302,7 @@ describe('BoxEntityAction', () => {
         blockId: 'blockId',
         height: 100,
       };
-      await action.storeInitialBoxes([box], 'extractor');
+      await action.storeInitialBoxes([box], 100, 'extractor');
       const repository = dataSource.getRepository(BoxEntity);
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];

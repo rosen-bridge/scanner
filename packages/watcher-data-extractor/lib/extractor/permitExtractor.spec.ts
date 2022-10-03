@@ -40,8 +40,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer',
-        100
+        'explorer'
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -60,8 +59,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer',
-        100
+        'explorer'
       );
       const tx1 = permitTxGenerator(true, 'ff11');
       const tx2 = permitTxGenerator(true, 'ff22');
@@ -130,8 +128,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer',
-        100
+        'explorer'
       );
       const tx1 = permitTxGenerator(true, 'wid1');
       const tx2 = permitTxGenerator(false, 'wid2');
@@ -160,8 +157,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer',
-        100
+        'explorer'
       );
       const tx1 = permitTxGenerator(true, 'wid1');
       const tx2 = permitTxGenerator(true, 'wid2');
@@ -187,8 +183,7 @@ describe('permitExtractor', () => {
         dataSource,
         'EE7687i4URb4YuSGSQXPCbAgnr73Bb67aXgwzpjguuNwyRrWwVamRPKsiE3hbewDFDzkQa2PDdQG1S3KGcPbbPqvaT15RXFcCELtrAJ5BeZJFf9EfumFNWKztr7Me5Z23TRUPNgbcYEpCkC3RJeui3Tv6jXbEF2v284inu65FisnWoicPvpbuJb3fHpLkr5JAFPcp6uGTqTaaNWMJxWrHRbpKtvwVjG2VibGBGZJPtMbG3pzryH7Aq6CtLKtCAkSivDUkQWbXpm7TuvMnRCL78LvdoqauB8fRHxxxMw5BbmhVqBsKigUa92WBJCdyM7efp5SM1EXvNskbDEtuHHiYbLPxBJHXvZWWa8XCKvbWVV5eWdWExzASe3KzPCDEFm5JY2Peq64SY5gz6yu9n23BxDtb7PueWCMYfJs2VaYcLbndFJpkcDJKDiaEm18wSd3oKQ9eENKNZ74H2JyqmjnX6yVXcecP6NUj5gE3N2b5Pm5MjL37wveibdWHeSRQZFepWQdVAK5TLTgDL9YEE4jv5RLqB6vZ5eMtfSjhZ2',
         '497287b9a1eff643791277744a74b7d598b834dc613f2ebc972e33767c61ac2b',
-        'explorer',
-        295140
+        'explorer'
       );
       const spy = jest
         .spyOn(extractor.explorerApi, 'getBoxesForAddress')
@@ -196,7 +191,7 @@ describe('permitExtractor', () => {
       const spy2 = jest
         .spyOn(extractor.actions, 'storeInitialPermits')
         .mockImplementation(() => Promise.resolve(true));
-      await extractor.initializeBoxes();
+      await extractor.initializeBoxes(295140);
       const permit1 = ergoLib.ErgoBox.from_json(
         JsonBI.stringify(addressBoxes.items[1])
       );
@@ -228,7 +223,7 @@ describe('permitExtractor', () => {
         },
       ];
       expect(spy).toHaveBeenCalled();
-      expect(spy2).toHaveBeenCalledWith(extracted, 'extractorId');
+      expect(spy2).toHaveBeenCalledWith(extracted, 295140, 'extractorId');
     });
   });
 });

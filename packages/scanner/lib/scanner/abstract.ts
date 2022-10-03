@@ -11,6 +11,7 @@ export abstract class AbstractScanner<TransactionType> {
   abstract readonly initialHeight: number;
   abstract extractors: Array<AbstractExtractor<TransactionType>>;
   abstract networkAccess: AbstractNetworkConnector<TransactionType>;
+  abstract extractorInitialization: Array<boolean>;
 
   abstract name: () => string;
 
@@ -153,6 +154,7 @@ export abstract class AbstractScanner<TransactionType> {
       ).length === 0
     ) {
       this.extractors.push(extractor);
+      this.extractorInitialization.push(false);
     }
   };
 
@@ -272,9 +274,15 @@ export abstract class AbstractScanner<TransactionType> {
    */
   update = async () => {
     try {
+      for (const [
+        index,
+        extractorInitialized,
+      ] of this.extractorInitialization.entries()) {
+        if (!extractorInitialized)
+          await this.extractors[index].initializeBoxes(this.initialHeight);
+      }
       const lastSavedBlock = await this.getLastSavedBlock();
       if (lastSavedBlock === undefined) {
-        this.extractors.forEach(extractor => extractor.initializeBoxes())
         const block = await this.networkAccess.getBlockAtHeight(
           this.initialHeight
         );

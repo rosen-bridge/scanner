@@ -15,15 +15,13 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
   private readonly permitErgoTree: string;
   private readonly RWT: string;
   readonly explorerApi: ExplorerApi;
-  private readonly initialHeight: number;
 
   constructor(
     id: string,
     dataSource: DataSource,
     address: string,
     RWT: string,
-    explorerUrl: string,
-    initialHeight: number
+    explorerUrl: string
   ) {
     super();
     this.id = id;
@@ -34,7 +32,6 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.explorerApi = new ExplorerApi(explorerUrl);
-    this.initialHeight = initialHeight;
   }
 
   getId = () => this.id;
@@ -118,7 +115,7 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
   /**
    * Initializes the database with older permits related to the address
    */
-  initializeBoxes = async () => {
+  initializeBoxes = async (initialHeight: number) => {
     const extractedBoxes: Array<ExtractedPermit> = [];
     let offset = 0,
       total = 100;
@@ -129,7 +126,7 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
       );
       boxes.items.forEach((boxJson) => {
         if (
-          boxJson.settlementHeight < this.initialHeight &&
+          boxJson.settlementHeight < initialHeight &&
           boxJson.assets.length > 0 &&
           boxJson.assets[0].tokenId == this.RWT
         ) {
@@ -152,7 +149,11 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
       total = boxes.total;
       offset += 100;
     }
-    await this.actions.storeInitialPermits(extractedBoxes, this.getId());
+    await this.actions.storeInitialPermits(
+      extractedBoxes,
+      initialHeight,
+      this.getId()
+    );
   };
 }
 

@@ -11,11 +11,13 @@ class ErgoScanner extends AbstractScanner<wasm.Transaction> {
   extractors: Array<AbstractExtractor<wasm.Transaction>>;
   readonly initialHeight: number;
   networkAccess: ErgoNetworkApi;
+  extractorInitialization: Array<boolean>;
 
   constructor(config: ErgoScannerConfig) {
     super();
     this.blockRepository = config.dataSource.getRepository(BlockEntity);
     this.extractors = [];
+    this.extractorInitialization = [];
     this.initialHeight = config.initialHeight;
     this.networkAccess = new ErgoNetworkApi(config.nodeUrl, config.timeout);
   }

@@ -10,10 +10,10 @@ export interface ErgoBoxJson {
   value: bigint;
   blockId: string;
   settlementHeight: number;
-  assets?: Array<Asset>;
+  assets: Array<Asset>;
 }
 
-export interface AddressBoxes {
+export interface Boxes {
   items: Array<ErgoBoxJson>;
   total: number;
 }
