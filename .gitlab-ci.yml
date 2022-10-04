@@ -21,11 +21,12 @@ installation:
 build:
   stage: build
   cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - packages/*/node_modules
+    - key: $CI_COMMIT_REF_NAME
+      policy: pull-push
+      paths:
+        - node_modules
+        - packages/*/node_modules
+        - packages/*/dist
   script:
     - npm run build
 
@@ -37,6 +38,7 @@ type_check:
     paths:
       - node_modules
       - packages/*/node_modules
+      - packages/*/dist
   script:
     - npm run type-check
 
@@ -48,6 +50,7 @@ lint:
     paths:
       - node_modules
       - packages/*/node_modules
+      - packages/*/dist
   script:
     - npm run lint
 
@@ -59,6 +62,7 @@ test:
     paths:
       - node_modules
       - packages/*/node_modules
+      - packages/*/dist
   script:
     - npm run coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
