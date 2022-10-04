@@ -21,13 +21,13 @@ export class BoxEntityAction {
     initializationHeight: number,
     extractor: string
   ) => {
-    await this.datasource.getRepository(BoxEntity).delete({
-      creationHeight: LessThan(initializationHeight),
-    });
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      await queryRunner.manager.getRepository(BoxEntity).delete({
+        creationHeight: LessThan(initializationHeight),
+      });
       for (const box of boxes) {
         const entity = {
           address: box.address,

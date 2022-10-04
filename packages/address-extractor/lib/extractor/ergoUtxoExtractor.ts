@@ -8,6 +8,7 @@ import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 import { ErgoBoxJson } from '../interfaces/types';
+import { tokens } from '@rosen-bridge/observation-extractor/dist/extractor/tokens.mocked';
 
 export class ErgoUTXOExtractor
   implements AbstractExtractor<ergoLib.Transaction>
@@ -143,7 +144,8 @@ export class ErgoUTXOExtractor
    * Initializes the database with older boxes related to the address
    */
   initializeBoxes = async (initialHeight: number) => {
-    const extractedBoxes: Array<ExtractedBox> = [];
+    // 1. Get Boxes
+    const allBoxes: Array<ErgoBoxJson> = [];
     if (this.ergoTree) {
       let offset = 0,
         total = 100;
@@ -152,38 +154,39 @@ export class ErgoUTXOExtractor
           this.ergoTree,
           offset
         );
-        boxes.items.forEach((boxJson) => {
-          if (this.tokens.length > 0) {
-            const boxTokens = boxJson.assets.map((token) => token.tokenId);
-            const requiredTokens = boxTokens.filter((token) =>
-              this.tokens.includes(token)
-            );
-            if (requiredTokens.length == 0) return;
-          }
-          if (boxJson.settlementHeight < initialHeight) {
-            extractedBoxes.push(this.extractBoxFromJson(boxJson));
-          }
-        });
+        allBoxes.push(...boxes.items);
         total = boxes.total;
         offset += 100;
       }
     }
     if (!this.ergoTree && this.tokens.length > 0) {
-      for (const token of this.tokens) {
-        let offset = 0,
-          total = 100;
-        while (offset < total) {
-          const boxes = await this.explorerApi.getBoxesByTokenId(token, offset);
-          boxes.items.forEach((boxJson) => {
-            if (boxJson.settlementHeight < initialHeight) {
-              extractedBoxes.push(this.extractBoxFromJson(boxJson));
-            }
-          });
-          total = boxes.total;
-          offset += 100;
-        }
+      let offset = 0,
+        total = 100;
+      while (offset < total) {
+        const boxes = await this.explorerApi.getBoxesByTokenId(
+          this.tokens[0],
+          offset
+        );
+        allBoxes.push(...boxes.items);
+        total = boxes.total;
+        offset += 100;
       }
     }
+    // 2. Filter Boxes
+    const extractedBoxes: Array<ExtractedBox> = [];
+    allBoxes.forEach((boxJson) => {
+      if (this.tokens.length > 0) {
+        const boxTokens = boxJson.assets.map((token) => token.tokenId);
+        const requiredTokens = boxTokens.filter((token) =>
+          this.tokens.includes(token)
+        );
+        if (requiredTokens.length < this.tokens.length) return;
+      }
+      if (boxJson.settlementHeight < initialHeight) {
+        extractedBoxes.push(this.extractBoxFromJson(boxJson));
+      }
+    });
+    // 3. Store Boxes
     await this.actions.storeInitialBoxes(
       extractedBoxes,
       initialHeight,
