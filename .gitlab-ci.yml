@@ -22,7 +22,7 @@ build:
   stage: build
   cache:
     key: $CI_COMMIT_REF_NAME
-    policy: push
+    policy: pull
     paths:
       - node_modules
       - packages/*/node_modules
