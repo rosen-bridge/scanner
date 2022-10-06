@@ -7,7 +7,7 @@ import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
-import { ErgoBoxJson } from '../interfaces/types';
+import { Boxes, ErgoBoxJson } from '../interfaces/types';
 import { tokens } from '@rosen-bridge/observation-extractor/dist/extractor/tokens.mocked';
 
 export class ErgoUTXOExtractor
@@ -146,46 +146,39 @@ export class ErgoUTXOExtractor
   initializeBoxes = async (initialHeight: number) => {
     // 1. Get Boxes
     const allBoxes: Array<ErgoBoxJson> = [];
-    if (this.ergoTree) {
-      let offset = 0,
-        total = 100;
-      while (offset < total) {
-        const boxes = await this.explorerApi.getBoxesForAddress(
+    let offset = 0,
+      total = 100,
+      boxes: Boxes;
+    while (offset < total) {
+      if (this.ergoTree) {
+        boxes = await this.explorerApi.getBoxesForAddress(
           this.ergoTree,
           offset
         );
-        allBoxes.push(...boxes.items);
-        total = boxes.total;
-        offset += 100;
-      }
-    }
-    if (!this.ergoTree && this.tokens.length > 0) {
-      let offset = 0,
-        total = 100;
-      while (offset < total) {
-        const boxes = await this.explorerApi.getBoxesByTokenId(
+      } else if (!this.ergoTree && this.tokens.length > 0) {
+        boxes = await this.explorerApi.getBoxesByTokenId(
           this.tokens[0],
           offset
         );
-        allBoxes.push(...boxes.items);
-        total = boxes.total;
-        offset += 100;
-      }
+      } else return;
+      allBoxes.push(...boxes.items);
+      total = boxes.total;
+      offset += 100;
     }
     // 2. Filter Boxes
-    const extractedBoxes: Array<ExtractedBox> = [];
-    allBoxes.forEach((boxJson) => {
-      if (this.tokens.length > 0) {
-        const boxTokens = boxJson.assets.map((token) => token.tokenId);
-        const requiredTokens = boxTokens.filter((token) =>
-          this.tokens.includes(token)
-        );
-        if (requiredTokens.length < this.tokens.length) return;
-      }
-      if (boxJson.settlementHeight < initialHeight) {
-        extractedBoxes.push(this.extractBoxFromJson(boxJson));
-      }
-    });
+    const extractedBoxes = allBoxes
+      .filter((boxJson) => boxJson.settlementHeight < initialHeight)
+      .filter((boxJson) => {
+        if (this.tokens.length > 0) {
+          const boxTokens = boxJson.assets.map((token) => token.tokenId);
+          const requiredTokens = this.tokens.filter((token) =>
+            boxTokens.includes(token)
+          );
+          if (requiredTokens.length < this.tokens.length) return false;
+        }
+        return true;
+      })
+      .map((boxJson) => this.extractBoxFromJson(boxJson));
     // 3. Store Boxes
     await this.actions.storeInitialBoxes(
       extractedBoxes,

@@ -25,7 +25,8 @@ export class BoxEntityAction {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.getRepository(BoxEntity).delete({
+      const repository = queryRunner.manager.getRepository(BoxEntity);
+      await repository.delete({
         creationHeight: LessThan(initializationHeight),
       });
       for (const box of boxes) {
@@ -38,7 +39,7 @@ export class BoxEntityAction {
           serialized: box.serialized,
           extractor: extractor,
         };
-        await queryRunner.manager.getRepository(BoxEntity).insert(entity);
+        await repository.insert(entity);
       }
       await queryRunner.commitTransaction();
     } catch (e) {

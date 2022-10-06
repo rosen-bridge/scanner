@@ -3,6 +3,7 @@ import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
+import { BoxEntity } from '@rosen-bridge/address-extractor';
 
 class PermitEntityAction {
   private readonly datasource: DataSource;
@@ -28,9 +29,8 @@ class PermitEntityAction {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.getRepository(PermitEntity).delete({
-        height: LessThan(initialHeight),
-      });
+      const repository = queryRunner.manager.getRepository(PermitEntity);
+      await repository.delete({ height: LessThan(initialHeight) });
       for (const permit of permits) {
         const entity = {
           boxId: permit.boxId,
