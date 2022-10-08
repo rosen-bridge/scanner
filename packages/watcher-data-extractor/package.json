@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
@@ -9,16 +9,17 @@
   "scripts": {
     "prettify": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint --fix . && npm run prettify",
-    "test": "rimraf sqlite; tsc --build; npm run lint; jest --detectOpenHandles; rimraf sqlite",
+    "test": "rimraf sqlite && jest --detectOpenHandles; rimraf sqlite",
     "coverage": "c8 npm run test",
     "build": "tsc --build",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "release": "npm run test && npm run build && npm publish --access public"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@rosen-bridge/scanner": "^0.1.9",
+    "@rosen-bridge/scanner": "^0.2.0",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.18.0",
     "reflect-metadata": "^0.1.13",

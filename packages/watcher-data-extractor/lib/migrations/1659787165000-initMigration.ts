@@ -40,6 +40,8 @@ export class initMigration1659787165000 implements MigrationInterface {
                     "sourceTxId" varchar NOT NULL,
                     "height" INTEGER NOT NULL, 
                     "WIDs" varchar NOT NULL,
+                     "spendBlock" varchar,
+                    "spendHeight" INTEGER,
                     CONSTRAINT "UQ_c905f221a1b6271ca4405dbbe5f" UNIQUE ("boxId", "extractor")
                 )`
     );
