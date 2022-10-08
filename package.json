@@ -16,10 +16,10 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@types/json-bigint": "^1.0.1",
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {
+    "@types/json-bigint": "^1.0.1",
     "husky": "^8.0.0"
   }
 }

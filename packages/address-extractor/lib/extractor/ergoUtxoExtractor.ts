@@ -8,7 +8,6 @@ import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 import { Boxes, ErgoBoxJson } from '../interfaces/types';
-import { tokens } from '@rosen-bridge/observation-extractor/dist/extractor/tokens.mocked';
 
 export class ErgoUTXOExtractor
   implements AbstractExtractor<ergoLib.Transaction>

@@ -167,6 +167,7 @@ export abstract class AbstractScanner<TransactionType> {
       return extractorItem.getId() === extractor.getId();
     });
     this.extractors.splice(extractorIndex, 1);
+    this.extractorInitialization.splice(extractorIndex, 1);
   };
 
   /**
