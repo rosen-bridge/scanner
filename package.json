@@ -15,11 +15,7 @@
     "release": "npm run release --workspaces",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "json-bigint": "^1.0.0"
-  },
   "devDependencies": {
-    "@types/json-bigint": "^1.0.1",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.3"
   },

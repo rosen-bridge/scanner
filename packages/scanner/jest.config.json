@@ -4,5 +4,7 @@
   "testEnvironment": "node",
   "transform": {
     "^.+\\.ts?$": "ts-jest"
-  }
+  },
+  "transformIgnorePatterns": ["node_modules/(?!(@rosen-bridge/scanner)/)"],
+  "coverageReporters": ["lcov", "cobertura", "text", "text-summary"]
 }

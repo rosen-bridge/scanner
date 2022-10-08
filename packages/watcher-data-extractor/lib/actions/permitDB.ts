@@ -3,7 +3,6 @@ import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import { BoxEntity } from '@rosen-bridge/address-extractor';
 
 class PermitEntityAction {
   private readonly datasource: DataSource;
@@ -24,7 +23,7 @@ class PermitEntityAction {
     permits: Array<ExtractedPermit>,
     initialHeight: number,
     extractor: string
-  ) => {
+  ): Promise<boolean> => {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
