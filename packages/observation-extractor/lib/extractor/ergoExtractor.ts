@@ -31,7 +31,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
   getId = () => 'ergo-observation-extractor';
 
   /**
-   * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
+   * returns ErgoRosenData object if the box format is like rosen bridge observations otherwise returns undefined
    * @param box
    */
   getRosenData = (box: wasm.ErgoBox): RosenData | undefined => {
@@ -41,7 +41,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
         const R4Serialized = R4.to_coll_coll_byte();
         if (
           box.tokens().len() > 0 &&
-          R4Serialized.length >= 4 &&
+          R4Serialized.length >= 5 &&
           this.toTargetToken(
             box.tokens().get(0).id().to_str(),
             Buffer.from(R4Serialized[0]).toString()
@@ -52,6 +52,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
             toAddress: Buffer.from(R4Serialized[1]).toString(),
             networkFee: Buffer.from(R4Serialized[2]).toString(),
             bridgeFee: Buffer.from(R4Serialized[3]).toString(),
+            fromAddress: Buffer.from(R4Serialized[4]).toString(),
           };
         }
       }
@@ -87,36 +88,33 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
       try {
         const observations: Array<ExtractedObservation> = [];
         txs.forEach((transaction) => {
-          for (let index = 0; index < transaction.outputs().len(); index++) {
-            const output = transaction.outputs().get(index);
-            const data = this.getRosenData(output);
-            if (
-              output.ergo_tree().to_base16_bytes() === this.bankErgoTree &&
-              data !== undefined
-            ) {
-              const token = output.tokens().get(0);
-              const inputAddress = 'fromAddress';
-              const requestId = Buffer.from(
-                blake2b(output.tx_id().to_str(), undefined, 32)
-              ).toString('hex');
-              observations.push({
-                fromChain: ErgoObservationExtractor.FROM_CHAIN,
-                toChain: data.toChain,
-                networkFee: data.networkFee,
-                bridgeFee: data.bridgeFee,
-                amount: token.amount().as_i64().to_str(),
-                sourceChainTokenId: token.id().to_str(),
-                targetChainTokenId: this.toTargetToken(
-                  token.id().to_str(),
-                  data.toChain
-                ),
-                sourceTxId: output.tx_id().to_str(),
-                sourceBlockId: block.hash,
-                requestId: requestId,
-                toAddress: data.toAddress,
-                fromAddress: inputAddress,
-              });
-            }
+          const output = transaction.outputs().get(0);
+          const data = this.getRosenData(output);
+          if (
+            output.ergo_tree().to_base16_bytes() === this.bankErgoTree &&
+            data !== undefined
+          ) {
+            const token = output.tokens().get(0);
+            const requestId = Buffer.from(
+              blake2b(output.tx_id().to_str(), undefined, 32)
+            ).toString('hex');
+            observations.push({
+              fromChain: ErgoObservationExtractor.FROM_CHAIN,
+              toChain: data.toChain,
+              networkFee: data.networkFee,
+              bridgeFee: data.bridgeFee,
+              amount: token.amount().as_i64().to_str(),
+              sourceChainTokenId: token.id().to_str(),
+              targetChainTokenId: this.toTargetToken(
+                token.id().to_str(),
+                data.toChain
+              ),
+              sourceTxId: output.tx_id().to_str(),
+              sourceBlockId: block.hash,
+              requestId: requestId,
+              toAddress: data.toAddress,
+              fromAddress: data.fromAddress,
+            });
           }
         });
         this.actions

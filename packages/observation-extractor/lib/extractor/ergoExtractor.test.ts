@@ -14,6 +14,9 @@ class ExtractorErgo extends ErgoObservationExtractor {}
 const bankAddress = '9f53ZBeKFk3VKS4KPj1Lap96BKFSw8zfdWb4FHYZH6qBBV6p9ZS';
 const bankSK =
   'f133100250abf1494e9ff5a0f998dc2fea7a5aa35641454ba723c913bff0e8fa';
+const watcherAddress = '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM';
+const watcherSK =
+  '3870dab5e5fb3eebfdcb30031b65a8dbb8eec75ffe3558e7d0c7ef9529984ee1';
 
 describe('extractorErgo', () => {
   describe('processTransactions', () => {
@@ -29,13 +32,27 @@ describe('extractorErgo', () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx1 = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000'],
-        bankSK
+        [
+          'cardano',
+          'address',
+          '10000',
+          '1000',
+          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
+        ],
+        bankSK,
+        watcherSK
       );
       const Tx3 = observationTxGenerator(
         false,
-        ['cardano', 'address', '10000', '1000'],
-        bankSK
+        [
+          'cardano',
+          'address',
+          '10000',
+          '1000',
+          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
+        ],
+        bankSK,
+        watcherSK
       );
       const res = await extractor.processTransactions(
         [Tx1, Tx3],
@@ -51,7 +68,7 @@ describe('extractorErgo', () => {
         id: 1,
         fromChain: 'ergo',
         toChain: 'cardano',
-        fromAddress: 'fromAddress',
+        fromAddress: watcherAddress,
         toAddress: 'address',
         height: 1,
         amount: box1.tokens().get(0).amount().as_i64().to_str(),
@@ -86,8 +103,9 @@ describe('extractorErgo', () => {
       );
       const Tx1 = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000'],
-        bankSK
+        ['cardano', 'address', '10000', '1000', watcherAddress],
+        bankSK,
+        watcherSK
       );
       const res = await extractor.processTransactions(
         [Tx1],
@@ -112,14 +130,16 @@ describe('extractorErgo', () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000'],
-        bankSK
+        ['cardano', 'address', '10000', '1000', watcherAddress],
+        bankSK,
+        watcherSK
       );
       expect(extractor.getRosenData(Tx.outputs().get(0))).toStrictEqual({
         toChain: 'cardano',
         toAddress: 'address',
         bridgeFee: '1000',
         networkFee: '10000',
+        fromAddress: watcherAddress,
       });
     });
 
@@ -132,7 +152,7 @@ describe('extractorErgo', () => {
     it('checks transaction without token', async () => {
       const dataSource = await loadDataBase('getRosenData');
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const Tx = observationTxGenerator(false, [], bankSK);
+      const Tx = observationTxGenerator(false, [], bankSK, watcherSK);
       expect(extractor.getRosenData(Tx.outputs().get(0))).toEqual(undefined);
     });
 
@@ -148,7 +168,8 @@ describe('extractorErgo', () => {
       const Tx = observationTxGenerator(
         true,
         ['Cardano', 'address', '10000'],
-        bankSK
+        bankSK,
+        watcherSK
       );
       expect(extractor.getRosenData(Tx.outputs().get(0))).toEqual(undefined);
     });

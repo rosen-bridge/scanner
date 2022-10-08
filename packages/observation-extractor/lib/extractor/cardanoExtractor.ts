@@ -29,7 +29,7 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
   getId = () => 'ergo-cardano-koios-extractor';
 
   /**
-   * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
+   * returns CardanoRosenData object if the box format is like rosen bridge observations otherwise returns undefined
    * @param metaDataArray
    */
   getRosenData = (metaDataArray: Array<MetaData>): RosenData | undefined => {
@@ -40,19 +40,22 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           'to' in metaData &&
           'bridgeFee' in metaData &&
           'networkFee' in metaData &&
-          'toAddress' in metaData
+          'toAddress' in metaData &&
+          'fromAddress' in metaData
         ) {
           const rosenData = metaData as unknown as {
             to: string;
             bridgeFee: string;
             networkFee: string;
             toAddress: string;
+            fromAddress: string;
           };
           return {
             toChain: rosenData.to,
             bridgeFee: rosenData.bridgeFee,
             networkFee: rosenData.networkFee,
             toAddress: rosenData.toAddress,
+            fromAddress: rosenData.fromAddress,
           };
         }
         return undefined;
@@ -104,37 +107,35 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           if (transaction.metadata !== undefined) {
             try {
               const data = this.getRosenData(transaction.metadata);
-              for (let index = 0; index < transaction.outputs.length; index++) {
-                if (
-                  transaction.outputs[index].payment_addr.bech32 ===
-                    this.bankAddress &&
-                  data !== undefined &&
-                  transaction.outputs[index].asset_list.length !== 0
-                ) {
-                  const asset = transaction.outputs[index].asset_list[0];
-                  const assetId = this.toTargetToken(
-                    asset.policy_id,
-                    asset.asset_name,
-                    data.toChain
-                  );
-                  const requestId = Buffer.from(
-                    blake2b(transaction.tx_hash, undefined, 32)
-                  ).toString('hex');
-                  observations.push({
-                    fromChain: CardanoObservationExtractor.FROM_CHAIN,
-                    toChain: data.toChain,
-                    amount: asset.quantity,
-                    sourceChainTokenId: assetId.fromChain,
-                    targetChainTokenId: assetId.toChain,
-                    sourceTxId: transaction.tx_hash,
-                    bridgeFee: data.bridgeFee,
-                    networkFee: data.networkFee,
-                    sourceBlockId: block.hash,
-                    requestId: requestId,
-                    toAddress: data.toAddress,
-                    fromAddress: transaction.inputs[0].payment_addr.bech32,
-                  });
-                }
+              if (
+                transaction.outputs[0].payment_addr.bech32 ===
+                  this.bankAddress &&
+                data !== undefined &&
+                transaction.outputs[0].asset_list.length !== 0
+              ) {
+                const asset = transaction.outputs[0].asset_list[0];
+                const assetId = this.toTargetToken(
+                  asset.policy_id,
+                  asset.asset_name,
+                  data.toChain
+                );
+                const requestId = Buffer.from(
+                  blake2b(transaction.tx_hash, undefined, 32)
+                ).toString('hex');
+                observations.push({
+                  fromChain: CardanoObservationExtractor.FROM_CHAIN,
+                  toChain: data.toChain,
+                  amount: asset.quantity,
+                  sourceChainTokenId: assetId.fromChain,
+                  targetChainTokenId: assetId.toChain,
+                  sourceTxId: transaction.tx_hash,
+                  bridgeFee: data.bridgeFee,
+                  networkFee: data.networkFee,
+                  sourceBlockId: block.hash,
+                  requestId: requestId,
+                  toAddress: data.toAddress,
+                  fromAddress: data.fromAddress,
+                });
               }
             } catch (e) {
               console.log('error during observing cardano transactions', e);

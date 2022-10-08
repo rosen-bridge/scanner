@@ -36,7 +36,7 @@ describe('cardanoKoiosObservationExtractor', () => {
                 '"bridgeFee": "10000",' +
                 '"networkFee": "1000",' +
                 '"toAddress": "ergoAddress",' +
-                '"targetChainTokenId": "cardanoTokenId"' +
+                `"fromAddress": "${bankAddress}"` +
                 '}'
             ),
           },
@@ -46,6 +46,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         bridgeFee: '10000',
         networkFee: '1000',
         toAddress: 'ergoAddress',
+        fromAddress: bankAddress,
       });
     });
 

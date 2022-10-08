@@ -334,7 +334,7 @@ export const cardanoTxValid = {
     {
       key: '0',
       json: JSON.parse(
-        '{"to": "ergo","bridgeFee": "10000","networkFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
+        '{"to": "ergo","bridgeFee": "10000","networkFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId","fromAddress": "addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0"}'
       ),
     },
   ],
@@ -369,6 +369,25 @@ export const cardanoTxValid = {
     {
       payment_addr: {
         bech32:
+          'addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re',
+        cred: 'b3e2001f41f12f92e2f484c821e98a6e60f39adc7ff30fb248819c21',
+      },
+      tx_hash:
+        'cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa',
+      stake_addr: null,
+      tx_index: 0,
+      value: '10000000',
+      asset_list: [
+        {
+          policy_id: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
+          asset_name: '7369676d61',
+          quantity: '10',
+        },
+      ],
+    },
+    {
+      payment_addr: {
+        bech32:
           'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',
         cred: '90ff35400c4d2cbddef24a750ad7064947a2461c1a0b9ca431c7e9f6',
       },
@@ -387,25 +406,6 @@ export const cardanoTxValid = {
           policy_id: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
           asset_name: '7369676d61',
           quantity: '9999968',
-        },
-      ],
-    },
-    {
-      payment_addr: {
-        bech32:
-          'addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re',
-        cred: 'b3e2001f41f12f92e2f484c821e98a6e60f39adc7ff30fb248819c21',
-      },
-      tx_hash:
-        'cf32ad374daefdce563e3391effc4fc42eb0e74bbec8afe16a46eeea69e3b2aa',
-      stake_addr: null,
-      tx_index: 0,
-      value: '10000000',
-      asset_list: [
-        {
-          policy_id: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
-          asset_name: '7369676d61',
-          quantity: '10',
         },
       ],
     },
@@ -434,17 +434,28 @@ export const clearDB = async (dataSource: DataSource) => {
 
 export const observationTxGenerator = (
   hasToken = true,
-  data: Array<string> = ['cardano', 'address', '10000', '1000'],
-  outputAddressSK: string
+  data: Array<string> = [
+    'cardano',
+    'address',
+    '10000',
+    '1000',
+    '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
+  ],
+  bankSecret: string,
+  watcherSecret: string
 ) => {
-  const sk = wasm.SecretKey.dlog_from_bytes(
-    Uint8Array.from(Buffer.from(outputAddressSK, 'hex'))
+  const bankSK = wasm.SecretKey.dlog_from_bytes(
+    Uint8Array.from(Buffer.from(bankSecret, 'hex'))
   );
-  const address = wasm.Contract.pay_to_address(sk.get_address());
-  const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
+  const bankAddress = wasm.Contract.pay_to_address(bankSK.get_address());
+  const watcherSK = wasm.SecretKey.dlog_from_bytes(
+    Uint8Array.from(Buffer.from(watcherSecret, 'hex'))
+  );
+  const watcherAddress = wasm.Contract.pay_to_address(watcherSK.get_address());
+  const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000'));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
-    address,
+    bankAddress,
     0
   );
   if (hasToken) {
@@ -474,16 +485,26 @@ export const observationTxGenerator = (
     )
   );
 
-  const inputBox = new wasm.ErgoBox(
+  const inputBoxBank = new wasm.ErgoBox(
     wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
     0,
-    address,
+    bankAddress,
+    wasm.TxId.zero(),
+    0,
+    new wasm.Tokens()
+  );
+
+  const inputBoxWatcher = new wasm.ErgoBox(
+    wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
+    0,
+    watcherAddress,
     wasm.TxId.zero(),
     0,
     tokens
   );
 
-  const unspentBoxes = new wasm.ErgoBoxes(inputBox);
+  const unspentBoxes = new wasm.ErgoBoxes(inputBoxBank);
+  unspentBoxes.add(inputBoxWatcher);
   const txOutputs = new wasm.ErgoBoxCandidates(outBox);
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
@@ -496,14 +517,15 @@ export const observationTxGenerator = (
     txOutputs,
     0,
     fee,
-    sk.get_address(),
+    watcherSK.get_address(),
     wasm.BoxValue.SAFE_USER_MIN()
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
   const ctx = new wasm.ErgoStateContext(preHeader, blockHeaders);
   const sks = new wasm.SecretKeys();
-  sks.add(sk);
+  sks.add(watcherSK);
+  sks.add(bankSK);
   const wallet = wasm.Wallet.from_secrets(sks);
   return wallet.sign_transaction(
     ctx,
