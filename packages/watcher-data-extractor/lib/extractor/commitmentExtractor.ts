@@ -116,6 +116,14 @@ class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockCommitment(hash, this.getId());
   };
+
+  /**
+   * Extractor box initialization
+   * No action needed for commitment extractor
+   */
+  initializeBoxes = async () => {
+    return;
+  };
 }
 
 export default CommitmentExtractor;

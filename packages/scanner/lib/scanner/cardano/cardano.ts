@@ -11,6 +11,7 @@ class CardanoKoiosScanner extends AbstractScanner<KoiosTransaction> {
   extractors: Array<AbstractExtractor<KoiosTransaction>>;
   readonly initialHeight: number;
   networkAccess: KoiosNetwork;
+  extractorInitialization: Array<boolean>;
 
   name = () => 'cardano-koios';
 
@@ -18,6 +19,7 @@ class CardanoKoiosScanner extends AbstractScanner<KoiosTransaction> {
     super();
     this.blockRepository = config.dataSource.getRepository(BlockEntity);
     this.extractors = [];
+    this.extractorInitialization = [];
     this.initialHeight = config.initialHeight;
     this.networkAccess = new KoiosNetwork(config.koiosUrl, config.timeout);
   }

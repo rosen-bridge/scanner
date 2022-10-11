@@ -3,15 +3,9 @@ import {
   commitmentTxGenerator,
   loadDataBase,
 } from './utilsFunctions.mock';
-import PermitExtractor from './permitExtractor';
 import CommitmentExtractor from './commitmentExtractor';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import {
-  block,
-  commitmentAddress,
-  permitAddress,
-  RWTId,
-} from './utilsVariable.mock';
+import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
 
 let dataSource: DataSource;
@@ -33,11 +27,11 @@ describe('CommitmentExtractor', () => {
    */
   describe('getId', () => {
     it('should return id of the extractor', async () => {
-      const extractor = new PermitExtractor(
+      const extractor = new CommitmentExtractor(
         'extractorId',
-        dataSource,
-        permitAddress,
-        RWTId
+        [commitmentAddress],
+        RWTId,
+        dataSource
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');

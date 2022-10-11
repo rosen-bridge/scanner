@@ -23,6 +23,13 @@ const samplePermit4 = {
   boxId: '4',
 };
 
+const initialPermit = {
+  ...samplePermit1,
+  boxId: '5',
+  block: 'block',
+  height: 1001,
+};
+
 describe('PermitEntityAction', () => {
   describe('storePermits', () => {
     /**
@@ -312,6 +319,36 @@ describe('PermitEntityAction', () => {
       await permitEntity.deleteBlock('hash', 'extractor1');
       [_, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
+    });
+  });
+
+  describe('storeInitialPermits', () => {
+    /**
+     * 2 valid PermitBox should save successfully
+     * Dependency: Nothing
+     * Scenario: one initial PermitBox should save successfully
+     * Expected: storeBoxes should returns true and database row count should be 1
+     */
+    it('store an initial permit box', async () => {
+      const dataSource = await loadDataBase('saveInitialPermit');
+      const permitEntity = new PermitEntityAction(dataSource);
+      const res = await permitEntity.storeInitialPermits(
+        [initialPermit],
+        100,
+        'extractor1'
+      );
+      expect(res).toEqual(true);
+      const repository = dataSource.getRepository(PermitEntity);
+      const [rows, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(1);
+      expect(rows[0]).toEqual(
+        expect.objectContaining({
+          ...initialPermit,
+          extractor: 'extractor1',
+          spendBlock: null,
+          spendHeight: null,
+        })
+      );
     });
   });
 });
