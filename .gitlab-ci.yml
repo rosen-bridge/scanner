@@ -68,6 +68,6 @@ test:
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
     reports:
-      coverage_reports:
+      coverage_report:
         coverage_format: cobertura
         path: packages/*/coverage/cobertura-coverage.xml
