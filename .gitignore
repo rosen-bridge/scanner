@@ -1,6 +1,8 @@
 .idea
-node_modules/
-package-lock.json
-dist/
+.vscode
+*.tsbuildinfo
 coverage/
+dist/
+node_modules/
 sqlite/
+yarn.lock

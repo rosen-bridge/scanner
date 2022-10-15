@@ -1,0 +1,8 @@
+{
+  "bail": 1,
+  "verbose": true,
+  "testEnvironment": "node",
+  "preset": "ts-jest/presets/js-with-babel",
+  "transformIgnorePatterns": ["node_modules/(?!(@rosen-bridge/scanner)/)"],
+  "coverageReporters": ["lcov", "cobertura", "text", "text-summary"]
+}
