@@ -465,14 +465,16 @@ export const observationTxGenerator = (
 
   const outBox = outBoxBuilder.build();
   const tokens = new wasm.Tokens();
-  tokens.add(
-    new wasm.Token(
-      wasm.TokenId.from_str(
-        'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3'
-      ),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-    )
-  );
+  if (hasToken) {
+    tokens.add(
+      new wasm.Token(
+        wasm.TokenId.from_str(
+          'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3'
+        ),
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      )
+    );
+  }
 
   const inputBox = new wasm.ErgoBox(
     wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
@@ -496,8 +498,7 @@ export const observationTxGenerator = (
     txOutputs,
     0,
     fee,
-    sk.get_address(),
-    wasm.BoxValue.SAFE_USER_MIN()
+    sk.get_address()
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
