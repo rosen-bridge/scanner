@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "UTXO box extractor for any address or token.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
