@@ -181,15 +181,18 @@ export abstract class AbstractScanner<TransactionType> {
     }
     const txs = await this.networkAccess.getBlockTxs(block.hash);
     let success = true;
-    for (const extractor of this.extractors) {
-      const extractionResult = await extractor.processTransactions(
-        txs,
-        savedBlock
-      );
-      if (!extractionResult) {
-        success = false;
-        break;
+    try {
+      for (const extractor of this.extractors) {
+        if (!(await extractor.processTransactions(txs, savedBlock))) {
+          success = false;
+          break;
+        }
       }
+    } catch (e) {
+      console.error(
+        `An error occurred while extracting data from transaction: ${e}`
+      );
+      success = false;
     }
     if (success && (await this.updateBlockStatus(block.blockHeight))) {
       return savedBlock;

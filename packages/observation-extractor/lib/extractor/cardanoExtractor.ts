@@ -143,8 +143,8 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
         });
         this.actions
           .storeObservations(observations, block, this.getId())
-          .then(() => {
-            resolve(true);
+          .then((status) => {
+            resolve(status);
           })
           .catch((e) => {
             console.log(`An error occurred during store observations: ${e}`);

@@ -64,8 +64,8 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
 
   getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
     return this.koios
-      .get<Array<{ tx_hash: string }>>('/block_txs', {
-        params: { _block_hash: blockHash },
+      .post<Array<{ tx_hash: string }>>('/block_txs', {
+        _block_hashes: [blockHash],
       })
       .then((res) => {
         if (res.data.length === 0) {
