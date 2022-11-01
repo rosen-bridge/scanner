@@ -38,8 +38,7 @@ interface Withdrawal {
 }
 
 interface MetaData {
-  key: string;
-  json: JSON;
+  [key: string]: JSON;
 }
 
 interface Certificate {
@@ -78,7 +77,7 @@ interface KoiosTransaction {
   outputs: Array<UTXO>;
   withdrawals: Array<Withdrawal>;
   assets_minted: Array<Asset>;
-  metadata: Array<MetaData>;
+  metadata: MetaData;
   certificates: Array<Certificate>;
   native_scripts: Array<NativeScript>;
   plutus_contracts: Array<PlutusContract>;

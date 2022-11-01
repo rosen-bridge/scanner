@@ -19,8 +19,7 @@ interface UTXO {
 }
 
 interface MetaData {
-  key: string;
-  json: JSON;
+  [key: string]: JSON;
 }
 
 interface KoiosTransaction {
@@ -28,7 +27,7 @@ interface KoiosTransaction {
   block_hash: string;
   inputs: Array<UTXO>;
   outputs: Array<UTXO>;
-  metadata?: Array<MetaData>;
+  metadata?: MetaData;
 }
 
 export { KoiosTransaction, MetaData };

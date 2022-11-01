@@ -131,7 +131,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
             reject(e);
           });
       } catch (e) {
-        console.log(`block ${block} doesn't save wit error`, e);
+        console.log(`An error occuurred while saving block ${block}: `, e);
         reject(e);
       }
     });
