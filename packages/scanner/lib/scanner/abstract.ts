@@ -179,6 +179,7 @@ export abstract class AbstractScanner<TransactionType> {
     if (typeof savedBlock === 'boolean') {
       return false;
     }
+    console.log(`Processing ${block.blockHeight}`);
     const txs = await this.networkAccess.getBlockTxs(block.hash);
     let success = true;
     try {
