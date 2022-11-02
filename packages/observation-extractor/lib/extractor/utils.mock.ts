@@ -330,14 +330,11 @@ export const last10BlockHeader = [
 
 export const cardanoTxValid = {
   block_hash: '',
-  metadata: [
-    {
-      key: '0',
-      json: JSON.parse(
-        '{"to": "ergo","bridgeFee": "10000","networkFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
-      ),
-    },
-  ],
+  metadata: {
+    '0': JSON.parse(
+      '{"to": "ergo","bridgeFee": "10000","networkFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
+    ),
+  },
   tx_hash: '9f00d372e930d685c3b410a10f2bd035cd9a927c4fd8ef8e419c79b210af7ba6',
   inputs: [
     {
