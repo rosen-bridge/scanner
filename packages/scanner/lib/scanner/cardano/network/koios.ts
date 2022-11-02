@@ -71,6 +71,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         if (res.data.length === 0) {
           return [];
         } else {
+          // Using the api for one block, just using the first output
           return this.koios
             .post<Array<KoiosTransaction>>('/tx_info', {
               _tx_hashes: res.data[0].tx_hashes,
