@@ -129,7 +129,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
             reject(e);
           });
       } catch (e) {
-        console.log(`An error occuurred while saving block ${block}: `, e);
+        console.log(`An error occurred while saving block ${block}: `, e);
         reject(e);
       }
     });
