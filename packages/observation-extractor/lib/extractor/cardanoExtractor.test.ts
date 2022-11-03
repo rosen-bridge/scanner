@@ -27,26 +27,23 @@ describe('cardanoKoiosObservationExtractor', () => {
       const dataSource = await loadDataBase('getRosenData-cardano');
       const extractor = new ExecutorCardano(dataSource, tokens, bankAddress);
       expect(
-        extractor.getRosenData([
-          {
-            key: '0',
-            json: JSON.parse(
-              '{' +
-                '"to": "ergo",' +
-                '"bridgeFee": "10000",' +
-                '"networkFee": "1000",' +
-                '"toAddress": "ergoAddress",' +
-                `"fromAddress": "${bankAddress}"` +
-                '}'
-            ),
-          },
-        ])
+        extractor.getRosenData({
+          '0': JSON.parse(
+            '{' +
+              '"toChain": "ergo",' +
+              '"bridgeFee": "10000",' +
+              '"networkFee": "1000",' +
+              '"toAddress": "ergoAddress",' +
+              '"fromAddress": "address"' +
+              '}'
+          ),
+        })
       ).toStrictEqual({
         toChain: 'ergo',
         bridgeFee: '10000',
         networkFee: '1000',
         toAddress: 'ergoAddress',
-        fromAddress: bankAddress,
+        fromAddress: 'address',
       });
     });
 
@@ -60,19 +57,16 @@ describe('cardanoKoiosObservationExtractor', () => {
       const dataSource = await loadDataBase('getRosenData-cardano');
       const extractor = new ExecutorCardano(dataSource, tokens, bankAddress);
       expect(
-        extractor.getRosenData([
-          {
-            key: '0',
-            json: JSON.parse(
-              '{' +
-                '"bridgeFee": "10000",' +
-                '"networkFee": "1000",' +
-                '"toAddress": "ergoAddress",' +
-                '"targetChainTokenId": "cardanoTokenId"' +
-                '}'
-            ),
-          },
-        ])
+        extractor.getRosenData({
+          '0': JSON.parse(
+            '{' +
+              '"bridgeFee": "10000",' +
+              '"networkFee": "1000",' +
+              '"toAddress": "ergoAddress",' +
+              '"targetChainTokenId": "cardanoTokenId"' +
+              '}'
+          ),
+        })
       ).toEqual(undefined);
     });
   });
@@ -162,14 +156,11 @@ describe('cardanoKoiosObservationExtractor', () => {
       const extractor = new ExecutorCardano(dataSource, tokens, bankAddress);
       const Tx: KoiosTransaction = {
         ...cardanoTxValid,
-        metadata: [
-          {
-            key: '0',
-            json: JSON.parse(
-              '{"to": "ergo","bridgeFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
-            ),
-          },
-        ],
+        metadata: {
+          '0': JSON.parse(
+            '{"to": "ergo","bridgeFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
+          ),
+        },
       };
       const res = await extractor.processTransactions(
         [Tx],

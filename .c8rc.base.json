@@ -1,7 +1,0 @@
-{
-  "all": true,
-  "cache": false,
-  "check-coverage": false,
-  "reporter": ["cobertura", "text", "text-summary"],
-  "sourceMap": true
-}

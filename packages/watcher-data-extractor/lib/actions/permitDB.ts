@@ -1,5 +1,5 @@
-import { DataSource, In, Repository } from 'typeorm';
-import { extractedPermit } from '../interfaces/extractedPermit';
+import { DataSource, In, LessThan, Repository } from 'typeorm';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
@@ -14,13 +14,54 @@ class PermitEntityAction {
   }
 
   /**
+   * stores initial permit boxes in the database
+   * @param permits
+   * @param initialHeight
+   * @param extractor
+   */
+  storeInitialPermits = async (
+    permits: Array<ExtractedPermit>,
+    initialHeight: number,
+    extractor: string
+  ): Promise<boolean> => {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const repository = queryRunner.manager.getRepository(PermitEntity);
+      await repository.delete({ height: LessThan(initialHeight) });
+      for (const permit of permits) {
+        const entity = {
+          boxId: permit.boxId,
+          boxSerialized: permit.boxSerialized,
+          block: permit.block,
+          height: permit.height,
+          extractor: extractor,
+          WID: permit.WID,
+        };
+        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      console.log(
+        `An error occurred during storing initial permits action: ${e}`
+      );
+      await queryRunner.rollbackTransaction();
+      throw new Error('Initialization failed while storing initial permits');
+    } finally {
+      await queryRunner.release();
+    }
+    return true;
+  };
+
+  /**
    * It stores list of permits in the dataSource with block id
    * @param permits
    * @param block
    * @param extractor
    */
   storePermits = async (
-    permits: Array<extractedPermit>,
+    permits: Array<ExtractedPermit>,
     block: BlockEntity,
     extractor: string
   ) => {

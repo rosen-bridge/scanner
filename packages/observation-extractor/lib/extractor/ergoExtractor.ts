@@ -129,7 +129,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
             reject(e);
           });
       } catch (e) {
-        console.log(`block ${block} doesn't save wit error`, e);
+        console.log(`An error occuurred while saving block ${block}: `, e);
         reject(e);
       }
     });
@@ -141,5 +141,13 @@ export class ErgoObservationExtractor extends AbstractExtractor<wasm.Transaction
    */
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockObservation(hash, this.getId());
+  };
+
+  /**
+   * Extractor box initialization
+   * No action needed in cardano extractors
+   */
+  initializeBoxes = async () => {
+    return;
   };
 }

@@ -1,5 +1,5 @@
 import { BoxEntity } from '../entities/boxEntity';
-import { DataSource, In } from 'typeorm';
+import { DataSource, In, LessThan } from 'typeorm';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 
@@ -9,6 +9,50 @@ export class BoxEntityAction {
   constructor(dataSource: DataSource) {
     this.datasource = dataSource;
   }
+
+  /**
+   * stores initial extracted boxes to the database
+   * @param boxes
+   * @param initializationHeight
+   * @param extractor
+   */
+  storeInitialBoxes = async (
+    boxes: Array<ExtractedBox>,
+    initializationHeight: number,
+    extractor: string
+  ) => {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const repository = queryRunner.manager.getRepository(BoxEntity);
+      await repository.delete({
+        creationHeight: LessThan(initializationHeight),
+      });
+      for (const box of boxes) {
+        const entity = {
+          address: box.address,
+          boxId: box.boxId,
+          createBlock: box.blockId,
+          creationHeight: box.height,
+          spendBlock: undefined,
+          serialized: box.serialized,
+          extractor: extractor,
+        };
+        await repository.insert(entity);
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      console.log(`An error occurred during store boxes action: ${e}`);
+      await queryRunner.rollbackTransaction();
+      throw new Error(
+        'Initialization failed while storing initial address boxes'
+      );
+    } finally {
+      await queryRunner.release();
+    }
+    return true;
+  };
 
   /**
    * It stores list of blocks in the dataSource with block id

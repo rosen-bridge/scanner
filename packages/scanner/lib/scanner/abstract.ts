@@ -11,6 +11,7 @@ export abstract class AbstractScanner<TransactionType> {
   abstract readonly initialHeight: number;
   abstract extractors: Array<AbstractExtractor<TransactionType>>;
   abstract networkAccess: AbstractNetworkConnector<TransactionType>;
+  abstract extractorInitialization: Array<boolean>;
 
   abstract name: () => string;
 
@@ -153,6 +154,7 @@ export abstract class AbstractScanner<TransactionType> {
       ).length === 0
     ) {
       this.extractors.push(extractor);
+      this.extractorInitialization.push(false);
     }
   };
 
@@ -165,6 +167,7 @@ export abstract class AbstractScanner<TransactionType> {
       return extractorItem.getId() === extractor.getId();
     });
     this.extractors.splice(extractorIndex, 1);
+    this.extractorInitialization.splice(extractorIndex, 1);
   };
 
   /**
@@ -178,15 +181,18 @@ export abstract class AbstractScanner<TransactionType> {
     }
     const txs = await this.networkAccess.getBlockTxs(block.hash);
     let success = true;
-    for (const extractor of this.extractors) {
-      const extractionResult = await extractor.processTransactions(
-        txs,
-        savedBlock
-      );
-      if (!extractionResult) {
-        success = false;
-        break;
+    try {
+      for (const extractor of this.extractors) {
+        if (!(await extractor.processTransactions(txs, savedBlock))) {
+          success = false;
+          break;
+        }
       }
+    } catch (e) {
+      console.error(
+        `An error occurred while extracting data from transaction: ${e}`
+      );
+      success = false;
     }
     if (success && (await this.updateBlockStatus(block.blockHeight))) {
       return savedBlock;
@@ -273,6 +279,16 @@ export abstract class AbstractScanner<TransactionType> {
   update = async () => {
     try {
       const lastSavedBlock = await this.getLastSavedBlock();
+      const height = lastSavedBlock
+        ? lastSavedBlock.height
+        : this.initialHeight;
+      for (const [
+        index,
+        extractorInitialized,
+      ] of this.extractorInitialization.entries()) {
+        if (!extractorInitialized)
+          await this.extractors[index].initializeBoxes(height);
+      }
       if (lastSavedBlock === undefined) {
         const block = await this.networkAccess.getBlockAtHeight(
           this.initialHeight

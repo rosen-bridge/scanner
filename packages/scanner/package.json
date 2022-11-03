@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "prettify": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint --fix . && npm run prettify",
     "test": "rimraf sqlite && jest; rimraf sqlite",
-    "coverage": "c8 npm run test",
+    "coverage": "rimraf sqlite && jest --detectOpenHandles --coverage; rimraf sqlite",
     "build": "tsc --build",
     "type-check": "tsc --noEmit",
     "release": "npm run test && npm run build && npm publish --access public"
@@ -24,7 +24,7 @@
   "author": "Sahand Zoufan",
   "dependencies": {
     "axios": "^0.27.2",
-    "ergo-lib-wasm-nodejs": "^0.18.0",
+    "ergo-lib-wasm-nodejs": "^0.21.0",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"

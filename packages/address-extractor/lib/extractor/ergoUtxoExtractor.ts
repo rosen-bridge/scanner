@@ -5,21 +5,26 @@ import { BoxEntityAction } from '../actions/db';
 import { AbstractExtractor } from '@rosen-bridge/scanner';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
+import { ExplorerApi } from '../network/ergoNetworkApi';
+import { JsonBI } from '../network/parser';
+import { Boxes, ErgoBoxJson } from '../interfaces/types';
 
 export class ErgoUTXOExtractor
   implements AbstractExtractor<ergoLib.Transaction>
 {
   private readonly dataSource: DataSource;
-  private readonly actions: BoxEntityAction;
+  readonly actions: BoxEntityAction;
   private readonly id: string;
   private readonly networkType: ergoLib.NetworkPrefix;
   private readonly ergoTree?: string;
   private readonly tokens: Array<string>;
+  readonly explorerApi: ExplorerApi;
 
   constructor(
     dataSource: DataSource,
     id: string,
     networkType: ergoLib.NetworkPrefix,
+    explorerUrl: string,
     address?: string,
     tokens?: Array<string>
   ) {
@@ -31,8 +36,21 @@ export class ErgoUTXOExtractor
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
+    this.explorerApi = new ExplorerApi(explorerUrl);
   }
 
+  private extractBoxFromJson = (boxJson: ErgoBoxJson) => {
+    const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+    return {
+      boxId: box.box_id().to_str(),
+      address: ergoLib.Address.recreate_from_ergo_tree(
+        ergoLib.ErgoTree.from_base16_bytes(box.ergo_tree().to_base16_bytes())
+      ).to_base58(this.networkType),
+      serialized: Buffer.from(box.sigma_serialize_bytes()).toString('base64'),
+      blockId: boxJson.blockId,
+      height: boxJson.settlementHeight,
+    };
+  };
   /**
    * get Id for current extractor
    */
@@ -119,5 +137,52 @@ export class ErgoUTXOExtractor
    */
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockBoxes(hash, this.getId());
+  };
+
+  /**
+   * Initializes the database with older boxes related to the address
+   */
+  initializeBoxes = async (initialHeight: number) => {
+    // 1. Get Boxes
+    const allBoxes: Array<ErgoBoxJson> = [];
+    let offset = 0,
+      total = 100,
+      boxes: Boxes;
+    while (offset < total) {
+      if (this.ergoTree) {
+        boxes = await this.explorerApi.getBoxesForAddress(
+          this.ergoTree,
+          offset
+        );
+      } else if (!this.ergoTree && this.tokens.length > 0) {
+        boxes = await this.explorerApi.getBoxesByTokenId(
+          this.tokens[0],
+          offset
+        );
+      } else return;
+      allBoxes.push(...boxes.items);
+      total = boxes.total;
+      offset += 100;
+    }
+    // 2. Filter Boxes
+    const extractedBoxes = allBoxes
+      .filter((boxJson) => boxJson.settlementHeight < initialHeight)
+      .filter((boxJson) => {
+        if (this.tokens.length > 0) {
+          const boxTokens = boxJson.assets.map((token) => token.tokenId);
+          const requiredTokens = this.tokens.filter((token) =>
+            boxTokens.includes(token)
+          );
+          if (requiredTokens.length < this.tokens.length) return false;
+        }
+        return true;
+      })
+      .map((boxJson) => this.extractBoxFromJson(boxJson));
+    // 3. Store Boxes
+    await this.actions.storeInitialBoxes(
+      extractedBoxes,
+      initialHeight,
+      this.getId()
+    );
   };
 }

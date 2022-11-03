@@ -29,32 +29,37 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
   getId = () => 'ergo-cardano-koios-extractor';
 
   /**
-   * returns CardanoRosenData object if the box format is like rosen bridge observations otherwise returns undefined
-   * @param metaDataArray
+   * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
+   * @param metaData
    */
-  getRosenData = (metaDataArray: Array<MetaData>): RosenData | undefined => {
-    if (metaDataArray.length > 0 && metaDataArray[0].key === '0') {
+  getRosenData = (metaData: MetaData): RosenData | undefined => {
+    // Rosen data type exists with the '0' key on the cardano tx metadata
+    if (Object.prototype.hasOwnProperty.call(metaData, '0')) {
       try {
-        const metaData = metaDataArray[0].json;
+        const data = metaData['0'];
         if (
-          'to' in metaData &&
-          'bridgeFee' in metaData &&
-          'networkFee' in metaData &&
-          'toAddress' in metaData &&
-          'fromAddress' in metaData
+          'toChain' in data &&
+          'bridgeFee' in data &&
+          'networkFee' in data &&
+          'toAddress' in data &&
+          // 'toAddress' in data
+          'fromAddress' in data
         ) {
-          const rosenData = metaData as unknown as {
-            to: string;
+          const rosenData = data as unknown as {
+            toChain: string;
             bridgeFee: string;
             networkFee: string;
             toAddress: string;
+            // targetChainTokenId: string;
             fromAddress: string;
           };
           return {
-            toChain: rosenData.to,
+            toChain: rosenData.toChain,
             bridgeFee: rosenData.bridgeFee,
             networkFee: rosenData.networkFee,
             toAddress: rosenData.toAddress,
+            // targetChainTokenId: rosenData.targetChainTokenId,
+            // targetChainTokenId:"",
             fromAddress: rosenData.fromAddress,
           };
         }
@@ -144,8 +149,8 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
         });
         this.actions
           .storeObservations(observations, block, this.getId())
-          .then(() => {
-            resolve(true);
+          .then((status) => {
+            resolve(status);
           })
           .catch((e) => {
             console.log(`An error occurred during store observations: ${e}`);
@@ -163,5 +168,13 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
    */
   forkBlock = async (hash: string): Promise<void> => {
     await this.actions.deleteBlockObservation(hash, this.getId());
+  };
+
+  /**
+   * Extractor box initialization
+   * No action needed in cardano extractors
+   */
+  initializeBoxes = async () => {
+    return;
   };
 }

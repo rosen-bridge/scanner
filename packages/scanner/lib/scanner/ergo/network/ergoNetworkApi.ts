@@ -2,6 +2,7 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
 import axios, { AxiosInstance } from 'axios';
 import { NodeBlock } from './types';
+import { JsonBI } from './parser';
 
 export class ErgoNetworkApi extends AbstractNetworkConnector<wasm.Transaction> {
   private readonly url: string;
@@ -40,10 +41,12 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<wasm.Transaction> {
 
   getBlockTxs = (blockHash: string): Promise<Array<wasm.Transaction>> => {
     return this.node
-      .get<NodeBlock>(`/blocks/${blockHash}/transactions`)
+      .get<NodeBlock>(`/blocks/${blockHash}/transactions`, {
+        transformResponse: (data) => JsonBI.parse(data),
+      })
       .then((res) => {
         return res.data.transactions.map((item) =>
-          wasm.Transaction.from_json(JSON.stringify(item))
+          wasm.Transaction.from_json(JsonBI.stringify(item))
         );
       });
   };
