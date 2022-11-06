@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,7 +24,6 @@
   "author": "Sahand Zoufan",
   "dependencies": {
     "axios": "^0.27.2",
-    "ergo-lib-wasm-nodejs": "^0.21.0",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"

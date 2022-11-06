@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
@@ -19,7 +19,7 @@
     "dist"
   ],
   "dependencies": {
-    "@rosen-bridge/scanner": "^0.2.5",
+    "@rosen-bridge/scanner": "^0.3.0",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.21.0",
     "reflect-metadata": "^0.1.13",
