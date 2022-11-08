@@ -86,6 +86,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
           return [];
         } else {
           // Using the api for one block, just using the first output
+          // TODO: remove request trial after the koios API update
           return retryRequest(
             () => this.getTxInformations(res.data[0].tx_hashes),
             10,
