@@ -342,7 +342,12 @@ export const cardanoTxValid = {
   block_hash: '',
   metadata: {
     '0': JSON.parse(
-      '{"toChain": "ergo","bridgeFee": "10000","networkFee": "10000","toAddress": "ergoAddress", "fromAddressHash": "' +
+      '{' +
+        '"to": "ergo",' +
+        '"bridgeFee": "10000",' +
+        '"networkFee": "10000",' +
+        '"toAddress": "ergoAddress",' +
+        ' "fromAddressHash": "' +
         addressHash +
         '" }'
     ),

@@ -38,21 +38,21 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
       try {
         const data = metaData['0'];
         if (
-          'toChain' in data &&
+          'to' in data &&
           'bridgeFee' in data &&
           'networkFee' in data &&
           'toAddress' in data &&
           'fromAddressHash' in data
         ) {
           const rosenData = data as unknown as {
-            toChain: string;
+            to: string;
             bridgeFee: string;
             networkFee: string;
             toAddress: string;
             fromAddressHash: string;
           };
           return {
-            toChain: rosenData.toChain,
+            toChain: rosenData.to,
             bridgeFee: rosenData.bridgeFee,
             networkFee: rosenData.networkFee,
             toAddress: rosenData.toAddress,
@@ -108,13 +108,17 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           if (transaction.metadata !== undefined) {
             try {
               const data = this.getRosenData(transaction.metadata);
+              const bankOutputs = transaction.outputs.filter(
+                (output) => output.payment_addr.bech32 === this.bankAddress
+              );
+              const paymentOutput =
+                bankOutputs.length > 0 ? bankOutputs[0] : undefined;
               if (
-                transaction.outputs[0].payment_addr.bech32 ===
-                  this.bankAddress &&
+                paymentOutput !== undefined &&
                 data !== undefined &&
-                transaction.outputs[0].asset_list.length !== 0
+                paymentOutput.asset_list.length !== 0
               ) {
-                const asset = transaction.outputs[0].asset_list[0];
+                const asset = paymentOutput.asset_list[0];
                 const assetId = this.toTargetToken(
                   asset.policy_id,
                   asset.asset_name,

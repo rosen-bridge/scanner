@@ -30,7 +30,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         extractor.getRosenData({
           '0': JSON.parse(
             '{' +
-              '"toChain": "ergo",' +
+              '"to": "ergo",' +
               '"bridgeFee": "10000",' +
               '"networkFee": "1000",' +
               '"toAddress": "ergoAddress",' +
