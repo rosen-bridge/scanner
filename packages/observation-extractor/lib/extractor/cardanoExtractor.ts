@@ -112,7 +112,7 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
                 (output) => output.payment_addr.bech32 === this.bankAddress
               );
               const paymentOutput =
-                bankOutputs.length > 0 ? bankOutputs[0] : undefined;
+                bankOutputs.length !== 0 ? bankOutputs[0] : undefined;
               if (
                 paymentOutput !== undefined &&
                 data !== undefined &&
