@@ -64,6 +64,10 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       });
   };
 
+  /**
+   * Try getting transactions information.
+   * @param txHashes
+   */
   getTxInformations = (
     txHashes: Array<string>
   ): Promise<Array<KoiosTransaction>> => {
@@ -87,6 +91,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         } else {
           // Using the api for one block, just using the first output
           // TODO: remove request trial after the koios API update
+          // Issue: https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/25
           return retryRequest(
             () => this.getTxInformations(res.data[0].tx_hashes),
             10,

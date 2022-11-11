@@ -1,4 +1,4 @@
-export const retryRequest = async <D>(
+const retryRequest = async <D>(
   promiseGenerator: () => Promise<D>,
   retriesCount: number,
   retrialPredicate: (data: D) => boolean
@@ -15,3 +15,5 @@ export const retryRequest = async <D>(
   }
   throw Error("Retrial finished and didn't get the required result");
 };
+
+export { retryRequest };

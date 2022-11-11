@@ -18,6 +18,10 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<Transaction> {
     });
   }
 
+  /**
+   * get block header from height
+   * @param height
+   */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.node
       .get<Array<{ id: string }>>(`/blocks/chainSlice`, {
@@ -32,12 +36,19 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<Transaction> {
       });
   };
 
+  /**
+   * get current height for blockchain
+   */
   getCurrentHeight = (): Promise<number> => {
     return this.node.get<{ fullHeight: number }>(`/info`).then((res) => {
       return res.data.fullHeight;
     });
   };
 
+  /**
+   * fetch list if transaction of specific block
+   * @param blockHash
+   */
   getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
     return this.node
       .get<NodeBlock>(`/blocks/${blockHash}/transactions`, {
