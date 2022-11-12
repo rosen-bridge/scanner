@@ -63,7 +63,9 @@ describe('extractorErgo', () => {
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
       const observation1 = rows[0];
-      const box1 = Tx1.outputs().get(0);
+      const box1 = Tx1.outputs[0];
+      const assetAmount = box1.assets ? box1.assets[0].amount.toString() : '';
+      const assetId = box1.assets ? box1.assets[0].tokenId : '';
       expect(observation1).toEqual({
         id: 1,
         fromChain: 'ergo',
@@ -71,15 +73,15 @@ describe('extractorErgo', () => {
         fromAddress: watcherAddress,
         toAddress: 'address',
         height: 1,
-        amount: box1.tokens().get(0).amount().as_i64().to_str(),
+        amount: assetAmount,
         networkFee: '10000',
         bridgeFee: '1000',
-        sourceChainTokenId: box1.tokens().get(0).id().to_str(),
+        sourceChainTokenId: assetId,
         targetChainTokenId: 'cardano',
         sourceBlockId: '1',
-        sourceTxId: box1.tx_id().to_str(),
+        sourceTxId: box1.transactionId,
         requestId: Buffer.from(
-          blake2b(box1.tx_id().to_str(), undefined, 32)
+          blake2b(box1.transactionId, undefined, 32)
         ).toString('hex'),
         block: '1',
         extractor: 'ergo-observation-extractor',
@@ -134,7 +136,7 @@ describe('extractorErgo', () => {
         bankSK,
         watcherSK
       );
-      expect(extractor.getRosenData(Tx.outputs().get(0))).toStrictEqual({
+      expect(extractor.getRosenData(Tx.outputs[0])).toStrictEqual({
         toChain: 'cardano',
         toAddress: 'address',
         bridgeFee: '1000',
@@ -153,7 +155,7 @@ describe('extractorErgo', () => {
       const dataSource = await loadDataBase('getRosenData');
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx = observationTxGenerator(false, [], bankSK, watcherSK);
-      expect(extractor.getRosenData(Tx.outputs().get(0))).toEqual(undefined);
+      expect(extractor.getRosenData(Tx.outputs[0])).toEqual(undefined);
     });
 
     /**
@@ -171,7 +173,7 @@ describe('extractorErgo', () => {
         bankSK,
         watcherSK
       );
-      expect(extractor.getRosenData(Tx.outputs().get(0))).toEqual(undefined);
+      expect(extractor.getRosenData(Tx.outputs[0])).toEqual(undefined);
     });
   });
 });

@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
+import { TxBuilder } from 'ergo-lib-wasm-nodejs';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import { retryRequest } from '../../../utils/utils';
 import {
   KoiosBlock,
   KoiosBlockInfo,
@@ -62,6 +64,22 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       });
   };
 
+  /**
+   * Try getting transactions information.
+   * @param txHashes
+   */
+  getTxInformations = (
+    txHashes: Array<string>
+  ): Promise<Array<KoiosTransaction>> => {
+    return this.koios
+      .post<Array<KoiosTransaction>>('/tx_info', {
+        _tx_hashes: txHashes,
+      })
+      .then((ret) => {
+        return ret.data;
+      });
+  };
+
   getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
     return this.koios
       .post<Array<{ tx_hashes: Array<string> }>>('/block_txs', {
@@ -72,13 +90,13 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
           return [];
         } else {
           // Using the api for one block, just using the first output
-          return this.koios
-            .post<Array<KoiosTransaction>>('/tx_info', {
-              _tx_hashes: res.data[0].tx_hashes,
-            })
-            .then((ret) => {
-              return ret.data;
-            });
+          // TODO: remove request trial after the koios API update
+          // Issue: https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/25
+          return retryRequest(
+            () => this.getTxInformations(res.data[0].tx_hashes),
+            10,
+            (txs: KoiosTransaction[]) => txs.some((tx) => !tx.metadata)
+          );
         }
       })
       .catch((exp) => {

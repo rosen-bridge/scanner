@@ -8,6 +8,8 @@ import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
 import { sampleEventEntity } from '../actions/EventTrigger.spec';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { JsonBI } from '../network/parser';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -71,7 +73,7 @@ describe('EventTriggerExtractor', () => {
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [event, rowsCount] = await repository.findAndCount();
-      const box = tx1.outputs().get(0);
+      const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
       expect(event[0]).toEqual({
         id: 1,
         extractor: 'extractorId',

@@ -2,8 +2,10 @@ import { DataSource } from 'typeorm';
 import { ObservationEntity } from '../entities/observationEntity';
 import { migrations } from '../migrations';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
+import { JsonBI } from '@rosen-bridge/scanner/dist/scanner/ergo/network/parser';
+import { sign } from 'crypto';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 
@@ -542,12 +544,13 @@ export const observationTxGenerator = (
   sks.add(watcherSK);
   sks.add(bankSK);
   const wallet = wasm.Wallet.from_secrets(sks);
-  return wallet.sign_transaction(
+  const signed = wallet.sign_transaction(
     ctx,
     tx,
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
+  return JsonBI.parse(signed.to_json()) as Transaction;
 };
 
 export const generateBlockEntity = (
