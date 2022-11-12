@@ -20,7 +20,7 @@ const sampleEventTrigger1: ExtractedEventTrigger = {
   boxId: '1',
   boxSerialized: 'serialized1',
   sourceBlockId: 'blockId',
-  height: 10,
+  sourceChainHeight: 10,
 };
 const sampleEventTrigger2: ExtractedEventTrigger = {
   WIDs: '1',
@@ -37,7 +37,7 @@ const sampleEventTrigger2: ExtractedEventTrigger = {
   boxId: '2',
   boxSerialized: 'serialized2',
   sourceBlockId: 'blockId',
-  height: 20,
+  sourceChainHeight: 20,
 };
 
 const sampleEventTrigger3: ExtractedEventTrigger = {
