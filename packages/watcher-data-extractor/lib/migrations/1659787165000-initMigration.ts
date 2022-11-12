@@ -35,6 +35,7 @@ export class initMigration1659787165000 implements MigrationInterface {
                     "bridgeFee" varchar NOT NULL,
                     "networkFee" varchar NOT NULL,
                     "sourceChainTokenId" varchar NOT NULL,
+                    "sourceChainHeight" integer NOT NULL,
                     "targetChainTokenId" varchar NOT NULL,
                     "sourceBlockId" varchar NOT NULL,
                     "sourceTxId" varchar NOT NULL,

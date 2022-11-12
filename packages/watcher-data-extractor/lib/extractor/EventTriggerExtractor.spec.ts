@@ -24,6 +24,7 @@ const sampleEventData = [
   'a1',
   'a2',
   'b1',
+  '12',
 ];
 
 describe('EventTriggerExtractor', () => {
@@ -90,6 +91,7 @@ describe('EventTriggerExtractor', () => {
         amount: '17',
         bridgeFee: '34',
         networkFee: '51',
+        sourceChainHeight: 12594,
         sourceChainTokenId: sampleEventData[8],
         targetChainTokenId: sampleEventData[9],
         sourceTxId: sampleEventData[0],
@@ -156,12 +158,14 @@ describe('EventTriggerExtractor', () => {
           ...sampleEventEntity,
           boxId: '22',
           block: 'hash2',
+          sourceChainHeight: 12,
           id: 2,
         },
         {
           ...sampleEventEntity,
           boxId: '33',
           extractor: 'secondExtractor',
+          sourceChainHeight: 15,
           id: 3,
         },
       ]);
