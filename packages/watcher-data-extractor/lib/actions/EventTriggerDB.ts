@@ -57,6 +57,7 @@ class EventTriggerDB {
           sourceBlockId: event.sourceBlockId,
           toChain: event.toChain,
           sourceTxId: event.sourceTxId,
+          sourceChainHeight: event.height,
         };
         if (!saved) {
           await queryRunner.manager.insert(EventTriggerEntity, entity);

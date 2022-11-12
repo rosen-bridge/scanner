@@ -73,7 +73,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                   if (R4Const && R5Const) {
                     const R4Serialized = R4Const.to_coll_coll_byte();
                     const R5Serialized = R5Const.to_coll_coll_byte();
-                    if (R4Serialized.length >= 1 && R5Serialized.length >= 11) {
+                    if (R4Serialized.length >= 1 && R5Serialized.length >= 12) {
                       const WIDs = R4Serialized.map((byteArray) =>
                         Buffer.from(byteArray).toString('hex')
                       ).join(',');
@@ -93,6 +93,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                         amount: BigInt(
                           '0x' + Buffer.from(R5Serialized[5]).toString('hex')
                         ).toString(10),
+                        // sourceChainHeight:
                         sourceChainTokenId: Buffer.from(
                           R5Serialized[8]
                         ).toString(),
@@ -104,6 +105,11 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                         fromAddress: Buffer.from(R5Serialized[3]).toString(),
                         sourceBlockId: Buffer.from(R5Serialized[10]).toString(),
                         WIDs: WIDs,
+                        height: Number(
+                          BigInt(
+                            '0x' + Buffer.from(R5Serialized[11]).toString('hex')
+                          ).toString(10)
+                        ),
                       });
                     }
                   }

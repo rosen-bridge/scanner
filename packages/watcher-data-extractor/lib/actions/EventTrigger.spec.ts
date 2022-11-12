@@ -20,6 +20,7 @@ const sampleEventTrigger1: ExtractedEventTrigger = {
   boxId: '1',
   boxSerialized: 'serialized1',
   sourceBlockId: 'blockId',
+  height: 10,
 };
 const sampleEventTrigger2: ExtractedEventTrigger = {
   WIDs: '1',
@@ -36,6 +37,7 @@ const sampleEventTrigger2: ExtractedEventTrigger = {
   boxId: '2',
   boxSerialized: 'serialized2',
   sourceBlockId: 'blockId',
+  height: 20,
 };
 
 const sampleEventTrigger3: ExtractedEventTrigger = {
@@ -66,6 +68,7 @@ export const sampleEventEntity = {
   sourceTxId: 'txId',
   sourceBlockId: 'blockId',
   WIDs: 'ff',
+  sourceChainHeight: 10,
 };
 
 let dataSource: DataSource;
@@ -131,12 +134,14 @@ describe('EventTrigger', () => {
           extractor: 'first-extractor',
           block: '1',
           height: 1,
+          sourceChainHeight: 11,
         },
         {
           ...sampleEventTrigger2,
           extractor: 'first-extractor',
           block: '1',
           height: 1,
+          sourceChainHeight: 12,
         },
       ]);
       const [firstInsertRows] = await repository.findAndCount();
@@ -185,12 +190,14 @@ describe('EventTrigger', () => {
           extractor: 'first-extractor',
           block: '1',
           height: 1,
+          sourceChainHeight: 11,
         },
         {
           ...sampleEventTrigger2,
           extractor: 'first-extractor',
           block: '1',
           height: 1,
+          sourceChainHeight: 11,
         },
       ]);
       const res = await action.storeEventTriggers(
@@ -230,12 +237,14 @@ describe('EventTrigger', () => {
           ...sampleEventTrigger1,
           extractor: 'first-extractor',
           block: 'hash',
+          sourceChainHeight: 11,
           height: 1,
         },
         {
           ...sampleEventTrigger2,
           extractor: 'first-extractor',
           block: 'hash',
+          sourceChainHeight: 11,
           height: 1,
         },
       ]);
@@ -275,12 +284,14 @@ describe('EventTrigger', () => {
           ...sampleEventTrigger1,
           extractor: 'first-extractor',
           block: 'hash',
+          sourceChainHeight: 11,
           height: 1,
         },
         {
           ...sampleEventTrigger2,
           extractor: 'first-extractor',
           block: 'hash',
+          sourceChainHeight: 12,
           height: 1,
         },
       ]);
