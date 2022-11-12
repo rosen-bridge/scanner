@@ -1,10 +1,15 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import EventTriggerDB from '../actions/EventTriggerDB';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  BlockEntity,
+  Transaction,
+} from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
+import { JsonBI } from '../network/parser';
 
-class EventTriggerExtractor extends AbstractExtractor<wasm.Transaction> {
+class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   id: string;
   private readonly dataSource: DataSource;
   private readonly actions: EventTriggerDB;
@@ -36,7 +41,7 @@ class EventTriggerExtractor extends AbstractExtractor<wasm.Transaction> {
    * @param txs
    */
   processTransactions = (
-    txs: Array<wasm.Transaction>,
+    txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -44,58 +49,72 @@ class EventTriggerExtractor extends AbstractExtractor<wasm.Transaction> {
         const boxes: Array<ExtractedEventTrigger> = [];
         const spendIds: Array<string> = [];
         txs.forEach((transaction) => {
-          for (let index = 0; index < transaction.outputs().len(); index++) {
-            const output = transaction.outputs().get(index);
+          for (const output of transaction.outputs) {
             try {
-              const r4 = output.register_value(4);
-              const r5 = output.register_value(5);
-              if (r4 && r5) {
-                const R5Serialized = r5.to_coll_coll_byte();
-                const R4Serialized = r4.to_coll_coll_byte();
-                if (
-                  output.tokens().len() > 0 &&
-                  output.tokens().get(0).id().to_str() === this.RWT &&
-                  R4Serialized.length >= 1 &&
-                  R5Serialized.length >= 11 &&
-                  output.ergo_tree().to_base16_bytes() ===
-                    this.eventTriggerErgoTree
-                ) {
-                  const WIDs = R4Serialized.map((byteArray) =>
-                    Buffer.from(byteArray).toString('hex')
-                  ).join(',');
-                  boxes.push({
-                    boxId: output.box_id().to_str(),
-                    boxSerialized: Buffer.from(
-                      output.sigma_serialize_bytes()
-                    ).toString('base64'),
-                    toChain: Buffer.from(R5Serialized[2]).toString(),
-                    toAddress: Buffer.from(R5Serialized[4]).toString(),
-                    networkFee: BigInt(
-                      '0x' + Buffer.from(R5Serialized[7]).toString('hex')
-                    ).toString(10),
-                    bridgeFee: BigInt(
-                      '0x' + Buffer.from(R5Serialized[6]).toString('hex')
-                    ).toString(10),
-                    amount: BigInt(
-                      '0x' + Buffer.from(R5Serialized[5]).toString('hex')
-                    ).toString(10),
-                    sourceChainTokenId: Buffer.from(R5Serialized[8]).toString(),
-                    targetChainTokenId: Buffer.from(R5Serialized[9]).toString(),
-                    sourceTxId: Buffer.from(R5Serialized[0]).toString(),
-                    fromChain: Buffer.from(R5Serialized[1]).toString(),
-                    fromAddress: Buffer.from(R5Serialized[3]).toString(),
-                    sourceBlockId: Buffer.from(R5Serialized[10]).toString(),
-                    WIDs: WIDs,
-                  });
+              if (
+                output.additionalRegisters &&
+                output.assets &&
+                output.assets.length > 0 &&
+                output.assets[0].tokenId === this.RWT &&
+                output.ergoTree === this.eventTriggerErgoTree
+              ) {
+                const R4 = output.additionalRegisters.R4;
+                const R5 = output.additionalRegisters.R5;
+                if (R4 && R5) {
+                  const outputParsed = wasm.ErgoBox.from_json(
+                    JsonBI.stringify(output)
+                  );
+                  const R4Const = outputParsed.register_value(
+                    wasm.NonMandatoryRegisterId.R4
+                  );
+                  const R5Const = outputParsed.register_value(
+                    wasm.NonMandatoryRegisterId.R5
+                  );
+                  if (R4Const && R5Const) {
+                    const R4Serialized = R4Const.to_coll_coll_byte();
+                    const R5Serialized = R5Const.to_coll_coll_byte();
+                    if (R4Serialized.length >= 1 && R5Serialized.length >= 11) {
+                      const WIDs = R4Serialized.map((byteArray) =>
+                        Buffer.from(byteArray).toString('hex')
+                      ).join(',');
+                      boxes.push({
+                        boxId: output.boxId,
+                        boxSerialized: Buffer.from(
+                          outputParsed.sigma_serialize_bytes()
+                        ).toString('base64'),
+                        toChain: Buffer.from(R5Serialized[2]).toString(),
+                        toAddress: Buffer.from(R5Serialized[4]).toString(),
+                        networkFee: BigInt(
+                          '0x' + Buffer.from(R5Serialized[7]).toString('hex')
+                        ).toString(10),
+                        bridgeFee: BigInt(
+                          '0x' + Buffer.from(R5Serialized[6]).toString('hex')
+                        ).toString(10),
+                        amount: BigInt(
+                          '0x' + Buffer.from(R5Serialized[5]).toString('hex')
+                        ).toString(10),
+                        sourceChainTokenId: Buffer.from(
+                          R5Serialized[8]
+                        ).toString(),
+                        targetChainTokenId: Buffer.from(
+                          R5Serialized[9]
+                        ).toString(),
+                        sourceTxId: Buffer.from(R5Serialized[0]).toString(),
+                        fromChain: Buffer.from(R5Serialized[1]).toString(),
+                        fromAddress: Buffer.from(R5Serialized[3]).toString(),
+                        sourceBlockId: Buffer.from(R5Serialized[10]).toString(),
+                        WIDs: WIDs,
+                      });
+                    }
+                  }
                 }
               }
             } catch {
               continue;
             }
             // process inputs
-            for (let index = 0; index < transaction.inputs().len(); index++) {
-              const input = transaction.inputs().get(index);
-              spendIds.push(input.box_id().to_str());
+            for (const input of transaction.inputs) {
+              spendIds.push(input.boxId);
             }
           }
         });

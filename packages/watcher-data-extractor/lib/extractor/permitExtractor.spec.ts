@@ -72,9 +72,9 @@ describe('permitExtractor', () => {
       const permit1 = rows[0];
       const permit2 = rows[1];
       const permit3 = rows[2];
-      const box1 = tx1.outputs().get(0);
-      const box2 = tx2.outputs().get(0);
-      const box3 = tx3.outputs().get(0);
+      const box1 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
+      const box2 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx2.outputs[0]));
+      const box3 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx3.outputs[0]));
       expect(permit1).toEqual({
         id: 1,
         WID: 'ff11',
