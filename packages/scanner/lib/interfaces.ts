@@ -1,4 +1,5 @@
 import { BlockEntity } from './entities/blockEntity';
+import { AbstractLogger } from './loger/AbstractLogger';
 
 interface Block {
   parentHash: string;
@@ -63,6 +64,8 @@ abstract class AbstractNetworkConnector<TransactionType> {
 }
 
 abstract class AbstractExtractor<TransactionType> {
+  abstract readonly logger?: AbstractLogger;
+
   /**
    * process a list of transactions and store any information
    * @param txs: list of transaction for block

@@ -2,9 +2,14 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { DataSource } from 'typeorm';
 import CommitmentEntityAction from '../actions/commitmentDB';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  AbstractLogger,
+  BlockEntity,
+} from '@rosen-bridge/scanner';
 
 class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
+  readonly logger?: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   private readonly commitmentsErgoTrees: Array<string>;
@@ -15,7 +20,8 @@ class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
     id: string,
     addresses: Array<string>,
     RWTId: string,
-    dataSource: DataSource
+    dataSource: DataSource,
+    logger?: AbstractLogger
   ) {
     super();
     this.id = id;
@@ -25,6 +31,7 @@ class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
     );
     this.actions = new CommitmentEntityAction(dataSource);
     this.RWTId = RWTId;
+    this.logger = logger;
   }
 
   /**

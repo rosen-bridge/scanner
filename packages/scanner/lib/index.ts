@@ -5,3 +5,4 @@ export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
 export { AbstractExtractor } from './interfaces';
 export { AbstractScanner } from './scanner/abstract';
+export { AbstractLogger } from './loger/AbstractLogger';

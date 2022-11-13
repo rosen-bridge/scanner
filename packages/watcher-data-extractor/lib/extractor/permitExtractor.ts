@@ -2,13 +2,18 @@ import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import PermitEntityAction from '../actions/permitDB';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  AbstractLogger,
+  BlockEntity,
+} from '@rosen-bridge/scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 
 class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
+  readonly logger?: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   readonly actions: PermitEntityAction;
@@ -21,7 +26,8 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
     dataSource: DataSource,
     address: string,
     RWT: string,
-    explorerUrl: string
+    explorerUrl: string,
+    logger?: AbstractLogger
   ) {
     super();
     this.id = id;
@@ -32,6 +38,7 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.explorerApi = new ExplorerApi(explorerUrl);
+    this.logger = logger;
   }
 
   getId = () => this.id;

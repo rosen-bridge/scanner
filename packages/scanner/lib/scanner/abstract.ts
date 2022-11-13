@@ -5,6 +5,7 @@ import {
   AbstractNetworkConnector,
   AbstractExtractor,
 } from '../interfaces';
+import { AbstractLogger } from '../loger/AbstractLogger';
 
 export abstract class AbstractScanner<TransactionType> {
   abstract readonly blockRepository: Repository<BlockEntity>;
@@ -12,6 +13,7 @@ export abstract class AbstractScanner<TransactionType> {
   abstract extractors: Array<AbstractExtractor<TransactionType>>;
   abstract networkAccess: AbstractNetworkConnector<TransactionType>;
   abstract extractorInitialization: Array<boolean>;
+  abstract logger?: AbstractLogger;
 
   abstract name: () => string;
 
@@ -122,7 +124,7 @@ export abstract class AbstractScanner<TransactionType> {
       });
       return res ? res : false;
     } catch (exp) {
-      console.error(`An error occurred during save new block: ${exp}`);
+      this.logger?.error(`An error occurred during save new block: ${exp}`);
       return false;
     }
   };
@@ -189,7 +191,7 @@ export abstract class AbstractScanner<TransactionType> {
         }
       }
     } catch (e) {
-      console.error(
+      this.logger?.error(
         `An error occurred while extracting data from transaction: ${e}`
       );
       success = false;
@@ -252,7 +254,7 @@ export abstract class AbstractScanner<TransactionType> {
           try {
             await extractor.forkBlock(forkPoint.hash);
           } catch (e) {
-            console.log(
+            this.logger?.warn(
               `An error occured during fork block in extractor ${extractor.getId()}: ${e}`
             );
           }

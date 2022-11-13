@@ -7,6 +7,7 @@ import {
 } from '../interfaces';
 import { AbstractScanner } from './abstract';
 import { migrations } from '../migrations';
+import { AbstractLogger } from '../loger/AbstractLogger';
 
 interface Tx {
   hash: string;
@@ -19,6 +20,7 @@ interface TestTransaction {
 }
 
 export class ExtractorTest extends AbstractExtractor<TestTransaction> {
+  readonly logger?: AbstractLogger;
   id: string;
 
   constructor(id: string) {
@@ -70,6 +72,7 @@ export const generateMockScanner = (name: string) => {
     extractors: Array<ExtractorTest>;
     networkAccess: NetworkConnectorTest;
     extractorInitialization: Array<boolean>;
+    readonly logger?: AbstractLogger;
 
     constructor(
       dataSource: DataSource,
