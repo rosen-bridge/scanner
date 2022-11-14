@@ -11,6 +11,8 @@ import {
   permitAddress,
   RWTId,
 } from './utilsVariable.mock';
+import { JsonBI } from '../network/parser';
+import { Transaction } from '@rosen-bridge/scanner';
 
 /**
  * generates a dataSource with filename passed to the function for database file name
@@ -119,12 +121,13 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
   const sks = new wasm.SecretKeys();
   sks.add(sk);
   const wallet = wasm.Wallet.from_secrets(sks);
-  return wallet.sign_transaction(
+  const signed = wallet.sign_transaction(
     ctx,
     tx,
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
+  return JsonBI.parse(signed.to_json()) as Transaction;
 };
 
 /**
@@ -222,12 +225,13 @@ export const commitmentTxGenerator = (
   const sks = new wasm.SecretKeys();
   sks.add(sk);
   const wallet = wasm.Wallet.from_secrets(sks);
-  return wallet.sign_transaction(
+  const signed = wallet.sign_transaction(
     ctx,
     tx,
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
+  return JsonBI.parse(signed.to_json()) as Transaction;
 };
 
 /**
@@ -320,10 +324,11 @@ export const eventTriggerTxGenerator = (
   const sks = new wasm.SecretKeys();
   sks.add(sk);
   const wallet = wasm.Wallet.from_secrets(sks);
-  return wallet.sign_transaction(
+  const signed = wallet.sign_transaction(
     ctx,
     tx,
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
+  return JsonBI.parse(signed.to_json()) as Transaction;
 };

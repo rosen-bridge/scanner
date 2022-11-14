@@ -6,9 +6,11 @@ import {
   AbstractExtractor,
   AbstractLogger,
   BlockEntity,
+  Transaction,
 } from '@rosen-bridge/scanner';
+import { JsonBI } from '../network/parser';
 
-class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
+class CommitmentExtractor extends AbstractExtractor<Transaction> {
   readonly logger?: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
@@ -46,7 +48,7 @@ class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
    * @param block
    */
   processTransactions = (
-    txs: Array<wasm.Transaction>,
+    txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -55,48 +57,52 @@ class CommitmentExtractor extends AbstractExtractor<wasm.Transaction> {
         const spendIds: Array<string> = [];
         txs.forEach((transaction) => {
           // process outputs
-          for (let index = 0; index < transaction.outputs().len(); index++) {
-            const output = transaction.outputs().get(index);
+          for (const output of transaction.outputs) {
             if (
-              output.tokens().len() > 0 &&
-              output.tokens().get(0).id().to_str() === this.RWTId &&
-              this.commitmentsErgoTrees.indexOf(
-                output.ergo_tree().to_base16_bytes()
-              ) !== -1
+              output.assets &&
+              output.additionalRegisters &&
+              output.assets.length > 0 &&
+              output.assets[0].tokenId === this.RWTId &&
+              this.commitmentsErgoTrees.indexOf(output.ergoTree) !== -1
             ) {
               try {
-                const R4 = output.register_value(4);
-                const R5 = output.register_value(5);
-                const R6 = output.register_value(6);
+                const decodedBox = wasm.ErgoBox.from_json(
+                  JsonBI.stringify(output)
+                );
+                const R4 = decodedBox.register_value(
+                  wasm.NonMandatoryRegisterId.R4
+                );
+                const R5 = decodedBox.register_value(
+                  wasm.NonMandatoryRegisterId.R5
+                );
+                const R6 = decodedBox.register_value(
+                  wasm.NonMandatoryRegisterId.R6
+                );
                 if (R4 && R5 && R6) {
-                  const WID = Buffer.from(R4.to_coll_coll_byte()[0]).toString(
-                    'hex'
-                  );
-                  const requestId = Buffer.from(
-                    R5.to_coll_coll_byte()[0]
-                  ).toString('hex');
-                  const eventDigest = Buffer.from(R6.to_byte_array()).toString(
-                    'hex'
-                  );
+                  const R4Value = R4.to_coll_coll_byte();
+                  const R5Value = R5.to_coll_coll_byte();
+                  const R6Value = R6.to_byte_array();
+                  const WID = Buffer.from(R4Value[0]).toString('hex');
+                  const requestId = Buffer.from(R5Value[0]).toString('hex');
+                  const eventDigest = Buffer.from(R6Value).toString('hex');
                   commitments.push({
                     WID: WID,
                     commitment: eventDigest,
                     eventId: requestId,
-                    boxId: output.box_id().to_str(),
+                    boxId: output.boxId,
                     boxSerialized: Buffer.from(
-                      output.sigma_serialize_bytes()
+                      decodedBox.sigma_serialize_bytes()
                     ).toString('base64'),
                   });
                 }
               } catch {
-                continue;
+                // empty
               }
             }
           }
           // process inputs
-          for (let index = 0; index < transaction.inputs().len(); index++) {
-            const input = transaction.inputs().get(index);
-            spendIds.push(input.box_id().to_str());
+          for (const input of transaction.inputs) {
+            spendIds.push(input.boxId);
           }
         });
         // process save commitments

@@ -1,10 +1,9 @@
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
 import axios, { AxiosInstance } from 'axios';
-import { NodeBlock } from './types';
+import { NodeBlock, Transaction } from './types';
 import { JsonBI } from './parser';
 
-export class ErgoNetworkApi extends AbstractNetworkConnector<wasm.Transaction> {
+export class ErgoNetworkApi extends AbstractNetworkConnector<Transaction> {
   private readonly url: string;
   private readonly timeout: number;
   private node: AxiosInstance;
@@ -19,6 +18,10 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<wasm.Transaction> {
     });
   }
 
+  /**
+   * get block header from height
+   * @param height
+   */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.node
       .get<Array<{ id: string }>>(`/blocks/chainSlice`, {
@@ -33,21 +36,24 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<wasm.Transaction> {
       });
   };
 
+  /**
+   * get current height for blockchain
+   */
   getCurrentHeight = (): Promise<number> => {
     return this.node.get<{ fullHeight: number }>(`/info`).then((res) => {
       return res.data.fullHeight;
     });
   };
 
-  getBlockTxs = (blockHash: string): Promise<Array<wasm.Transaction>> => {
+  /**
+   * fetch list if transaction of specific block
+   * @param blockHash
+   */
+  getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
     return this.node
       .get<NodeBlock>(`/blocks/${blockHash}/transactions`, {
         transformResponse: (data) => JsonBI.parse(data),
       })
-      .then((res) => {
-        return res.data.transactions.map((item) =>
-          wasm.Transaction.from_json(JsonBI.stringify(item))
-        );
-      });
+      .then((res) => res.data.transactions);
   };
 }

@@ -7,6 +7,8 @@ import CommitmentExtractor from './commitmentExtractor';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
+import { JsonBI } from '../network/parser';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 let dataSource: DataSource;
 
@@ -62,8 +64,8 @@ describe('CommitmentExtractor', () => {
       expect(rowsCount).toBe(2);
       const commitment1 = rows[0];
       const commitment2 = rows[1];
-      const box1 = tx1.outputs().get(0);
-      const box2 = tx2.outputs().get(0);
+      const box1 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
+      const box2 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx2.outputs[0]));
       expect(commitment1).toEqual({
         id: 1,
         WID: 'f1',

@@ -8,10 +8,9 @@ import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 import { Boxes, ErgoBoxJson } from '../interfaces/types';
+import { Transaction } from '@rosen-bridge/scanner';
 
-export class ErgoUTXOExtractor
-  implements AbstractExtractor<ergoLib.Transaction>
-{
+export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
   readonly logger?: AbstractLogger;
   private readonly dataSource: DataSource;
   readonly actions: BoxEntityAction;
@@ -66,7 +65,7 @@ export class ErgoUTXOExtractor
    * @param block
    */
   processTransactions = (
-    txs: Array<ergoLib.Transaction>,
+    txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -74,24 +73,18 @@ export class ErgoUTXOExtractor
         const boxes: Array<ExtractedBox> = [];
         const spendBoxes: Array<string> = [];
         txs.forEach((transaction) => {
-          for (let index = 0; index < transaction.outputs().len(); index++) {
-            const output = transaction.outputs().get(index);
-            if (
-              this.ergoTree &&
-              output.ergo_tree().to_base16_bytes() !== this.ergoTree
-            ) {
+          for (const output of transaction.outputs) {
+            if (this.ergoTree && output.ergoTree !== this.ergoTree) {
               continue;
             }
             const filteredTokens = this.tokens.filter((token) => {
-              for (
-                let tokenIndex = 0;
-                tokenIndex < output.tokens().len();
-                tokenIndex++
-              ) {
-                if (output.tokens().get(tokenIndex).id().to_str() === token) {
+              const outputTokens = output.assets ? output.assets : [];
+              for (const outputToken of outputTokens) {
+                if (outputToken.tokenId === token) {
                   return true;
                 }
               }
+              return false;
             });
             if (
               this.tokens.filter(
@@ -101,20 +94,19 @@ export class ErgoUTXOExtractor
               continue;
             }
             boxes.push({
-              boxId: output.box_id().to_str(),
+              boxId: output.boxId,
               address: ergoLib.Address.recreate_from_ergo_tree(
-                ergoLib.ErgoTree.from_base16_bytes(
-                  output.ergo_tree().to_base16_bytes()
-                )
+                ergoLib.ErgoTree.from_base16_bytes(output.ergoTree)
               ).to_base58(this.networkType),
-              serialized: Buffer.from(output.sigma_serialize_bytes()).toString(
-                'base64'
-              ),
+              serialized: Buffer.from(
+                ergoLib.ErgoBox.from_json(
+                  JsonBI.stringify(output)
+                ).sigma_serialize_bytes()
+              ).toString('base64'),
             });
           }
-          for (let index2 = 0; index2 < transaction.inputs().len(); index2++) {
-            const input = transaction.inputs().get(index2);
-            spendBoxes.push(input.box_id().to_str());
+          for (const input of transaction.inputs) {
+            spendBoxes.push(input.boxId);
           }
         });
         this.actions

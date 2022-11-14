@@ -4,7 +4,7 @@ import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../actions/db';
 import { KoiosTransaction, MetaData } from '../interfaces/koiosTransaction';
-import { RosenData } from '../interfaces/rosen';
+import { CardanoRosenData } from '../interfaces/rosen';
 import {
   AbstractExtractor,
   AbstractLogger,
@@ -43,7 +43,7 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
    * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
    * @param metaData
    */
-  getRosenData = (metaData: MetaData): RosenData | undefined => {
+  getRosenData = (metaData: MetaData): CardanoRosenData | undefined => {
     // Rosen data type exists with the '0' key on the cardano tx metadata
     if (Object.prototype.hasOwnProperty.call(metaData, '0')) {
       try {
@@ -52,19 +52,22 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           'to' in data &&
           'bridgeFee' in data &&
           'networkFee' in data &&
-          'toAddress' in data
+          'toAddress' in data &&
+          'fromAddressHash' in data
         ) {
           const rosenData = data as unknown as {
             to: string;
             bridgeFee: string;
             networkFee: string;
             toAddress: string;
+            fromAddressHash: string;
           };
           return {
             toChain: rosenData.to,
             bridgeFee: rosenData.bridgeFee,
             networkFee: rosenData.networkFee,
             toAddress: rosenData.toAddress,
+            fromAddressHash: rosenData.fromAddressHash,
           };
         }
         return undefined;
@@ -116,22 +119,36 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           if (transaction.metadata !== undefined) {
             try {
               const data = this.getRosenData(transaction.metadata);
-              for (let index = 0; index < transaction.outputs.length; index++) {
-                if (
-                  transaction.outputs[index].payment_addr.bech32 ===
-                    this.bankAddress &&
-                  data !== undefined &&
-                  transaction.outputs[index].asset_list.length !== 0
-                ) {
-                  const asset = transaction.outputs[index].asset_list[0];
-                  const assetId = this.toTargetToken(
-                    asset.policy_id,
-                    asset.asset_name,
-                    data.toChain
-                  );
-                  const requestId = Buffer.from(
-                    blake2b(transaction.tx_hash, undefined, 32)
-                  ).toString('hex');
+              // TODO: The order of output box are different from what we sent from wallet to Network
+              //  https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/27
+              const bankOutputs = transaction.outputs.filter(
+                (output) => output.payment_addr.bech32 === this.bankAddress
+              );
+              const paymentOutput =
+                bankOutputs.length !== 0 ? bankOutputs[0] : undefined;
+              if (
+                paymentOutput !== undefined &&
+                data !== undefined &&
+                paymentOutput.asset_list.length !== 0
+              ) {
+                const asset = paymentOutput.asset_list[0];
+                const assetId = this.toTargetToken(
+                  asset.policy_id,
+                  asset.asset_name,
+                  data.toChain
+                );
+                const requestId = Buffer.from(
+                  blake2b(transaction.tx_hash, undefined, 32)
+                ).toString('hex');
+                const fromAddress = transaction.outputs
+                  .filter(
+                    (output) =>
+                      Buffer.from(
+                        blake2b(output.payment_addr.bech32, undefined, 32)
+                      ).toString('hex') === data.fromAddressHash
+                  )
+                  .map((output) => output.payment_addr.bech32);
+                if (fromAddress.length !== 0) {
                   observations.push({
                     fromChain: CardanoObservationExtractor.FROM_CHAIN,
                     toChain: data.toChain,
@@ -144,7 +161,7 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
                     sourceBlockId: block.hash,
                     requestId: requestId,
                     toAddress: data.toAddress,
-                    fromAddress: transaction.inputs[0].payment_addr.bech32,
+                    fromAddress: fromAddress[0],
                   });
                 }
               }

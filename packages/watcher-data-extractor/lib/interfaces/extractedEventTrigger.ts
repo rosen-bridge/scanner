@@ -13,6 +13,7 @@ interface ExtractedEventTrigger {
   sourceBlockId: string;
   sourceTxId: string;
   WIDs: string;
+  sourceChainHeight: number;
 }
 
 export { ExtractedEventTrigger };

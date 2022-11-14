@@ -1,4 +1,3 @@
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Repository } from 'typeorm';
 import { AbstractScanner } from '../abstract';
 import { BlockEntity } from '../../entities/blockEntity';
@@ -6,10 +5,11 @@ import { AbstractExtractor } from '../../interfaces';
 import { ErgoNetworkApi } from './network/ergoNetworkApi';
 import { ErgoScannerConfig } from './interfaces';
 import { AbstractLogger } from '../../loger/AbstractLogger';
+import { Transaction } from './network/types';
 
-class ErgoScanner extends AbstractScanner<wasm.Transaction> {
+class ErgoScanner extends AbstractScanner<Transaction> {
   readonly blockRepository: Repository<BlockEntity>;
-  extractors: Array<AbstractExtractor<wasm.Transaction>>;
+  extractors: Array<AbstractExtractor<Transaction>>;
   readonly initialHeight: number;
   networkAccess: ErgoNetworkApi;
   extractorInitialization: Array<boolean>;

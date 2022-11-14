@@ -46,6 +46,9 @@ class EventTriggerEntity {
   sourceChainTokenId: string;
 
   @Column()
+  sourceChainHeight: number;
+
+  @Column()
   targetChainTokenId: string;
 
   @Column()

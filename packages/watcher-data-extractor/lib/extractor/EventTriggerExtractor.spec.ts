@@ -8,6 +8,8 @@ import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
 import { sampleEventEntity } from '../actions/EventTrigger.spec';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { JsonBI } from '../network/parser';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -22,6 +24,7 @@ const sampleEventData = [
   'a1',
   'a2',
   'b1',
+  '12',
 ];
 
 describe('EventTriggerExtractor', () => {
@@ -71,7 +74,7 @@ describe('EventTriggerExtractor', () => {
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [event, rowsCount] = await repository.findAndCount();
-      const box = tx1.outputs().get(0);
+      const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
       expect(event[0]).toEqual({
         id: 1,
         extractor: 'extractorId',
@@ -88,6 +91,7 @@ describe('EventTriggerExtractor', () => {
         amount: '17',
         bridgeFee: '34',
         networkFee: '51',
+        sourceChainHeight: 12594,
         sourceChainTokenId: sampleEventData[8],
         targetChainTokenId: sampleEventData[9],
         sourceTxId: sampleEventData[0],
@@ -154,12 +158,14 @@ describe('EventTriggerExtractor', () => {
           ...sampleEventEntity,
           boxId: '22',
           block: 'hash2',
+          sourceChainHeight: 12,
           id: 2,
         },
         {
           ...sampleEventEntity,
           boxId: '33',
           extractor: 'secondExtractor',
+          sourceChainHeight: 15,
           id: 3,
         },
       ]);

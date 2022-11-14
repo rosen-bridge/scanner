@@ -6,13 +6,14 @@ import {
   AbstractExtractor,
   AbstractLogger,
   BlockEntity,
+  Transaction,
 } from '@rosen-bridge/scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 
-class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
+class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly logger?: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
@@ -50,7 +51,7 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
    * @param txs
    */
   processTransactions = (
-    txs: Array<wasm.Transaction>,
+    txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -58,36 +59,42 @@ class PermitExtractor extends AbstractExtractor<wasm.Transaction> {
         const boxes: Array<ExtractedPermit> = [];
         const spendIds: Array<string> = [];
         txs.forEach((transaction) => {
-          for (let index = 0; index < transaction.outputs().len(); index++) {
-            const output = transaction.outputs().get(index);
+          for (const output of transaction.outputs) {
             try {
-              const r4 = output.register_value(4);
-              if (r4) {
-                const R4Serialized = r4.to_coll_coll_byte();
-                if (
-                  output.tokens().len() > 0 &&
-                  output.tokens().get(0).id().to_str() == this.RWT &&
-                  output.ergo_tree().to_base16_bytes() ===
-                    this.permitErgoTree &&
-                  R4Serialized.length >= 1
-                ) {
-                  boxes.push({
-                    boxId: output.box_id().to_str(),
-                    boxSerialized: Buffer.from(
-                      output.sigma_serialize_bytes()
-                    ).toString('base64'),
-                    WID: Buffer.from(R4Serialized[0]).toString('hex'),
-                  });
+              if (
+                output.additionalRegisters &&
+                output.additionalRegisters.R4 &&
+                output.assets &&
+                output.assets.length > 0 &&
+                output.assets[0].tokenId === this.RWT &&
+                output.ergoTree === this.permitErgoTree
+              ) {
+                const boxOutput = wasm.ErgoBox.from_json(
+                  JsonBI.stringify(output)
+                );
+                const r4 = boxOutput.register_value(
+                  wasm.NonMandatoryRegisterId.R4
+                );
+                if (r4) {
+                  const R4Serialized = r4.to_coll_coll_byte();
+                  if (R4Serialized.length >= 1) {
+                    boxes.push({
+                      boxId: output.boxId,
+                      boxSerialized: Buffer.from(
+                        boxOutput.sigma_serialize_bytes()
+                      ).toString('base64'),
+                      WID: Buffer.from(R4Serialized[0]).toString('hex'),
+                    });
+                  }
                 }
               }
             } catch {
-              continue;
+              // empty
             }
           }
           // process inputs
-          for (let index = 0; index < transaction.inputs().len(); index++) {
-            const input = transaction.inputs().get(index);
-            spendIds.push(input.box_id().to_str());
+          for (const input of transaction.inputs) {
+            spendIds.push(input.boxId);
           }
         });
 

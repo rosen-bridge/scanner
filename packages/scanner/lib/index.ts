@@ -6,3 +6,5 @@ export { BlockEntity } from './entities/blockEntity';
 export { AbstractExtractor } from './interfaces';
 export { AbstractScanner } from './scanner/abstract';
 export { AbstractLogger } from './loger/AbstractLogger';
+export { Transaction, OutputBox } from './scanner/ergo/network/types';
+export { retryRequest } from './utils/utils';
