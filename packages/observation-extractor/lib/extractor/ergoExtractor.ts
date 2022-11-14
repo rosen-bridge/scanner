@@ -36,7 +36,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   getId = () => 'ergo-observation-extractor';
 
   /**
-   * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
+   * returns ErgoRosenData object if the box format is like rosen bridge observations otherwise returns undefined
    * @param box
    */
   getRosenData = (box: OutputBox): RosenData | undefined => {
@@ -51,7 +51,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
         if (R4) {
           const R4Serialized = R4.to_coll_coll_byte();
           if (
-            R4Serialized.length >= 4 &&
+            R4Serialized.length >= 5 &&
             this.toTargetToken(
               box.assets[0].tokenId,
               Buffer.from(R4Serialized[0]).toString()
@@ -62,6 +62,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               toAddress: Buffer.from(R4Serialized[1]).toString(),
               networkFee: Buffer.from(R4Serialized[2]).toString(),
               bridgeFee: Buffer.from(R4Serialized[3]).toString(),
+              fromAddress: Buffer.from(R4Serialized[4]).toString(),
             };
           }
         }
@@ -107,7 +108,6 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               const data = this.getRosenData(output);
               if (data !== undefined && output.assets) {
                 const token = output.assets[0];
-                const inputAddress = 'fromAddress';
                 const requestId = Buffer.from(
                   blake2b(output.transactionId, undefined, 32)
                 ).toString('hex');
@@ -126,7 +126,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
                   sourceBlockId: block.hash,
                   requestId: requestId,
                   toAddress: data.toAddress,
-                  fromAddress: inputAddress,
+                  fromAddress: data.fromAddress,
                 });
               }
             }

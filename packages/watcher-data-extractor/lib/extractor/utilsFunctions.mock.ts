@@ -12,7 +12,6 @@ import {
   RWTId,
 } from './utilsVariable.mock';
 import { JsonBI } from '../network/parser';
-import { sign } from 'crypto';
 import { Transaction } from '@rosen-bridge/scanner';
 
 /**
