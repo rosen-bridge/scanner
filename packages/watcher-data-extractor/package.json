@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
