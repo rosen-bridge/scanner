@@ -108,6 +108,8 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
           if (transaction.metadata !== undefined) {
             try {
               const data = this.getRosenData(transaction.metadata);
+              // TODO: The order of output box are different from what we sent from wallet to Network
+              //  https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/27
               const bankOutputs = transaction.outputs.filter(
                 (output) => output.payment_addr.bech32 === this.bankAddress
               );
