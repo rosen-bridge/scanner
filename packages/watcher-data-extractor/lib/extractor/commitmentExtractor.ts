@@ -6,12 +6,13 @@ import {
   AbstractExtractor,
   AbstractLogger,
   BlockEntity,
+  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { JsonBI } from '../network/parser';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
-  readonly logger?: AbstractLogger;
+  readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   private readonly commitmentsErgoTrees: Array<string>;
@@ -33,7 +34,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     );
     this.actions = new CommitmentEntityAction(dataSource);
     this.RWTId = RWTId;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   /**

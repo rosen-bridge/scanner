@@ -2,7 +2,11 @@ import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { BoxEntityAction } from '../actions/db';
-import { AbstractExtractor, AbstractLogger } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  AbstractLogger,
+  DummyLogger,
+} from '@rosen-bridge/scanner';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
@@ -11,7 +15,7 @@ import { Boxes, ErgoBoxJson } from '../interfaces/types';
 import { Transaction } from '@rosen-bridge/scanner';
 
 export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
-  readonly logger?: AbstractLogger;
+  readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   readonly actions: BoxEntityAction;
   private readonly id: string;
@@ -38,7 +42,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
       : undefined;
     this.tokens = tokens ? tokens : [];
     this.explorerApi = new ExplorerApi(explorerUrl);
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   private extractBoxFromJson = (boxJson: ErgoBoxJson) => {

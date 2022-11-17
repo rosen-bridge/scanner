@@ -5,13 +5,14 @@ import {
   AbstractExtractor,
   AbstractLogger,
   BlockEntity,
+  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
-  readonly logger?: AbstractLogger;
+  readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   private readonly actions: EventTriggerDB;
@@ -33,7 +34,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   getId = () => this.id;

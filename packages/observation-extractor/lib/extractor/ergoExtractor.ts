@@ -11,11 +11,12 @@ import {
   BlockEntity,
   Transaction,
   OutputBox,
+  DummyLogger,
 } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
-  readonly logger?: AbstractLogger;
+  readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
@@ -35,6 +36,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     this.dataSource = dataSource;
     this.tokens = new TokenMap(tokens);
     this.actions = new ObservationEntityAction(dataSource);
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   /**
