@@ -458,7 +458,8 @@ export const observationTxGenerator = (
     '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
   ],
   bankSecret: string,
-  watcherSecret: string
+  watcherSecret: string,
+  boxValue = '1100000000'
 ) => {
   const bankSK = wasm.SecretKey.dlog_from_bytes(
     Uint8Array.from(Buffer.from(bankSecret, 'hex'))
@@ -468,7 +469,7 @@ export const observationTxGenerator = (
     Uint8Array.from(Buffer.from(watcherSecret, 'hex'))
   );
   const watcherAddress = wasm.Contract.pay_to_address(watcherSK.get_address());
-  const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000'));
+  const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(boxValue));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     bankAddress,
@@ -504,7 +505,7 @@ export const observationTxGenerator = (
   }
 
   const inputBoxBank = new wasm.ErgoBox(
-    wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
+    wasm.BoxValue.from_i64(wasm.I64.from_str(boxValue)),
     0,
     bankAddress,
     wasm.TxId.zero(),
@@ -513,7 +514,7 @@ export const observationTxGenerator = (
   );
 
   const inputBoxWatcher = new wasm.ErgoBox(
-    wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
+    wasm.BoxValue.from_i64(wasm.I64.from_str(boxValue)),
     0,
     watcherAddress,
     wasm.TxId.zero(),

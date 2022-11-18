@@ -108,7 +108,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         networkFee: '10000',
         bridgeFee: '10000',
         sourceChainTokenId: 'fingerPrint',
-        targetChainTokenId: 'ergo',
+        targetChainTokenId: 'erg',
         sourceBlockId: '1',
         sourceTxId: txHash,
         block: '1',

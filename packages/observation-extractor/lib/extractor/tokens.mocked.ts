@@ -10,7 +10,7 @@ export const tokens: RosenTokens = {
   tokens: [
     {
       [ErgoObservationExtractor.FROM_CHAIN]: {
-        tokenId: 'ergo',
+        tokenId: 'erg',
       },
       [CardanoObservationExtractor.FROM_CHAIN]: {
         fingerprint: 'fingerPrint',
@@ -26,9 +26,9 @@ export const tokens: RosenTokens = {
         idKey: 'fingerprint',
       },
       [CardanoObservationExtractor.FROM_CHAIN]: {
-        fingerprint: 'cardano',
-        tokenId: 'cardano',
-        id: 'cardano',
+        fingerprint: 'lovelace',
+        tokenId: 'lovelace',
+        id: 'lovelace',
       },
     },
   ],

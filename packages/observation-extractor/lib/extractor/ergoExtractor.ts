@@ -36,33 +36,34 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   getId = () => 'ergo-observation-extractor';
 
   /**
-   * returns ErgoRosenData object if the box format is like rosen bridge observations otherwise returns undefined
+   * returns token transfer data object if the box format is like rosen bridge observations otherwise returns undefined
    * @param box
    */
-  getRosenData = (box: OutputBox): RosenData | undefined => {
+  getTransferData = (box: OutputBox): RosenData | undefined => {
     try {
-      if (
-        box.additionalRegisters &&
-        box.additionalRegisters.R4 &&
-        box.assets &&
-        box.assets.length > 0
-      ) {
+      if (box.additionalRegisters && box.additionalRegisters.R4) {
         const R4 = wasm.Constant.decode_from_base16(box.additionalRegisters.R4);
         if (R4) {
           const R4Serialized = R4.to_coll_coll_byte();
+          const [assetId, amount] =
+            box.assets && box.assets.length >= 1
+              ? [box.assets[0].tokenId, box.assets[0].amount]
+              : ['erg', box.value];
           if (
             R4Serialized.length >= 5 &&
             this.toTargetToken(
-              box.assets[0].tokenId,
+              assetId,
               Buffer.from(R4Serialized[0]).toString()
             ) != undefined
           ) {
             return {
+              tokenId: assetId,
               toChain: Buffer.from(R4Serialized[0]).toString(),
               toAddress: Buffer.from(R4Serialized[1]).toString(),
               networkFee: Buffer.from(R4Serialized[2]).toString(),
               bridgeFee: Buffer.from(R4Serialized[3]).toString(),
               fromAddress: Buffer.from(R4Serialized[4]).toString(),
+              amount: amount,
             };
           }
         }
@@ -105,9 +106,8 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               output.additionalRegisters &&
               output.additionalRegisters.R4
             ) {
-              const data = this.getRosenData(output);
+              const data = this.getTransferData(output);
               if (data !== undefined && output.assets) {
-                const token = output.assets[0];
                 const requestId = Buffer.from(
                   blake2b(output.transactionId, undefined, 32)
                 ).toString('hex');
@@ -116,10 +116,10 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
                   toChain: data.toChain,
                   networkFee: data.networkFee,
                   bridgeFee: data.bridgeFee,
-                  amount: token.amount.toString(),
-                  sourceChainTokenId: token.tokenId,
+                  amount: data.amount.toString(),
+                  sourceChainTokenId: data.tokenId,
                   targetChainTokenId: this.toTargetToken(
-                    token.tokenId,
+                    data.tokenId,
                     data.toChain
                   ),
                   sourceTxId: output.transactionId,
