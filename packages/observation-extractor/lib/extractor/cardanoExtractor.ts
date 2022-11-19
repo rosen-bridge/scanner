@@ -9,13 +9,9 @@ import {
   UTXO,
 } from '../interfaces/koiosTransaction';
 import { CardanoRosenData } from '../interfaces/rosen';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  CardanoKoiosScanner,
-  OutputBox,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { CARDANO_NATIVE_TOKEN } from './const';
 
 export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransaction> {
   private readonly dataSource: DataSource;
@@ -100,12 +96,13 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
     const lovelace = this.tokens.search(
       CardanoObservationExtractor.FROM_CHAIN,
       {
-        finger_print: 'lovelace',
+        [this.tokens.getIdKey(CardanoObservationExtractor.FROM_CHAIN)]:
+          CARDANO_NATIVE_TOKEN,
       }
     );
     if (lovelace.length) {
       return {
-        from: 'lovelace',
+        from: CARDANO_NATIVE_TOKEN,
         to: this.tokens.getID(lovelace[0], toChain),
         amount: box.value,
       };

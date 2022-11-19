@@ -9,6 +9,7 @@ import { ObservationEntity } from '../entities/observationEntity';
 import { tokens } from './tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { ERGO_NATIVE_TOKEN } from './const';
 
 class ExecutorCardano extends CardanoObservationExtractor {}
 
@@ -108,7 +109,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         networkFee: '10000',
         bridgeFee: '10000',
         sourceChainTokenId: 'fingerPrint',
-        targetChainTokenId: 'erg',
+        targetChainTokenId: ERGO_NATIVE_TOKEN,
         sourceBlockId: '1',
         sourceTxId: txHash,
         block: '1',

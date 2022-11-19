@@ -1,6 +1,7 @@
 import { ErgoObservationExtractor } from './ergoExtractor';
 import { CardanoObservationExtractor } from './cardanoExtractor';
 import { RosenTokens } from '@rosen-bridge/tokens';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';
 
 export const tokens: RosenTokens = {
   idKeys: {
@@ -10,7 +11,7 @@ export const tokens: RosenTokens = {
   tokens: [
     {
       [ErgoObservationExtractor.FROM_CHAIN]: {
-        tokenId: 'erg',
+        tokenId: ERGO_NATIVE_TOKEN,
       },
       [CardanoObservationExtractor.FROM_CHAIN]: {
         fingerprint: 'fingerPrint',
@@ -26,9 +27,9 @@ export const tokens: RosenTokens = {
         idKey: 'fingerprint',
       },
       [CardanoObservationExtractor.FROM_CHAIN]: {
-        fingerprint: 'lovelace',
-        tokenId: 'lovelace',
-        id: 'lovelace',
+        fingerprint: CARDANO_NATIVE_TOKEN,
+        tokenId: CARDANO_NATIVE_TOKEN,
+        id: CARDANO_NATIVE_TOKEN,
       },
     },
   ],

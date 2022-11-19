@@ -8,6 +8,7 @@ import { ObservationEntity } from '../entities/observationEntity';
 import { tokens } from './tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -83,7 +84,7 @@ describe('extractorErgo', () => {
         networkFee: '10000',
         bridgeFee: '1000',
         sourceChainTokenId: assetId,
-        targetChainTokenId: 'lovelace',
+        targetChainTokenId: CARDANO_NATIVE_TOKEN,
         sourceBlockId: '1',
         sourceTxId: box1.transactionId,
         requestId: Buffer.from(
@@ -177,7 +178,7 @@ describe('extractorErgo', () => {
         networkFee: '10000',
         fromAddress: watcherAddress,
         amount: BigInt('100000000000'),
-        tokenId: 'erg',
+        tokenId: ERGO_NATIVE_TOKEN,
       });
     });
 

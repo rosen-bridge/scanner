@@ -12,6 +12,7 @@ import {
   OutputBox,
 } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { ERGO_NATIVE_TOKEN } from './const';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   private readonly dataSource: DataSource;
@@ -48,7 +49,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
           const [assetId, amount] =
             box.assets && box.assets.length >= 1
               ? [box.assets[0].tokenId, box.assets[0].amount]
-              : ['erg', box.value];
+              : [ERGO_NATIVE_TOKEN, box.value];
           if (
             R4Serialized.length >= 5 &&
             this.toTargetToken(
