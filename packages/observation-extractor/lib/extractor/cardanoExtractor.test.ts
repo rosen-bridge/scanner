@@ -2,6 +2,7 @@ import { CardanoObservationExtractor } from './cardanoExtractor';
 import { KoiosTransaction } from '../interfaces/koiosTransaction';
 import {
   cardanoTxValid,
+  cardanoTxValidNative,
   generateBlockEntity,
   loadDataBase,
 } from './utils.mock';
@@ -9,6 +10,8 @@ import { ObservationEntity } from '../entities/observationEntity';
 import { tokens } from './tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { ERGO_NATIVE_TOKEN } from './const';
+import { ErgoObservationExtractor } from './ergoExtractor';
 
 class ExecutorCardano extends CardanoObservationExtractor {}
 
@@ -108,7 +111,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         networkFee: '10000',
         bridgeFee: '10000',
         sourceChainTokenId: 'fingerPrint',
-        targetChainTokenId: 'ergo',
+        targetChainTokenId: ERGO_NATIVE_TOKEN,
         sourceBlockId: '1',
         sourceTxId: txHash,
         block: '1',
@@ -170,6 +173,41 @@ describe('cardanoKoiosObservationExtractor', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
+    });
+  });
+
+  describe('getTokenDetail', () => {
+    it('should extract cardano lovelace ergo chain token id from a transaction without asset', async () => {
+      const dataSource = await loadDataBase(
+        'processTransactionCardano-valid-cardano'
+      );
+      const extractor = new ExecutorCardano(dataSource, tokens, bankAddress);
+      const Tx: KoiosTransaction = cardanoTxValidNative;
+      const res = extractor.getTokenDetail(
+        Tx.outputs[0],
+        ErgoObservationExtractor.FROM_CHAIN
+      );
+      expect(res).toEqual({
+        from: 'lovelace',
+        to: 'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
+        amount: '1000000000',
+      });
+    });
+    it('should extract cardano chain token id and ergo chain token id from a transaction with assets', async () => {
+      const dataSource = await loadDataBase(
+        'processTransactionCardano-valid-cardano'
+      );
+      const extractor = new ExecutorCardano(dataSource, tokens, bankAddress);
+      const Tx: KoiosTransaction = cardanoTxValid;
+      const res = extractor.getTokenDetail(
+        Tx.outputs[0],
+        ErgoObservationExtractor.FROM_CHAIN
+      );
+      expect(res).toEqual({
+        from: 'fingerPrint',
+        to: 'erg',
+        amount: '10',
+      });
     });
   });
 });

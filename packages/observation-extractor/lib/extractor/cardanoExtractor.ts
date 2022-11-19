@@ -3,10 +3,15 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../actions/db';
-import { KoiosTransaction, MetaData } from '../interfaces/koiosTransaction';
+import {
+  KoiosTransaction,
+  MetaData,
+  UTXO,
+} from '../interfaces/koiosTransaction';
 import { CardanoRosenData } from '../interfaces/rosen';
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { CARDANO_NATIVE_TOKEN } from './const';
 
 export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransaction> {
   private readonly dataSource: DataSource;
@@ -68,27 +73,40 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
   };
 
   /**
-   * Should return the target token hex string id
-   * @param policyId
-   * @param assetName
+   * calculate transformation token id in both sides and transfer amount
+   * @param box
    * @param toChain
    */
-  toTargetToken = (
-    policyId: string,
-    assetName: string,
+  getTokenDetail = (
+    box: UTXO,
     toChain: string
-  ): { fromChain: string; toChain: string } => {
-    const tokens = this.tokens.search(CardanoObservationExtractor.FROM_CHAIN, {
-      assetName: assetName,
-      policyId: policyId,
-    })[0];
-    return {
-      fromChain: this.tokens.getID(
-        tokens,
-        CardanoObservationExtractor.FROM_CHAIN
-      ),
-      toChain: this.tokens.getID(tokens, toChain),
-    };
+  ): { from: string; to: string; amount: string } | undefined => {
+    if (box.asset_list.length > 0) {
+      const asset = box.asset_list[0];
+      const token = this.tokens.search(CardanoObservationExtractor.FROM_CHAIN, {
+        assetName: asset.asset_name,
+        policyId: asset.policy_id,
+      })[0];
+      return {
+        from: this.tokens.getID(token, CardanoObservationExtractor.FROM_CHAIN),
+        to: this.tokens.getID(token, toChain),
+        amount: asset.quantity,
+      };
+    }
+    const lovelace = this.tokens.search(
+      CardanoObservationExtractor.FROM_CHAIN,
+      {
+        [this.tokens.getIdKey(CardanoObservationExtractor.FROM_CHAIN)]:
+          CARDANO_NATIVE_TOKEN,
+      }
+    );
+    if (lovelace.length) {
+      return {
+        from: CARDANO_NATIVE_TOKEN,
+        to: this.tokens.getID(lovelace[0], toChain),
+        amount: box.value,
+      };
+    }
   };
 
   /**
@@ -110,48 +128,42 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
               const data = this.getRosenData(transaction.metadata);
               // TODO: The order of output box are different from what we sent from wallet to Network
               //  https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/27
-              const bankOutputs = transaction.outputs.filter(
+              const paymentOutputs = transaction.outputs.filter(
                 (output) => output.payment_addr.bech32 === this.bankAddress
               );
-              const paymentOutput =
-                bankOutputs.length !== 0 ? bankOutputs[0] : undefined;
-              if (
-                paymentOutput !== undefined &&
-                data !== undefined &&
-                paymentOutput.asset_list.length !== 0
-              ) {
-                const asset = paymentOutput.asset_list[0];
-                const assetId = this.toTargetToken(
-                  asset.policy_id,
-                  asset.asset_name,
+              if (paymentOutputs.length > 0 && data !== undefined) {
+                const transferAsset = this.getTokenDetail(
+                  paymentOutputs[0],
                   data.toChain
                 );
-                const requestId = Buffer.from(
-                  blake2b(transaction.tx_hash, undefined, 32)
-                ).toString('hex');
-                const fromAddress = transaction.outputs
-                  .filter(
-                    (output) =>
-                      Buffer.from(
-                        blake2b(output.payment_addr.bech32, undefined, 32)
-                      ).toString('hex') === data.fromAddressHash
-                  )
-                  .map((output) => output.payment_addr.bech32);
-                if (fromAddress.length !== 0) {
-                  observations.push({
-                    fromChain: CardanoObservationExtractor.FROM_CHAIN,
-                    toChain: data.toChain,
-                    amount: asset.quantity,
-                    sourceChainTokenId: assetId.fromChain,
-                    targetChainTokenId: assetId.toChain,
-                    sourceTxId: transaction.tx_hash,
-                    bridgeFee: data.bridgeFee,
-                    networkFee: data.networkFee,
-                    sourceBlockId: block.hash,
-                    requestId: requestId,
-                    toAddress: data.toAddress,
-                    fromAddress: fromAddress[0],
-                  });
+                if (transferAsset) {
+                  const requestId = Buffer.from(
+                    blake2b(transaction.tx_hash, undefined, 32)
+                  ).toString('hex');
+                  const fromAddress = transaction.outputs
+                    .filter(
+                      (output) =>
+                        Buffer.from(
+                          blake2b(output.payment_addr.bech32, undefined, 32)
+                        ).toString('hex') === data.fromAddressHash
+                    )
+                    .map((output) => output.payment_addr.bech32);
+                  if (fromAddress.length !== 0) {
+                    observations.push({
+                      fromChain: CardanoObservationExtractor.FROM_CHAIN,
+                      toChain: data.toChain,
+                      amount: transferAsset.amount,
+                      sourceChainTokenId: transferAsset.from,
+                      targetChainTokenId: transferAsset.to,
+                      sourceTxId: transaction.tx_hash,
+                      bridgeFee: data.bridgeFee,
+                      networkFee: data.networkFee,
+                      sourceBlockId: block.hash,
+                      requestId: requestId,
+                      toAddress: data.toAddress,
+                      fromAddress: fromAddress[0],
+                    });
+                  }
                 }
               }
             } catch (e) {

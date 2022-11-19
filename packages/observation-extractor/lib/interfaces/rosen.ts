@@ -4,6 +4,8 @@ interface RosenData {
   bridgeFee: string;
   networkFee: string;
   fromAddress: string;
+  tokenId: string;
+  amount: bigint;
 }
 
 interface CardanoRosenData {
