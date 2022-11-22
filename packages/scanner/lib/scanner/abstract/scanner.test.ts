@@ -4,7 +4,7 @@ import {
   NetworkConnectorTest,
   generateMockScanner,
 } from './abstract.mock';
-import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
+import { BlockEntity, PROCEED, PROCESSING } from '../../entities/blockEntity';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScanner('first');

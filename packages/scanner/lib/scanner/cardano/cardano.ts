@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { AbstractScanner } from '../abstract';
+import { AbstractScanner } from '../abstract/scanner';
 import { CardanoScannerConfig } from './interfaces';
 import { KoiosNetwork } from './network/koios';
 import { KoiosTransaction } from './interfaces/Koios';

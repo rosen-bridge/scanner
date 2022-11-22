@@ -4,6 +4,6 @@ export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
 export { AbstractExtractor } from './interfaces';
-export { AbstractScanner } from './scanner/abstract';
+export { AbstractScanner } from './scanner/abstract/scanner';
 export { Transaction, OutputBox } from './scanner/ergo/network/types';
 export { retryRequest } from './utils/utils';

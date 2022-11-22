@@ -1,12 +1,12 @@
 import { DataSource, Repository } from 'typeorm';
-import { BlockEntity } from '../entities/blockEntity';
+import { BlockEntity } from '../../entities/blockEntity';
 import {
   Block,
   AbstractExtractor,
   AbstractNetworkConnector,
-} from '../interfaces';
-import { AbstractScanner } from './abstract';
-import { migrations } from '../migrations';
+} from '../../interfaces';
+import { AbstractScanner } from './scanner';
+import { migrations } from '../../migrations';
 
 interface Tx {
   hash: string;

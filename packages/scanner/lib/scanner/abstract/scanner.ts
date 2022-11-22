@@ -1,10 +1,10 @@
 import { DeleteResult, MoreThanOrEqual, Repository } from 'typeorm';
-import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
+import { BlockEntity, PROCEED, PROCESSING } from '../../entities/blockEntity';
 import {
   Block,
   AbstractNetworkConnector,
   AbstractExtractor,
-} from '../interfaces';
+} from '../../interfaces';
 
 export abstract class AbstractScanner<TransactionType> {
   abstract readonly blockRepository: Repository<BlockEntity>;
