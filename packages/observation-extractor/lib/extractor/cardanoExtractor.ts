@@ -39,7 +39,7 @@ export class CardanoObservationExtractor extends AbstractExtractor<KoiosTransact
    */
   getRosenData = (metaData: MetaData): CardanoRosenData | undefined => {
     // Rosen data type exists with the '0' key on the cardano tx metadata
-    if (Object.prototype.hasOwnProperty.call(metaData, '0')) {
+    if (metaData && Object.prototype.hasOwnProperty.call(metaData, '0')) {
       try {
         const data = metaData['0'];
         if (
