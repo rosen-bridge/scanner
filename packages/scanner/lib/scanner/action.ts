@@ -38,18 +38,13 @@ export class BlockDbAction {
   getLastSavedBlocks = async (
     skip: number,
     count: number
-  ): Promise<Array<BlockEntity> | undefined> => {
-    const lastBlock = await this.blockRepository.find({
+  ): Promise<Array<BlockEntity>> => {
+    return await this.blockRepository.find({
       where: { status: PROCEED, scanner: this.name() },
       order: { height: 'DESC' },
       skip: skip,
       take: count,
     });
-    if (lastBlock.length !== 0) {
-      return lastBlock;
-    } else {
-      return undefined;
-    }
   };
 
   /**

@@ -80,10 +80,10 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     while (count !== 0) {
       try {
         const blocks = await this.action.getLastSavedBlocks(skip, count);
-        if (blocks === undefined) count = 0;
+        if (blocks.length === 0) count = 0;
         const points = blocks
           ? blocks.map((item) => ({
-              slot: parseInt(item.extra),
+              slot: item.extra ? parseInt(item.extra) : 0,
               hash: item.hash,
             }))
           : [this.initPoint];
