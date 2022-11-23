@@ -4,25 +4,26 @@ import { CardanoScannerConfig } from './interfaces';
 import { KoiosNetwork } from './network/koios';
 import { KoiosTransaction } from './interfaces/Koios';
 import { BlockEntity } from '../../entities/blockEntity';
-import { AbstractExtractor } from '../../interfaces';
+import { AbstractExtractor, Block } from '../../interfaces';
+import { GeneralScanner } from '../abstract/generalScanner';
+import { ErgoNetworkApi } from '../ergo/network/ergoNetworkApi';
+import { BlockDbAction } from '../action';
 
-class CardanoKoiosScanner extends AbstractScanner<KoiosTransaction> {
-  readonly blockRepository: Repository<BlockEntity>;
-  extractors: Array<AbstractExtractor<KoiosTransaction>>;
+class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   readonly initialHeight: number;
   networkAccess: KoiosNetwork;
-  extractorInitialization: Array<boolean>;
-
-  name = () => 'cardano-koios';
-
   constructor(config: CardanoScannerConfig) {
     super();
-    this.blockRepository = config.dataSource.getRepository(BlockEntity);
-    this.extractors = [];
-    this.extractorInitialization = [];
+    this.action = new BlockDbAction(config.dataSource, this.name());
     this.initialHeight = config.initialHeight;
     this.networkAccess = new KoiosNetwork(config.koiosUrl, config.timeout);
   }
+
+  getFirstBlock = (): Promise<Block> => {
+    return this.networkAccess.getBlockAtHeight(this.initialHeight);
+  };
+
+  name = () => 'cardano-koios';
 }
 
 export { CardanoKoiosScanner };

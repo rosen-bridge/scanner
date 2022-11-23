@@ -1,30 +1,28 @@
 import { Repository } from 'typeorm';
 import { AbstractScanner } from '../abstract/scanner';
 import { BlockEntity } from '../../entities/blockEntity';
-import { AbstractExtractor } from '../../interfaces';
+import { AbstractExtractor, Block } from '../../interfaces';
 import { ErgoNetworkApi } from './network/ergoNetworkApi';
 import { ErgoScannerConfig } from './interfaces';
 import { Transaction } from './network/types';
+import { GeneralScanner } from '../abstract/generalScanner';
+import { BlockDbAction } from '../action';
 
-class ErgoScanner extends AbstractScanner<Transaction> {
-  readonly blockRepository: Repository<BlockEntity>;
-  extractors: Array<AbstractExtractor<Transaction>>;
+class ErgoNodeScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
   networkAccess: ErgoNetworkApi;
-  extractorInitialization: Array<boolean>;
 
   constructor(config: ErgoScannerConfig) {
     super();
-    this.blockRepository = config.dataSource.getRepository(BlockEntity);
-    this.extractors = [];
-    this.extractorInitialization = [];
+    this.action = new BlockDbAction(config.dataSource, this.name());
     this.initialHeight = config.initialHeight;
     this.networkAccess = new ErgoNetworkApi(config.nodeUrl, config.timeout);
   }
 
-  name = (): string => {
-    return 'ergo-node';
+  getFirstBlock = (): Promise<Block> => {
+    return this.networkAccess.getBlockAtHeight(this.initialHeight);
   };
-}
 
-export { ErgoScanner };
+  name = () => 'ergo-node';
+}
+export { ErgoNodeScanner };
