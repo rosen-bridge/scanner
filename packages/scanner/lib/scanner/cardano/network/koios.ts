@@ -89,14 +89,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         if (res.data.length === 0) {
           return [];
         } else {
-          // Using the api for one block, just using the first output
-          // TODO: remove request trial after the koios API update
-          // Issue: https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/25
-          return retryRequest(
-            () => this.getTxInformations(res.data[0].tx_hashes),
-            10,
-            (txs: KoiosTransaction[]) => txs.some((tx) => !tx.metadata)
-          );
+          return this.getTxInformations(res.data[0].tx_hashes);
         }
       })
       .catch((exp) => {
