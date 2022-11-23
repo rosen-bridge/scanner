@@ -31,6 +31,28 @@ export class BlockDbAction {
   };
 
   /**
+   * get last n stored blocks in database
+   * @param skip
+   * @param count
+   */
+  getLastSavedBlocks = async (
+    skip: number,
+    count: number
+  ): Promise<Array<BlockEntity> | undefined> => {
+    const lastBlock = await this.blockRepository.find({
+      where: { status: PROCEED, scanner: this.name() },
+      order: { height: 'DESC' },
+      skip: skip,
+      take: count,
+    });
+    if (lastBlock.length !== 0) {
+      return lastBlock;
+    } else {
+      return undefined;
+    }
+  };
+
+  /**
    * get first saved block
    * @return Promise<BlockEntity or undefined>
    */
@@ -67,6 +89,19 @@ export class BlockDbAction {
     } else {
       return undefined;
     }
+  };
+
+  /**
+   * get block with entered blockhash
+   * @param hash
+   * @param status
+   */
+  getBlockWithHash = async (hash: string, status: string = PROCEED) => {
+    return this.blockRepository.findOneBy({
+      hash: hash,
+      status: status,
+      scanner: this.name(),
+    });
   };
 
   /**

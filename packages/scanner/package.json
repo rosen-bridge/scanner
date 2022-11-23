@@ -23,6 +23,8 @@
   ],
   "author": "Sahand Zoufan",
   "dependencies": {
+    "@cardano-ogmios/client": "^5.5.7",
+    "@cardano-ogmios/schema": "^5.5.7",
     "axios": "^0.27.2",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",

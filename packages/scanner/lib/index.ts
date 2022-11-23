@@ -1,5 +1,6 @@
-export { ErgoScanner } from './scanner/ergo/ergoScanner';
-export { CardanoKoiosScanner } from './scanner/cardano/cardano';
+export { ErgoNodeScanner } from './scanner/ergo/ergoScanner';
+export { CardanoKoiosScanner } from './scanner/cardano/scanner/koios';
+export { CardanoOgmiosScanner } from './scanner/cardano/scanner/ogmios';
 export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
