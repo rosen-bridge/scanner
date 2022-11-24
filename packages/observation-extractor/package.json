@@ -19,6 +19,7 @@
     "dist"
   ],
   "dependencies": {
+    "@cardano-ogmios/schema": "^5.5.7",
     "@rosen-bridge/scanner": "^0.4.0",
     "@rosen-bridge/tokens": "^0.1.8",
     "blakejs": "^1.2.1",

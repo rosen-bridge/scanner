@@ -1,5 +1,5 @@
 import { ErgoObservationExtractor } from './ergoExtractor';
-import { CardanoObservationExtractor } from './cardanoExtractor';
+import { CardanoKoiosObservationExtractor } from './cardano/koios';
 import { RosenTokens } from '@rosen-bridge/tokens';
 import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';
 
@@ -13,8 +13,8 @@ export const tokens: RosenTokens = {
       [ErgoObservationExtractor.FROM_CHAIN]: {
         tokenId: ERGO_NATIVE_TOKEN,
       },
-      [CardanoObservationExtractor.FROM_CHAIN]: {
-        fingerprint: 'fingerPrint',
+      [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
+        fingerprint: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
         policyId: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
         assetName: '7369676d61',
       },
@@ -26,7 +26,7 @@ export const tokens: RosenTokens = {
         id: 'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
         idKey: 'fingerprint',
       },
-      [CardanoObservationExtractor.FROM_CHAIN]: {
+      [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
         fingerprint: CARDANO_NATIVE_TOKEN,
         tokenId: CARDANO_NATIVE_TOKEN,
         id: CARDANO_NATIVE_TOKEN,
