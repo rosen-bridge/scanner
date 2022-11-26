@@ -88,8 +88,8 @@ abstract class GeneralScanner<
   initialize = async () => {
     const block = await this.getFirstBlock();
     await this.processBlock(block);
-    const entity = await this.getFirstBlock();
-    if (entity) {
+    const entity = await this.action.getFirstSavedBlock();
+    if (entity === undefined) {
       throw new Error('Can not store block in database');
     }
     return entity;
