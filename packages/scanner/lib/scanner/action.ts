@@ -121,25 +121,21 @@ export class BlockDbAction {
         height: block.blockHeight,
         scanner: this.name(),
       });
+      const blockInfo = {
+        height: block.blockHeight,
+        hash: block.hash,
+        parentHash: block.parentHash,
+        status: PROCESSING,
+        scanner: this.name(),
+        extra: block.extra,
+      };
       if (!instance) {
-        const row = {
-          height: block.blockHeight,
-          hash: block.hash,
-          parentHash: block.parentHash,
-          status: PROCESSING,
-          scanner: this.name(),
-        };
-        await this.blockRepository.insert(row);
+        await this.blockRepository.insert(blockInfo);
       } else {
         await this.blockRepository
           .createQueryBuilder()
           .update()
-          .set({
-            hash: block.hash,
-            parentHash: block.parentHash,
-            status: PROCESSING,
-            scanner: this.name(),
-          })
+          .set(blockInfo)
           .where({
             height: block.blockHeight,
             scanner: this.name(),

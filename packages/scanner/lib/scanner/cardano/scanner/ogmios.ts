@@ -64,7 +64,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
       const babbageBlock = (response.block as Babbage).babbage;
       const block = {
-        hash: babbageBlock.header.blockHash,
+        hash: babbageBlock.headerHash,
         blockHeight: babbageBlock.header.blockHeight,
         parentHash: babbageBlock.header.prevHash,
         extra: `${babbageBlock.header.slot}`,
@@ -81,14 +81,25 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
       try {
         const blocks = await this.action.getLastSavedBlocks(skip, count);
         if (blocks.length === 0) count = 0;
-        const points = blocks
-          ? blocks.map((item) => ({
-              slot: item.extra ? parseInt(item.extra) : 0,
-              hash: item.hash,
-            }))
-          : [this.initPoint];
+        const points =
+          blocks.length > 0
+            ? blocks.map((item) => ({
+                slot: item.extra ? parseInt(item.extra) : 0,
+                hash: item.hash,
+              }))
+            : [this.initPoint];
         const intersect = await findIntersect(context, points);
-        return intersect.point as Point;
+        const intersectPoint = intersect.point as Point;
+        let height = 0;
+        if (blocks.length) {
+          const foundedBlock = blocks.find(
+            (item) => (item.hash = intersectPoint.hash)
+          );
+          if (foundedBlock) {
+            height = foundedBlock.height;
+          }
+        }
+        return { point: intersect.point as Point, height: height };
       } catch {
         skip += count;
         count *= 2;
@@ -110,7 +121,8 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         rollBackward: this.rollBackward,
         rollForward: this.rollForward,
       });
-      await this.client.startSync([intersect]);
+      await this.forkBlock(intersect.height);
+      await this.client.startSync([intersect.point]);
     } else {
       throw Error('Can not start scanner. initial block is invalid');
     }
