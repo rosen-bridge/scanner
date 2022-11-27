@@ -47,21 +47,21 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
           'bridgeFee' in data &&
           'networkFee' in data &&
           'toAddress' in data &&
-          'fromAddressHash' in data
+          'fromAddress' in data
         ) {
           const rosenData = data as unknown as {
             to: string;
             bridgeFee: string;
             networkFee: string;
             toAddress: string;
-            fromAddressHash: string;
+            fromAddress: Array<string>;
           };
           return {
             toChain: rosenData.to,
             bridgeFee: rosenData.bridgeFee,
             networkFee: rosenData.networkFee,
             toAddress: rosenData.toAddress,
-            fromAddressHash: rosenData.fromAddressHash,
+            fromAddress: rosenData.fromAddress.join(''),
           };
         }
         return undefined;
@@ -146,30 +146,20 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
                   const requestId = Buffer.from(
                     blake2b(transaction.tx_hash, undefined, 32)
                   ).toString('hex');
-                  const fromAddress = transaction.inputs
-                    .filter(
-                      (output) =>
-                        Buffer.from(
-                          blake2b(output.payment_addr.bech32, undefined, 32)
-                        ).toString('hex') === data.fromAddressHash
-                    )
-                    .map((output) => output.payment_addr.bech32);
-                  if (fromAddress.length !== 0) {
-                    observations.push({
-                      fromChain: CardanoKoiosObservationExtractor.FROM_CHAIN,
-                      toChain: data.toChain,
-                      amount: transferAsset.amount,
-                      sourceChainTokenId: transferAsset.from,
-                      targetChainTokenId: transferAsset.to,
-                      sourceTxId: transaction.tx_hash,
-                      bridgeFee: data.bridgeFee,
-                      networkFee: data.networkFee,
-                      sourceBlockId: block.hash,
-                      requestId: requestId,
-                      toAddress: data.toAddress,
-                      fromAddress: fromAddress[0],
-                    });
-                  }
+                  observations.push({
+                    fromChain: CardanoKoiosObservationExtractor.FROM_CHAIN,
+                    toChain: data.toChain,
+                    amount: transferAsset.amount,
+                    sourceChainTokenId: transferAsset.from,
+                    targetChainTokenId: transferAsset.to,
+                    sourceTxId: transaction.tx_hash,
+                    bridgeFee: data.bridgeFee,
+                    networkFee: data.networkFee,
+                    sourceBlockId: block.hash,
+                    requestId: requestId,
+                    toAddress: data.toAddress,
+                    fromAddress: data.fromAddress,
+                  });
                 }
               }
             } catch (e) {

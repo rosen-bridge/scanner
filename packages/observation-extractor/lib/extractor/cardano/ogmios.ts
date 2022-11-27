@@ -112,23 +112,14 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
             value,
             'toAddress'
           );
-          const fromAddressHash = this.getObjectKeyAsStringOrUndefined(
-            value,
-            'fromAddressHash'
-          );
-          if (
-            toChain &&
-            bridgeFee &&
-            networkFee &&
-            toAddress &&
-            fromAddressHash
-          ) {
+          const fromAddress = (value.fromAddress as Array<string>).join('');
+          if (toChain && bridgeFee && networkFee && toAddress && fromAddress) {
             return {
               toChain,
               bridgeFee,
               networkFee,
               toAddress,
-              fromAddressHash,
+              fromAddress,
             };
           }
         }
@@ -170,9 +161,6 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
                   const requestId = Buffer.from(
                     blake2b(transaction.id, undefined, 32)
                   ).toString('hex');
-                  // TODO must calculate or update fromAddress field. node data does not contain fromAddress field
-                  // https://git.ergopool.io/ergo/rosen-bridge/scanner/-/issues/31
-                  const fromAddress = 'noaddressyet';
                   observations.push({
                     fromChain: CardanoOgmiosObservationExtractor.FROM_CHAIN,
                     toChain: data.toChain,
@@ -185,7 +173,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
                     sourceBlockId: block.hash,
                     requestId: requestId,
                     toAddress: data.toAddress,
-                    fromAddress: fromAddress,
+                    fromAddress: data.fromAddress,
                   });
                 }
               }
