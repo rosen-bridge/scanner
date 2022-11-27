@@ -54,20 +54,29 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
       undefined;
     if (box.value.assets) {
       const asset = box.value.assets;
-      Object.keys(asset).map((fingerprint) => {
-        const token = this.tokens.search(
+      Object.keys(asset).map((tokenKey) => {
+        let token = this.tokens.search(
           CardanoOgmiosObservationExtractor.FROM_CHAIN,
-          {
-            [this.tokens.getIdKey(
-              CardanoOgmiosObservationExtractor.FROM_CHAIN
-            )]: fingerprint,
-          }
+          { policyId: tokenKey }
         );
+        if (tokenKey.indexOf('.') != -1) {
+          const parts = tokenKey.split('.');
+          token = this.tokens.search(
+            CardanoOgmiosObservationExtractor.FROM_CHAIN,
+            {
+              policyId: parts[0],
+              assetName: parts[1],
+            }
+          );
+        }
         if (token.length > 0) {
           res = {
-            from: fingerprint,
+            from: this.tokens.getID(
+              token[0],
+              CardanoOgmiosObservationExtractor.FROM_CHAIN
+            ),
             to: this.tokens.getID(token[0], toChain),
-            amount: asset[fingerprint].toString(),
+            amount: asset[tokenKey].toString(),
           };
         }
       });
