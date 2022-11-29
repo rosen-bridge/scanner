@@ -254,6 +254,29 @@ describe('generalScanner', () => {
     });
 
     /**
+     * Test initialize extractor once
+     * Dependency: Nothing
+     * Scenario: create scanner and extractor and mock initialize method for extractor.
+     *           then register a scanner on it.
+     *           and call update twice
+     * Expected: first update must call extractor initialize
+     *          second must not.
+     */
+    it('should call extractor initialize', async () => {
+      const network = new NetworkConnectorTest();
+      const scanner = new firstScanner(dataSource, network);
+      const extractor = new ExtractorTest('test');
+      scanner.registerExtractor(extractor);
+      const mockedInit = jest
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation();
+      await scanner.update();
+      expect(mockedInit).toHaveBeenCalledTimes(1);
+      await scanner.update();
+      expect(mockedInit).toHaveBeenCalledTimes(1);
+    });
+
+    /**
      * Test stepForward when block if not forked
      * Dependency: Nothing
      * Scenario: create scanner. and mock stepForward method.
