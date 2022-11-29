@@ -1,4 +1,4 @@
-import { ErgoObservationExtractor } from './ergoExtractor';
+import { ErgoObservationExtractor } from './ergo/ergoExtractor';
 import { CardanoKoiosObservationExtractor } from './cardano/koios';
 import { RosenTokens } from '@rosen-bridge/tokens';
 import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';

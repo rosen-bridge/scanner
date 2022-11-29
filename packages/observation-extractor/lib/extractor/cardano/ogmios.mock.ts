@@ -1730,11 +1730,15 @@ export const AuxiliaryDatas = {
             },
             {
               k: {
-                string: 'fromAddressHash',
+                string: 'fromAddress',
               },
               v: {
-                string:
-                  '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+                list: [
+                  {
+                    string:
+                      '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+                  },
+                ],
               },
             },
           ],
@@ -1888,11 +1892,15 @@ export class Transactions {
               },
               {
                 k: {
-                  string: 'fromAddressHash',
+                  string: 'fromAddress',
                 },
                 v: {
-                  string:
-                    '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+                  list: [
+                    {
+                      string:
+                        '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+                    },
+                  ],
                 },
               },
             ],

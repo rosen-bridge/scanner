@@ -9,14 +9,6 @@ import { sign } from 'crypto';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 
-const addressHash = Buffer.from(
-  blake2b(
-    'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',
-    undefined,
-    32
-  )
-).toString('hex');
-
 export const last10BlockHeader = [
   {
     extensionId:
@@ -340,6 +332,9 @@ export const last10BlockHeader = [
   },
 ];
 
+const fromAddress =
+  'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0';
+
 export const cardanoTxValid = {
   block_hash: '',
   metadata: {
@@ -349,9 +344,9 @@ export const cardanoTxValid = {
         '"bridgeFee": "10000",' +
         '"networkFee": "10000",' +
         '"toAddress": "ergoAddress",' +
-        ' "fromAddressHash": "' +
-        addressHash +
-        '" }'
+        ' "fromAddress": ["' +
+        fromAddress +
+        '"] }'
     ),
   },
   tx_hash: '9f00d372e930d685c3b410a10f2bd035cd9a927c4fd8ef8e419c79b210af7ba6',
@@ -437,9 +432,9 @@ export const cardanoTxValidNative = {
         '"bridgeFee": "10000",' +
         '"networkFee": "10000",' +
         '"toAddress": "ergoAddress",' +
-        ' "fromAddressHash": "' +
-        addressHash +
-        '" }'
+        ' "fromAddress": ["' +
+        fromAddress +
+        '"] }'
     ),
   },
   tx_hash: '9f00d372e930d685c3b410a10f2bd035cd9a927c4fd8ef8e419c79b210af7ba7',

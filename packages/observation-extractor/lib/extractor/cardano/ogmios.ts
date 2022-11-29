@@ -3,7 +3,7 @@ import { AuxiliaryData, TxBabbage, TxOut } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ObservationEntityAction } from '../../actions/db';
-import { getDictValue, JsonObject } from '../utils';
+import { getDictValue, JsonObject, ListObject } from '../utils';
 import { CARDANO_NATIVE_TOKEN } from '../const';
 import { CardanoRosenData } from '../../interfaces/rosen';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
@@ -112,21 +112,26 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
       const blob = metaData.body.blob;
       if (blob) {
         const value = getDictValue(blob['0']);
-        if (value) {
-          const toChain = this.getObjectKeyAsStringOrUndefined(value, 'to');
+        if (value && typeof value === 'object') {
+          const toChain = this.getObjectKeyAsStringOrUndefined(
+            value as JsonObject,
+            'to'
+          );
           const bridgeFee = this.getObjectKeyAsStringOrUndefined(
-            value,
+            value as JsonObject,
             'bridgeFee'
           );
           const networkFee = this.getObjectKeyAsStringOrUndefined(
-            value,
+            value as JsonObject,
             'networkFee'
           );
           const toAddress = this.getObjectKeyAsStringOrUndefined(
-            value,
+            value as JsonObject,
             'toAddress'
           );
-          const fromAddress = (value.fromAddress as Array<string>).join('');
+          const fromAddress = (
+            (value as JsonObject).fromAddress as ListObject
+          ).join('');
           if (toChain && bridgeFee && networkFee && toAddress && fromAddress) {
             return {
               toChain,

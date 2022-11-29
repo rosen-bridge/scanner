@@ -55,7 +55,7 @@ const getNativeValue = (val: Metadatum) => {
   if (stringVal) return stringVal;
 };
 
-const getDictValue = (val: Metadatum) => {
+const getDictValue = (val: Metadatum): MetadataObject => {
   if (Object.prototype.hasOwnProperty.call(val, 'map')) {
     const list = (val as Map).map;
     const res: JsonObject = {};
@@ -66,7 +66,15 @@ const getDictValue = (val: Metadatum) => {
       }
     });
     return res;
+  } else if (Object.prototype.hasOwnProperty.call(val, 'list')) {
+    const list = (val as List).list;
+    const res: ListObject = [];
+    list.map((item) => {
+      res.push(getDictValue(item));
+    });
+    return res;
   }
+  return getNativeValue(val);
 };
 
 const ObjectToJson = (val: Metadatum) => {

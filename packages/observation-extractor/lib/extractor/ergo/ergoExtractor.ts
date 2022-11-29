@@ -2,9 +2,9 @@ import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ExtractedObservation } from '../interfaces/extractedObservation';
-import { ObservationEntityAction } from '../actions/db';
-import { RosenData } from '../interfaces/rosen';
+import { ExtractedObservation } from '../../interfaces/extractedObservation';
+import { ObservationEntityAction } from '../../actions/db';
+import { RosenData } from '../../interfaces/rosen';
 import {
   AbstractExtractor,
   BlockEntity,
@@ -12,7 +12,7 @@ import {
   OutputBox,
 } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
-import { ERGO_NATIVE_TOKEN } from './const';
+import { ERGO_NATIVE_TOKEN } from '../const';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   private readonly dataSource: DataSource;

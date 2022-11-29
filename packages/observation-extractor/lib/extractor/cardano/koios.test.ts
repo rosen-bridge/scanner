@@ -11,7 +11,7 @@ import { tokens } from '../tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../const';
-import { ErgoObservationExtractor } from '../ergoExtractor';
+import { ErgoObservationExtractor } from '../ergo/ergoExtractor';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
@@ -41,7 +41,7 @@ describe('cardanoKoiosObservationExtractor', () => {
               '"bridgeFee": "10000",' +
               '"networkFee": "1000",' +
               '"toAddress": "ergoAddress",' +
-              '"fromAddressHash": "hash"' +
+              '"fromAddress": ["hash"]' +
               '}'
           ),
         })
@@ -50,7 +50,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         bridgeFee: '10000',
         networkFee: '1000',
         toAddress: 'ergoAddress',
-        fromAddressHash: 'hash',
+        fromAddress: 'hash',
       });
     });
 
@@ -131,7 +131,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         requestId: Buffer.from(blake2b(txHash, undefined, 32)).toString('hex'),
         extractor: 'ergo-cardano-koios-extractor',
       });
-    });
+    }, 100000);
 
     /**
      * one valid transaction to the wrong bank Address should not save in database

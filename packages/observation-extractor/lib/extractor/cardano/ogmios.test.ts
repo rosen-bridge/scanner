@@ -124,7 +124,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const res = extractor.getRosenData(AuxiliaryDatas.validEvent);
       expect(res).toEqual({
         bridgeFee: '3000',
-        fromAddressHash:
+        fromAddress:
           '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
         networkFee: '300',
         toAddress: '9hZxV3YNSfbCqS6GEses7DhAVSatvaoNtdsiNvkimPGG2c8fzkG',
@@ -188,7 +188,8 @@ describe('CardanoOgmiosObservationExtractor', () => {
           '340df860ccefa2ee3a65ac85a44116e9c4b49ec0a19367e23e56d30fa9d13f99',
         bridgeFee: '3000',
         extractor: 'ergo-cardano-ogmios-extractor',
-        fromAddress: 'noaddressyet',
+        fromAddress:
+          '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
         fromChain: 'cardano',
         height: 7991037,
         id: 0,
