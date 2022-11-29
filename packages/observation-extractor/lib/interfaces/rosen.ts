@@ -13,7 +13,7 @@ interface CardanoRosenData {
   toAddress: string;
   bridgeFee: string;
   networkFee: string;
-  fromAddressHash: string;
+  fromAddress: string;
 }
 
 export { RosenData, CardanoRosenData };

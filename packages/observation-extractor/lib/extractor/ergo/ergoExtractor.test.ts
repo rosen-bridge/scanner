@@ -3,12 +3,12 @@ import {
   generateBlockEntity,
   loadDataBase,
   observationTxGenerator,
-} from './utils.mock';
-import { ObservationEntity } from '../entities/observationEntity';
-import { tokens } from './tokens.mocked';
+} from '../utils.mock';
+import { ObservationEntity } from '../../entities/observationEntity';
+import { tokens } from '../tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../const';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 

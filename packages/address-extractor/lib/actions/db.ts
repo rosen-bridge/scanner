@@ -100,7 +100,7 @@ export class BoxEntityAction {
           await queryRunner.manager.getRepository(BoxEntity).insert(entity);
         }
       }
-      await this.datasource
+      await queryRunner.manager
         .getRepository(BoxEntity)
         .createQueryBuilder()
         .update()
