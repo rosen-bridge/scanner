@@ -1,7 +1,4 @@
-import { Repository } from 'typeorm';
-import { AbstractScanner } from '../abstract/scanner';
-import { BlockEntity } from '../../entities/blockEntity';
-import { AbstractExtractor, Block } from '../../interfaces';
+import { Block } from '../../interfaces';
 import { ErgoNetworkApi } from './network/ergoNetworkApi';
 import { ErgoScannerConfig } from './interfaces';
 import { Transaction } from './network/types';

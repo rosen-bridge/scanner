@@ -9,11 +9,11 @@ import {
 } from '@cardano-ogmios/schema';
 import {
   createInteractionContext,
+  createChainSyncClient,
   InteractionContext,
 } from '@cardano-ogmios/client';
 import {
   ChainSyncClient,
-  createChainSyncClient,
   findIntersect,
 } from '@cardano-ogmios/client/dist/ChainSync';
 import { BlockDbAction } from '../../action';
@@ -48,6 +48,11 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     };
   }
 
+  /**
+   * process block when a block forked library call this function
+   * @param response: forked block
+   * @param requestNext: a function to tell node to send next block
+   */
   rollBackward = async (
     response: BackwardResponse,
     requestNext: () => void
@@ -60,6 +65,11 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     requestNext();
   };
 
+  /**
+   * Step forward when new block arrived ogmios-client call this function
+   * @param response: new block
+   * @param requestNext: tell library that this block proceeds. pass next block when available
+   */
   rollForward = async (response: ForwardResponse, requestNext: () => void) => {
     if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
       const babbageBlock = (response.block as Babbage).babbage;
@@ -74,6 +84,10 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     requestNext();
   };
 
+  /**
+   * find intersect between stored blocks and blockchain.
+   * @param context: blockchain context
+   */
   findIntersection = async (context: InteractionContext) => {
     let count = 1;
     let skip = 0;
@@ -108,6 +122,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     return undefined;
   };
 
+  /**
+   * start scanner. first find fork point. fork all blocks and request updates from node.
+   */
   start = async (): Promise<void> => {
     const context: InteractionContext = await createInteractionContext(
       (err) => console.error(err),
@@ -128,6 +145,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     }
   };
 
+  /**
+   * stop ws connection to node.
+   */
   stop = async (): Promise<void> => {
     await this.client.shutdown();
   };

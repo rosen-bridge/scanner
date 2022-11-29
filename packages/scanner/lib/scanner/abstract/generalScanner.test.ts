@@ -11,7 +11,6 @@ import { BlockEntity } from '../../entities/blockEntity';
 import { type } from 'os';
 
 const firstScanner = generateMockGeneralScannerClass('first');
-// const secondScanner = generateMockGeneralScannerClass('second');
 let dataSource: DataSource;
 
 describe('generalScanner', () => {
@@ -57,7 +56,7 @@ describe('generalScanner', () => {
     });
 
     /**
-     * Test isForkHappen return True in case of changed block
+     * Test isForkHappen return false in case of changed block
      * Dependency: Some block inserted into database
      * Scenario: Mock getBlockAtHeight to return same block
      *           And insert 3 blocks in database
@@ -304,7 +303,7 @@ describe('generalScanner', () => {
      *           with mocked network. call update
      * Expected: It must call stepBackward
      */
-    it('should call stepForward', async () => {
+    it('should call stepBackward', async () => {
       const network = new NetworkConnectorTest();
       jest
         .spyOn(network, 'getBlockAtHeight')

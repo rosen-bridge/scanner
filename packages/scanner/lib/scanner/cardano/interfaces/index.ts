@@ -1,16 +1,18 @@
 import { DataSource } from 'typeorm';
 
-export interface CardanoKoiosConfig {
+interface CardanoKoiosConfig {
   koiosUrl: string;
   timeout: number;
   initialHeight: number;
   dataSource: DataSource;
 }
 
-export interface CardanoOgmiosConfig {
+interface CardanoOgmiosConfig {
   nodeIp: string;
   nodePort: number;
   initialSlot: number;
   initialHash: string;
   dataSource: DataSource;
 }
+
+export { CardanoKoiosConfig, CardanoOgmiosConfig };

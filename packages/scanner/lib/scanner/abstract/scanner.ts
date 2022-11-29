@@ -61,9 +61,8 @@ export abstract class AbstractScanner<TransactionType> {
     }
     if (success && (await this.action.updateBlockStatus(block.blockHeight))) {
       return savedBlock;
-    } else {
-      return false;
     }
+    return false;
   };
 
   /**

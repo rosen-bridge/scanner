@@ -59,6 +59,10 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
           CardanoOgmiosObservationExtractor.FROM_CHAIN,
           { policyId: tokenKey }
         );
+        // according to ogmios docs assets are stores as
+        //      [policyId.assetName]: amount
+        //      [policyId]: amount        if assetName not exists.
+        // check if assetName exists search token with policyId and asset name
         if (tokenKey.indexOf('.') != -1) {
           const parts = tokenKey.split('.');
           token = this.tokens.search(
@@ -69,6 +73,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
             }
           );
         }
+        // it no tokens are extracted we search token with policyId
         if (token.length > 0) {
           res = {
             from: this.tokens.getID(
