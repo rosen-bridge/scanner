@@ -1,15 +1,17 @@
 import { DataSource, In, LessThan, Repository } from 'typeorm';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
 
 class PermitEntityAction {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
     this.permitRepository = dataSource.getRepository(PermitEntity);
   }
 
@@ -43,7 +45,7 @@ class PermitEntityAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(
+      this.logger.error(
         `An error occurred during storing initial permits action: ${e}`
       );
       await queryRunner.rollbackTransaction();
@@ -102,7 +104,7 @@ class PermitEntityAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store permit action: ${e}`);
+      this.logger.error(`An error occurred during store permit action: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {

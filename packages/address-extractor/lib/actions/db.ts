@@ -1,13 +1,15 @@
 import { BoxEntity } from '../entities/boxEntity';
 import { DataSource, In, LessThan } from 'typeorm';
 import ExtractedBox from '../interfaces/ExtractedBox';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;
+  readonly logger: AbstractLogger;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
   }
 
   /**
@@ -43,7 +45,7 @@ export class BoxEntityAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
       throw new Error(
         'Initialization failed while storing initial address boxes'
@@ -112,7 +114,7 @@ export class BoxEntityAction {
         .execute();
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {

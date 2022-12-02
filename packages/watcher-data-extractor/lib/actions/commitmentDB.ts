@@ -1,14 +1,16 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 class CommitmentEntityAction {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly commitmentRepository: Repository<CommitmentEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
     this.commitmentRepository = dataSource.getRepository(CommitmentEntity);
   }
 
@@ -62,7 +64,9 @@ class CommitmentEntityAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store commitments action: ${e}`);
+      this.logger.error(
+        `An error occurred during store commitments action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {

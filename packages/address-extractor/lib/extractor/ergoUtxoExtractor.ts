@@ -34,7 +34,6 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     logger?: AbstractLogger
   ) {
     this.dataSource = dataSource;
-    this.actions = new BoxEntityAction(dataSource);
     this.id = id;
     this.networkType = networkType;
     this.ergoTree = address
@@ -43,6 +42,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     this.tokens = tokens ? tokens : [];
     this.explorerApi = new ExplorerApi(explorerUrl);
     this.logger = logger ? logger : new DummyLogger();
+    this.actions = new BoxEntityAction(dataSource, this.logger);
   }
 
   private extractBoxFromJson = (boxJson: ErgoBoxJson) => {

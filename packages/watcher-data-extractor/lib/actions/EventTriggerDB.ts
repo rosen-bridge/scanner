@@ -1,15 +1,17 @@
 import { DataSource, In, Repository } from 'typeorm';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import eventTriggerEntity from '../entities/EventTriggerEntity';
 
 class EventTriggerDB {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly triggerEventRepository: Repository<EventTriggerEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
     this.triggerEventRepository = dataSource.getRepository(EventTriggerEntity);
   }
 
@@ -73,7 +75,9 @@ class EventTriggerDB {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store eventTrigger action: ${e}`);
+      this.logger.error(
+        `An error occurred during store eventTrigger action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {

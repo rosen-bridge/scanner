@@ -29,12 +29,12 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     super();
     this.id = id;
     this.dataSource = dataSource;
-    this.actions = new EventTriggerDB(dataSource);
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
+    this.actions = new EventTriggerDB(dataSource, this.logger);
   }
 
   getId = () => this.id;

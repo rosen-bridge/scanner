@@ -32,9 +32,9 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     this.commitmentsErgoTrees = addresses.map((address) =>
       wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
     );
-    this.actions = new CommitmentEntityAction(dataSource);
     this.RWTId = RWTId;
     this.logger = logger ? logger : new DummyLogger();
+    this.actions = new CommitmentEntityAction(dataSource, this.logger);
   }
 
   /**

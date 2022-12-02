@@ -1,15 +1,17 @@
 import { ObservationEntity } from '../entities/observationEntity';
 import { DataSource, In, Repository } from 'typeorm';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 export class ObservationEntityAction {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly observationRepository: Repository<ObservationEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
     this.observationRepository = dataSource.getRepository(ObservationEntity);
+    this.logger = logger;
   }
 
   /**
@@ -69,7 +71,9 @@ export class ObservationEntityAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store observation action: ${e}`);
+      this.logger.error(
+        `An error occurred during store observation action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {

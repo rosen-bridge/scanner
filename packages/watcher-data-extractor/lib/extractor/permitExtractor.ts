@@ -34,13 +34,13 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     super();
     this.id = id;
     this.dataSource = dataSource;
-    this.actions = new PermitEntityAction(dataSource);
     this.permitErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
     this.explorerApi = new ExplorerApi(explorerUrl);
     this.logger = logger ? logger : new DummyLogger();
+    this.actions = new PermitEntityAction(dataSource, this.logger);
   }
 
   getId = () => this.id;

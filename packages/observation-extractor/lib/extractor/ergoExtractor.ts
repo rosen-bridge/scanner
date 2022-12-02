@@ -35,8 +35,8 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.dataSource = dataSource;
     this.tokens = new TokenMap(tokens);
-    this.actions = new ObservationEntityAction(dataSource);
     this.logger = logger ? logger : new DummyLogger();
+    this.actions = new ObservationEntityAction(dataSource, this.logger);
   }
 
   /**
