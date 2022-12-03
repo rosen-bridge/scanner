@@ -3,11 +3,12 @@ import {
   generateBlockEntity,
   loadDataBase,
   observationTxGenerator,
-} from './utils.mock';
-import { ObservationEntity } from '../entities/observationEntity';
-import { tokens } from './tokens.mocked';
+} from '../utils.mock';
+import { ObservationEntity } from '../../entities/observationEntity';
+import { tokens } from '../tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../const';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -42,6 +43,12 @@ describe('extractorErgo', () => {
         bankSK,
         watcherSK
       );
+      const Tx2 = observationTxGenerator(
+        true,
+        ['cardano', 'address', '10000', '1000'],
+        bankSK,
+        watcherSK
+      );
       const Tx3 = observationTxGenerator(
         false,
         [
@@ -55,13 +62,13 @@ describe('extractorErgo', () => {
         watcherSK
       );
       const res = await extractor.processTransactions(
-        [Tx1, Tx3],
+        [Tx1, Tx2, Tx3],
         generateBlockEntity(dataSource, '1')
       );
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toEqual(1);
+      expect(rowsCount).toEqual(2);
       const observation1 = rows[0];
       const box1 = Tx1.outputs[0];
       const assetAmount = box1.assets ? box1.assets[0].amount.toString() : '';
@@ -77,7 +84,7 @@ describe('extractorErgo', () => {
         networkFee: '10000',
         bridgeFee: '1000',
         sourceChainTokenId: assetId,
-        targetChainTokenId: 'cardano',
+        targetChainTokenId: CARDANO_NATIVE_TOKEN,
         sourceBlockId: '1',
         sourceTxId: box1.transactionId,
         requestId: Buffer.from(
@@ -127,7 +134,7 @@ describe('extractorErgo', () => {
      * Scenario: valid Rosen Output box pass to the function
      * Expected: function returns rosenData object
      */
-    it('valid rosen transaction', async () => {
+    it('valid transaction token locked', async () => {
       const dataSource = await loadDataBase('getRosenData-ergo');
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx = observationTxGenerator(
@@ -136,26 +143,43 @@ describe('extractorErgo', () => {
         bankSK,
         watcherSK
       );
-      expect(extractor.getRosenData(Tx.outputs[0])).toStrictEqual({
+      expect(extractor.getTransferData(Tx.outputs[0])).toStrictEqual({
         toChain: 'cardano',
         toAddress: 'address',
         bridgeFee: '1000',
         networkFee: '10000',
         fromAddress: watcherAddress,
+        amount: BigInt(10),
+        tokenId:
+          'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
       });
     });
 
     /**
-     * Test that invalid Rosen output box find successfully
+     * Test that valid Rosen output box find successfully when ergo locked
      * Dependency: Nothing
-     * Scenario: invalid Rosen Output box pass to the function there is no token in the box
-     * Expected: function returns undefined
+     * Scenario: valid Rosen Output box pass to the function
+     * Expected: function returns rosenData object
      */
-    it('checks transaction without token', async () => {
-      const dataSource = await loadDataBase('getRosenData');
+    it('valid transaction ergo locked', async () => {
+      const dataSource = await loadDataBase('getRosenData-ergo');
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const Tx = observationTxGenerator(false, [], bankSK, watcherSK);
-      expect(extractor.getRosenData(Tx.outputs[0])).toEqual(undefined);
+      const Tx = observationTxGenerator(
+        false,
+        ['cardano', 'address', '10000', '1000', watcherAddress],
+        bankSK,
+        watcherSK,
+        '100000000000'
+      );
+      expect(extractor.getTransferData(Tx.outputs[0])).toStrictEqual({
+        toChain: 'cardano',
+        toAddress: 'address',
+        bridgeFee: '1000',
+        networkFee: '10000',
+        fromAddress: watcherAddress,
+        amount: BigInt('100000000000'),
+        tokenId: ERGO_NATIVE_TOKEN,
+      });
     });
 
     /**
@@ -173,7 +197,7 @@ describe('extractorErgo', () => {
         bankSK,
         watcherSK
       );
-      expect(extractor.getRosenData(Tx.outputs[0])).toEqual(undefined);
+      expect(extractor.getTransferData(Tx.outputs[0])).toEqual(undefined);
     });
   });
 });

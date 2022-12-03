@@ -30,4 +30,4 @@ interface KoiosTransaction {
   metadata?: MetaData;
 }
 
-export { KoiosTransaction, MetaData };
+export { KoiosTransaction, MetaData, UTXO };

@@ -1,10 +1,10 @@
-export { ErgoScanner } from './scanner/ergo/ergoScanner';
-export { CardanoKoiosScanner } from './scanner/cardano/cardano';
+export { ErgoNodeScanner } from './scanner/ergo/ergoScanner';
+export { CardanoKoiosScanner } from './scanner/cardano/scanner/koios';
+export { CardanoOgmiosScanner } from './scanner/cardano/scanner/ogmios';
 export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
 export { AbstractExtractor } from './interfaces';
-export { AbstractScanner } from './scanner/abstract';
 export { AbstractLogger } from './loger/AbstractLogger';
 export { DummyLogger } from './loger/DummyLogger';
 export { Transaction, OutputBox } from './scanner/ergo/network/types';
