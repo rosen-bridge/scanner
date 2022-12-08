@@ -175,7 +175,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
                 }
               }
             } catch (e) {
-              this.logger?.warn(
+              this.logger.warn(
                 `Error during observing cardano transactions with error [${e}]`
               );
             }
@@ -187,7 +187,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
             resolve(status);
           })
           .catch((e) => {
-            this.logger?.error(
+            this.logger.error(
               `An error occurred during store observations: ${e}`
             );
             reject(e);

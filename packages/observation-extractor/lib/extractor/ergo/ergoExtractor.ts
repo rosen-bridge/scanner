@@ -148,13 +148,13 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
             resolve(status);
           })
           .catch((e) => {
-            this.logger?.error(
+            this.logger.error(
               `An error uncached exception occurred during store ergo observation: ${e}`
             );
             reject(e);
           });
       } catch (e) {
-        this.logger?.error(
+        this.logger.error(
           `An error occurred while saving block ${block}: [${e}]`
         );
         reject(e);
