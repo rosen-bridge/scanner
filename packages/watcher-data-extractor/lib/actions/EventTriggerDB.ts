@@ -62,8 +62,14 @@ class EventTriggerDB {
           sourceChainHeight: event.sourceChainHeight,
         };
         if (!saved) {
+          this.logger.info(
+            `Storing event trigger ${event.boxId} at height ${block.height}`
+          );
           await queryRunner.manager.insert(EventTriggerEntity, entity);
         } else {
+          this.logger.info(
+            `Updating event trigger ${event.boxId} at height ${block.height}`
+          );
           await queryRunner.manager.update(
             EventTriggerEntity,
             {
@@ -72,6 +78,7 @@ class EventTriggerDB {
             entity
           );
         }
+        this.logger.debug(JSON.stringify(entity));
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -98,6 +105,9 @@ class EventTriggerDB {
     extractor: string
   ): Promise<void> => {
     for (const id of spendId) {
+      this.logger.info(
+        `Spending event trigger ${id} at height ${block.height}`
+      );
       await this.datasource
         .createQueryBuilder()
         .update(eventTriggerEntity)
@@ -116,6 +126,9 @@ class EventTriggerDB {
    * @param extractor
    */
   deleteBlock = async (block: string, extractor: string) => {
+    this.logger.info(
+      `Deleting event triggers at block ${block} for extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

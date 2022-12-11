@@ -40,8 +40,8 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
-    this.explorerApi = new ExplorerApi(explorerUrl);
     this.logger = logger ? logger : new DummyLogger();
+    this.explorerApi = new ExplorerApi(explorerUrl, this.logger);
     this.actions = new BoxEntityAction(dataSource, this.logger);
   }
 
