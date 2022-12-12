@@ -5,10 +5,10 @@ import { JsonBI } from './parser';
 class ExplorerApi {
   api: AxiosInstance;
 
-  constructor(explorerAddress: string) {
+  constructor(explorerAddress: string, timeout?: number) {
     this.api = axios.create({
       baseURL: explorerAddress,
-      timeout: 10000,
+      timeout: timeout ? timeout : 10000,
     });
   }
 

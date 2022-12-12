@@ -31,7 +31,8 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     explorerUrl: string,
     address?: string,
     tokens?: Array<string>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    timeout?: number
   ) {
     this.dataSource = dataSource;
     this.id = id;
@@ -41,7 +42,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
       : undefined;
     this.tokens = tokens ? tokens : [];
     this.logger = logger ? logger : new DummyLogger();
-    this.explorerApi = new ExplorerApi(explorerUrl, this.logger);
+    this.explorerApi = new ExplorerApi(explorerUrl, this.logger, timeout);
     this.actions = new BoxEntityAction(dataSource, this.logger);
   }
 

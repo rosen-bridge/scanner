@@ -7,10 +7,14 @@ export class ExplorerApi {
   api: AxiosInstance;
   readonly logger: AbstractLogger;
 
-  constructor(explorerAddress: string, logger: AbstractLogger) {
+  constructor(
+    explorerAddress: string,
+    logger: AbstractLogger,
+    timeout?: number
+  ) {
     this.api = axios.create({
       baseURL: explorerAddress,
-      timeout: 10000,
+      timeout: timeout ? timeout : 10000,
     });
     this.logger = logger;
   }
