@@ -59,12 +59,12 @@ export class ObservationEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Storing observation ${observation.requestId} in blockHeight ${block.height}`
+            `Storing observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(ObservationEntity, entity);
         } else {
           this.logger.info(
-            `Updating observation ${observation.requestId} in blockHeight ${block.height}`
+            `Updating observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             ObservationEntity,
@@ -90,7 +90,9 @@ export class ObservationEntityAction {
   };
 
   deleteBlockObservation = async (block: string, extractor: string) => {
-    this.logger.info(`Deleting observations in block ${block}`);
+    this.logger.info(
+      `Deleting observations in block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

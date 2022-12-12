@@ -41,7 +41,9 @@ export class BoxEntityAction {
           serialized: box.serialized,
           extractor: extractor,
         };
-        this.logger.info(`Storing initial box ${box.boxId}`);
+        this.logger.info(
+          `Storing initial box ${box.boxId} and extractor ${extractor}`
+        );
         this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
         await repository.insert(entity);
       }
@@ -93,7 +95,9 @@ export class BoxEntityAction {
         };
         const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
         if (dbBox.length > 0) {
-          this.logger.info(`Updating box ${box.boxId}`);
+          this.logger.info(
+            `Updating box ${box.boxId} and extractor ${extractor}`
+          );
           this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
           await queryRunner.manager
             .getRepository(BoxEntity)
@@ -137,7 +141,9 @@ export class BoxEntityAction {
    * @param extractor
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
-    this.logger.info(`Deleting boxes in block ${block}`);
+    this.logger.info(
+      `Deleting boxes in block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

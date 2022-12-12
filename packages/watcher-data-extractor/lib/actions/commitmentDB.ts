@@ -52,12 +52,12 @@ class CommitmentEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Saving commitment ${commitment.boxId} at height ${block.height}`
+            `Saving commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(CommitmentEntity, entity);
         } else {
           this.logger.info(
-            `Updating commitment ${commitment.boxId} at height ${block.height}`
+            `Updating commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             CommitmentEntity,
@@ -95,7 +95,9 @@ class CommitmentEntityAction {
   ): Promise<void> => {
     //todo: should change with single db call
     for (const id of spendId) {
-      this.logger.info(`Spend commitment ${id} at height ${block.height}`);
+      this.logger.info(
+        `Spend commitment ${id} at height ${block.height} and extractor ${extractor}`
+      );
       await this.datasource
         .createQueryBuilder()
         .update(CommitmentEntity)
