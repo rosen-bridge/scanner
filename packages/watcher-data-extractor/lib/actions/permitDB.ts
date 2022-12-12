@@ -91,8 +91,14 @@ class PermitEntityAction {
           WID: permit.WID,
         };
         if (!saved) {
+          this.logger.info(
+            `Saving permit ${permit.boxId} at height ${block.height}`
+          );
           await queryRunner.manager.insert(PermitEntity, entity);
         } else {
+          this.logger.info(
+            `Updating permit ${permit.boxId} at height ${block.height}`
+          );
           await queryRunner.manager.update(
             PermitEntity,
             {
@@ -101,6 +107,7 @@ class PermitEntityAction {
             entity
           );
         }
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -126,6 +133,7 @@ class PermitEntityAction {
   ): Promise<void> => {
     //todo: should change with single db call
     for (const id of spendId) {
+      this.logger.info(`Spending permit ${id} at height ${block.height}`);
       await this.datasource
         .createQueryBuilder()
         .update(PermitEntity)
@@ -145,6 +153,9 @@ class PermitEntityAction {
    */
   //TODO: should check if deleted or not Promise<Boolean>
   deleteBlock = async (block: string, extractor: string): Promise<void> => {
+    this.logger.info(
+      `Deleting permits at block ${block} for extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

@@ -67,7 +67,7 @@ class CommitmentEntityAction {
             entity
           );
         }
-        this.logger.debug(JSON.stringify(entity));
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {

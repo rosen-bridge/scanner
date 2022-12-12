@@ -74,7 +74,7 @@ export class ObservationEntityAction {
             entity
           );
         }
-        this.logger.debug(`${entity}`);
+        this.logger.debug(`Entity ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {

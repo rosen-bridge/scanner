@@ -42,7 +42,7 @@ export class BoxEntityAction {
           extractor: extractor,
         };
         this.logger.info(`Storing initial box ${box.boxId}`);
-        this.logger.debug(JSON.stringify(entity));
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
         await repository.insert(entity);
       }
       await queryRunner.commitTransaction();
@@ -94,7 +94,7 @@ export class BoxEntityAction {
         const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
         if (dbBox.length > 0) {
           this.logger.info(`Updating box ${box.boxId}`);
-          this.logger.debug(JSON.stringify(entity));
+          this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
           await queryRunner.manager
             .getRepository(BoxEntity)
             .createQueryBuilder()
