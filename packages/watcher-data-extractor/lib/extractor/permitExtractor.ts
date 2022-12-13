@@ -25,7 +25,8 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     dataSource: DataSource,
     address: string,
     RWT: string,
-    explorerUrl: string
+    explorerUrl: string,
+    timeout?: number
   ) {
     super();
     this.id = id;
@@ -35,7 +36,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
-    this.explorerApi = new ExplorerApi(explorerUrl);
+    this.explorerApi = new ExplorerApi(explorerUrl, timeout);
   }
 
   getId = () => this.id;

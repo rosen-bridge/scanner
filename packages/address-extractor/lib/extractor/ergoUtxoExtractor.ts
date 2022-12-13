@@ -25,7 +25,8 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     networkType: ergoLib.NetworkPrefix,
     explorerUrl: string,
     address?: string,
-    tokens?: Array<string>
+    tokens?: Array<string>,
+    timeout?: number
   ) {
     this.dataSource = dataSource;
     this.actions = new BoxEntityAction(dataSource);
@@ -35,7 +36,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
-    this.explorerApi = new ExplorerApi(explorerUrl);
+    this.explorerApi = new ExplorerApi(explorerUrl, timeout);
   }
 
   private extractBoxFromJson = (boxJson: ErgoBoxJson) => {
