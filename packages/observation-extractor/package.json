@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/observation-extractor",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "@cardano-ogmios/schema": "^5.5.7",
-    "@rosen-bridge/scanner": "^0.4.0",
+    "@rosen-bridge/scanner": "^0.4.2",
     "@rosen-bridge/tokens": "^0.1.8",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.21.0",

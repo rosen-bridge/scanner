@@ -60,7 +60,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     const hash = (response.point as Point).hash;
     const block = await this.action.getBlockWithHash(hash);
     if (block) {
-      await this.forkBlock(block.height);
+      await this.forkBlock(block.height + 1);
     }
     requestNext();
   };
@@ -138,7 +138,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         rollBackward: this.rollBackward,
         rollForward: this.rollForward,
       });
-      await this.forkBlock(intersect.height);
+      await this.forkBlock(intersect.height + 1);
       await this.client.startSync([intersect.point]);
     } else {
       throw Error('Can not start scanner. initial block is invalid');
