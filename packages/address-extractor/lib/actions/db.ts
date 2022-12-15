@@ -1,13 +1,15 @@
 import { BoxEntity } from '../entities/boxEntity';
 import { DataSource, In, LessThan } from 'typeorm';
 import ExtractedBox from '../interfaces/ExtractedBox';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;
+  readonly logger: AbstractLogger;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
   }
 
   /**
@@ -39,11 +41,15 @@ export class BoxEntityAction {
           serialized: box.serialized,
           extractor: extractor,
         };
+        this.logger.info(
+          `Storing initial box ${box.boxId} and extractor ${extractor}`
+        );
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
         await repository.insert(entity);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
       throw new Error(
         'Initialization failed while storing initial address boxes'
@@ -89,6 +95,10 @@ export class BoxEntityAction {
         };
         const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
         if (dbBox.length > 0) {
+          this.logger.info(
+            `Updating box ${box.boxId} and extractor ${extractor}`
+          );
+          this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
           await queryRunner.manager
             .getRepository(BoxEntity)
             .createQueryBuilder()
@@ -97,9 +107,12 @@ export class BoxEntityAction {
             .where({ id: dbBox[0].id })
             .execute();
         } else {
+          this.logger.info(`Storing box ${box.boxId}`);
+          this.logger.debug(JSON.stringify(entity));
           await queryRunner.manager.getRepository(BoxEntity).insert(entity);
         }
       }
+      this.logger.debug(`Updating spendBlock for boxes ${spendBoxes}`);
       await queryRunner.manager
         .getRepository(BoxEntity)
         .createQueryBuilder()
@@ -112,7 +125,7 @@ export class BoxEntityAction {
         .execute();
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {
@@ -128,6 +141,9 @@ export class BoxEntityAction {
    * @param extractor
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
+    this.logger.info(
+      `Deleting boxes in block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

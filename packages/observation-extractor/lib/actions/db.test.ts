@@ -1,11 +1,13 @@
 import { ObservationEntityAction } from './db';
 import { ObservationEntity } from '../entities/observationEntity';
 import { generateBlockEntity, loadDataBase } from '../extractor/utils.mock';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, DummyLogger } from '@rosen-bridge/scanner';
 import {
   firstObservations,
   secondObservations,
 } from '../extractor/observations.mock';
+
+const logger = new DummyLogger();
 
 describe('ObservationEntityAction', () => {
   describe('storeObservation', () => {
@@ -18,7 +20,7 @@ describe('ObservationEntityAction', () => {
      */
     it('checks observations saved successfully', async () => {
       const dataSource = await loadDataBase('savingObservation');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const res = await action.storeObservations(
         firstObservations,
         generateBlockEntity(dataSource, '1'),
@@ -54,7 +56,7 @@ describe('ObservationEntityAction', () => {
      */
     it('checks that observations saved successfully with two different extractor', async () => {
       const dataSource = await loadDataBase('twoObservation');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -106,7 +108,7 @@ describe('ObservationEntityAction', () => {
      */
     it('checks that duplicated observation updated with same extractor', async () => {
       const dataSource = await loadDataBase('duplicatedObservationUpdated');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -152,7 +154,7 @@ describe('ObservationEntityAction', () => {
      */
     it('checks that two observation with different extractor but same requestId added to table', async () => {
       const dataSource = await loadDataBase('duplicateRequestId');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -197,7 +199,7 @@ describe('ObservationEntityAction', () => {
      */
     it('checks that two observation with different requestId but same extractor added to table', async () => {
       const dataSource = await loadDataBase('duplicateExtractor');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -248,7 +250,7 @@ describe('ObservationEntityAction', () => {
         return output;
       };
       const dataSource = await loadDataBase('fork');
-      const action = new ObservationEntityAction(dataSource);
+      const action = new ObservationEntityAction(dataSource, logger);
       const insertObservation = async (
         extractor: string,
         block: BlockEntity

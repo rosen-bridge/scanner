@@ -4,7 +4,9 @@ import PermitEntityAction from '../actions/permitDB';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import {
   AbstractExtractor,
+  AbstractLogger,
   BlockEntity,
+  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
@@ -13,6 +15,7 @@ import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 
 class PermitExtractor extends AbstractExtractor<Transaction> {
+  readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   readonly actions: PermitEntityAction;
@@ -26,16 +29,18 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     address: string,
     RWT: string,
     explorerUrl: string,
+    logger?: AbstractLogger,
     timeout?: number
   ) {
     super();
     this.id = id;
     this.dataSource = dataSource;
-    this.actions = new PermitEntityAction(dataSource);
     this.permitErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
+    this.logger = logger ? logger : new DummyLogger();
+    this.actions = new PermitEntityAction(dataSource, this.logger);
     this.explorerApi = new ExplorerApi(explorerUrl, timeout);
   }
 

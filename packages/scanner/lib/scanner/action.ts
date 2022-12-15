@@ -1,14 +1,22 @@
 import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
 import { DataSource, DeleteResult, MoreThanOrEqual, Repository } from 'typeorm';
 import { Block } from '../interfaces';
+import { DummyLogger } from '../loger/DummyLogger';
+import { AbstractLogger } from '../loger/AbstractLogger';
 
 export class BlockDbAction {
   readonly blockRepository: Repository<BlockEntity>;
   readonly scannerName: string;
+  readonly logger: AbstractLogger;
 
-  constructor(dataSource: DataSource, scannerName: string) {
+  constructor(
+    dataSource: DataSource,
+    scannerName: string,
+    logger?: AbstractLogger
+  ) {
     this.blockRepository = dataSource.getRepository(BlockEntity);
     this.scannerName = scannerName;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   readonly name = () => this.scannerName;
@@ -105,6 +113,7 @@ export class BlockDbAction {
    * @return Promise<DeleteResult>
    */
   removeBlocksFromHeight = async (height: number): Promise<DeleteResult> => {
+    this.logger.info(`Removing blocks from height ${height}`);
     return await this.blockRepository.delete({
       height: MoreThanOrEqual(height),
       scanner: this.name(),
@@ -116,6 +125,7 @@ export class BlockDbAction {
    * @param block
    */
   saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
+    this.logger.info(`Saving block ${block.blockHeight}`);
     try {
       const instance = await this.blockRepository.findOneBy({
         height: block.blockHeight,
@@ -129,6 +139,7 @@ export class BlockDbAction {
         scanner: this.name(),
         extra: block.extra,
       };
+      this.logger.debug(`Block info: ${JSON.stringify(blockInfo)}`);
       if (!instance) {
         await this.blockRepository.insert(blockInfo);
       } else {
@@ -158,6 +169,7 @@ export class BlockDbAction {
    * @param blockHeight: height of expected block
    */
   updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
+    this.logger.info(`Updating block status at height ${blockHeight}`);
     return await this.blockRepository
       .createQueryBuilder()
       .update()
@@ -179,6 +191,7 @@ export class BlockDbAction {
    * @param blockHeight: height of expected block
    */
   revertBlockStatus = async (blockHeight: number): Promise<boolean> => {
+    this.logger.info(`Reverting block status at height ${blockHeight}`);
     return await this.blockRepository
       .createQueryBuilder()
       .update()

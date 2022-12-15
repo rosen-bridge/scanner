@@ -1,15 +1,17 @@
 import { ObservationEntity } from '../entities/observationEntity';
 import { DataSource, In, Repository } from 'typeorm';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 export class ObservationEntityAction {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly observationRepository: Repository<ObservationEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
     this.observationRepository = dataSource.getRepository(ObservationEntity);
+    this.logger = logger;
   }
 
   /**
@@ -56,8 +58,14 @@ export class ObservationEntityAction {
           extractor: extractor,
         };
         if (!saved) {
+          this.logger.info(
+            `Storing observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.insert(ObservationEntity, entity);
         } else {
+          this.logger.info(
+            `Updating observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.update(
             ObservationEntity,
             {
@@ -66,10 +74,13 @@ export class ObservationEntityAction {
             entity
           );
         }
+        this.logger.debug(`Entity ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store observation action: ${e}`);
+      this.logger.error(
+        `An error occurred during store observation action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {
@@ -79,6 +90,9 @@ export class ObservationEntityAction {
   };
 
   deleteBlockObservation = async (block: string, extractor: string) => {
+    this.logger.info(
+      `Deleting observations in block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

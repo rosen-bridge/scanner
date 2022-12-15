@@ -3,13 +3,16 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import EventTriggerDB from '../actions/EventTriggerDB';
 import {
   AbstractExtractor,
+  AbstractLogger,
   BlockEntity,
+  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
+  readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
   private readonly actions: EventTriggerDB;
@@ -20,16 +23,18 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     id: string,
     dataSource: DataSource,
     address: string,
-    RWT: string
+    RWT: string,
+    logger?: AbstractLogger
   ) {
     super();
     this.id = id;
     this.dataSource = dataSource;
-    this.actions = new EventTriggerDB(dataSource);
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
+    this.logger = logger ? logger : new DummyLogger();
+    this.actions = new EventTriggerDB(dataSource, this.logger);
   }
 
   getId = () => this.id;

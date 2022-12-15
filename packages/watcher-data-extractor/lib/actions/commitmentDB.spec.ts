@@ -2,6 +2,7 @@ import CommitmentEntityAction from './commitmentDB';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { block } from '../extractor/utilsVariable.mock';
 import { loadDataBase } from '../extractor/utilsFunctions.mock';
+import { DummyLogger } from '@rosen-bridge/scanner';
 
 const commitment1 = {
   WID: 'wid1',
@@ -26,6 +27,8 @@ const commitment4 = {
   boxId: 'boxId4',
 };
 
+const logger = new DummyLogger();
+
 describe('commitmentEntityAction', () => {
   describe('storeCommitments', () => {
     /**
@@ -36,7 +39,7 @@ describe('commitmentEntityAction', () => {
      */
     it('gets two commitments and dataBase row should be 2', async () => {
       const dataSource = await loadDataBase('commitment-save');
-      const commitmentEntity = new CommitmentEntityAction(dataSource);
+      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
         block,
@@ -58,7 +61,7 @@ describe('commitmentEntityAction', () => {
       const dataSource = await loadDataBase(
         'commitment-save-different-extractor'
       );
-      const action = new CommitmentEntityAction(dataSource);
+      const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -112,7 +115,7 @@ describe('commitmentEntityAction', () => {
      */
     it('checks that duplicated commitment updated with same extractor', async () => {
       const dataSource = await loadDataBase('commitment-save-duplicate');
-      const action = new CommitmentEntityAction(dataSource);
+      const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -160,7 +163,7 @@ describe('commitmentEntityAction', () => {
      */
     it('two commitment with two different extractor but same boxId', async () => {
       const dataSource = await loadDataBase('commitment-same-boxId');
-      const action = new CommitmentEntityAction(dataSource);
+      const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -207,7 +210,7 @@ describe('commitmentEntityAction', () => {
      */
     it('two commitment with two different boxId but same extractor', async () => {
       const dataSource = await loadDataBase('commitment-same-extractor');
-      const action = new CommitmentEntityAction(dataSource);
+      const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -254,7 +257,7 @@ describe('commitmentEntityAction', () => {
   describe('spendCommitments', () => {
     it('sets one spendBlock for one commitment & one row should have spendBlock', async () => {
       const dataSource = await loadDataBase('spendCommitments');
-      const commitmentEntity = new CommitmentEntityAction(dataSource);
+      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
         block,
@@ -286,7 +289,7 @@ describe('commitmentEntityAction', () => {
      */
     it('should deleted one row of the dataBase correspond to one block', async () => {
       const dataSource = await loadDataBase('deleteBlockCommitment');
-      const commitmentEntity = new CommitmentEntityAction(dataSource);
+      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       await commitmentEntity.storeCommitments(
         [commitment1],
         block,

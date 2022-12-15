@@ -1,4 +1,9 @@
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  BlockEntity,
+  DummyLogger,
+  AbstractLogger,
+} from '@rosen-bridge/scanner';
 import { AuxiliaryData, TxBabbage, TxOut } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
@@ -11,18 +16,25 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabbage> {
+  readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
   private readonly bankAddress: string;
   static readonly FROM_CHAIN: string = 'cardano';
 
-  constructor(dataSource: DataSource, tokens: RosenTokens, address: string) {
+  constructor(
+    dataSource: DataSource,
+    tokens: RosenTokens,
+    address: string,
+    logger?: AbstractLogger
+  ) {
     super();
     this.bankAddress = address;
     this.dataSource = dataSource;
     this.tokens = new TokenMap(tokens);
-    this.actions = new ObservationEntityAction(dataSource);
+    this.logger = logger ? logger : new DummyLogger();
+    this.actions = new ObservationEntityAction(dataSource, this.logger);
   }
 
   getObjectKeyAsStringOrUndefined = (

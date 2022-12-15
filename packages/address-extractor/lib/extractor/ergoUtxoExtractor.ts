@@ -2,7 +2,11 @@ import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { BoxEntityAction } from '../actions/db';
-import { AbstractExtractor } from '@rosen-bridge/scanner';
+import {
+  AbstractExtractor,
+  AbstractLogger,
+  DummyLogger,
+} from '@rosen-bridge/scanner';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';
@@ -11,6 +15,7 @@ import { Boxes, ErgoBoxJson } from '../interfaces/types';
 import { Transaction } from '@rosen-bridge/scanner';
 
 export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
+  readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   readonly actions: BoxEntityAction;
   private readonly id: string;
@@ -26,17 +31,19 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     explorerUrl: string,
     address?: string,
     tokens?: Array<string>,
+    logger?: AbstractLogger,
     timeout?: number
   ) {
     this.dataSource = dataSource;
-    this.actions = new BoxEntityAction(dataSource);
     this.id = id;
     this.networkType = networkType;
     this.ergoTree = address
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
-    this.explorerApi = new ExplorerApi(explorerUrl, timeout);
+    this.logger = logger ? logger : new DummyLogger();
+    this.explorerApi = new ExplorerApi(explorerUrl, this.logger, timeout);
+    this.actions = new BoxEntityAction(dataSource, this.logger);
   }
 
   private extractBoxFromJson = (boxJson: ErgoBoxJson) => {

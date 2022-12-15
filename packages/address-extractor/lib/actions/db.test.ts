@@ -2,6 +2,9 @@ import { BoxEntityAction } from './db';
 import { generateBlockEntity, loadDataBase } from '../extractor/utils.mock';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BoxEntity } from '../entities/boxEntity';
+import { DummyLogger } from '@rosen-bridge/scanner';
+
+const logger = new DummyLogger();
 
 describe('BoxEntityAction', () => {
   describe('storeBlockBoxes', () => {
@@ -13,7 +16,7 @@ describe('BoxEntityAction', () => {
      */
     it('should checks boxes saved successfully', async () => {
       const dataSource = await loadDataBase('db1');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -39,7 +42,7 @@ describe('BoxEntityAction', () => {
      */
     it('should update saved boxes successfully', async () => {
       const dataSource = await loadDataBase('db-update');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       await dataSource.getRepository(BoxEntity).insert({
         boxId: 'boxid',
         serialized: 'serialized-old',
@@ -74,7 +77,7 @@ describe('BoxEntityAction', () => {
      */
     it('should update saved boxes successfully', async () => {
       const dataSource = await loadDataBase('db-update');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       await dataSource.getRepository(BoxEntity).insert({
         boxId: 'boxid',
         serialized: 'serialized-old',
@@ -109,7 +112,7 @@ describe('BoxEntityAction', () => {
      */
     it('should set spendBlock on spend box', async () => {
       const dataSource = await loadDataBase('db2');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -138,7 +141,7 @@ describe('BoxEntityAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       await action.storeBox([box], [], block, 'extractor1');
       const repository = dataSource.getRepository(BoxEntity);
       expect(await repository.count()).toEqual(1);
@@ -155,7 +158,7 @@ describe('BoxEntityAction', () => {
      */
     it('create a spend box in database', async () => {
       const dataSource = await loadDataBase('db4');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -185,7 +188,7 @@ describe('BoxEntityAction', () => {
      */
     it('should delete box from database when call delete box with boxId', async () => {
       const dataSource = await loadDataBase('spendBox1');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -214,7 +217,7 @@ describe('BoxEntityAction', () => {
         serialized: 'serialized',
         address: 'address',
       };
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
       await action.storeBox([box], [], block1, 'extractor1');
@@ -244,7 +247,7 @@ describe('BoxEntityAction', () => {
         serialized: 'serialized',
         address: 'address',
       };
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
       await action.storeBox([box], [], block1, 'extractor1');
@@ -273,7 +276,7 @@ describe('BoxEntityAction', () => {
         serialized: 'serialized',
         address: 'address',
       };
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBox([box], ['boxid'], block, 'extractor1');
       const repository = dataSource.getRepository(BoxEntity);
@@ -294,7 +297,7 @@ describe('BoxEntityAction', () => {
      */
     it('should store initial boxes in the database', async () => {
       const dataSource = await loadDataBase('initialDb');
-      const action = new BoxEntityAction(dataSource);
+      const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxId',
         serialized: 'serialized',

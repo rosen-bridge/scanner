@@ -7,28 +7,37 @@ import { ObservationEntityAction } from '../../actions/db';
 import { RosenData } from '../../interfaces/rosen';
 import {
   AbstractExtractor,
+  AbstractLogger,
   BlockEntity,
   Transaction,
   OutputBox,
+  DummyLogger,
 } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ERGO_NATIVE_TOKEN } from '../const';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
+  readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
   private readonly bankErgoTree: string;
   static readonly FROM_CHAIN: string = 'ergo';
 
-  constructor(dataSource: DataSource, tokens: RosenTokens, address: string) {
+  constructor(
+    dataSource: DataSource,
+    tokens: RosenTokens,
+    address: string,
+    logger?: AbstractLogger
+  ) {
     super();
     this.bankErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.dataSource = dataSource;
     this.tokens = new TokenMap(tokens);
-    this.actions = new ObservationEntityAction(dataSource);
+    this.logger = logger ? logger : new DummyLogger();
+    this.actions = new ObservationEntityAction(dataSource, this.logger);
   }
 
   /**
@@ -139,13 +148,15 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
             resolve(status);
           })
           .catch((e) => {
-            console.log(
+            this.logger.error(
               `An error uncached exception occurred during store ergo observation: ${e}`
             );
             reject(e);
           });
       } catch (e) {
-        console.log(`An error occurred while saving block ${block}: `, e);
+        this.logger.error(
+          `An error occurred while saving block ${block}: [${e}]`
+        );
         reject(e);
       }
     });

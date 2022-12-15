@@ -4,6 +4,7 @@ import EventTriggerDB from './EventTriggerDB';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { block } from '../extractor/utilsVariable.mock';
 import { DataSource } from 'typeorm';
+import { DummyLogger } from '@rosen-bridge/scanner';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
   WIDs: 'wid2',
@@ -50,6 +51,8 @@ const sampleEventTrigger4: ExtractedEventTrigger = {
   boxId: '4',
 };
 
+const logger = new DummyLogger();
+
 export const sampleEventEntity = {
   extractor: 'extractorId',
   boxId: 'id',
@@ -90,7 +93,7 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and database row count should be 2
      */
     it('gets two EventBoxes and dataBase row should be 2', async () => {
-      const eventTrigger = new EventTriggerDB(dataSource);
+      const eventTrigger = new EventTriggerDB(dataSource, logger);
       const res = await eventTrigger.storeEventTriggers(
         [sampleEventTrigger1, sampleEventTrigger2],
         block,
@@ -126,7 +129,7 @@ describe('EventTrigger', () => {
      * Expected: eventTriggers should returns true and each saved eventTrigger should have valid fields
      */
     it('checks that eventTrigger saved successfully with two different extractor', async () => {
-      const action = new EventTriggerDB(dataSource);
+      const action = new EventTriggerDB(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -182,7 +185,7 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and last eventTrigger fields should update
      */
     it('checks that duplicated eventTrigger updated with same extractor', async () => {
-      const action = new EventTriggerDB(dataSource);
+      const action = new EventTriggerDB(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -230,7 +233,7 @@ describe('EventTrigger', () => {
      *  each step and new eventTrigger should insert in the database
      */
     it('two eventTrigger with two different extractor but same boxId', async () => {
-      const action = new EventTriggerDB(dataSource);
+      const action = new EventTriggerDB(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -277,7 +280,7 @@ describe('EventTrigger', () => {
      *  each step and new eventTriggers should insert in the database
      */
     it('two eventTrigger with two different boxId but same extractor', async () => {
-      const action = new EventTriggerDB(dataSource);
+      const action = new EventTriggerDB(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -324,7 +327,7 @@ describe('EventTrigger', () => {
    */
   describe('spendEventTriggers', () => {
     it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
-      const eventTriggerAction = new EventTriggerDB(dataSource);
+      const eventTriggerAction = new EventTriggerDB(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         sampleEventEntity,
@@ -348,7 +351,7 @@ describe('EventTrigger', () => {
      * Expected: deleteBlock should call without no error and database row count should be 1
      */
     it('should deleted one row of the dataBase correspond to one block', async () => {
-      const eventTrigger = new EventTriggerDB(dataSource);
+      const eventTrigger = new EventTriggerDB(dataSource, logger);
       await eventTrigger.storeEventTriggers(
         [sampleEventTrigger1],
         block,

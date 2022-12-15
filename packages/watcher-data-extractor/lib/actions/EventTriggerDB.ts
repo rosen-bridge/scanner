@@ -1,15 +1,17 @@
 import { DataSource, In, Repository } from 'typeorm';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import eventTriggerEntity from '../entities/EventTriggerEntity';
 
 class EventTriggerDB {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly triggerEventRepository: Repository<EventTriggerEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
     this.triggerEventRepository = dataSource.getRepository(EventTriggerEntity);
   }
 
@@ -60,8 +62,14 @@ class EventTriggerDB {
           sourceChainHeight: event.sourceChainHeight,
         };
         if (!saved) {
+          this.logger.info(
+            `Storing event trigger ${event.boxId} at height ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.insert(EventTriggerEntity, entity);
         } else {
+          this.logger.info(
+            `Updating event trigger ${event.boxId} at height ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.update(
             EventTriggerEntity,
             {
@@ -70,10 +78,13 @@ class EventTriggerDB {
             entity
           );
         }
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store eventTrigger action: ${e}`);
+      this.logger.error(
+        `An error occurred during store eventTrigger action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {
@@ -94,6 +105,9 @@ class EventTriggerDB {
     extractor: string
   ): Promise<void> => {
     for (const id of spendId) {
+      this.logger.info(
+        `Spending event trigger ${id} at height ${block.height} and extractor ${extractor}`
+      );
       await this.datasource
         .createQueryBuilder()
         .update(eventTriggerEntity)
@@ -112,6 +126,9 @@ class EventTriggerDB {
    * @param extractor
    */
   deleteBlock = async (block: string, extractor: string) => {
+    this.logger.info(
+      `Deleting event triggers at block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()

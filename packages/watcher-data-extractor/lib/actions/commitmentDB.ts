@@ -1,14 +1,16 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 
 class CommitmentEntityAction {
+  readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly commitmentRepository: Repository<CommitmentEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
+    this.logger = logger;
     this.commitmentRepository = dataSource.getRepository(CommitmentEntity);
   }
 
@@ -49,8 +51,14 @@ class CommitmentEntityAction {
           boxSerialized: commitment.boxSerialized,
         };
         if (!saved) {
+          this.logger.info(
+            `Saving commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.insert(CommitmentEntity, entity);
         } else {
+          this.logger.info(
+            `Updating commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+          );
           await queryRunner.manager.update(
             CommitmentEntity,
             {
@@ -59,10 +67,13 @@ class CommitmentEntityAction {
             entity
           );
         }
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(`An error occurred during store commitments action: ${e}`);
+      this.logger.error(
+        `An error occurred during store commitments action: ${e}`
+      );
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {
@@ -84,6 +95,9 @@ class CommitmentEntityAction {
   ): Promise<void> => {
     //todo: should change with single db call
     for (const id of spendId) {
+      this.logger.info(
+        `Spend commitment ${id} at height ${block.height} and extractor ${extractor}`
+      );
       await this.datasource
         .createQueryBuilder()
         .update(CommitmentEntity)
@@ -102,6 +116,9 @@ class CommitmentEntityAction {
    * @param extractor
    */
   deleteBlockCommitment = async (block: string, extractor: string) => {
+    this.logger.info(
+      `Deleting commitments of block ${block} and extractor ${extractor}`
+    );
     await this.datasource
       .createQueryBuilder()
       .delete()
