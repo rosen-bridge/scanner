@@ -4,5 +4,4 @@
 coverage/
 dist/
 node_modules/
-sqlite/
 yarn.lock

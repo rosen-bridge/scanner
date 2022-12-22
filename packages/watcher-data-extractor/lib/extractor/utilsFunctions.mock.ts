@@ -26,7 +26,7 @@ export const loadDataBase = async (
     type: 'sqlite',
     database: `./sqlite/${name}-test.sqlite`,
     entities: [PermitEntity, CommitmentEntity, EventTriggerEntity],
-    migrations: migrations,
+    migrations: migrations.sqlite,
     synchronize: false,
     logging: false,
   });

@@ -488,7 +488,7 @@ export const loadDataBase = async (name: string): Promise<DataSource> => {
     type: 'sqlite',
     database: `./sqlite/${name}-test.sqlite`,
     entities: [BlockEntity, ObservationEntity],
-    migrations: [...migrations, ...scannerMigrations],
+    migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],
     synchronize: false,
     logging: false,
   })

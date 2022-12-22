@@ -11,7 +11,7 @@ const loadDataBase = async (name: string): Promise<DataSource> => {
     type: 'sqlite',
     database: `./sqlite/${name}-test.sqlite`,
     entities: [BlockEntity, BoxEntity],
-    migrations: [...migrations, ...scannerMigrations],
+    migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],
     synchronize: false,
     logging: false,
   })
