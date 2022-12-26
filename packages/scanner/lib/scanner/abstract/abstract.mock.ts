@@ -103,7 +103,7 @@ export const openDataBase = async (dbName: string) => {
     database: `./sqlite/testing-${dbName}.sqlite`,
     entities: [BlockEntity],
     synchronize: false,
-    migrations: migrations,
+    migrations: migrations.sqlite,
     logging: false,
   });
   await dataSource.initialize();
