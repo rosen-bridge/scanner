@@ -93,20 +93,27 @@ class CommitmentEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    //todo: should change with single db call
-    for (const id of spendId) {
-      this.logger.info(
-        `Spend commitment ${id} at height ${block.height} and extractor ${extractor}`
-      );
-      await this.datasource
-        .createQueryBuilder()
-        .update(CommitmentEntity)
-        .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where('boxId = :id AND extractor = :extractor', {
-          id: id,
-          extractor: extractor,
-        })
-        .execute();
+    const updateResult = await this.datasource
+      .createQueryBuilder()
+      .update(CommitmentEntity)
+      .set({ spendBlock: block.hash, spendHeight: block.height })
+      .where('boxId IN (:...ids) AND extractor = :extractor', {
+        ids: spendId,
+        extractor,
+      })
+      .execute();
+
+    if (updateResult.affected && updateResult.affected > 0) {
+      const spentRows = await this.commitmentRepository.findBy({
+        boxId: In(spendId),
+        spendBlock: block.hash,
+      });
+      for (const row of spentRows) {
+        this.logger.info(
+          `Spent commitment ${row.id} with boxId ${row.boxId} at height ${block.height}`
+        );
+        this.logger.debug(`Spent commitment ${JSON.stringify(row)}`);
+      }
     }
   };
 
