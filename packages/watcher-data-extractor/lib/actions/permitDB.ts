@@ -4,6 +4,7 @@ import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { chunk } from 'lodash-es';
+import { dbIdChunkSize } from '../constants';
 
 class PermitEntityAction {
   readonly logger: AbstractLogger;
@@ -132,7 +133,7 @@ class PermitEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    const spendIdChunks = chunk(spendId, 100);
+    const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.datasource
         .createQueryBuilder()

@@ -4,6 +4,7 @@ import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import eventTriggerEntity from '../entities/EventTriggerEntity';
 import { chunk } from 'lodash-es';
+import { dbIdChunkSize } from '../constants';
 
 class EventTriggerDB {
   readonly logger: AbstractLogger;
@@ -105,7 +106,7 @@ class EventTriggerDB {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    const spendIdChunks = chunk(spendId, 100);
+    const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.datasource
         .createQueryBuilder()
