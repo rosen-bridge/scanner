@@ -2,6 +2,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
+import { chunk } from 'lodash-es';
 
 class CommitmentEntityAction {
   readonly logger: AbstractLogger;
@@ -93,26 +94,27 @@ class CommitmentEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    const updateResult = await this.datasource
-      .createQueryBuilder()
-      .update(CommitmentEntity)
-      .set({ spendBlock: block.hash, spendHeight: block.height })
-      .where('boxId IN (:...ids) AND extractor = :extractor', {
-        ids: spendId,
-        extractor,
-      })
-      .execute();
+    const spendIdChunks = chunk(spendId, 100);
+    for (const spendIdChunk of spendIdChunks) {
+      const updateResult = await this.datasource
+        .createQueryBuilder()
+        .update(CommitmentEntity)
+        .set({ spendBlock: block.hash, spendHeight: block.height })
+        .where({ boxId: In(spendIdChunk) })
+        .andWhere({ extractor: extractor })
+        .execute();
 
-    if (updateResult.affected && updateResult.affected > 0) {
-      const spentRows = await this.commitmentRepository.findBy({
-        boxId: In(spendId),
-        spendBlock: block.hash,
-      });
-      for (const row of spentRows) {
-        this.logger.info(
-          `Spent commitment ${row.id} with boxId ${row.boxId} at height ${block.height}`
-        );
-        this.logger.debug(`Spent commitment ${JSON.stringify(row)}`);
+      if (updateResult.affected && updateResult.affected > 0) {
+        const spentRows = await this.commitmentRepository.findBy({
+          boxId: In(spendIdChunk),
+          spendBlock: block.hash,
+        });
+        for (const row of spentRows) {
+          this.logger.info(
+            `Spent commitment for event [${row.eventId}] with boxId [${row.boxId}] at height ${block.height}`
+          );
+          this.logger.debug(`Spent commitment [${JSON.stringify(row)}]`);
+        }
       }
     }
   };

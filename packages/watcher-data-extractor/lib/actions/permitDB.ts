@@ -3,6 +3,7 @@ import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
+import { chunk } from 'lodash-es';
 
 class PermitEntityAction {
   readonly logger: AbstractLogger;
@@ -131,20 +132,27 @@ class PermitEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    //todo: should change with single db call
-    for (const id of spendId) {
-      this.logger.info(
-        `Spending permit ${id} at height ${block.height} and extractor ${extractor}`
-      );
-      await this.datasource
+    const spendIdChunks = chunk(spendId, 100);
+    for (const spendIdChunk of spendIdChunks) {
+      const updateResult = await this.datasource
         .createQueryBuilder()
         .update(PermitEntity)
         .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where('boxId = :id AND extractor = :extractor', {
-          id: id,
-          extractor: extractor,
-        })
+        .where({ boxId: In(spendIdChunk) })
+        .andWhere({ extractor: extractor })
         .execute();
+
+      if (updateResult.affected && updateResult.affected > 0) {
+        const spentRows = await this.permitRepository.findBy({
+          boxId: In(spendIdChunk),
+          spendBlock: block.hash,
+        });
+        for (const row of spentRows) {
+          this.logger.debug(
+            `Spent permit with boxId [${row.boxId}] belonging to watcher with WID [${row.WID}] at height ${block.height}`
+          );
+        }
+      }
     }
   };
 
