@@ -209,7 +209,9 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
                 }
               }
             } catch (e) {
-              console.log('error during observing cardano transactions', e);
+              this.logger.error(
+                `error during observing cardano transactions: ${e}`
+              );
             }
           }
         }
@@ -219,7 +221,9 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
             resolve(status);
           })
           .catch((e) => {
-            console.log(`An error occurred during store observations: ${e}`);
+            this.logger.error(
+              `An error occurred during store observations: ${e}`
+            );
             reject(e);
           });
       } catch (e) {

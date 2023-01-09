@@ -138,14 +138,14 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
               });
           })
           .catch((e) => {
-            console.log(`Error in soring permits of the block ${block}`);
-            console.log(e);
+            this.logger.error(
+              `Error in soring permits of the block ${block}: ${e}`
+            );
             reject(e);
           });
       } catch (e) {
-        console.log(
-          `block ${block} doesn't save in the database with error`,
-          e
+        this.logger.error(
+          `block ${block} doesn't save in the database with error: ${e}`
         );
         reject(e);
       }

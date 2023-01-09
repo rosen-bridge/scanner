@@ -120,7 +120,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
             resolve(status);
           })
           .catch((e) => {
-            console.log(
+            this.logger.error(
               `An error uncached exception occurred during store ergo observation: ${e}`
             );
             reject(e);
