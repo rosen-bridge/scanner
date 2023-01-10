@@ -59,12 +59,12 @@ export class ObservationEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Storing observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+            `Storing observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(ObservationEntity, entity);
         } else {
           this.logger.info(
-            `Updating observation ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+            `Updating observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             ObservationEntity,

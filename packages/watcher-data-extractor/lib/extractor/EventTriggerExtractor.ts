@@ -10,6 +10,7 @@ import {
 } from '@rosen-bridge/scanner';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
+import { blake2b } from 'blakejs';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -82,7 +83,14 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                       const WIDs = R4Serialized.map((byteArray) =>
                         Buffer.from(byteArray).toString('hex')
                       ).join(',');
+                      const sourceTxId = Buffer.from(
+                        R5Serialized[0]
+                      ).toString();
+                      const eventId = Buffer.from(
+                        blake2b(sourceTxId, undefined, 32)
+                      ).toString('hex');
                       boxes.push({
+                        eventId: eventId,
                         boxId: output.boxId,
                         boxSerialized: Buffer.from(
                           outputParsed.sigma_serialize_bytes()
@@ -104,7 +112,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                         targetChainTokenId: Buffer.from(
                           R5Serialized[9]
                         ).toString(),
-                        sourceTxId: Buffer.from(R5Serialized[0]).toString(),
+                        sourceTxId: sourceTxId,
                         fromChain: Buffer.from(R5Serialized[1]).toString(),
                         fromAddress: Buffer.from(R5Serialized[3]).toString(),
                         sourceBlockId: Buffer.from(R5Serialized[10]).toString(),
@@ -139,7 +147,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
           })
           .catch((e) => {
             this.logger.error(
-              `Error in soring permits of the block ${block}: ${e}`
+              `Error in storing permits of the block ${block}: ${e}`
             );
             reject(e);
           });

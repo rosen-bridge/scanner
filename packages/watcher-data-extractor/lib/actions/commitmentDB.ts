@@ -54,12 +54,12 @@ class CommitmentEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Saving commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+            `Saving commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(CommitmentEntity, entity);
         } else {
           this.logger.info(
-            `Updating commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+            `Updating commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             CommitmentEntity,
@@ -112,7 +112,7 @@ class CommitmentEntityAction {
         });
         for (const row of spentRows) {
           this.logger.info(
-            `Spent commitment for event [${row.eventId}] with boxId [${row.boxId}] at height ${block.height}`
+            `Spent commitment [${row.boxId}] for event [${row.eventId}] at height ${block.height}`
           );
           this.logger.debug(`Spent commitment [${JSON.stringify(row)}]`);
         }
@@ -127,7 +127,7 @@ class CommitmentEntityAction {
    */
   deleteBlockCommitment = async (block: string, extractor: string) => {
     this.logger.info(
-      `Deleting commitments of block ${block} and extractor ${extractor}`
+      `Deleting commitments of block [${block}] and extractor ${extractor}`
     );
     await this.datasource
       .createQueryBuilder()

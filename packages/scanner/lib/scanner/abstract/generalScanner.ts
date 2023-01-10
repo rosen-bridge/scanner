@@ -28,6 +28,11 @@ abstract class GeneralScanner<
    * @param block
    */
   processBlock = async (block: Block) => {
+    this.logger.debug(
+      `Processing block at height [${
+        block.blockHeight
+      }] in scanner ${this.name()}`
+    );
     const txs = await this.networkAccess.getBlockTxs(block.hash);
     return await this.processBlockTransactions(block, txs);
   };

@@ -23,6 +23,7 @@ export class initMigration1659787165000 implements MigrationInterface {
     await queryRunner.query(
       `CREATE TABLE "event_trigger_entity" 
                     ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                    "eventId" varchar NOT NULL, 
                     "extractor" varchar NOT NULL, 
                     "boxId" varchar NOT NULL, 
                     "boxSerialized" varchar NOT NULL, 

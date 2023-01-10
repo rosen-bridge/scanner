@@ -77,6 +77,8 @@ describe('EventTriggerExtractor', () => {
       const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
       expect(event[0]).toEqual({
         id: 1,
+        eventId:
+          '1e379d551cf0aed106c21a9f4b42ddd3b36349a93de799ed54d600acbe05d313',
         extractor: 'extractorId',
         boxId: box.box_id().to_str(),
         boxSerialized: Buffer.from(box.sigma_serialize_bytes()).toString(

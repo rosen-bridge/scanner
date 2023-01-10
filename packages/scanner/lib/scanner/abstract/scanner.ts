@@ -24,6 +24,9 @@ export abstract class AbstractScanner<TransactionType> {
   forkBlock = async (height: number) => {
     let lastBlock = await this.action.getLastSavedBlock();
     while (lastBlock && lastBlock.height >= height) {
+      this.logger.debug(
+        `Reverting block ${lastBlock.hash} at height ${lastBlock.height}`
+      );
       await this.action.revertBlockStatus(lastBlock.height);
       for (const extractor of this.extractors) {
         try {
