@@ -33,7 +33,7 @@ export abstract class AbstractScanner<TransactionType> {
           await extractor.forkBlock(lastBlock.hash);
         } catch (e) {
           this.logger.error(
-            `An error occured during fork block in extractor ${extractor.getId()}: ${e}`
+            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`
           );
         }
       }
