@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/scanner';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
+  eventId: 'eventId',
   WIDs: 'wid2',
   amount: '22',
   bridgeFee: '11',
@@ -24,6 +25,7 @@ const sampleEventTrigger1: ExtractedEventTrigger = {
   sourceChainHeight: 10,
 };
 const sampleEventTrigger2: ExtractedEventTrigger = {
+  eventId: 'eventId',
   WIDs: '1',
   amount: '100',
   bridgeFee: '10',
@@ -54,6 +56,7 @@ const sampleEventTrigger4: ExtractedEventTrigger = {
 const logger = new DummyLogger();
 
 export const sampleEventEntity = {
+  eventId: 'eventId',
   extractor: 'extractorId',
   boxId: 'id',
   boxSerialized: 'boxSerialized',

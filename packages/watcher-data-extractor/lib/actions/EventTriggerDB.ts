@@ -39,43 +39,44 @@ class EventTriggerDB {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      for (const event of eventTriggers) {
+      for (const trigger of eventTriggers) {
         const saved = savedTriggers.some((entity) => {
-          return entity.boxId === event.boxId;
+          return entity.boxId === trigger.boxId;
         });
         const entity = {
-          boxId: event.boxId,
-          boxSerialized: event.boxSerialized,
+          eventId: trigger.eventId,
+          boxId: trigger.boxId,
+          boxSerialized: trigger.boxSerialized,
           block: block.hash,
           height: block.height,
           extractor: extractor,
-          WIDs: event.WIDs,
-          amount: event.amount,
-          bridgeFee: event.bridgeFee,
-          fromAddress: event.fromAddress,
-          toAddress: event.toAddress,
-          fromChain: event.fromChain,
-          networkFee: event.networkFee,
-          sourceChainTokenId: event.sourceChainTokenId,
-          targetChainTokenId: event.targetChainTokenId,
-          sourceBlockId: event.sourceBlockId,
-          toChain: event.toChain,
-          sourceTxId: event.sourceTxId,
-          sourceChainHeight: event.sourceChainHeight,
+          WIDs: trigger.WIDs,
+          amount: trigger.amount,
+          bridgeFee: trigger.bridgeFee,
+          fromAddress: trigger.fromAddress,
+          toAddress: trigger.toAddress,
+          fromChain: trigger.fromChain,
+          networkFee: trigger.networkFee,
+          sourceChainTokenId: trigger.sourceChainTokenId,
+          targetChainTokenId: trigger.targetChainTokenId,
+          sourceBlockId: trigger.sourceBlockId,
+          toChain: trigger.toChain,
+          sourceTxId: trigger.sourceTxId,
+          sourceChainHeight: trigger.sourceChainHeight,
         };
         if (!saved) {
           this.logger.info(
-            `Storing event trigger ${event.boxId} at height ${block.height} and extractor ${extractor}`
+            `Storing event trigger [${trigger.boxId}] for event [${trigger.eventId}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(EventTriggerEntity, entity);
         } else {
           this.logger.info(
-            `Updating event trigger ${event.boxId} at height ${block.height} and extractor ${extractor}`
+            `Updating event trigger ${trigger.boxId} for event [${trigger.eventId}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             EventTriggerEntity,
             {
-              boxId: event.boxId,
+              boxId: trigger.boxId,
             },
             entity
           );
@@ -123,9 +124,9 @@ class EventTriggerDB {
         });
         for (const row of spentRows) {
           this.logger.info(
-            `Spent trigger of event [${row.id}] with boxId [${row.boxId}] at height ${block.height}`
+            `Spent trigger [${row.boxId}] of event [${row.eventId}] at height ${block.height}`
           );
-          this.logger.debug(`Spent trigger [${JSON.stringify(row)}]`);
+          this.logger.debug(`Spent trigger: [${JSON.stringify(row)}]`);
         }
       }
     }

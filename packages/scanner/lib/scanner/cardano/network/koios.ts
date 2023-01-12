@@ -1,7 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { TxBuilder } from 'ergo-lib-wasm-nodejs';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
-import { retryRequest } from '../../../utils/utils';
 import {
   KoiosBlock,
   KoiosBlockInfo,
@@ -42,12 +40,10 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
             };
           })
           .catch((exp) => {
-            console.log(exp);
             throw exp;
           });
       })
       .catch((exp) => {
-        console.log(exp);
         throw exp;
       });
   };
@@ -59,7 +55,6 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       })
       .then((res) => res.data[0].block_height)
       .catch((exp) => {
-        console.log(exp);
         throw exp;
       });
   };
@@ -93,7 +88,6 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         }
       })
       .catch((exp) => {
-        console.log(exp);
         throw exp;
       });
   };

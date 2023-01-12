@@ -18,6 +18,7 @@ import {
 } from '@cardano-ogmios/client/dist/ChainSync';
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
+import { AbstractLogger } from '../../../loger/AbstractLogger';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -36,8 +37,8 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   port: number;
   name = () => 'cardano-ogmios';
 
-  constructor(config: CardanoOgmiosConfig) {
-    super();
+  constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
+    super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name());
     this.host = config.nodeIp;
     this.port = config.nodePort;
@@ -59,6 +60,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   ) => {
     const hash = (response.point as Point).hash;
     const block = await this.action.getBlockWithHash(hash);
+    this.logger.debug(
+      `Rolling backward to height ${block?.height} in scanner ${this.name()}`
+    );
     if (block) {
       await this.forkBlock(block.height + 1);
     }
@@ -73,6 +77,11 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   rollForward = async (response: ForwardResponse, requestNext: () => void) => {
     if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
       const babbageBlock = (response.block as Babbage).babbage;
+      this.logger.debug(
+        `Processing new block at height ${
+          babbageBlock.header.blockHeight
+        } in scanner ${this.name()}`
+      );
       const block = {
         hash: babbageBlock.headerHash,
         blockHeight: babbageBlock.header.blockHeight,
@@ -127,8 +136,8 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
    */
   start = async (): Promise<void> => {
     const context: InteractionContext = await createInteractionContext(
-      (err) => console.error(err),
-      () => console.log('Connection closed.'),
+      (err) => this.logger.error(`${err}`),
+      () => this.logger.debug('Connection closed.'),
       { connection: { port: 1337, host: this.host } }
     );
     const intersect = await this.findIntersection(context);

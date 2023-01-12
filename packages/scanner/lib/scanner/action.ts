@@ -159,7 +159,7 @@ export class BlockDbAction {
       });
       return res ? res : false;
     } catch (exp) {
-      console.error(`An error occurred during save new block: ${exp}`);
+      this.logger.error(`An error occurred during save new block: ${exp}`);
       return false;
     }
   };

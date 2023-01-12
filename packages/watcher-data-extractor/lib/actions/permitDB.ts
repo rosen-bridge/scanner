@@ -44,6 +44,14 @@ class PermitEntityAction {
           WID: permit.WID,
         };
         await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+        this.logger.info(
+          `Storing initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
+        );
+        this.logger.debug(
+          `Stored permit Entity: [${JSON.stringify(
+            entity
+          )}] and extractor ${extractor}`
+        );
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -93,13 +101,13 @@ class PermitEntityAction {
           WID: permit.WID,
         };
         if (!saved) {
-          this.logger.info(
-            `Saving permit ${permit.boxId} at height ${block.height} and extractor ${extractor}`
+          this.logger.debug(
+            `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(PermitEntity, entity);
         } else {
-          this.logger.info(
-            `Updating permit ${permit.boxId} at height ${block.height} and extractor ${extractor}`
+          this.logger.debug(
+            `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             PermitEntity,

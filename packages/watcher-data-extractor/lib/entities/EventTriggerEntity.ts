@@ -7,6 +7,9 @@ class EventTriggerEntity {
   id: number;
 
   @Column()
+  eventId: string;
+
+  @Column()
   extractor: string;
 
   @Column()

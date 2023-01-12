@@ -116,8 +116,9 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
           })
           .catch((e) => reject(e));
       } catch (e) {
-        console.log(`Error in soring permits of the block ${block}`);
-        console.log(e);
+        this.logger.error(
+          `Error in soring permits of the block ${block}: ${e}`
+        );
         reject(e);
       }
     });

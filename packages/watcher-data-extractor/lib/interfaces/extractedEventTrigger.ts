@@ -1,4 +1,5 @@
 interface ExtractedEventTrigger {
+  eventId: string;
   boxId: string;
   boxSerialized: string;
   fromChain: string;
