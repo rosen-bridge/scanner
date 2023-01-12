@@ -126,7 +126,6 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
-      /* empty */
     }
   };
 }

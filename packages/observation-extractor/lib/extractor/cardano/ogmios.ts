@@ -155,8 +155,8 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
           }
         }
       }
-    } catch {
-      /* empty */
+    } catch (e) {
+      this.logger.warn(`Error during fetch rosen data. ${e}`);
     }
     return undefined;
   };
