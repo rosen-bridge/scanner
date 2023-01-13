@@ -11,6 +11,7 @@ export class networkModelMigration1671715090347 implements MigrationInterface {
                                         "parentHash" varchar(64) NOT NULL, 
                                         "status" varchar NOT NULL, 
                                         "scanner" varchar NOT NULL, 
+                                        "extra" varchar,
                                         CONSTRAINT "UQ_7e20625b11840edf7f120565c3d" UNIQUE ("parentHash", "scanner"), 
                                         CONSTRAINT "UQ_b1e24c5950a7c3dd48d92bbfbb2" UNIQUE ("hash", "scanner"), 
                                         CONSTRAINT "UQ_521d830047d5fe08988538289dd" UNIQUE ("height", "scanner"))`);
