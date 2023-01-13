@@ -2,6 +2,8 @@ import { DataSource, In, Repository } from 'typeorm';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
+import { chunk } from 'lodash-es';
+import { dbIdChunkSize } from '../constants';
 
 class CommitmentEntityAction {
   readonly logger: AbstractLogger;
@@ -52,12 +54,12 @@ class CommitmentEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Saving commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+            `Saving commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(CommitmentEntity, entity);
         } else {
           this.logger.info(
-            `Updating commitment ${commitment.boxId} at height ${block.height} and extractor ${extractor}`
+            `Updating commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             CommitmentEntity,
@@ -93,26 +95,27 @@ class CommitmentEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    const updateResult = await this.datasource
-      .createQueryBuilder()
-      .update(CommitmentEntity)
-      .set({ spendBlock: block.hash, spendHeight: block.height })
-      .where('boxId IN (:...ids) AND extractor = :extractor', {
-        ids: spendId,
-        extractor,
-      })
-      .execute();
+    const spendIdChunks = chunk(spendId, dbIdChunkSize);
+    for (const spendIdChunk of spendIdChunks) {
+      const updateResult = await this.datasource
+        .createQueryBuilder()
+        .update(CommitmentEntity)
+        .set({ spendBlock: block.hash, spendHeight: block.height })
+        .where({ boxId: In(spendIdChunk) })
+        .andWhere({ extractor: extractor })
+        .execute();
 
-    if (updateResult.affected && updateResult.affected > 0) {
-      const spentRows = await this.commitmentRepository.findBy({
-        boxId: In(spendId),
-        spendBlock: block.hash,
-      });
-      for (const row of spentRows) {
-        this.logger.info(
-          `Spent commitment ${row.id} with boxId ${row.boxId} at height ${block.height}`
-        );
-        this.logger.debug(`Spent commitment ${JSON.stringify(row)}`);
+      if (updateResult.affected && updateResult.affected > 0) {
+        const spentRows = await this.commitmentRepository.findBy({
+          boxId: In(spendIdChunk),
+          spendBlock: block.hash,
+        });
+        for (const row of spentRows) {
+          this.logger.info(
+            `Spent commitment [${row.boxId}] for event [${row.eventId}] at height ${block.height}`
+          );
+          this.logger.debug(`Spent commitment [${JSON.stringify(row)}]`);
+        }
       }
     }
   };
@@ -124,7 +127,7 @@ class CommitmentEntityAction {
    */
   deleteBlockCommitment = async (block: string, extractor: string) => {
     this.logger.info(
-      `Deleting commitments of block ${block} and extractor ${extractor}`
+      `Deleting commitments of block [${block}] and extractor ${extractor}`
     );
     await this.datasource
       .createQueryBuilder()

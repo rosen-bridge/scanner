@@ -3,6 +3,8 @@ import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
 import CommitmentEntity from '../entities/CommitmentEntity';
+import { chunk } from 'lodash-es';
+import { dbIdChunkSize } from '../constants';
 
 class PermitEntityAction {
   readonly logger: AbstractLogger;
@@ -42,6 +44,14 @@ class PermitEntityAction {
           WID: permit.WID,
         };
         await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+        this.logger.info(
+          `Storing initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
+        );
+        this.logger.debug(
+          `Stored permit Entity: [${JSON.stringify(
+            entity
+          )}] and extractor ${extractor}`
+        );
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -91,13 +101,13 @@ class PermitEntityAction {
           WID: permit.WID,
         };
         if (!saved) {
-          this.logger.info(
-            `Saving permit ${permit.boxId} at height ${block.height} and extractor ${extractor}`
+          this.logger.debug(
+            `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.insert(PermitEntity, entity);
         } else {
-          this.logger.info(
-            `Updating permit ${permit.boxId} at height ${block.height} and extractor ${extractor}`
+          this.logger.debug(
+            `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await queryRunner.manager.update(
             PermitEntity,
@@ -131,20 +141,27 @@ class PermitEntityAction {
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    //todo: should change with single db call
-    for (const id of spendId) {
-      this.logger.info(
-        `Spending permit ${id} at height ${block.height} and extractor ${extractor}`
-      );
-      await this.datasource
+    const spendIdChunks = chunk(spendId, dbIdChunkSize);
+    for (const spendIdChunk of spendIdChunks) {
+      const updateResult = await this.datasource
         .createQueryBuilder()
         .update(PermitEntity)
         .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where('boxId = :id AND extractor = :extractor', {
-          id: id,
-          extractor: extractor,
-        })
+        .where({ boxId: In(spendIdChunk) })
+        .andWhere({ extractor: extractor })
         .execute();
+
+      if (updateResult.affected && updateResult.affected > 0) {
+        const spentRows = await this.permitRepository.findBy({
+          boxId: In(spendIdChunk),
+          spendBlock: block.hash,
+        });
+        for (const row of spentRows) {
+          this.logger.debug(
+            `Spent permit with boxId [${row.boxId}] belonging to watcher with WID [${row.WID}] at height ${block.height}`
+          );
+        }
+      }
     }
   };
 
