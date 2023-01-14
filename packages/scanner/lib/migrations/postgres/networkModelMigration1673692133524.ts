@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class networkModelMigration1671715090347 implements MigrationInterface {
-  name = 'networkModelMigration1671715090347';
+export class networkModelMigration1673692133524 implements MigrationInterface {
+  name = 'networkModelMigration1673692133524';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE "block_entity" (
