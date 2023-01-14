@@ -42,9 +42,9 @@ export class BoxEntityAction {
           extractor: extractor,
         };
         this.logger.info(
-          `Storing initial box ${box.boxId} and extractor ${extractor}`
+          `Storing initial box ${box.boxId} with extractor ${extractor}`
         );
-        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
+        this.logger.debug(`Stored box entity: [${JSON.stringify(entity)}]`);
         await repository.insert(entity);
       }
       await queryRunner.commitTransaction();

@@ -1,14 +1,18 @@
 import { AbstractExtractor, Block } from '../../interfaces';
 import { BlockDbAction } from '../action';
+import { AbstractLogger } from '../../loger/AbstractLogger';
+import { DummyLogger } from '../../loger/DummyLogger';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
   extractors: Array<AbstractExtractor<TransactionType>>;
   extractorInitialization: Array<boolean>;
+  logger: AbstractLogger;
 
-  constructor() {
+  constructor(logger?: AbstractLogger) {
     this.extractors = [];
     this.extractorInitialization = [];
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   abstract name: () => string;
@@ -20,13 +24,16 @@ export abstract class AbstractScanner<TransactionType> {
   forkBlock = async (height: number) => {
     let lastBlock = await this.action.getLastSavedBlock();
     while (lastBlock && lastBlock.height >= height) {
+      this.logger.debug(
+        `Reverting block ${lastBlock.hash} at height ${lastBlock.height}`
+      );
       await this.action.revertBlockStatus(lastBlock.height);
       for (const extractor of this.extractors) {
         try {
           await extractor.forkBlock(lastBlock.hash);
         } catch (e) {
-          console.log(
-            `An error occured during fork block in extractor ${extractor.getId()}: ${e}`
+          this.logger.error(
+            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`
           );
         }
       }
