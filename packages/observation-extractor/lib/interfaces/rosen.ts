@@ -16,4 +16,12 @@ interface CardanoRosenData {
   fromAddress: string;
 }
 
-export { RosenData, CardanoRosenData };
+interface RawCardanoRosenData {
+  to: string;
+  networkFee: string;
+  bridgeFee: string;
+  toAddress: string;
+  fromAddress: string[];
+}
+
+export { RosenData, CardanoRosenData, RawCardanoRosenData };

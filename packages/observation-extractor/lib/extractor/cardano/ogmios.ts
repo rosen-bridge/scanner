@@ -8,12 +8,13 @@ import { AuxiliaryData, TxBabbage, TxOut } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ObservationEntityAction } from '../../actions/db';
-import { getDictValue, JsonObject, ListObject } from '../utils';
+import { getDictValue, JsonObject, ListObject, MetadataObject } from '../utils';
 import { CARDANO_NATIVE_TOKEN } from '../const';
-import { CardanoRosenData } from '../../interfaces/rosen';
+import { CardanoRosenData, RawCardanoRosenData } from '../../interfaces/rosen';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { isArray, isPlainObject, isString } from 'lodash-es';
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabbage> {
   readonly logger: AbstractLogger;
@@ -37,15 +38,35 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
     this.actions = new ObservationEntityAction(dataSource, this.logger);
   }
 
-  getObjectKeyAsStringOrUndefined = (
-    val: JsonObject,
-    key: string
-  ): string | undefined => {
-    if (Object.prototype.hasOwnProperty.call(val, key)) {
-      const res = val[key];
-      if (typeof res === 'string') return res;
-    }
-    return undefined;
+  private isJsonObject = (
+    metadataObject: MetadataObject
+  ): metadataObject is JsonObject => {
+    return isPlainObject(metadataObject);
+  };
+
+  private isCardanoRosenData = (
+    metadataObject: MetadataObject
+  ): metadataObject is JsonObject => {
+    if (!this.isJsonObject(metadataObject)) return false;
+
+    const assertedMetadataObject =
+      metadataObject as Partial<RawCardanoRosenData>;
+
+    const isToChainValid = isString(assertedMetadataObject.to);
+    const isNetworkFeeValid = isString(assertedMetadataObject.networkFee);
+    const isBridgeFeeValid = isString(assertedMetadataObject.bridgeFee);
+    const isToAddressValid = isString(assertedMetadataObject.toAddress);
+    const isFromAddressValid =
+      isArray(assertedMetadataObject.fromAddress) &&
+      assertedMetadataObject.fromAddress.every(isString);
+
+    return (
+      isToChainValid &&
+      isNetworkFeeValid &&
+      isBridgeFeeValid &&
+      isToAddressValid &&
+      isFromAddressValid
+    );
   };
 
   /**
@@ -124,35 +145,22 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
       const blob = metaData.body.blob;
       if (blob?.['0']) {
         const value = getDictValue(blob['0']);
-        if (value && typeof value === 'object') {
-          const toChain = this.getObjectKeyAsStringOrUndefined(
-            value as JsonObject,
-            'to'
-          );
-          const bridgeFee = this.getObjectKeyAsStringOrUndefined(
-            value as JsonObject,
-            'bridgeFee'
-          );
-          const networkFee = this.getObjectKeyAsStringOrUndefined(
-            value as JsonObject,
-            'networkFee'
-          );
-          const toAddress = this.getObjectKeyAsStringOrUndefined(
-            value as JsonObject,
-            'toAddress'
-          );
-          const fromAddress = (
-            (value as JsonObject).fromAddress as ListObject
-          ).join('');
-          if (toChain && bridgeFee && networkFee && toAddress && fromAddress) {
-            return {
-              toChain,
-              bridgeFee,
-              networkFee,
-              toAddress,
-              fromAddress,
-            };
-          }
+        if (this.isCardanoRosenData(value)) {
+          const rawRosenData = value as unknown as RawCardanoRosenData;
+
+          const toChain = rawRosenData.to;
+          const bridgeFee = rawRosenData.bridgeFee;
+          const networkFee = rawRosenData.networkFee;
+          const toAddress = rawRosenData.toAddress;
+          const fromAddress = rawRosenData.fromAddress.join('');
+
+          return {
+            toChain,
+            bridgeFee,
+            networkFee,
+            toAddress,
+            fromAddress,
+          };
         }
       }
     } catch (e) {
