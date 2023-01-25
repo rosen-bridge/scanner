@@ -144,6 +144,24 @@ describe('CardanoOgmiosObservationExtractor', () => {
     });
 
     /**
+     * Target:
+     * It should return `undefined` if `blob['0']` doesn't exist
+     *
+     * Dependencies:
+     * N/A
+     *
+     * Scenario:
+     * N/A
+     *
+     * Expected output:
+     * It should return `undefined`
+     */
+    it("should return `undefined` if `blob['0']` doesn't exist", () => {
+      const res = extractor.getRosenData(AuxiliaryDatas.noBlobZeroKey);
+      expect(res).toBeUndefined();
+    });
+
+    /**
      * Test return valid undefined when blob index 0 contain no json value
      * Dependency: Nothing
      * Scenario: try getting rosen data from a transaction metadata blob contain only strings

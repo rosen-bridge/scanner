@@ -122,7 +122,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
   getRosenData = (metaData: AuxiliaryData): CardanoRosenData | undefined => {
     try {
       const blob = metaData.body.blob;
-      if (blob) {
+      if (blob?.['0']) {
         const value = getDictValue(blob['0']);
         if (value && typeof value === 'object') {
           const toChain = this.getObjectKeyAsStringOrUndefined(
