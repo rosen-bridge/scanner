@@ -1753,6 +1753,63 @@ export const AuxiliaryDatas = {
       scripts: [],
     },
   },
+  noBlobZeroKey: {
+    hash: '1c278913fc51ccef7681929feb60be65b383b741c5ea698bb5f5332c98bd163d',
+    body: {
+      blob: {
+        '1': {
+          map: [
+            {
+              k: {
+                string: 'to',
+              },
+              v: {
+                string: 'ergo',
+              },
+            },
+            {
+              k: {
+                string: 'bridgeFee',
+              },
+              v: {
+                string: '3000',
+              },
+            },
+            {
+              k: {
+                string: 'networkFee',
+              },
+              v: {
+                string: '300',
+              },
+            },
+            {
+              k: {
+                string: 'toAddress',
+              },
+              v: {
+                string: '9hZxV3YNSfbCqS6GEses7DhAVSatvaoNtdsiNvkimPGG2c8fzkG',
+              },
+            },
+            {
+              k: {
+                string: 'fromAddress',
+              },
+              v: {
+                list: [
+                  {
+                    string:
+                      '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      scripts: [],
+    },
+  },
   noJson: {
     hash: '484b3aae1d0a97347e0bc4e3626d96c2e27a507d17bb985e7d8e76415bf73fdf',
     body: {
