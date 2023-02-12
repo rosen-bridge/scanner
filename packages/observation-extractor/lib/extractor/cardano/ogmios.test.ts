@@ -6,6 +6,8 @@ import { AuxiliaryDatas, OgmiosBoxes, Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/scanner';
 import { ObservationEntity } from '../../entities/observationEntity';
 
+import { cloneDeep, set } from 'lodash-es';
+
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;
 const bankAddress =
@@ -23,47 +25,6 @@ describe('CardanoOgmiosObservationExtractor', () => {
 
   beforeEach(async () => {
     await clearDB(dataSource);
-  });
-
-  describe('getObjectKeyAsStringOrUndefined', () => {
-    /**
-     *  Test returning value from json
-     *  Dependency: Nothing
-     *  Scenario: Try to get value of key1
-     *  Expected: value1
-     */
-    it('should return field value in json when exists', () => {
-      const val = { key1: 'value1', key2: 'value2' };
-      expect(extractor.getObjectKeyAsStringOrUndefined(val, 'key1')).toEqual(
-        'value1'
-      );
-    });
-
-    /**
-     *  Test returning undefined when key does not exist in json
-     *  Dependency: Nothing
-     *  Scenario: Try to get value of key3
-     *  Expected: undefined
-     */
-    it('should return undefined when one key does not exists', () => {
-      const val = { key1: 'value1', key2: 'value2' };
-      expect(
-        extractor.getObjectKeyAsStringOrUndefined(val, 'key3')
-      ).toBeUndefined();
-    });
-
-    /**
-     *  Test returning undefined when value is not string
-     *  Dependency: Nothing
-     *  Scenario: Try to get value of key2
-     *  Expected: undefined
-     */
-    it('should return undefined when value is not string', () => {
-      const val = { key1: 'value1', key2: [] };
-      expect(
-        extractor.getObjectKeyAsStringOrUndefined(val, 'key2')
-      ).toBeUndefined();
-    });
   });
 
   describe('getTokenDetail', () => {
@@ -141,6 +102,112 @@ describe('CardanoOgmiosObservationExtractor', () => {
     it('should return valid rosen data', () => {
       const res = extractor.getRosenData(AuxiliaryDatas.noBlob);
       expect(res).toBeUndefined();
+    });
+
+    /**
+     * Target:
+     * It should return `undefined` if `blob['0']` doesn't exist
+     *
+     * Dependencies:
+     * N/A
+     *
+     * Scenario:
+     * N/A
+     *
+     * Expected output:
+     * It should return `undefined`
+     */
+    it("should return `undefined` if `blob['0']` doesn't exist", () => {
+      const res = extractor.getRosenData(AuxiliaryDatas.noBlobZeroKey);
+      expect(res).toBeUndefined();
+    });
+
+    /**
+     * Target:
+     * It should return `undefined` if `blob['0']` has wrong keys
+     *
+     * Dependencies:
+     * N/A
+     *
+     * Scenario:
+     * N/A
+     *
+     * Expected output:
+     * It should return `undefined`
+     */
+    it("should return `undefined` if `blob['0']` has wrong keys", () => {
+      const invalidKeyEvents = [
+        set(
+          cloneDeep(AuxiliaryDatas.validEvent),
+          'body.blob.0.map.0.k.string',
+          'dumb'
+        ),
+        set(
+          cloneDeep(AuxiliaryDatas.validEvent),
+          'body.blob.0.map.1.k.string',
+          'dumb'
+        ),
+        set(
+          cloneDeep(AuxiliaryDatas.validEvent),
+          'body.blob.0.map.2.k.string',
+          'dumb'
+        ),
+        set(
+          cloneDeep(AuxiliaryDatas.validEvent),
+          'body.blob.0.map.3.k.string',
+          'dumb'
+        ),
+        set(
+          cloneDeep(AuxiliaryDatas.validEvent),
+          'body.blob.0.map.4.k.string',
+          'dumb'
+        ),
+      ];
+
+      invalidKeyEvents.forEach((invalidKeyEvent) => {
+        const res = extractor.getRosenData(invalidKeyEvent);
+
+        expect(res).toBeUndefined();
+      });
+    });
+
+    /**
+     * Target:
+     * It should return `undefined` if `blob['0']` has wrong values for valid keys
+     *
+     * Dependencies:
+     * N/A
+     *
+     * Scenario:
+     * N/A
+     *
+     * Expected output:
+     * It should return `undefined`
+     */
+    it("should return `undefined` if `blob['0']` has wrong values for valid keys", () => {
+      const invalidValueTypesEvents = [
+        set(cloneDeep(AuxiliaryDatas.validEvent), 'body.blob.0.map.0.v', {
+          list: [],
+        }),
+        set(cloneDeep(AuxiliaryDatas.validEvent), 'body.blob.0.map.1.v', {
+          list: [],
+        }),
+        set(cloneDeep(AuxiliaryDatas.validEvent), 'body.blob.0.map.2.v', {
+          list: [],
+        }),
+        set(cloneDeep(AuxiliaryDatas.validEvent), 'body.blob.0.map.3.v', {
+          list: [],
+        }),
+        set(cloneDeep(AuxiliaryDatas.validEvent), 'body.blob.0.map.4.v', {
+          int: 1,
+        }),
+      ];
+
+      invalidValueTypesEvents.forEach((invalidKeyEvent) => {
+        const res = extractor.getRosenData(invalidKeyEvent);
+
+        expect(res).toBeUndefined();
+      });
     });
 
     /**
