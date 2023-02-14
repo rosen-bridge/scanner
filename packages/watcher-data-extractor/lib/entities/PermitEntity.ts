@@ -25,7 +25,7 @@ class PermitEntity {
   height: number;
 
   @Column({ nullable: true })
-  spendBlock!: string;
+  spendBlock?: string;
 
   @Column({ nullable: true })
   spendHeight?: number;

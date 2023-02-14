@@ -43,6 +43,7 @@ class CommitmentEntityAction {
           return entity.boxId === commitment.boxId;
         });
         const entity = {
+          txId: commitment.txId,
           commitment: commitment.commitment,
           eventId: commitment.eventId,
           boxId: commitment.boxId,

@@ -5,6 +5,7 @@ import { loadDataBase } from '../extractor/utilsFunctions.mock';
 import { DummyLogger } from '@rosen-bridge/scanner';
 
 const commitment1 = {
+  txId: 'txId1',
   WID: 'wid1',
   commitment: 'commitment1',
   eventId: 'eventId1',
@@ -12,6 +13,7 @@ const commitment1 = {
   boxSerialized: 'box1',
 };
 const commitment2 = {
+  txId: 'txId2',
   WID: 'wid2',
   commitment: 'commitment2',
   eventId: 'eventId2',
