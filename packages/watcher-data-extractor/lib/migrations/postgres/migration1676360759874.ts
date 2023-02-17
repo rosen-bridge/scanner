@@ -5,7 +5,7 @@ export class migration1676360759874 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "event_trigger_entity" ADD "txId" varchar NOT NULL DEFAULT ""`
+      `ALTER TABLE "event_trigger_entity" ADD "txId" varchar NOT NULL DEFAULT ''`
     );
     await queryRunner.query(
       `ALTER TABLE "event_trigger_entity" ADD "spendTxId" varchar`
