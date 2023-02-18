@@ -77,6 +77,7 @@ describe('EventTriggerExtractor', () => {
       const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
       expect(event[0]).toEqual({
         id: 1,
+        txId: tx1.id,
         eventId:
           '1e379d551cf0aed106c21a9f4b42ddd3b36349a93de799ed54d600acbe05d313',
         extractor: 'extractorId',
@@ -101,6 +102,7 @@ describe('EventTriggerExtractor', () => {
         WIDs: 'ff',
         spendBlock: null,
         spendHeight: null,
+        spendTxId: null,
       });
       expect(rowsCount).toBe(1);
     });

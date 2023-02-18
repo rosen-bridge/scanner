@@ -7,6 +7,9 @@ class CommitmentEntity {
   id: number;
 
   @Column()
+  txId: string;
+
+  @Column()
   extractor: string;
 
   @Column()

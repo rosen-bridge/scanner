@@ -87,6 +87,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                   const requestId = Buffer.from(R5Value[0]).toString('hex');
                   const eventDigest = Buffer.from(R6Value).toString('hex');
                   commitments.push({
+                    txId: transaction.id,
                     WID: WID,
                     commitment: eventDigest,
                     eventId: requestId,
