@@ -15,11 +15,13 @@ import {
 } from '@rosen-bridge/scanner';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ERGO_NATIVE_TOKEN } from '../const';
+import { NodeRosenExtractor } from '../../../../../../utils/packages/rosen-extractor';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
+  private readonly nodeExtractor: NodeRosenExtractor;
   private readonly actions: ObservationEntityAction;
   private readonly bankErgoTree: string;
   static readonly FROM_CHAIN: string = 'ergo';
@@ -38,6 +40,11 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     this.tokens = new TokenMap(tokens);
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
+    this.nodeExtractor = new NodeRosenExtractor(
+      this.bankErgoTree,
+      tokens,
+      this.logger
+    );
   }
 
   /**
@@ -110,36 +117,25 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
       try {
         const observations: Array<ExtractedObservation> = [];
         txs.forEach((transaction) => {
-          for (const output of transaction.outputs) {
-            if (
-              output.ergoTree === this.bankErgoTree &&
-              output.additionalRegisters &&
-              output.additionalRegisters.R4
-            ) {
-              const data = this.getTransferData(output);
-              if (data !== undefined && output.assets) {
-                const requestId = Buffer.from(
-                  blake2b(output.transactionId, undefined, 32)
-                ).toString('hex');
-                observations.push({
-                  fromChain: ErgoObservationExtractor.FROM_CHAIN,
-                  toChain: data.toChain,
-                  networkFee: data.networkFee,
-                  bridgeFee: data.bridgeFee,
-                  amount: data.amount.toString(),
-                  sourceChainTokenId: data.tokenId,
-                  targetChainTokenId: this.toTargetToken(
-                    data.tokenId,
-                    data.toChain
-                  ),
-                  sourceTxId: output.transactionId,
-                  sourceBlockId: block.hash,
-                  requestId: requestId,
-                  toAddress: data.toAddress,
-                  fromAddress: data.fromAddress,
-                });
-              }
-            }
+          const data = this.nodeExtractor.get(transaction);
+          if (data) {
+            const requestId = Buffer.from(
+              blake2b(transaction.id, undefined, 32)
+            ).toString('hex');
+            observations.push({
+              fromChain: ErgoObservationExtractor.FROM_CHAIN,
+              toChain: data.toChain,
+              networkFee: data.networkFee,
+              bridgeFee: data.bridgeFee,
+              amount: data.amount,
+              sourceChainTokenId: data.sourceChainTokenId,
+              targetChainTokenId: data.targetChainTokenId,
+              sourceTxId: data.sourceTxId,
+              sourceBlockId: block.hash,
+              requestId: requestId,
+              toAddress: data.toAddress,
+              fromAddress: data.fromAddress,
+            });
           }
         });
         this.actions
