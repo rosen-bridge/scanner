@@ -12,7 +12,7 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   constructor(config: CardanoKoiosConfig, logger?: AbstractLogger) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name());
-    this.initialHeight = config.initialHeight;
+    this.initialHeight = config.initialHeight + 1;
     this.networkAccess = new KoiosNetwork(config.koiosUrl, config.timeout);
   }
 

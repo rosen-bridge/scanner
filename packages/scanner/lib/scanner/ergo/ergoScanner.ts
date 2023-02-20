@@ -15,7 +15,7 @@ class ErgoNodeScanner extends GeneralScanner<Transaction> {
   constructor(config: ErgoScannerConfig, logger?: AbstractLogger) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name());
-    this.initialHeight = config.initialHeight;
+    this.initialHeight = config.initialHeight + 1;
     this.networkAccess = new ErgoNetworkApi(config.nodeUrl, config.timeout);
     this.logger = logger ? logger : new DummyLogger();
   }
