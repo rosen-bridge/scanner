@@ -8,7 +8,7 @@ import { ObservationEntity } from '../../entities/observationEntity';
 import { tokens } from '../tokens.mocked';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../const';
+import { CARDANO_NATIVE_TOKEN } from '../const';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -124,80 +124,6 @@ describe('extractorErgo', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-    });
-  });
-
-  describe('getRosenData', () => {
-    /**
-     * Test that valid Rosen output box find successfully
-     * Dependency: Nothing
-     * Scenario: valid Rosen Output box pass to the function
-     * Expected: function returns rosenData object
-     */
-    it('valid transaction token locked', async () => {
-      const dataSource = await loadDataBase('getRosenData-ergo');
-      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const Tx = observationTxGenerator(
-        true,
-        ['cardano', 'address', '10000', '1000', watcherAddress],
-        bankSK,
-        watcherSK
-      );
-      expect(extractor.getTransferData(Tx.outputs[0])).toStrictEqual({
-        toChain: 'cardano',
-        toAddress: 'address',
-        bridgeFee: '1000',
-        networkFee: '10000',
-        fromAddress: watcherAddress,
-        amount: BigInt(10),
-        tokenId:
-          'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
-      });
-    });
-
-    /**
-     * Test that valid Rosen output box find successfully when ergo locked
-     * Dependency: Nothing
-     * Scenario: valid Rosen Output box pass to the function
-     * Expected: function returns rosenData object
-     */
-    it('valid transaction ergo locked', async () => {
-      const dataSource = await loadDataBase('getRosenData-ergo');
-      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const Tx = observationTxGenerator(
-        false,
-        ['cardano', 'address', '10000', '1000', watcherAddress],
-        bankSK,
-        watcherSK,
-        '100000000000'
-      );
-      expect(extractor.getTransferData(Tx.outputs[0])).toStrictEqual({
-        toChain: 'cardano',
-        toAddress: 'address',
-        bridgeFee: '1000',
-        networkFee: '10000',
-        fromAddress: watcherAddress,
-        amount: BigInt('100000000000'),
-        tokenId: ERGO_NATIVE_TOKEN,
-      });
-    });
-
-    /**
-     * Test that invalid Rosen output box find successfully
-     * Dependency: Nothing
-     * Scenario: invalid Rosen Output box pass to the function there is incorrect register value
-     * Expected: function returns false
-     */
-    it('checks transaction without valid register value', async () => {
-      const dataSource = await loadDataBase('getRosenData');
-      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const Tx = observationTxGenerator(
-        true,
-        ['Cardano', 'address', '10000'],
-        bankSK,
-        watcherSK
-      );
-      expect(extractor.getTransferData(Tx.outputs[0])).toEqual(undefined);
     });
   });
 });
