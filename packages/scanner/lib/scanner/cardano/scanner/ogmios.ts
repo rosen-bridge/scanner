@@ -18,7 +18,7 @@ import {
 } from '@cardano-ogmios/client/dist/ChainSync';
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
-import { AbstractLogger } from '../../../loger/AbstractLogger';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 
 interface BackwardResponse {
   point: PointOrOrigin;

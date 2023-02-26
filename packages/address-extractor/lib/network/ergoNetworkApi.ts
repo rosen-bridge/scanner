@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { Boxes } from '../interfaces/types';
 import { JsonBI } from './parser';
-import { AbstractLogger } from '@rosen-bridge/scanner';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 
 export class ExplorerApi {
   api: AxiosInstance;
