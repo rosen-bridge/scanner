@@ -24,18 +24,26 @@ abstract class WebSocketScanner<
   insert = (block: Block, transactions: Array<TransactionType>) => {
     this.semaphore.acquire().then((release) => {
       const element = { block, transactions, fork: false };
-      for (let index = this.queue.length - 1; index > 0; index--) {
-        if (this.queue[index].block.blockHeight == block.blockHeight) {
-          this.queue[index] = element;
-        } else if (this.queue[index].block.blockHeight > block.blockHeight) {
-          this.queue = [
-            ...this.queue.slice(0, index),
-            element,
-            ...this.queue.slice(index + 1),
-          ];
-        }
-        release();
+      let index = 0;
+      while (
+        index < this.queue.length &&
+        this.queue[index].block.blockHeight < block.blockHeight
+      ) {
+        index++;
       }
+      if (
+        this.queue.length > index &&
+        this.queue[index].block.blockHeight === element.block.blockHeight
+      ) {
+        this.queue[index] = element;
+      } else {
+        this.queue = [
+          ...this.queue.splice(0, index),
+          element,
+          ...this.queue.splice(index),
+        ];
+      }
+      release();
     });
   };
 
@@ -55,8 +63,18 @@ abstract class WebSocketScanner<
 
   processElement = async (element: QueueType<TransactionType>) => {
     if (element.fork) {
+      this.logger.debug(
+        `Processing fork block at height ${element.block.blockHeight}`
+      );
       return await this.forkBlock(element.block.blockHeight);
     } else {
+      this.logger.debug(
+        `Processing new block  at height ${element.block.blockHeight}`
+      );
+      const lastSavedBlock = await this.action.getLastSavedBlock();
+      if (lastSavedBlock && element.block.parentHash !== lastSavedBlock.hash) {
+        throw Error('It seems saved block is not valid in scanner.');
+      }
       const res = await this.processBlockTransactions(
         element.block,
         element.transactions
@@ -101,10 +119,6 @@ abstract class WebSocketScanner<
   };
 
   forwardBlock = async (block: Block, transactions: Array<TransactionType>) => {
-    const lastSavedBlock = await this.action.getLastSavedBlock();
-    if (lastSavedBlock && block.parentHash !== lastSavedBlock.hash) {
-      return false;
-    }
     await this.insert(block, transactions);
     // Running transaction queue asynchronously
     setTimeout(this.processQueue, 100);

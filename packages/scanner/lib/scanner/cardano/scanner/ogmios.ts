@@ -78,7 +78,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
       const babbageBlock = (response.block as Babbage).babbage;
       this.logger.debug(
-        `Processing new block at height ${
+        `Queueing new block at height ${
           babbageBlock.header.blockHeight
         } in scanner ${this.name()}`
       );
@@ -143,10 +143,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     const intersect = await this.findIntersection(context);
     if (intersect) {
       // find intersect then start from that point
-      this.client = await createChainSyncClient(context, {
-        rollBackward: this.rollBackward,
-        rollForward: this.rollForward,
-      });
+      this.client = await createChainSyncClient(
+        context,
+        {
+          rollBackward: this.rollBackward,
+          rollForward: this.rollForward,
+        },
+        { sequential: true }
+      );
       await this.forkBlock(intersect.height + 1);
       await this.client.startSync([intersect.point]);
     } else {
