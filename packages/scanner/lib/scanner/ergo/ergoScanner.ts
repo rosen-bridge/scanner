@@ -15,6 +15,11 @@ class ErgoNodeScanner extends GeneralScanner<Transaction> {
   constructor(config: ErgoScannerConfig, logger?: AbstractLogger) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name());
+    /**
+     * In order to keep the scanners functionalities consistent, we add config
+     * `initialHeight` by one so that it matches how Ogmios scanner currently
+     * works.
+     */
     this.initialHeight = config.initialHeight + 1;
     this.networkAccess = new ErgoNetworkApi(config.nodeUrl, config.timeout);
     this.logger = logger ? logger : new DummyLogger();
