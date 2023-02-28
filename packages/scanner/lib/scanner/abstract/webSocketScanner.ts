@@ -127,7 +127,7 @@ abstract class WebSocketScanner<
         }
         if (this.queue.length > 0) {
           // try processing next block asynchronously
-          setTimeout(this.processQueue, 100);
+          this.processQueue();
         }
         release();
       } catch (e) {
@@ -143,7 +143,7 @@ abstract class WebSocketScanner<
             `retrying storing this block in 100 ms... try ${queuedElement.retriesCount}`
           );
           // try processing queue element again
-          setTimeout(this.processQueue, 100);
+          this.processQueue();
         }
       }
     }
@@ -158,7 +158,7 @@ abstract class WebSocketScanner<
   forwardBlock = async (block: Block, transactions: Array<TransactionType>) => {
     await this.enqueueNewBlock(block, transactions);
     // Running transaction queue asynchronously
-    setTimeout(this.processQueue, 100);
+    this.processQueue();
   };
 
   /**
@@ -167,6 +167,7 @@ abstract class WebSocketScanner<
    */
   backwardBlock = async (block: Block) => {
     await this.enqueueNewFork(block);
+    this.processQueue();
   };
 }
 
