@@ -56,7 +56,7 @@ abstract class WebSocketScanner<
 
   /**
    * Enqueue new fork to processing queue.
-   * first remove forked block from queue then insert fork to queue.
+   * First remove forked blocks from the queue and then insert fork to the queue.
    * @param lastValidBlock
    */
   enqueueNewFork = (lastValidBlock: Block) => {
@@ -77,9 +77,9 @@ abstract class WebSocketScanner<
 
   /**
    * process single Queued element.
-   * in case of fork remove all next block and extracted content.
-   * and in case of new block, store block and extract information from transactions.
-   * if any exception happened rethrow it.
+   * In case of a fork, remove all next blocks and their corresponding extracted content.
+   * In case of a new block, store block and extract information from transactions.
+   * If any exception happen, rethrow it.
    * @param element
    */
   processElement = async (element: QueueType<TransactionType>) => {
