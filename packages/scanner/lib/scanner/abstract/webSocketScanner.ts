@@ -8,68 +8,84 @@ type QueueType<TransactionType> = {
   block: Block;
   transactions: Array<TransactionType>;
   fork: boolean;
-  proceedCount?: number;
+  retriesCount?: number;
 };
 
 abstract class WebSocketScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
-  private semaphore: Semaphore = new Semaphore(1);
+  private semaphore = new Semaphore(1);
   private queue: Array<QueueType<TransactionType>> = [];
   abstract name: () => string;
 
   abstract start: () => Promise<void>;
   abstract stop: () => Promise<void>;
 
-  insert = (block: Block, transactions: Array<TransactionType>) => {
+  /**
+   * Insert new block to processing queue
+   * @param newBlock
+   * @param transactions
+   */
+  enqueueNewBlock = (newBlock: Block, transactions: Array<TransactionType>) => {
     this.semaphore.acquire().then((release) => {
-      const element = { block, transactions, fork: false };
-      let index = 0;
-      while (
-        index < this.queue.length &&
-        this.queue[index].block.blockHeight < block.blockHeight
-      ) {
-        index++;
-      }
+      const newQueueElement = { block: newBlock, transactions, fork: false };
+      const newElementIndex = this.queue.findIndex(
+        (queueElement) => queueElement.block.blockHeight >= newBlock.blockHeight
+      );
       if (
-        this.queue.length > index &&
-        this.queue[index].block.blockHeight === element.block.blockHeight
+        this.queue.length > newElementIndex &&
+        this.queue[newElementIndex].block.blockHeight ===
+          newQueueElement.block.blockHeight
       ) {
-        this.queue[index] = element;
+        this.queue[newElementIndex] = newQueueElement;
       } else {
         this.queue = [
-          ...this.queue.splice(0, index),
-          element,
-          ...this.queue.splice(index),
+          ...this.queue.slice(0, newElementIndex),
+          newQueueElement,
+          ...this.queue.slice(newElementIndex),
         ];
       }
       release();
     });
   };
 
-  fork = (block: Block) => {
+  /**
+   * Enqueue new fork to processing queue.
+   * first remove forked block from queue then insert fork to queue.
+   * @param lastValidBlock
+   */
+  enqueueNewFork = (lastValidBlock: Block) => {
     this.semaphore.acquire().then((release) => {
-      const element = { block, transactions: [], fork: false };
-      let index: number;
-      for (index = 0; index < this.queue.length; index++) {
-        if (this.queue[index].block.blockHeight >= block.blockHeight) {
-          break;
-        }
-      }
-      this.queue = [...this.queue.slice(0, index), element];
+      const newQueueElement = {
+        block: lastValidBlock,
+        transactions: [],
+        fork: false,
+      };
+      const forkedBlockIndex = this.queue.findIndex(
+        (queueElement) =>
+          queueElement.block.blockHeight >= lastValidBlock.blockHeight
+      );
+      this.queue = [...this.queue.slice(0, forkedBlockIndex), newQueueElement];
       release();
     });
   };
 
+  /**
+   * process single Queued element.
+   * in case of fork remove all next block and extracted content.
+   * and in case of new block, store block and extract information from transactions.
+   * if any exception happened rethrow it.
+   * @param element
+   */
   processElement = async (element: QueueType<TransactionType>) => {
     if (element.fork) {
       this.logger.debug(
-        `Processing fork block at height ${element.block.blockHeight}`
+        `Processing forked block at height ${element.block.blockHeight}`
       );
       return await this.forkBlock(element.block.blockHeight);
     } else {
       this.logger.debug(
-        `Processing new block  at height ${element.block.blockHeight}`
+        `Processing new block at height ${element.block.blockHeight}`
       );
       const lastSavedBlock = await this.action.getLastSavedBlock();
       if (lastSavedBlock && element.block.parentHash !== lastSavedBlock.hash) {
@@ -87,13 +103,16 @@ abstract class WebSocketScanner<
     }
   };
 
+  /**
+   * process block queue elements.
+   */
   processQueue = async () => {
     if (this.queue.length > 0) {
-      const element = this.queue[0];
+      const queuedElement = this.queue[0];
       try {
-        await this.processElement(element);
+        await this.processElement(queuedElement);
         const release = await this.semaphore.acquire();
-        if (this.queue[0] === element) {
+        if (this.queue[0] === queuedElement) {
           this.queue.splice(0, 1);
         }
         if (this.queue.length > 0) {
@@ -102,15 +121,17 @@ abstract class WebSocketScanner<
         }
         release();
       } catch (e) {
-        const logMessage = `Can not process block at height ${element.block.blockHeight}: ${e}`;
-        if (element.proceedCount == MAX_PROCESS_TRANSACTION) {
+        const logMessage = `Can not process block at height ${queuedElement.block.blockHeight}: ${e}`;
+        if (queuedElement.retriesCount == MAX_PROCESS_TRANSACTION) {
           this.logger.error(logMessage);
         } else {
           this.logger.warn(logMessage);
-          this.logger.warn(`retry store this block`);
-          element.proceedCount = element.proceedCount
-            ? element.proceedCount + 1
+          queuedElement.retriesCount = queuedElement.retriesCount
+            ? queuedElement.retriesCount + 1
             : 1;
+          this.logger.warn(
+            `retrying storing this block in 100 ms... try ${queuedElement.retriesCount}`
+          );
           // try processing queue element again
           setTimeout(this.processQueue, 100);
         }
@@ -119,13 +140,13 @@ abstract class WebSocketScanner<
   };
 
   forwardBlock = async (block: Block, transactions: Array<TransactionType>) => {
-    await this.insert(block, transactions);
+    await this.enqueueNewBlock(block, transactions);
     // Running transaction queue asynchronously
     setTimeout(this.processQueue, 100);
   };
 
   backwardBlock = async (block: Block) => {
-    await this.fork(block);
+    await this.enqueueNewFork(block);
   };
 }
 
