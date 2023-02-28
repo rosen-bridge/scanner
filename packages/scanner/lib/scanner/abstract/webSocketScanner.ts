@@ -66,10 +66,14 @@ abstract class WebSocketScanner<
         transactions: [],
         fork: false,
       };
-      const forkedBlockIndex = this.queue.findIndex(
-        (queueElement) =>
-          queueElement.block.blockHeight >= lastValidBlock.blockHeight
-      );
+      let forkedBlockIndex = 0;
+      while (
+        forkedBlockIndex < this.queue.length &&
+        this.queue[forkedBlockIndex].block.blockHeight <
+          lastValidBlock.blockHeight
+      ) {
+        forkedBlockIndex++;
+      }
       this.queue = [...this.queue.slice(0, forkedBlockIndex), newQueueElement];
       release();
     });
