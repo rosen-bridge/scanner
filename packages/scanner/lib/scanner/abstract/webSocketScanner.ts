@@ -15,6 +15,7 @@ abstract class WebSocketScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
   private semaphore = new Semaphore(1);
+  private processQueueSemaphore = new Semaphore(1);
   private queue: Array<QueueType<TransactionType>> = [];
   abstract name: () => string;
 
@@ -29,9 +30,13 @@ abstract class WebSocketScanner<
   enqueueNewBlock = (newBlock: Block, transactions: Array<TransactionType>) => {
     this.semaphore.acquire().then((release) => {
       const newQueueElement = { block: newBlock, transactions, fork: false };
-      const newElementIndex = this.queue.findIndex(
-        (queueElement) => queueElement.block.blockHeight >= newBlock.blockHeight
-      );
+      let newElementIndex = 0;
+      while (
+        newElementIndex < this.queue.length &&
+        this.queue[newElementIndex].block.blockHeight < newBlock.blockHeight
+      ) {
+        newElementIndex++;
+      }
       if (
         this.queue.length > newElementIndex &&
         this.queue[newElementIndex].block.blockHeight ===
@@ -107,6 +112,7 @@ abstract class WebSocketScanner<
    * process block queue elements.
    */
   processQueue = async () => {
+    const releaseProcessQueue = await this.processQueueSemaphore.acquire();
     if (this.queue.length > 0) {
       const queuedElement = this.queue[0];
       try {
@@ -137,6 +143,7 @@ abstract class WebSocketScanner<
         }
       }
     }
+    releaseProcessQueue();
   };
 
   forwardBlock = async (block: Block, transactions: Array<TransactionType>) => {
