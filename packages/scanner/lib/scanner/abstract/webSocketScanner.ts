@@ -80,7 +80,7 @@ abstract class WebSocketScanner<
   };
 
   /**
-   * process single Queued element.
+   * Process single Queued element.
    * In case of a fork, remove all next blocks and their corresponding extracted content.
    * In case of a new block, store block and extract information from transactions.
    * If any exception happen, rethrow it.
@@ -113,7 +113,7 @@ abstract class WebSocketScanner<
   };
 
   /**
-   * process block queue elements.
+   * Process block queue elements.
    */
   processQueue = async () => {
     const releaseProcessQueue = await this.processQueueSemaphore.acquire();
@@ -150,12 +150,21 @@ abstract class WebSocketScanner<
     releaseProcessQueue();
   };
 
+  /**
+   * Handle new block arrived.
+   * @param block
+   * @param transactions
+   */
   forwardBlock = async (block: Block, transactions: Array<TransactionType>) => {
     await this.enqueueNewBlock(block, transactions);
     // Running transaction queue asynchronously
     setTimeout(this.processQueue, 100);
   };
 
+  /**
+   * Handle forking a block
+   * @param block
+   */
   backwardBlock = async (block: Block) => {
     await this.enqueueNewFork(block);
   };
