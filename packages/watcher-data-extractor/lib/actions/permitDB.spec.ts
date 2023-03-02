@@ -2,7 +2,7 @@ import PermitEntityAction from './permitDB';
 import PermitEntity from '../entities/PermitEntity';
 import { block } from '../extractor/utilsVariable.mock';
 import { loadDataBase } from '../extractor/utilsFunctions.mock';
-import { DummyLogger } from '@rosen-bridge/scanner';
+import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const samplePermit1 = {
   boxId: '1',

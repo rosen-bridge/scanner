@@ -4,11 +4,10 @@ import { DataSource } from 'typeorm';
 import CommitmentEntityAction from '../actions/commitmentDB';
 import {
   AbstractExtractor,
-  AbstractLogger,
   BlockEntity,
-  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { JsonBI } from '../network/parser';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {

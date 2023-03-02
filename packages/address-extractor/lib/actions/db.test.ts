@@ -2,7 +2,7 @@ import { BoxEntityAction } from './db';
 import { generateBlockEntity, loadDataBase } from '../extractor/utils.mock';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BoxEntity } from '../entities/boxEntity';
-import { DummyLogger } from '@rosen-bridge/scanner';
+import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const logger = new DummyLogger();
 

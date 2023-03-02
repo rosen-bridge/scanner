@@ -1,14 +1,10 @@
-import {
-  AbstractExtractor,
-  BlockEntity,
-  DummyLogger,
-  AbstractLogger,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { AuxiliaryData, TxBabbage, TxOut } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ObservationEntityAction } from '../../actions/db';
-import { getDictValue, JsonObject, ListObject, MetadataObject } from '../utils';
+import { getDictValue, JsonObject, MetadataObject } from '../utils';
 import { CARDANO_NATIVE_TOKEN } from '../const';
 import { CardanoRosenData, RawCardanoRosenData } from '../../interfaces/rosen';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';

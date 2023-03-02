@@ -2,9 +2,9 @@
   "bail": 1,
   "verbose": true,
   "testEnvironment": "node",
-  "transform": {
-    "^.+\\.ts?$": "ts-jest"
-  },
-  "transformIgnorePatterns": ["node_modules/(?!(@rosen-bridge/scanner)/)"],
+  "preset": "ts-jest/presets/js-with-babel",
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@rosen-bridge/logger-interface)/)"
+  ],
   "coverageReporters": ["lcov", "cobertura", "text", "text-summary"]
 }

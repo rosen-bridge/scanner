@@ -1,7 +1,8 @@
 import { DataSource, In, LessThan, Repository } from 'typeorm';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
-import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';

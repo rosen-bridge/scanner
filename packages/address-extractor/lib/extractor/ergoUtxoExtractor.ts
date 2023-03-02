@@ -2,11 +2,8 @@ import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { BoxEntityAction } from '../actions/db';
-import {
-  AbstractExtractor,
-  AbstractLogger,
-  DummyLogger,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExplorerApi } from '../network/ergoNetworkApi';

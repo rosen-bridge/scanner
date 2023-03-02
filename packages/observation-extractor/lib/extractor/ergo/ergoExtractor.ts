@@ -7,12 +7,11 @@ import { ObservationEntityAction } from '../../actions/db';
 import { RosenData } from '../../interfaces/rosen';
 import {
   AbstractExtractor,
-  AbstractLogger,
   BlockEntity,
   Transaction,
   OutputBox,
-  DummyLogger,
 } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ERGO_NATIVE_TOKEN } from '../const';
 

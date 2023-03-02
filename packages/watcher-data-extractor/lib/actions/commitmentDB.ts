@@ -1,7 +1,8 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';
 

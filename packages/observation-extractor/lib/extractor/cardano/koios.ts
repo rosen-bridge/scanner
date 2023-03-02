@@ -9,12 +9,8 @@ import {
   UTXO,
 } from '../../interfaces/koiosTransaction';
 import { CardanoRosenData } from '../../interfaces/rosen';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  AbstractLogger,
-  DummyLogger,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CARDANO_NATIVE_TOKEN } from '../const';
 
