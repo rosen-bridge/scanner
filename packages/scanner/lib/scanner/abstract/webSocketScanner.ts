@@ -96,6 +96,7 @@ abstract class WebSocketScanner<
       this.logger.debug(
         `Processing new block at height ${element.block.blockHeight}`
       );
+      await this.forkBlock(element.block.blockHeight);
       const lastSavedBlock = await this.action.getLastSavedBlock();
       if (lastSavedBlock && element.block.parentHash !== lastSavedBlock.hash) {
         throw Error('It seems saved block is not valid in scanner.');
