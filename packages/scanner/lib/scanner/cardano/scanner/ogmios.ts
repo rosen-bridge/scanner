@@ -59,12 +59,20 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     requestNext: () => void
   ) => {
     const hash = (response.point as Point).hash;
-    const block = await this.action.getBlockWithHash(hash);
+    const savedBlock = await this.action.getBlockWithHash(hash);
     this.logger.debug(
-      `Rolling backward to height ${block?.height} in scanner ${this.name()}`
+      `Rolling backward to height ${
+        savedBlock?.height
+      } in scanner ${this.name()}`
     );
-    if (block) {
-      await this.forkBlock(block.height + 1);
+    if (savedBlock) {
+      const block = {
+        hash: savedBlock.hash,
+        blockHeight: savedBlock.height,
+        parentHash: savedBlock.parentHash,
+        extra: savedBlock.extra,
+      };
+      await this.backwardBlock(block);
     }
     requestNext();
   };
