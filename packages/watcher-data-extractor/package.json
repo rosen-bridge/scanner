@@ -23,7 +23,7 @@
     "@rosen-bridge/scanner": "^0.4.6",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
-    "ergo-lib-wasm-nodejs": "^0.21.0",
+    "ergo-lib-wasm-nodejs": "^0.24.0-alpha-1f24f53",
     "lodash-es": "^4.17.21",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
