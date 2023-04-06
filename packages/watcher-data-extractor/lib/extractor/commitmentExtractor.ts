@@ -95,6 +95,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                     boxSerialized: Buffer.from(
                       decodedBox.sigma_serialize_bytes()
                     ).toString('base64'),
+                    rwtCount: BigInt(output.assets[0].amount).toString(),
                   });
                 }
               } catch {
