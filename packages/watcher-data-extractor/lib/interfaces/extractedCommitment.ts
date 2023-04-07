@@ -5,6 +5,7 @@ interface extractedCommitment {
   eventId: string;
   boxId: string;
   boxSerialized: string;
+  rwtCount: string;
 }
 
 export { extractedCommitment };

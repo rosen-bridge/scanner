@@ -81,6 +81,7 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        rwtCount: '10',
       });
       expect(commitment2).toEqual({
         id: 2,
@@ -97,6 +98,7 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        rwtCount: '10',
       });
     });
   });

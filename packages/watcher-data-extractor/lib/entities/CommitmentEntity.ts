@@ -38,6 +38,9 @@ class CommitmentEntity {
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column({ nullable: true })
+  rwtCount?: string;
 }
 
 export default CommitmentEntity;

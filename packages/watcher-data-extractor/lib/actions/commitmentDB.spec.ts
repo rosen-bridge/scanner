@@ -11,6 +11,7 @@ const commitment1 = {
   eventId: 'eventId1',
   boxId: 'boxId1',
   boxSerialized: 'box1',
+  rwtCount: '10',
 };
 const commitment2 = {
   txId: 'txId2',
@@ -19,6 +20,7 @@ const commitment2 = {
   eventId: 'eventId2',
   boxId: 'boxId2',
   boxSerialized: 'box2',
+  rwtCount: '10',
 };
 const commitment3 = {
   ...commitment1,

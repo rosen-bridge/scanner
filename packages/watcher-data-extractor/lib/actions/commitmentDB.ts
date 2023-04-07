@@ -52,6 +52,7 @@ class CommitmentEntityAction {
           block: block.hash,
           height: block.height,
           boxSerialized: commitment.boxSerialized,
+          rwtCount: commitment.rwtCount,
         };
         if (!saved) {
           this.logger.info(
