@@ -163,6 +163,7 @@ abstract class WebSocketScanner<
         }
       }
     }
+    await this.handleMemory();
     releaseProcessQueue();
   };
 
