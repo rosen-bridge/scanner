@@ -163,7 +163,7 @@ abstract class WebSocketScanner<
         }
       }
     }
-    await this.handleMemory();
+    await this.checkQueueRestartPoint();
     releaseProcessQueue();
   };
 
@@ -177,7 +177,7 @@ abstract class WebSocketScanner<
     // Running transaction queue asynchronously
     this.processQueue();
     // Handle memory usage
-    await this.handleMemory();
+    await this.checkQueueStopLimit();
   };
 
   /**
@@ -189,18 +189,10 @@ abstract class WebSocketScanner<
     this.processQueue();
   };
 
-  handleMemory = async () => {
-    if (this.stopFlag && this.queue.length <= this.restartPoint) {
-      const releaseStopLock = await this.stopLock.acquire();
-      this.logger.warn(
-        `Queue length is less than ${
-          this.restartPoint
-        }. Restarting ${this.name()} scanner...`
-      );
-      this.stopFlag = false;
-      await this.start();
-      releaseStopLock();
-    }
+  /**
+   * Check the queue, if reached stop limit, stop scanner.
+   */
+  checkQueueStopLimit = async () => {
     if (!this.stopFlag && this.queue.length > this.stopLimit) {
       const releaseStopLock = await this.stopLock.acquire();
       this.logger.warn(
@@ -210,6 +202,23 @@ abstract class WebSocketScanner<
       );
       this.stopFlag = true;
       await this.stop();
+      releaseStopLock();
+    }
+  };
+
+  /**
+   * Check the queue, if reached restart point, start scanner.
+   */
+  checkQueueRestartPoint = async () => {
+    if (this.stopFlag && this.queue.length <= this.restartPoint) {
+      const releaseStopLock = await this.stopLock.acquire();
+      this.logger.warn(
+        `Queue length is less than ${
+          this.restartPoint
+        }. Restarting ${this.name()} scanner...`
+      );
+      this.stopFlag = false;
+      await this.start();
       releaseStopLock();
     }
   };
