@@ -1,6 +1,7 @@
 import { AbstractScanner } from './scanner';
 import { Block } from '../../interfaces';
 import { Semaphore } from 'await-semaphore';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 
 const MAX_PROCESS_TRANSACTION = 10;
 
@@ -17,10 +18,20 @@ abstract class WebSocketScanner<
   private semaphore = new Semaphore(1);
   private processQueueSemaphore = new Semaphore(1);
   private queue: Array<QueueType<TransactionType>> = [];
+  private stopLock = new Semaphore(1);
+  private stopFlag = false;
   abstract name: () => string;
 
   abstract start: () => Promise<void>;
   abstract stop: () => Promise<void>;
+
+  constructor(
+    logger?: AbstractLogger,
+    public stopLimit = 100,
+    public restartPoint = 10
+  ) {
+    super(logger);
+  }
 
   /**
    * Insert new block to processing queue
@@ -28,6 +39,10 @@ abstract class WebSocketScanner<
    * @param transactions
    */
   enqueueNewBlock = (newBlock: Block, transactions: Array<TransactionType>) => {
+    if (this.stopFlag) {
+      // Don't enqueue new block if scanner is stopped
+      return;
+    }
     this.semaphore.acquire().then((release) => {
       const newQueueElement = { block: newBlock, transactions, fork: false };
       let newElementIndex = 0;
@@ -148,6 +163,7 @@ abstract class WebSocketScanner<
         }
       }
     }
+    await this.checkQueueRestartPoint();
     releaseProcessQueue();
   };
 
@@ -160,6 +176,8 @@ abstract class WebSocketScanner<
     await this.enqueueNewBlock(block, transactions);
     // Running transaction queue asynchronously
     this.processQueue();
+    // Handle memory usage
+    await this.checkQueueStopLimit();
   };
 
   /**
@@ -169,6 +187,40 @@ abstract class WebSocketScanner<
   backwardBlock = async (block: Block) => {
     await this.enqueueNewFork(block);
     this.processQueue();
+  };
+
+  /**
+   * Check the queue, if reached stop limit, stop scanner.
+   */
+  checkQueueStopLimit = async () => {
+    if (!this.stopFlag && this.queue.length > this.stopLimit) {
+      const releaseStopLock = await this.stopLock.acquire();
+      this.logger.warn(
+        `Queue length is more than ${
+          this.stopLimit
+        }. Stopping ${this.name()} scanner...`
+      );
+      this.stopFlag = true;
+      await this.stop();
+      releaseStopLock();
+    }
+  };
+
+  /**
+   * Check the queue, if reached restart point, start scanner.
+   */
+  checkQueueRestartPoint = async () => {
+    if (this.stopFlag && this.queue.length <= this.restartPoint) {
+      const releaseStopLock = await this.stopLock.acquire();
+      this.logger.warn(
+        `Queue length is less than ${
+          this.restartPoint
+        }. Restarting ${this.name()} scanner...`
+      );
+      this.stopFlag = false;
+      await this.start();
+      releaseStopLock();
+    }
   };
 }
 

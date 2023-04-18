@@ -37,8 +37,13 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   port: number;
   name = () => 'cardano-ogmios';
 
-  constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: CardanoOgmiosConfig,
+    logger?: AbstractLogger,
+    stopLimit?: number,
+    restartPoint?: number
+  ) {
+    super(logger, stopLimit, restartPoint);
     this.action = new BlockDbAction(config.dataSource, this.name());
     this.host = config.nodeIp;
     this.port = config.nodePort;
