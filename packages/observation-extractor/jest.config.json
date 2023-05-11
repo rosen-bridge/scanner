@@ -4,7 +4,7 @@
   "testEnvironment": "node",
   "preset": "ts-jest/presets/js-with-babel",
   "transformIgnorePatterns": [
-    "node_modules/(?!(@rosen-bridge/(rosen-extractor|tokens|scanner|logger-interface)|lodash-es)/)"
+    "node_modules/(?!(@rosen-bridge/*|lodash-es)/)"
   ],
   "coverageReporters": ["lcov", "cobertura", "text", "text-summary"]
 }
