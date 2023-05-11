@@ -7,6 +7,9 @@ class CommitmentEntity {
   id: number;
 
   @Column()
+  txId: string;
+
+  @Column()
   extractor: string;
 
   @Column()
@@ -35,6 +38,9 @@ class CommitmentEntity {
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column({ nullable: true })
+  rwtCount?: string;
 }
 
 export default CommitmentEntity;

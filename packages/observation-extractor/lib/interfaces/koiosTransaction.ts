@@ -19,7 +19,7 @@ interface UTXO {
 }
 
 interface MetaData {
-  [key: string]: JSON;
+  [key: string]: Record<string, unknown>;
 }
 
 interface KoiosTransaction {

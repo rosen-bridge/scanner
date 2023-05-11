@@ -8,6 +8,7 @@ import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
   eventId: 'eventId',
+  txId: 'txId2',
   WIDs: 'wid2',
   amount: '22',
   bridgeFee: '11',
@@ -26,6 +27,7 @@ const sampleEventTrigger1: ExtractedEventTrigger = {
 };
 const sampleEventTrigger2: ExtractedEventTrigger = {
   eventId: 'eventId',
+  txId: 'txId',
   WIDs: '1',
   amount: '100',
   bridgeFee: '10',
@@ -56,6 +58,7 @@ const sampleEventTrigger4: ExtractedEventTrigger = {
 const logger = new DummyLogger();
 
 export const sampleEventEntity = {
+  txId: 'txId',
   eventId: 'eventId',
   extractor: 'extractorId',
   boxId: 'id',
@@ -336,7 +339,12 @@ describe('EventTrigger', () => {
         sampleEventEntity,
         { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
       ]);
-      await eventTriggerAction.spendEventTriggers(['id'], block, 'extractorId');
+      await eventTriggerAction.spendEventTriggers(
+        ['id'],
+        block,
+        'extractorId',
+        'spendTxId'
+      );
       expect(
         (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
       ).toEqual(1);

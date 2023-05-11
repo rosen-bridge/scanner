@@ -86,6 +86,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                   const requestId = Buffer.from(R5Value[0]).toString('hex');
                   const eventDigest = Buffer.from(R6Value).toString('hex');
                   commitments.push({
+                    txId: transaction.id,
                     WID: WID,
                     commitment: eventDigest,
                     eventId: requestId,
@@ -93,6 +94,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                     boxSerialized: Buffer.from(
                       decodedBox.sigma_serialize_bytes()
                     ).toString('base64'),
+                    rwtCount: BigInt(output.assets[0].amount).toString(),
                   });
                 }
               } catch {

@@ -68,6 +68,7 @@ describe('CommitmentExtractor', () => {
       const box2 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx2.outputs[0]));
       expect(commitment1).toEqual({
         id: 1,
+        txId: tx1.id,
         WID: 'f1',
         commitment: 'd1',
         eventId: '11',
@@ -80,9 +81,11 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        rwtCount: '10',
       });
       expect(commitment2).toEqual({
         id: 2,
+        txId: tx2.id,
         WID: 'f2',
         commitment: 'd2',
         eventId: '22',
@@ -95,6 +98,7 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        rwtCount: '10',
       });
     });
   });

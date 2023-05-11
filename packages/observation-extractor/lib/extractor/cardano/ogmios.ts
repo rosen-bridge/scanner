@@ -1,23 +1,20 @@
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import { AuxiliaryData, TxBabbage, TxOut } from '@cardano-ogmios/schema';
+import { TxBabbage } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ObservationEntityAction } from '../../actions/db';
-import { getDictValue, JsonObject, MetadataObject } from '../utils';
-import { CARDANO_NATIVE_TOKEN } from '../const';
-import { CardanoRosenData, RawCardanoRosenData } from '../../interfaces/rosen';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { isArray, isPlainObject, isString } from 'lodash-es';
+import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabbage> {
   readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
-  private readonly bankAddress: string;
+  private readonly extractor: CardanoOgmiosRosenExtractor;
   static readonly FROM_CHAIN: string = 'cardano';
 
   constructor(
@@ -27,143 +24,21 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
     logger?: AbstractLogger
   ) {
     super();
-    this.bankAddress = address;
     this.dataSource = dataSource;
     this.tokens = new TokenMap(tokens);
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
-  }
-
-  private isJsonObject = (
-    metadataObject: MetadataObject
-  ): metadataObject is JsonObject => {
-    return isPlainObject(metadataObject);
-  };
-
-  private isCardanoRosenData = (
-    metadataObject: MetadataObject
-  ): metadataObject is JsonObject => {
-    if (!this.isJsonObject(metadataObject)) return false;
-
-    const assertedMetadataObject =
-      metadataObject as Partial<RawCardanoRosenData>;
-
-    const isToChainValid = isString(assertedMetadataObject.to);
-    const isNetworkFeeValid = isString(assertedMetadataObject.networkFee);
-    const isBridgeFeeValid = isString(assertedMetadataObject.bridgeFee);
-    const isToAddressValid = isString(assertedMetadataObject.toAddress);
-    const isFromAddressValid =
-      isArray(assertedMetadataObject.fromAddress) &&
-      assertedMetadataObject.fromAddress.every(isString);
-
-    return (
-      isToChainValid &&
-      isNetworkFeeValid &&
-      isBridgeFeeValid &&
-      isToAddressValid &&
-      isFromAddressValid
+    this.extractor = new CardanoOgmiosRosenExtractor(
+      address,
+      tokens,
+      this.logger
     );
-  };
+  }
 
   /**
    * get Id for current extractor
    */
   getId = () => 'ergo-cardano-ogmios-extractor';
-
-  /**
-   * calculate transformation token id in both sides and transfer amount
-   * @param box
-   * @param toChain
-   */
-  getTokenDetail = (
-    box: TxOut,
-    toChain: string
-  ): { from: string; to: string; amount: string } | undefined => {
-    let res: { from: string; to: string; amount: string } | undefined =
-      undefined;
-    if (box.value.assets) {
-      const asset = box.value.assets;
-      Object.keys(asset).map((tokenKey) => {
-        let token = this.tokens.search(
-          CardanoOgmiosObservationExtractor.FROM_CHAIN,
-          { policyId: tokenKey }
-        );
-        // according to ogmios docs assets are stores as
-        //      [policyId.assetName]: amount
-        //      [policyId]: amount        if assetName not exists.
-        // check if assetName exists search token with policyId and asset name
-        if (tokenKey.indexOf('.') != -1) {
-          const parts = tokenKey.split('.');
-          token = this.tokens.search(
-            CardanoOgmiosObservationExtractor.FROM_CHAIN,
-            {
-              policyId: parts[0],
-              assetName: parts[1],
-            }
-          );
-        }
-        // it no tokens are extracted we search token with policyId
-        if (token.length > 0) {
-          res = {
-            from: this.tokens.getID(
-              token[0],
-              CardanoOgmiosObservationExtractor.FROM_CHAIN
-            ),
-            to: this.tokens.getID(token[0], toChain),
-            amount: asset[tokenKey].toString(),
-          };
-        }
-      });
-    }
-    if (res) return res;
-    const lovelace = this.tokens.search(
-      CardanoOgmiosObservationExtractor.FROM_CHAIN,
-      {
-        [this.tokens.getIdKey(CardanoOgmiosObservationExtractor.FROM_CHAIN)]:
-          CARDANO_NATIVE_TOKEN,
-      }
-    );
-    if (lovelace.length) {
-      return {
-        from: CARDANO_NATIVE_TOKEN,
-        to: this.tokens.getID(lovelace[0], toChain),
-        amount: box.value.coins.toString(),
-      };
-    }
-  };
-
-  /**
-   * returns rosenData object if the box format is like rosen bridge observations otherwise returns undefined
-   * @param metaData
-   */
-  getRosenData = (metaData: AuxiliaryData): CardanoRosenData | undefined => {
-    try {
-      const blob = metaData.body.blob;
-      if (blob?.['0']) {
-        const value = getDictValue(blob['0']);
-        if (this.isCardanoRosenData(value)) {
-          const rawRosenData = value as unknown as RawCardanoRosenData;
-
-          const toChain = rawRosenData.to;
-          const bridgeFee = rawRosenData.bridgeFee;
-          const networkFee = rawRosenData.networkFee;
-          const toAddress = rawRosenData.toAddress;
-          const fromAddress = rawRosenData.fromAddress.join('');
-
-          return {
-            toChain,
-            bridgeFee,
-            networkFee,
-            toAddress,
-            fromAddress,
-          };
-        }
-      }
-    } catch (e) {
-      this.logger.warn(`Error during fetch rosen data. ${e}`);
-    }
-    return undefined;
-  };
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
@@ -179,44 +54,25 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<TxBabba
       try {
         const observations: Array<ExtractedObservation> = [];
         for (const transaction of txs) {
-          if (transaction.metadata !== null) {
-            try {
-              const data = this.getRosenData(transaction.metadata);
-              const paymentOutput = transaction.body.outputs[0];
-              if (
-                data &&
-                paymentOutput &&
-                paymentOutput.address === this.bankAddress
-              ) {
-                const transferAsset = this.getTokenDetail(
-                  paymentOutput,
-                  data.toChain
-                );
-                if (transferAsset) {
-                  const requestId = Buffer.from(
-                    blake2b(transaction.id, undefined, 32)
-                  ).toString('hex');
-                  observations.push({
-                    fromChain: CardanoOgmiosObservationExtractor.FROM_CHAIN,
-                    toChain: data.toChain,
-                    amount: transferAsset.amount,
-                    sourceChainTokenId: transferAsset.from,
-                    targetChainTokenId: transferAsset.to,
-                    sourceTxId: transaction.id,
-                    bridgeFee: data.bridgeFee,
-                    networkFee: data.networkFee,
-                    sourceBlockId: block.hash,
-                    requestId: requestId,
-                    toAddress: data.toAddress,
-                    fromAddress: data.fromAddress,
-                  });
-                }
-              }
-            } catch (e) {
-              this.logger.error(
-                `error during observing cardano transactions: ${e}`
-              );
-            }
+          const data = this.extractor.get(transaction);
+          if (data) {
+            const requestId = Buffer.from(
+              blake2b(transaction.id, undefined, 32)
+            ).toString('hex');
+            observations.push({
+              fromChain: CardanoOgmiosObservationExtractor.FROM_CHAIN,
+              toChain: data.toChain,
+              amount: data.amount,
+              sourceChainTokenId: data.sourceChainTokenId,
+              targetChainTokenId: data.targetChainTokenId,
+              sourceTxId: data.sourceTxId,
+              bridgeFee: data.bridgeFee,
+              networkFee: data.networkFee,
+              sourceBlockId: block.hash,
+              requestId: requestId,
+              toAddress: data.toAddress,
+              fromAddress: data.fromAddress,
+            });
           }
         }
         this.actions

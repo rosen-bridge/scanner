@@ -44,6 +44,7 @@ class CommitmentEntityAction {
           return entity.boxId === commitment.boxId;
         });
         const entity = {
+          txId: commitment.txId,
           commitment: commitment.commitment,
           eventId: commitment.eventId,
           boxId: commitment.boxId,
@@ -52,6 +53,7 @@ class CommitmentEntityAction {
           block: block.hash,
           height: block.height,
           boxSerialized: commitment.boxSerialized,
+          rwtCount: commitment.rwtCount,
         };
         if (!saved) {
           this.logger.info(

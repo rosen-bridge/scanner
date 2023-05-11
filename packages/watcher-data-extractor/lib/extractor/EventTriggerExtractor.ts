@@ -52,7 +52,8 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     return new Promise((resolve, reject) => {
       try {
         const boxes: Array<ExtractedEventTrigger> = [];
-        const spendIds: Array<string> = [];
+        const txSpendIds: Array<{ txId: string; spendBoxes: Array<string> }> =
+          [];
         txs.forEach((transaction) => {
           for (const output of transaction.outputs) {
             try {
@@ -90,6 +91,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                       ).toString('hex');
                       boxes.push({
                         eventId: eventId,
+                        txId: transaction.id,
                         boxId: output.boxId,
                         boxSerialized: Buffer.from(
                           outputParsed.sigma_serialize_bytes()
@@ -130,19 +132,27 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
               continue;
             }
             // process inputs
-            for (const input of transaction.inputs) {
-              spendIds.push(input.boxId);
-            }
+            txSpendIds.push({
+              txId: transaction.id,
+              spendBoxes: transaction.inputs.map((box) => box.boxId),
+            });
           }
         });
         this.actions
           .storeEventTriggers(boxes, block, this.getId())
           .then(() => {
-            this.actions
-              .spendEventTriggers(spendIds, block, this.id)
-              .then(() => {
-                resolve(true);
-              });
+            txSpendIds.forEach((txSpends) => {
+              this.actions
+                .spendEventTriggers(
+                  txSpends.spendBoxes,
+                  block,
+                  this.id,
+                  txSpends.txId
+                )
+                .then(() => {
+                  resolve(true);
+                });
+            });
           })
           .catch((e) => {
             this.logger.error(

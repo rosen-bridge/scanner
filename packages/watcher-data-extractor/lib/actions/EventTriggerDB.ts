@@ -45,6 +45,7 @@ class EventTriggerDB {
           return entity.boxId === trigger.boxId;
         });
         const entity = {
+          txId: trigger.txId,
           eventId: trigger.eventId,
           boxId: trigger.boxId,
           boxSerialized: trigger.boxSerialized,
@@ -102,18 +103,24 @@ class EventTriggerDB {
    * @param spendId
    * @param block
    * @param extractor
+   * @param txId
    */
   spendEventTriggers = async (
     spendId: Array<string>,
     block: BlockEntity,
-    extractor: string
+    extractor: string,
+    txId: string
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.datasource
         .createQueryBuilder()
         .update(eventTriggerEntity)
-        .set({ spendBlock: block.hash, spendHeight: block.height })
+        .set({
+          spendBlock: block.hash,
+          spendHeight: block.height,
+          spendTxId: txId,
+        })
         .where({ boxId: In(spendIdChunk) })
         .andWhere({ extractor: extractor })
         .execute();

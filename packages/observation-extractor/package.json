@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/observation-extractor",
-  "version": "0.3.11",
+  "version": "1.0.1",
   "description": "",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
@@ -21,11 +21,12 @@
   "dependencies": {
     "@cardano-ogmios/schema": "^5.5.7",
     "@rosen-bridge/logger-interface": "^0.1.0",
-    "@rosen-bridge/scanner": "^0.4.8",
-    "@rosen-bridge/tokens": "^0.1.8",
-    "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.0-alpha-1f24f53",
     "lodash-es": "^4.17.21",
+    "@rosen-bridge/scanner": "^1.0.1",
+    "@rosen-bridge/tokens": "^0.1.12",
+    "@rosen-bridge/rosen-extractor": "^0.1.7",
+    "blakejs": "^1.2.1",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"
@@ -34,7 +35,6 @@
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
     "@types/jest": "^28.1.6",
-    "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.26.0",

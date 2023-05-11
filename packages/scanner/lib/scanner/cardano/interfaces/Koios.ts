@@ -38,18 +38,18 @@ interface Withdrawal {
 }
 
 interface MetaData {
-  [key: string]: JSON;
+  [key: string]: Record<string, unknown>;
 }
 
 interface Certificate {
   index?: number | null;
   type: string;
-  info: JSON;
+  info: Record<string, unknown>;
 }
 
 interface NativeScript {
   script_hash: string;
-  script_json: JSON;
+  script_json: Record<string, unknown>;
 }
 
 interface PlutusContract {

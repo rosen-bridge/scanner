@@ -10,6 +10,9 @@ class EventTriggerEntity {
   eventId: string;
 
   @Column()
+  txId: string;
+
+  @Column()
   extractor: string;
 
   @Column()
@@ -64,10 +67,13 @@ class EventTriggerEntity {
   WIDs: string;
 
   @Column({ nullable: true })
-  spendBlock!: string;
+  spendBlock?: string;
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column({ nullable: true })
+  spendTxId?: string;
 }
 
 export default EventTriggerEntity;
