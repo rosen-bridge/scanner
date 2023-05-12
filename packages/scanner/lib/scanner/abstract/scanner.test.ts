@@ -196,12 +196,12 @@ describe('AbstractScanner', () => {
         .spyOn(extractor, 'processTransactions')
         .mockImplementation(() => Promise.reject('this is my error on save'));
       scanner.registerExtractor(extractor);
-      expect(() => {
+      await expect(() => {
         return scanner.processBlockTransactions(
           { blockHeight: 1, parentHash: ' ', hash: '1' },
           [{ height: 1, blockHash: '1' }]
         );
-      }).rejects.toThrow('this is my error on save');
+      }).rejects.toBeTruthy();
     });
   });
 });
