@@ -3,11 +3,10 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import EventTriggerDB from '../actions/EventTriggerDB';
 import {
   AbstractExtractor,
-  AbstractLogger,
   BlockEntity,
-  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
 import { blake2b } from 'blakejs';

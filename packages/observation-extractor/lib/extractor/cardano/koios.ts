@@ -4,12 +4,8 @@ import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
 import { KoiosTransaction } from '../../interfaces/koiosTransaction';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  AbstractLogger,
-  DummyLogger,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
 

@@ -1,7 +1,6 @@
 import { AbstractExtractor, Block } from '../../interfaces';
 import { BlockDbAction } from '../action';
-import { AbstractLogger } from '../../loger/AbstractLogger';
-import { DummyLogger } from '../../loger/DummyLogger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -56,15 +55,11 @@ export abstract class AbstractScanner<TransactionType> {
       return false;
     }
     let success = true;
-    try {
-      for (const extractor of this.extractors) {
-        if (!(await extractor.processTransactions(transactions, savedBlock))) {
-          success = false;
-          break;
-        }
+    for (const extractor of this.extractors) {
+      if (!(await extractor.processTransactions(transactions, savedBlock))) {
+        success = false;
+        break;
       }
-    } catch (e) {
-      success = false;
     }
     if (success && (await this.action.updateBlockStatus(block.blockHeight))) {
       return savedBlock;

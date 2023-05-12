@@ -1,9 +1,5 @@
-import {
-  AbstractExtractor,
-  BlockEntity,
-  DummyLogger,
-  AbstractLogger,
-} from '@rosen-bridge/scanner';
+import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { TxBabbage } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';

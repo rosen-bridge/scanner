@@ -1,7 +1,8 @@
 import { BoxEntity } from '../entities/boxEntity';
 import { DataSource, In, LessThan } from 'typeorm';
 import ExtractedBox from '../interfaces/ExtractedBox';
-import { BlockEntity, AbstractLogger } from '@rosen-bridge/scanner';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { BlockEntity } from '@rosen-bridge/scanner';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;

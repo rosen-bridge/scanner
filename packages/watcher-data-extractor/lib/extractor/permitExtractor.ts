@@ -4,11 +4,10 @@ import PermitEntityAction from '../actions/permitDB';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import {
   AbstractExtractor,
-  AbstractLogger,
   BlockEntity,
-  DummyLogger,
   Transaction,
 } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { ExplorerApi } from '../network/ergoNetworkApi';

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Sahand Zoufan",
   "license": "GPL-3.0",
@@ -19,14 +19,16 @@
     "dist"
   ],
   "dependencies": {
-    "@rosen-bridge/scanner": "^1.0.0",
+    "@rosen-bridge/logger-interface": "^0.1.0",
+    "@rosen-bridge/scanner": "^1.0.1",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
-    "ergo-lib-wasm-nodejs": "^0.21.0",
+    "ergo-lib-wasm-nodejs": "^0.24.0-alpha-1f24f53",
+    "json-bigint": "^1.0.0",
     "lodash-es": "^4.17.21",
+    "pg": "^8.10.0",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
-    "json-bigint": "^1.0.0",
     "typeorm": "^0.3.7"
   },
   "type": "module",
@@ -37,7 +39,6 @@
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.26.0",
-    "c8": "^7.11.3",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.3",

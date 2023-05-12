@@ -4,7 +4,7 @@ import EventTriggerDB from './EventTriggerDB';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { block } from '../extractor/utilsVariable.mock';
 import { DataSource } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/scanner';
+import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
   eventId: 'eventId',

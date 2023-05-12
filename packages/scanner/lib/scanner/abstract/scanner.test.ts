@@ -184,23 +184,24 @@ describe('AbstractScanner', () => {
     });
 
     /**
-     * Test when extractor raise Exception must return False
+     * Test when extractor raise Exception must rethrow it.
      * Dependency: Nothing
      * Scenario: Mock extractor to raise exception when pass transactions to it.
-     * Expected: returns false
+     * Expected: throw exception
      */
-    it('should return false when extractor raise exception', async () => {
+    it('should rethrow when extractor raise exception', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
       jest
         .spyOn(extractor, 'processTransactions')
-        .mockImplementation(() => Promise.reject(''));
+        .mockImplementation(() => Promise.reject('this is my error on save'));
       scanner.registerExtractor(extractor);
-      const res = await scanner.processBlockTransactions(
-        { blockHeight: 1, parentHash: ' ', hash: '1' },
-        [{ height: 1, blockHash: '1' }]
-      );
-      expect(res).toBeFalsy();
+      await expect(() => {
+        return scanner.processBlockTransactions(
+          { blockHeight: 1, parentHash: ' ', hash: '1' },
+          [{ height: 1, blockHash: '1' }]
+        );
+      }).rejects.toBeTruthy();
     });
   });
 });

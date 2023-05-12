@@ -18,7 +18,7 @@ import {
 } from '@cardano-ogmios/client/dist/ChainSync';
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
-import { AbstractLogger } from '../../../loger/AbstractLogger';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -37,8 +37,13 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   port: number;
   name = () => 'cardano-ogmios';
 
-  constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: CardanoOgmiosConfig,
+    logger?: AbstractLogger,
+    stopLimit?: number,
+    restartPoint?: number
+  ) {
+    super(logger, stopLimit, restartPoint);
     this.action = new BlockDbAction(config.dataSource, this.name());
     this.host = config.nodeIp;
     this.port = config.nodePort;
@@ -59,12 +64,20 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     requestNext: () => void
   ) => {
     const hash = (response.point as Point).hash;
-    const block = await this.action.getBlockWithHash(hash);
+    const savedBlock = await this.action.getBlockWithHash(hash);
     this.logger.debug(
-      `Rolling backward to height ${block?.height} in scanner ${this.name()}`
+      `Rolling backward to height ${
+        savedBlock?.height
+      } in scanner ${this.name()}`
     );
-    if (block) {
-      await this.forkBlock(block.height + 1);
+    if (savedBlock) {
+      const block = {
+        hash: savedBlock.hash,
+        blockHeight: savedBlock.height,
+        parentHash: savedBlock.parentHash,
+        extra: savedBlock.extra,
+      };
+      await this.backwardBlock(block);
     }
     requestNext();
   };
@@ -78,7 +91,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
       const babbageBlock = (response.block as Babbage).babbage;
       this.logger.debug(
-        `Processing new block at height ${
+        `Queueing new block at height ${
           babbageBlock.header.blockHeight
         } in scanner ${this.name()}`
       );
@@ -143,10 +156,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     const intersect = await this.findIntersection(context);
     if (intersect) {
       // find intersect then start from that point
-      this.client = await createChainSyncClient(context, {
-        rollBackward: this.rollBackward,
-        rollForward: this.rollForward,
-      });
+      this.client = await createChainSyncClient(
+        context,
+        {
+          rollBackward: this.rollBackward,
+          rollForward: this.rollForward,
+        },
+        { sequential: true }
+      );
       await this.forkBlock(intersect.height + 1);
       await this.client.startSync([intersect.point]);
     } else {

@@ -8,7 +8,6 @@ import {
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockEntity } from '../../entities/blockEntity';
-import { type } from 'os';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 let dataSource: DataSource;

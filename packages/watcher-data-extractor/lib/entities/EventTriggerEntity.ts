@@ -6,7 +6,7 @@ class EventTriggerEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: 'Not-set' })
   eventId: string;
 
   @Column()

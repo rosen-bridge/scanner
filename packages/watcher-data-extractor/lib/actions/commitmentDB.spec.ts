@@ -2,7 +2,7 @@ import CommitmentEntityAction from './commitmentDB';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { block } from '../extractor/utilsVariable.mock';
 import { loadDataBase } from '../extractor/utilsFunctions.mock';
-import { DummyLogger } from '@rosen-bridge/scanner';
+import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const commitment1 = {
   txId: 'txId1',

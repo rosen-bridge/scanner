@@ -5,11 +5,10 @@ import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
 import {
   AbstractExtractor,
-  AbstractLogger,
   BlockEntity,
   Transaction,
-  DummyLogger,
 } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 

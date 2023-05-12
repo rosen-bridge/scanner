@@ -1,9 +1,8 @@
 import { Block } from '../../interfaces';
 import { ErgoNetworkApi } from './network/ergoNetworkApi';
 import { ErgoScannerConfig } from './interfaces';
-import { AbstractLogger } from '../../loger/AbstractLogger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { Transaction } from './network/types';
-import { DummyLogger } from '../../loger/DummyLogger';
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';
 
