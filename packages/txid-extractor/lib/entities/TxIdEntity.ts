@@ -6,7 +6,7 @@ export class TxIdEntity {
   id: number;
 
   @Column()
-  tx_id: string;
+  txId: string;
 
   @Column()
   block: string;

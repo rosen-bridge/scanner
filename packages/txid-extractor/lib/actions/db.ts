@@ -50,7 +50,7 @@ export class TxAction {
       .createQueryBuilder()
       .insert()
       .values(
-        txIds.map((item) => ({ tx_id: item, extractor, block: block.hash }))
+        txIds.map((item) => ({ txId: item, extractor, block: block.hash }))
       )
       .execute();
   };

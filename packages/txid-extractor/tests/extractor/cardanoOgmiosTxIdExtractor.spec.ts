@@ -41,7 +41,7 @@ describe('CardanoOgmiosTxIdExtractor', () => {
       ];
       expect(elements.length).toEqual(3);
       for (const txId of txIds) {
-        const filteredElements = elements.filter((item) => item.tx_id === txId);
+        const filteredElements = elements.filter((item) => item.txId === txId);
         expect(filteredElements.length).toEqual(1);
         const element = filteredElements[0];
         expect(element.block).toEqual('block 1');
