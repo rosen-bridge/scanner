@@ -14,18 +14,18 @@ export class TxAction {
 
   /**
    * remove all inserted transaction for specific block in specific extractor from database
-   * @param block selected block id
+   * @param blockId selected block id
    * @param extractor selected extractor
    */
-  deleteBlockTransactions = async (block: string, extractor: string) => {
+  deleteBlockTransactions = async (blockId: string, extractor: string) => {
     this.logger.info(
-      `Deleting transaction in block ${block} and extractor ${extractor}`
+      `Deleting transaction in block ${blockId} and extractor ${extractor}`
     );
     await this.repository
       .createQueryBuilder()
       .delete()
-      .where('extractor = :extractor AND block = :block', {
-        block: block,
+      .where('extractor = :extractor AND blockId = :blockId', {
+        blockId: blockId,
         extractor: extractor,
       })
       .execute();
@@ -50,7 +50,7 @@ export class TxAction {
       .createQueryBuilder()
       .insert()
       .values(
-        txIds.map((item) => ({ txId: item, extractor, block: block.hash }))
+        txIds.map((item) => ({ txId: item, extractor, blockId: block.hash }))
       )
       .execute();
   };

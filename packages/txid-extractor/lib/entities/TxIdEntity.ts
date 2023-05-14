@@ -9,7 +9,7 @@ export class TxIdEntity {
   txId: string;
 
   @Column()
-  block: string;
+  blockId: string;
 
   @Column()
   extractor: string;

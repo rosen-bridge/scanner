@@ -1,11 +1,6 @@
-import { DummyLogger } from '@rosen-bridge/logger-interface';
 import { loadDataBase } from '../utils.mock';
-import { TxAction } from '../../lib/actions/db';
 import { CardanoOgmiosTxIdExtractor, TxIdEntity } from '../../lib';
 import txs from './data/cardanoOgmiosTxIdExtractor.data';
-import exp = require('constants');
-
-const logger = new DummyLogger();
 
 describe('CardanoOgmiosTxIdExtractor', () => {
   describe('processTransactions', () => {
@@ -44,7 +39,7 @@ describe('CardanoOgmiosTxIdExtractor', () => {
         const filteredElements = elements.filter((item) => item.txId === txId);
         expect(filteredElements.length).toEqual(1);
         const element = filteredElements[0];
-        expect(element.block).toEqual('block 1');
+        expect(element.blockId).toEqual('block 1');
         expect(element.extractor).toEqual('extractor1');
       }
     });

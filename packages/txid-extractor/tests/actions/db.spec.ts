@@ -32,8 +32,8 @@ describe('TxAction', () => {
      */
     it('should delete all stored txs for specific block', async () => {
       const txs = [
-        { txId: 'txid1block1', block: 'block1', extractor: 'extractor 1' },
-        { txId: 'txid2block1', block: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid1block1', blockId: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
       await action.deleteBlockTransactions('block1', 'extractor 1');
@@ -51,10 +51,10 @@ describe('TxAction', () => {
      */
     it('should delete only expected block txs', async () => {
       const txs = [
-        { txId: 'txid1block1', block: 'block1', extractor: 'extractor 1' },
-        { txId: 'txid2block1', block: 'block1', extractor: 'extractor 1' },
-        { txId: 'txid1block2', block: 'block2', extractor: 'extractor 1' },
-        { txId: 'txid2block2', block: 'block2', extractor: 'extractor 1' },
+        { txId: 'txid1block1', blockId: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid1block2', blockId: 'block2', extractor: 'extractor 1' },
+        { txId: 'txid2block2', blockId: 'block2', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
       await action.deleteBlockTransactions('block1', 'extractor 1');
@@ -72,10 +72,10 @@ describe('TxAction', () => {
      */
     it('should delete only selected extractor txs', async () => {
       const txs = [
-        { txId: 'txid1block1', block: 'block1', extractor: 'extractor 1' },
-        { txId: 'txid2block1', block: 'block1', extractor: 'extractor 1' },
-        { txId: 'txid1block1', block: 'block1', extractor: 'extractor 2' },
-        { txId: 'txid2block1', block: 'block1', extractor: 'extractor 2' },
+        { txId: 'txid1block1', blockId: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 1' },
+        { txId: 'txid1block1', blockId: 'block1', extractor: 'extractor 2' },
+        { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 2' },
       ];
       for (const tx of txs) await repository.insert(tx);
       await action.deleteBlockTransactions('block1', 'extractor 1');
@@ -112,7 +112,7 @@ describe('TxAction', () => {
       for (const txId of txIds) {
         const element = elements.filter((item) => item.txId === txId);
         expect(element.length).toEqual(1);
-        expect(element[0].block).toEqual('block 1');
+        expect(element[0].blockId).toEqual('block 1');
         expect(element[0].extractor).toEqual('extractor 1');
       }
     });

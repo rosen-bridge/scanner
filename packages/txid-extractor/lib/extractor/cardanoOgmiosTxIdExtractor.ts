@@ -11,7 +11,6 @@ export class CardanoOgmiosTxIdExtractor
   private readonly dataSource: DataSource;
   readonly actions: TxAction;
   private readonly id: string;
-  private url: string;
 
   constructor(
     dataSource: DataSource,

@@ -8,7 +8,7 @@ export class TxIdEntity1683960694422 implements MigrationInterface {
       `CREATE TABLE "tx_id_entity" (
         "id" serial PRIMARY KEY NOT NULL,
         "txId" varchar NOT NULL, 
-        "block" varchar NOT NULL, 
+        "blockId" varchar NOT NULL, 
         "extractor" varchar NOT NULL)`
     );
   }
