@@ -8,8 +8,7 @@ export class CardanoOgmiosTxIdExtractor
   implements AbstractExtractor<TxBabbage>
 {
   readonly logger: AbstractLogger;
-  private readonly dataSource: DataSource;
-  readonly actions: TxAction;
+  readonly action: TxAction;
   private readonly id: string;
 
   constructor(
@@ -17,44 +16,28 @@ export class CardanoOgmiosTxIdExtractor
     id: string,
     logger: AbstractLogger = new DummyLogger()
   ) {
-    this.dataSource = dataSource;
     this.id = id;
     this.logger = logger;
-    this.actions = new TxAction(dataSource, this.logger);
+    this.action = new TxAction(dataSource, this.logger);
   }
 
   /**
    * get Id for current extractor
    */
-  getId = () => `${this.id}`;
+  getId = () => this.id;
 
   /**
    * gets block id and transactions corresponding to the block and saves all transaction ids in database
    * @param txs
    * @param block
    */
-  processTransactions = (
+  processTransactions = async (
     txs: Array<TxBabbage>,
     block: BlockEntity
   ): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const txIds = txs.map((item) => item.id);
-        this.actions
-          .storeTxs(txIds, block, this.getId())
-          .then(() => {
-            resolve(true);
-          })
-          .catch((e) => {
-            this.logger.error(
-              `An error uncached exception occurred during store ergo observation: ${e}`
-            );
-            reject(e);
-          });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    const txIds = txs.map((item) => item.id);
+    await this.action.storeTxs(txIds, block, this.getId());
+    return true;
   };
 
   /**
@@ -62,7 +45,7 @@ export class CardanoOgmiosTxIdExtractor
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockTransactions(hash, this.getId());
+    await this.action.deleteBlockTxs(hash, this.getId());
   };
 
   /**

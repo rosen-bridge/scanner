@@ -17,7 +17,7 @@ export class TxAction {
    * @param blockId selected block id
    * @param extractor selected extractor
    */
-  deleteBlockTransactions = async (blockId: string, extractor: string) => {
+  deleteBlockTxs = async (blockId: string, extractor: string) => {
     this.logger.info(
       `Deleting transaction in block ${blockId} and extractor ${extractor}`
     );
@@ -32,7 +32,8 @@ export class TxAction {
   };
 
   /**
-   * store a list of transaction in database for specific block and extractor
+   * remove old list of transactions and
+   * store a new list of transactions database for specific block and extractor
    * @param txIds
    * @param block
    * @param extractor
@@ -42,7 +43,7 @@ export class TxAction {
     block: BlockEntity,
     extractor: string
   ) => {
-    await this.deleteBlockTransactions(block.hash, extractor);
+    await this.deleteBlockTxs(block.hash, extractor);
     this.logger.info(
       `Inserting new transactions in block ${block} and extractor ${extractor}`
     );

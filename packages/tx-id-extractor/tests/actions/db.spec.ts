@@ -11,7 +11,7 @@ let repository: Repository<TxIdEntity>;
 
 describe('TxAction', () => {
   beforeAll(async () => {
-    dataSource = await loadDataBase('db1');
+    dataSource = await loadDataBase();
     action = new TxAction(dataSource, logger);
     repository = dataSource.getRepository(TxIdEntity);
   });
@@ -20,13 +20,13 @@ describe('TxAction', () => {
     await repository.createQueryBuilder().delete().execute();
   });
 
-  describe('deleteBlockTransactions', () => {
+  describe('deleteBlockTxs', () => {
     /**
-     * @target TxAction.deleteBlockTransactions should delete all stored txs for specific block
+     * @target TxAction.deleteBlockTxs should delete all stored txs for specific block
      * @dependency
      * @scenario
      * - insert two transaction for a block
-     * - call deleteBlockTransactions
+     * - call deleteBlockTxs
      * @expected
      * - TxEntities must be empty
      */
@@ -36,16 +36,16 @@ describe('TxAction', () => {
         { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTransactions('block1', 'extractor 1');
+      await action.deleteBlockTxs('block1', 'extractor 1');
       expect(await repository.count()).toEqual(0);
     });
 
     /**
-     * @target TxAction.deleteBlockTransactions should delete only expected block txs
+     * @target TxAction.deleteBlockTxs should delete only expected block txs
      * @dependency
      * @scenario
      * - insert four transaction for two blocks
-     * - call deleteBlockTransactions
+     * - call deleteBlockTxs
      * @expected
      * - TxEntities elements count must be 2
      */
@@ -57,16 +57,16 @@ describe('TxAction', () => {
         { txId: 'txid2block2', blockId: 'block2', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTransactions('block1', 'extractor 1');
+      await action.deleteBlockTxs('block1', 'extractor 1');
       expect(await repository.count()).toEqual(2);
     });
 
     /**
-     * @target TxAction.deleteBlockTransactions should delete only selected extractor txs
+     * @target TxAction.deleteBlockTxs should delete only selected extractor txs
      * @dependency
      * @scenario
      * - insert four transaction for two extractor for same block
-     * - call deleteBlockTransactions
+     * - call deleteBlockTxs
      * @expected
      * - TxEntities elements count must be 2
      */
@@ -78,7 +78,7 @@ describe('TxAction', () => {
         { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 2' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTransactions('block1', 'extractor 1');
+      await action.deleteBlockTxs('block1', 'extractor 1');
       expect(await repository.count()).toEqual(2);
     });
   });

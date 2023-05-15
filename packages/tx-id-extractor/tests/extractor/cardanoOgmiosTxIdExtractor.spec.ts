@@ -5,15 +5,15 @@ import txs from './data/cardanoOgmiosTxIdExtractor.data';
 describe('CardanoOgmiosTxIdExtractor', () => {
   describe('processTransactions', () => {
     /**
-     * @target CardanoOgmiosTxIdExtractor.processTransactions should call TxAction.storeTxs with list of all transactions
+     * @target CardanoOgmiosTxIdExtractor.processTransactions should store all transaction ids of block in database
      * @dependency
      * @scenario
      * - call processTransactions with 3 txs in a block
      * @expected
      * - three instance of txId must insert to database with expected data
      */
-    it('should call TxAction.storeTxs with list of all transactions', async () => {
-      const dataSource = await loadDataBase('db1');
+    it('should store all transaction ids of block in database', async () => {
+      const dataSource = await loadDataBase();
       const extractor = new CardanoOgmiosTxIdExtractor(
         dataSource,
         'extractor1'

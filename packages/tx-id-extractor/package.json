@@ -1,7 +1,7 @@
 {
-  "name": "@rosen-bridge/txid-extractor",
+  "name": "@rosen-bridge/tx-id-extractor",
   "version": "0.1.0",
-  "description": "TxID extractor.",
+  "description": "Extract and store all transaction ids in ogmios blocks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -10,9 +10,9 @@
   "scripts": {
     "prettify": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint --fix . && npm run prettify",
-    "test": "rimraf sqlite && jest --detectOpenHandles ; rimraf sqlite",
-    "coverage": "rimraf sqlite && jest --detectOpenHandles --coverage; rimraf sqlite",
-    "build": "tsc --build",
+    "test": "jest --detectOpenHandles",
+    "coverage": "jest --detectOpenHandles --coverage",
+    "build": "tsc --build tsconfig.build.json",
     "type-check": "tsc --noEmit",
     "release": "npm run test && npm run build && npm publish --access public"
   },
@@ -39,9 +39,7 @@
     "jest": "^28.1.3",
     "json-bigint": "^1.0.0",
     "prettier": "2.7.1",
-    "rimraf": "^3.0.2",
     "ts-jest": "^28.0.7",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.7.4"
+    "typescript": "^5.0.4"
   }
 }

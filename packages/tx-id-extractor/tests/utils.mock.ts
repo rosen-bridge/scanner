@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { TxIdEntity } from '../lib';
 import { migrations } from '../lib';
 
-const loadDataBase = async (name: string): Promise<DataSource> => {
+const loadDataBase = async (): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
     database: ':memory:',
