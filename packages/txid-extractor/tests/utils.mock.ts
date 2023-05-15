@@ -5,7 +5,7 @@ import { migrations } from '../lib';
 const loadDataBase = async (name: string): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
-    database: `./sqlite/${name}-test.sqlite`,
+    database: ':memory:',
     entities: [TxIdEntity],
     migrations: [...migrations.sqlite],
     synchronize: false,
