@@ -7,7 +7,7 @@ const loadDataBase = async (name: string): Promise<DataSource> => {
     type: 'sqlite',
     database: ':memory:',
     entities: [TxIdEntity],
-    migrations: [...migrations.sqlite],
+    migrations: migrations.sqlite,
     synchronize: false,
     logging: false,
   })
