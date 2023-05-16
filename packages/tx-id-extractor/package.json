@@ -21,8 +21,6 @@
   "dependencies": {
     "@rosen-bridge/logger-interface": "^0.1.0",
     "@rosen-bridge/scanner": "^1.0.1",
-    "blakejs": "^1.2.1",
-    "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"
   },

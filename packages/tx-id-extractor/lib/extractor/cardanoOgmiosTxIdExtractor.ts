@@ -4,9 +4,7 @@ import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { TxBabbage } from '@cardano-ogmios/schema';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 
-export class CardanoOgmiosTxIdExtractor
-  implements AbstractExtractor<TxBabbage>
-{
+export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<TxBabbage> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
@@ -16,6 +14,7 @@ export class CardanoOgmiosTxIdExtractor
     id: string,
     logger: AbstractLogger = new DummyLogger()
   ) {
+    super();
     this.id = id;
     this.logger = logger;
     this.action = new TxAction(dataSource, this.logger);
