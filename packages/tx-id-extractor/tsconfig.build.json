@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "exclude": ["tests"],
-  "references": [{ "path": "../scanner" }]
-}
