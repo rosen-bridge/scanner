@@ -4,7 +4,7 @@ import { migrations } from '../../lib';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
 
-const loadDataBase = async (): Promise<DataSource> => {
+const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
     database: `:memory:`,
@@ -219,4 +219,4 @@ const addressBoxes = {
   total: 2,
 };
 
-export { loadDataBase, generateBlockEntity, tx1, addressBoxes, tokenBoxes };
+export { createDatabase, generateBlockEntity, tx1, addressBoxes, tokenBoxes };
