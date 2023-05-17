@@ -3,8 +3,8 @@ import {
   loadDataBase,
   permitTxGenerator,
 } from './utilsFunctions.mock';
-import PermitExtractor from './permitExtractor';
-import PermitEntity from '../entities/PermitEntity';
+import PermitExtractor from '../../lib/extractor/permitExtractor';
+import PermitEntity from '../../lib/entities/PermitEntity';
 import {
   addressBoxes,
   block,
@@ -14,7 +14,7 @@ import {
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 
 let dataSource: DataSource;
 

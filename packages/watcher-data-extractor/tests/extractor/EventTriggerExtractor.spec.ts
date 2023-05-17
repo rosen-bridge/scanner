@@ -3,13 +3,13 @@ import {
   eventTriggerTxGenerator,
   loadDataBase,
 } from './utilsFunctions.mock';
-import EventTriggerExtractor from './EventTriggerExtractor';
-import EventTriggerEntity from '../entities/EventTriggerEntity';
+import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
+import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
 import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
 import { sampleEventEntity } from '../actions/EventTrigger.spec';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -114,7 +114,7 @@ describe('EventTriggerExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 2
      */
     it('should save 2 eventTrigger successfully out of 5 transaction', async () => {
-      const dataSource = await loadDataBase('eventTriggerExtractor');
+      const dataSource = await loadDataBase();
       const repository1 = dataSource.getRepository(EventTriggerEntity);
       const [, rowsCount1] = await repository1.findAndCount();
       expect(rowsCount1).toBe(0);

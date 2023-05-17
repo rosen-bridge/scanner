@@ -1,5 +1,5 @@
-import PermitEntityAction from './permitDB';
-import PermitEntity from '../entities/PermitEntity';
+import PermitEntityAction from '../../lib/actions/permitDB';
+import PermitEntity from '../../lib/entities/PermitEntity';
 import { block } from '../extractor/utilsVariable.mock';
 import { loadDataBase } from '../extractor/utilsFunctions.mock';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
@@ -42,7 +42,7 @@ describe('PermitEntityAction', () => {
      * Expected: storeBoxes should returns true and database row count should be 2
      */
     it('gets two PermitBox and dataBase row should be 2', async () => {
-      const dataSource = await loadDataBase('savePermit');
+      const dataSource = await loadDataBase();
       const permitEntity = new PermitEntityAction(dataSource, logger);
       const res = await permitEntity.storePermits(
         [samplePermit1, samplePermit2],
@@ -82,7 +82,7 @@ describe('PermitEntityAction', () => {
      * Expected: storePermits should returns true and each saved permit should have valid fields
      */
     it('checks that permit saved successfully with two different extractor', async () => {
-      const dataSource = await loadDataBase('twoExtractor');
+      const dataSource = await loadDataBase();
       const action = new PermitEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
@@ -136,7 +136,7 @@ describe('PermitEntityAction', () => {
      * Expected: storePermits should returns true and last permit fields should update
      */
     it('checks that duplicated permit updated with same extractor', async () => {
-      const dataSource = await loadDataBase('permit-duplicatedFields');
+      const dataSource = await loadDataBase();
       const action = new PermitEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
@@ -185,7 +185,7 @@ describe('PermitEntityAction', () => {
      *  each step and new permit should insert in the database
      */
     it('Two permit with two different extractor but same boxId', async () => {
-      const dataSource = await loadDataBase('permit-same-boxId');
+      const dataSource = await loadDataBase();
       const action = new PermitEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
@@ -233,7 +233,7 @@ describe('PermitEntityAction', () => {
      *  each step and new permits should insert in the database
      */
     it('two permit with two different boxId but same extractor', async () => {
-      const dataSource = await loadDataBase('permit-same-extractor');
+      const dataSource = await loadDataBase();
       const action = new PermitEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
@@ -275,7 +275,7 @@ describe('PermitEntityAction', () => {
 
   describe('spendPermits', () => {
     it('sets one spendBlock for one permit & one row should have spendBlock', async () => {
-      const dataSource = await loadDataBase('spendPermit');
+      const dataSource = await loadDataBase();
       const permitEntity = new PermitEntityAction(dataSource, logger);
       const res = await permitEntity.storePermits(
         [samplePermit1, samplePermit2],
@@ -302,7 +302,7 @@ describe('PermitEntityAction', () => {
    */
   describe('deleteBlock', () => {
     it('should deleted one row of the dataBase correspond to one block', async () => {
-      const dataSource = await loadDataBase('permit-deleteBlock');
+      const dataSource = await loadDataBase();
       const permitEntity = new PermitEntityAction(dataSource, logger);
       let res = await permitEntity.storePermits(
         [samplePermit1],
@@ -333,7 +333,7 @@ describe('PermitEntityAction', () => {
      * Expected: storeBoxes should returns true and database row count should be 1
      */
     it('store an initial permit box', async () => {
-      const dataSource = await loadDataBase('saveInitialPermit');
+      const dataSource = await loadDataBase();
       const permitEntity = new PermitEntityAction(dataSource, logger);
       const res = await permitEntity.storeInitialPermits(
         [initialPermit],

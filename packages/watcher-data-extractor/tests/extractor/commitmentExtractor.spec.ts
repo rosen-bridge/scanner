@@ -3,11 +3,11 @@ import {
   commitmentTxGenerator,
   loadDataBase,
 } from './utilsFunctions.mock';
-import CommitmentExtractor from './commitmentExtractor';
-import CommitmentEntity from '../entities/CommitmentEntity';
+import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
+import CommitmentEntity from '../../lib/entities/CommitmentEntity';
 import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 let dataSource: DataSource;
