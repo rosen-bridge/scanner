@@ -1,4 +1,4 @@
-import { openDataBase, resetDatabase } from './abstract/abstract.mock';
+import { createDatabase } from './abstract/abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockDbAction } from '../../lib/scanner/action';
 import {
@@ -11,13 +11,9 @@ let dataSource: DataSource;
 let action: BlockDbAction;
 
 describe('action', () => {
-  beforeAll(async () => {
-    dataSource = await openDataBase();
-    action = new BlockDbAction(dataSource, 'testScannerName');
-  });
-
   beforeEach(async () => {
-    await resetDatabase(dataSource);
+    dataSource = await createDatabase();
+    action = new BlockDbAction(dataSource, 'testScannerName');
   });
 
   describe('getLastSavedBlock', () => {

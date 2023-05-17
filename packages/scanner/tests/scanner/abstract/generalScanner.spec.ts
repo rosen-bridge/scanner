@@ -3,8 +3,7 @@ import {
   generateMockGeneralScannerClass,
   insertBlocks,
   NetworkConnectorTest,
-  openDataBase,
-  resetDatabase,
+  createDatabase,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockEntity } from '../../../lib';
@@ -13,12 +12,8 @@ const firstScanner = generateMockGeneralScannerClass('first');
 let dataSource: DataSource;
 
 describe('generalScanner', () => {
-  beforeAll(async () => {
-    dataSource = await openDataBase();
-  });
-
   beforeEach(async () => {
-    await resetDatabase(dataSource);
+    dataSource = await createDatabase();
   });
 
   describe('isForkHappen', () => {

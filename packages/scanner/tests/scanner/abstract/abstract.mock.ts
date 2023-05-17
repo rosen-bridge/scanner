@@ -97,7 +97,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
   };
 };
 
-export const openDataBase = async () => {
+export const createDatabase = async () => {
   const dataSource = new DataSource({
     type: 'sqlite',
     database: `:memory:`,
@@ -108,16 +108,7 @@ export const openDataBase = async () => {
   });
   await dataSource.initialize();
   await dataSource.runMigrations();
-  await resetDatabase(dataSource);
   return dataSource;
-};
-
-export const resetDatabase = async (dataSource: DataSource) => {
-  await dataSource
-    .getRepository(BlockEntity)
-    .createQueryBuilder()
-    .delete()
-    .execute();
 };
 
 export const insertBlocks = async (

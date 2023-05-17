@@ -1,11 +1,10 @@
 import {
   ExtractorTest,
-  openDataBase,
-  resetDatabase,
   generateMockScannerClass,
   insertBlocks,
+  createDatabase,
 } from './abstract.mock';
-import { BlockEntity } from '../../../lib/entities/blockEntity';
+import { BlockEntity } from '../../../lib';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
@@ -13,11 +12,8 @@ const secondScanner = generateMockScannerClass('second');
 let dataSource: DataSource;
 
 describe('AbstractScanner', () => {
-  beforeAll(async () => {
-    dataSource = await openDataBase();
-  });
   beforeEach(async () => {
-    await resetDatabase(dataSource);
+    dataSource = await createDatabase();
   });
 
   describe('registerExtractor', () => {
