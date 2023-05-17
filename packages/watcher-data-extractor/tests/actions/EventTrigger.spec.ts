@@ -1,4 +1,4 @@
-import { clearDB, loadDataBase } from '../extractor/utilsFunctions.mock';
+import { clearDB, createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventTriggerEntity } from '../../lib';
 import EventTriggerDB from '../../lib/actions/EventTriggerDB';
 import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
@@ -83,12 +83,8 @@ export const sampleEventEntity = {
 let dataSource: DataSource;
 
 describe('EventTrigger', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   describe('storeEventTriggers', () => {

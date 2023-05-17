@@ -1,8 +1,4 @@
-import {
-  clearDB,
-  commitmentTxGenerator,
-  loadDataBase,
-} from './utilsFunctions.mock';
+import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
 import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
@@ -13,12 +9,8 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 let dataSource: DataSource;
 
 describe('CommitmentExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   /**

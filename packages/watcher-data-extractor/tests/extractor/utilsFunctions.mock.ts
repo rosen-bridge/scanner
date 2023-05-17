@@ -19,7 +19,7 @@ import { Transaction } from '@rosen-bridge/scanner';
  *  used for test datasource
  * @param name
  */
-export const loadDataBase = async (): Promise<DataSource> => {
+export const createDatabase = async (): Promise<DataSource> => {
   const dataSource = new DataSource({
     type: 'sqlite',
     database: `:memory:`,

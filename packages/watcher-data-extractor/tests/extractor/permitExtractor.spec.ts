@@ -1,8 +1,4 @@
-import {
-  clearDB,
-  loadDataBase,
-  permitTxGenerator,
-} from './utilsFunctions.mock';
+import { permitTxGenerator, createDatabase } from './utilsFunctions.mock';
 import PermitExtractor from '../../lib/extractor/permitExtractor';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import {
@@ -19,12 +15,8 @@ import { JsonBI } from '../../lib/network/parser';
 let dataSource: DataSource;
 
 describe('permitExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   /**

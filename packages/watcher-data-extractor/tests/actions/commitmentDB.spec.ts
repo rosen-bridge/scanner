@@ -1,8 +1,9 @@
 import CommitmentEntityAction from '../../lib/actions/commitmentDB';
 import { CommitmentEntity } from '../../lib';
 import { block } from '../extractor/utilsVariable.mock';
-import { loadDataBase } from '../extractor/utilsFunctions.mock';
+import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DataSource } from 'typeorm';
 
 const commitment1 = {
   txId: 'txId1',
@@ -32,8 +33,13 @@ const commitment4 = {
 };
 
 const logger = new DummyLogger();
+let dataSource: DataSource;
 
 describe('commitmentEntityAction', () => {
+  beforeEach(async () => {
+    dataSource = await createDatabase();
+  });
+
   describe('storeCommitments', () => {
     /**
      * 2 valid Commitment should save successfully
@@ -42,7 +48,6 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and database row count should be 2
      */
     it('gets two commitments and dataBase row should be 2', async () => {
-      const dataSource = await loadDataBase();
       const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
@@ -62,7 +67,6 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and each saved commitments should have valid fields
      */
     it('checks that commitments saved successfully with two different extractor', async () => {
-      const dataSource = await loadDataBase();
       const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
@@ -116,7 +120,6 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and last commitment fields should update
      */
     it('checks that duplicated commitment updated with same extractor', async () => {
-      const dataSource = await loadDataBase();
       const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
@@ -164,7 +167,6 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different extractor but same boxId', async () => {
-      const dataSource = await loadDataBase();
       const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
@@ -211,7 +213,6 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different boxId but same extractor', async () => {
-      const dataSource = await loadDataBase();
       const action = new CommitmentEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
@@ -258,7 +259,6 @@ describe('commitmentEntityAction', () => {
    */
   describe('spendCommitments', () => {
     it('sets one spendBlock for one commitment & one row should have spendBlock', async () => {
-      const dataSource = await loadDataBase();
       const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
@@ -290,7 +290,6 @@ describe('commitmentEntityAction', () => {
      * Expected: deleteBlock should call without no error and database row count should be 1
      */
     it('should deleted one row of the dataBase correspond to one block', async () => {
-      const dataSource = await loadDataBase();
       const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
       await commitmentEntity.storeCommitments(
         [commitment1],
