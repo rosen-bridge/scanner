@@ -1,15 +1,15 @@
-import { CardanoKoiosObservationExtractor } from './koios';
-import { KoiosTransaction } from '../../interfaces/koiosTransaction';
+import { CardanoKoiosObservationExtractor } from '../../../lib';
+import { KoiosTransaction } from '../../../lib/interfaces/koiosTransaction';
 import {
   cardanoTxValid,
   generateBlockEntity,
   loadDataBase,
 } from '../utils.mock';
-import { ObservationEntity } from '../../entities/observationEntity';
-import { tokens } from '../tokens.mocked';
+import { ObservationEntity } from '../../../lib';
+import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ERGO_NATIVE_TOKEN } from '../const';
+import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
@@ -26,9 +26,7 @@ describe('cardanoKoiosObservationExtractor', () => {
    */
   describe('processTransactionsCardano', () => {
     it('should returns true valid rosen transaction', async () => {
-      const dataSource = await loadDataBase(
-        'processTransactionCardano-valid-cardano'
-      );
+      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,
@@ -75,9 +73,7 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('database row count should be zero because of invalid bankAddress', async () => {
-      const dataSource = await loadDataBase(
-        'processTransactionCardano-invalid-cardano'
-      );
+      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,
@@ -101,9 +97,7 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('should returns false invalid rosen metadata', async () => {
-      const dataSource = await loadDataBase(
-        'processTransactionCardano-invalid-cardano'
-      );
+      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,

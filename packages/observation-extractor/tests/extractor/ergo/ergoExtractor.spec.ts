@@ -1,14 +1,14 @@
-import { ErgoObservationExtractor } from './ergoExtractor';
+import { ErgoObservationExtractor } from '../../../lib';
 import {
   generateBlockEntity,
   loadDataBase,
   observationTxGenerator,
 } from '../utils.mock';
-import { ObservationEntity } from '../../entities/observationEntity';
-import { tokens } from '../tokens.mocked';
+import { ObservationEntity } from '../../../lib';
+import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { CARDANO_NATIVE_TOKEN } from '../const';
+import { CARDANO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -29,7 +29,7 @@ describe('extractorErgo', () => {
      *  should fulfill expected values
      */
     it('checks valid transaction', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo');
+      const dataSource = await loadDataBase();
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx1 = observationTxGenerator(
         true,
@@ -102,9 +102,7 @@ describe('extractorErgo', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('checks observation with invalid bankAddress should not saved', async () => {
-      const dataSource = await loadDataBase(
-        'processTransactionErgo-invalidBankAddress'
-      );
+      const dataSource = await loadDataBase();
       const extractor = new ExtractorErgo(
         dataSource,
         tokens,
