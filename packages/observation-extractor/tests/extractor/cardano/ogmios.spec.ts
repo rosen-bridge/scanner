@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { loadDataBase, clearDB } from '../utils.mock';
+import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosObservationExtractor } from '../../../lib';
 import { tokens } from '../tokens.mock';
 import { Transactions } from './ogmios.mock';
@@ -12,17 +12,13 @@ const bankAddress =
   'addr1v8xputtxppjx9f255nqgz0xv9cquqm4ndemd659zdz4nznc7guuzv';
 
 describe('CardanoOgmiosObservationExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
+  beforeEach(async () => {
+    dataSource = await createDatabase();
     extractor = new CardanoOgmiosObservationExtractor(
       dataSource,
       tokens,
       bankAddress
     );
-  });
-
-  beforeEach(async () => {
-    await clearDB(dataSource);
   });
 
   describe('processTransactions', () => {

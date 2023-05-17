@@ -421,7 +421,7 @@ export const cardanoTxValid = {
   ],
 };
 
-export const loadDataBase = async (): Promise<DataSource> => {
+export const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
     database: `:memory:`,
@@ -435,10 +435,6 @@ export const loadDataBase = async (): Promise<DataSource> => {
       await dataSource.runMigrations();
       return dataSource;
     });
-};
-
-export const clearDB = async (dataSource: DataSource) => {
-  await dataSource.getRepository(ObservationEntity).clear();
 };
 
 export const observationTxGenerator = (

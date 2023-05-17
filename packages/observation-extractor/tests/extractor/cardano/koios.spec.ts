@@ -3,30 +3,35 @@ import { KoiosTransaction } from '../../../lib/interfaces/koiosTransaction';
 import {
   cardanoTxValid,
   generateBlockEntity,
-  loadDataBase,
+  createDatabase,
 } from '../utils.mock';
 import { ObservationEntity } from '../../../lib';
 import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
+import { DataSource } from 'typeorm';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
 const bankAddress =
   'addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re';
 
+let dataSource: DataSource;
+
 describe('cardanoKoiosObservationExtractor', () => {
-  /**
-   * one Valid Transaction should save successfully
-   * Dependency: action.storeObservations
-   * Scenario: one observation should save successfully
-   * Expected: processTransactions should returns true and database row count should be 1 and dataBase
-   *  field should fulfill expected values
-   */
+  beforeEach(async () => {
+    dataSource = await createDatabase();
+  });
   describe('processTransactionsCardano', () => {
+    /**
+     * one Valid Transaction should save successfully
+     * Dependency: action.storeObservations
+     * Scenario: one observation should save successfully
+     * Expected: processTransactions should returns true and database row count should be 1 and dataBase
+     *  field should fulfill expected values
+     */
     it('should returns true valid rosen transaction', async () => {
-      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,
@@ -73,7 +78,6 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('database row count should be zero because of invalid bankAddress', async () => {
-      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,
@@ -97,7 +101,6 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('should returns false invalid rosen metadata', async () => {
-      const dataSource = await loadDataBase();
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokens,
