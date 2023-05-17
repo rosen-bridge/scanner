@@ -5,7 +5,7 @@ import {
   generateMockScannerClass,
   insertBlocks,
 } from './abstract.mock';
-import { BlockEntity } from '../../entities/blockEntity';
+import { BlockEntity } from '../../../lib/entities/blockEntity';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
@@ -14,7 +14,7 @@ let dataSource: DataSource;
 
 describe('AbstractScanner', () => {
   beforeAll(async () => {
-    dataSource = await openDataBase('scanner');
+    dataSource = await openDataBase();
   });
   beforeEach(async () => {
     await resetDatabase(dataSource);

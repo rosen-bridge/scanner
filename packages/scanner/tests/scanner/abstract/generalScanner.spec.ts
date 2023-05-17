@@ -7,14 +7,14 @@ import {
   resetDatabase,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
-import { BlockEntity } from '../../entities/blockEntity';
+import { BlockEntity } from '../../../lib';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 let dataSource: DataSource;
 
 describe('generalScanner', () => {
   beforeAll(async () => {
-    dataSource = await openDataBase('generalScanner');
+    dataSource = await openDataBase();
   });
 
   beforeEach(async () => {
