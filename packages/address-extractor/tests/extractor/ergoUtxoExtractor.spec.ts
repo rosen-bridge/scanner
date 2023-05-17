@@ -1,5 +1,5 @@
-import { ErgoUTXOExtractor } from './ergoUtxoExtractor';
-import { BoxEntity } from '../entities/boxEntity';
+import { ErgoUTXOExtractor } from '../../lib';
+import { BoxEntity } from '../../lib';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import {
   addressBoxes,
@@ -8,9 +8,9 @@ import {
   tokenBoxes,
   tx1,
 } from './utils.mock';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 import { Buffer } from 'buffer';
-import ExtractedBox from '../interfaces/ExtractedBox';
+import ExtractedBox from '../../lib/interfaces/ExtractedBox';
 
 describe('extractorErgo', () => {
   describe('processTransactions', () => {
@@ -21,7 +21,7 @@ describe('extractorErgo', () => {
      * Expected: stored one box with expected id and information into database
      */
     it('checks transaction by address', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo1');
+      const dataSource = await loadDataBase();
       const extractor = new ErgoUTXOExtractor(
         dataSource,
         'extractor1',
@@ -46,7 +46,7 @@ describe('extractorErgo', () => {
      * Expected: stored one box with expected id and information into database
      */
     it('checks transaction by tokens', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo2');
+      const dataSource = await loadDataBase();
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const extractor = new ErgoUTXOExtractor(
         dataSource,
@@ -73,7 +73,7 @@ describe('extractorErgo', () => {
      * Expected: stored one box with expected id and information into database
      */
     it('checks transaction by tokens', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo3');
+      const dataSource = await loadDataBase();
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const extractor = new ErgoUTXOExtractor(
         dataSource,
@@ -102,7 +102,7 @@ describe('extractorErgo', () => {
      * Expected: stored one box with expected id and information into database
      */
     it('checks transaction by tokens and address', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo4');
+      const dataSource = await loadDataBase();
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const extractor = new ErgoUTXOExtractor(
         dataSource,
@@ -165,7 +165,7 @@ describe('extractorErgo', () => {
      * Expected: extract two box and store it into the database
      */
     it('extracts the initial boxes with address', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo4');
+      const dataSource = await loadDataBase();
       const extractor = new ErgoUTXOExtractor(
         dataSource,
         'extractor1',
@@ -196,7 +196,7 @@ describe('extractorErgo', () => {
      * Expected: extract one box and store it into the database
      */
     it('extracts one initial box with address and token', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo4');
+      const dataSource = await loadDataBase();
       const extractor = new ErgoUTXOExtractor(
         dataSource,
         'extractor1',
@@ -223,7 +223,7 @@ describe('extractorErgo', () => {
      * Expected: extract one box and store it into the database
      */
     it('extracts the initial boxes with token', async () => {
-      const dataSource = await loadDataBase('processTransactionErgo4');
+      const dataSource = await loadDataBase();
       const extractor = new ErgoUTXOExtractor(
         dataSource,
         'extractor1',

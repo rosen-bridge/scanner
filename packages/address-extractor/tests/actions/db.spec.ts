@@ -1,7 +1,7 @@
-import { BoxEntityAction } from './db';
+import { BoxEntityAction } from '../../lib/actions/db';
 import { generateBlockEntity, loadDataBase } from '../extractor/utils.mock';
-import ExtractedBox from '../interfaces/ExtractedBox';
-import { BoxEntity } from '../entities/boxEntity';
+import ExtractedBox from '../../lib/interfaces/ExtractedBox';
+import { BoxEntity } from '../../lib';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 const logger = new DummyLogger();
@@ -15,7 +15,7 @@ describe('BoxEntityAction', () => {
      * Expected: height, blockhash and box information must be correct
      */
     it('should checks boxes saved successfully', async () => {
-      const dataSource = await loadDataBase('db1');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
@@ -41,7 +41,7 @@ describe('BoxEntityAction', () => {
      * Expected: height, blockhash and box information must be correct
      */
     it('should update saved boxes successfully', async () => {
-      const dataSource = await loadDataBase('db-update');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       await dataSource.getRepository(BoxEntity).insert({
         boxId: 'boxid',
@@ -76,7 +76,7 @@ describe('BoxEntityAction', () => {
      * Expected: new instance of box must inserted into database and height, blockhash and box information must be correct
      */
     it('should update saved boxes successfully', async () => {
-      const dataSource = await loadDataBase('db-update');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       await dataSource.getRepository(BoxEntity).insert({
         boxId: 'boxid',
@@ -111,7 +111,7 @@ describe('BoxEntityAction', () => {
      * Expected: spendHeight of box in database must be updated
      */
     it('should set spendBlock on spend box', async () => {
-      const dataSource = await loadDataBase('db2');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
@@ -134,7 +134,7 @@ describe('BoxEntityAction', () => {
      * Expected: spendHeight of box must no changed
      */
     it("shouldn't change spend block of other extractor", async () => {
-      const dataSource = await loadDataBase('db3');
+      const dataSource = await loadDataBase();
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -157,7 +157,7 @@ describe('BoxEntityAction', () => {
      * Expected: must create a spend boxes
      */
     it('create a spend box in database', async () => {
-      const dataSource = await loadDataBase('db4');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
@@ -187,7 +187,7 @@ describe('BoxEntityAction', () => {
      * Expected: must delete box from database
      */
     it('should delete box from database when call delete box with boxId', async () => {
-      const dataSource = await loadDataBase('spendBox1');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxid',
@@ -211,7 +211,7 @@ describe('BoxEntityAction', () => {
      * Expected: must set spendBlock to null
      */
     it('should set spendBlock to null', async () => {
-      const dataSource = await loadDataBase('spendBox2');
+      const dataSource = await loadDataBase();
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -241,7 +241,7 @@ describe('BoxEntityAction', () => {
      * Expected: must not set spendBlock to null
      */
     it('should set spendBlock to null', async () => {
-      const dataSource = await loadDataBase('spendBox3');
+      const dataSource = await loadDataBase();
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -270,7 +270,7 @@ describe('BoxEntityAction', () => {
      * Expected: must delete box
      */
     it('should set spendBlock to null', async () => {
-      const dataSource = await loadDataBase('spendBox4');
+      const dataSource = await loadDataBase();
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -296,7 +296,7 @@ describe('BoxEntityAction', () => {
      * Expected: must store thr correct box
      */
     it('should store initial boxes in the database', async () => {
-      const dataSource = await loadDataBase('initialDb');
+      const dataSource = await loadDataBase();
       const action = new BoxEntityAction(dataSource, logger);
       const box: ExtractedBox = {
         boxId: 'boxId',
