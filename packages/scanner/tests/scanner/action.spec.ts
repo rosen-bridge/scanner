@@ -1,19 +1,19 @@
-import { openDataBase, resetDatabase } from './abstract/abstract.mock';
+import { createDatabase } from './abstract/abstract.mock';
 import { DataSource } from 'typeorm';
-import { BlockDbAction } from './action';
-import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
+import { BlockDbAction } from '../../lib/scanner/action';
+import {
+  BlockEntity,
+  PROCEED,
+  PROCESSING,
+} from '../../lib/entities/blockEntity';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
 
 describe('action', () => {
-  beforeAll(async () => {
-    dataSource = await openDataBase('action');
-    action = new BlockDbAction(dataSource, 'testScannerName');
-  });
-
   beforeEach(async () => {
-    await resetDatabase(dataSource);
+    dataSource = await createDatabase();
+    action = new BlockDbAction(dataSource, 'testScannerName');
   });
 
   describe('getLastSavedBlock', () => {

@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
-import { ObservationEntity } from '../entities/observationEntity';
-import { migrations } from '../migrations';
+import { ObservationEntity } from '../../lib';
+import { migrations } from '../../lib';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
@@ -421,10 +421,10 @@ export const cardanoTxValid = {
   ],
 };
 
-export const loadDataBase = async (name: string): Promise<DataSource> => {
+export const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
-    database: `./sqlite/${name}-test.sqlite`,
+    database: `:memory:`,
     entities: [BlockEntity, ObservationEntity],
     migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],
     synchronize: false,
@@ -435,10 +435,6 @@ export const loadDataBase = async (name: string): Promise<DataSource> => {
       await dataSource.runMigrations();
       return dataSource;
     });
-};
-
-export const clearDB = async (dataSource: DataSource) => {
-  await dataSource.getRepository(ObservationEntity).clear();
 };
 
 export const observationTxGenerator = (

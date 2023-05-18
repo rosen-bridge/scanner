@@ -1,5 +1,5 @@
 import { DummyLogger } from '@rosen-bridge/logger-interface';
-import { loadDataBase } from '../utils.mock';
+import { createDatabase } from '../utils.mock';
 import { TxAction } from '../../lib/actions/db';
 import { TxIdEntity } from '../../lib';
 import { DataSource, Repository } from 'typeorm';
@@ -10,14 +10,10 @@ let action: TxAction;
 let repository: Repository<TxIdEntity>;
 
 describe('TxAction', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
+  beforeEach(async () => {
+    dataSource = await createDatabase();
     action = new TxAction(dataSource, logger);
     repository = dataSource.getRepository(TxIdEntity);
-  });
-
-  beforeEach(async () => {
-    await repository.createQueryBuilder().delete().execute();
   });
 
   describe('deleteBlockTxs', () => {

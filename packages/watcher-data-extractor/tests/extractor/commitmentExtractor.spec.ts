@@ -1,24 +1,16 @@
-import {
-  clearDB,
-  commitmentTxGenerator,
-  loadDataBase,
-} from './utilsFunctions.mock';
-import CommitmentExtractor from './commitmentExtractor';
-import CommitmentEntity from '../entities/CommitmentEntity';
+import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
+import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
+import CommitmentEntity from '../../lib/entities/CommitmentEntity';
 import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { DataSource } from 'typeorm';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 let dataSource: DataSource;
 
 describe('CommitmentExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   /**

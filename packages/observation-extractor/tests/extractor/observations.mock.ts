@@ -1,4 +1,4 @@
-import { ExtractedObservation } from '../interfaces/extractedObservation';
+import { ExtractedObservation } from '../../lib/interfaces/extractedObservation';
 
 export const firstObservations: Array<ExtractedObservation> = [
   {

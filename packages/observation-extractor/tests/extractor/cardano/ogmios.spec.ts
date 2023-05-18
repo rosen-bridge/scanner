@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
-import { loadDataBase, clearDB } from '../utils.mock';
-import { CardanoOgmiosObservationExtractor } from './ogmios';
-import { tokens } from '../tokens.mocked';
+import { createDatabase } from '../utils.mock';
+import { CardanoOgmiosObservationExtractor } from '../../../lib';
+import { tokens } from '../tokens.mock';
 import { Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/scanner';
-import { ObservationEntity } from '../../entities/observationEntity';
+import { ObservationEntity } from '../../../lib';
 
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;
@@ -12,17 +12,13 @@ const bankAddress =
   'addr1v8xputtxppjx9f255nqgz0xv9cquqm4ndemd659zdz4nznc7guuzv';
 
 describe('CardanoOgmiosObservationExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase('generalScanner');
+  beforeEach(async () => {
+    dataSource = await createDatabase();
     extractor = new CardanoOgmiosObservationExtractor(
       dataSource,
       tokens,
       bankAddress
     );
-  });
-
-  beforeEach(async () => {
-    await clearDB(dataSource);
   });
 
   describe('processTransactions', () => {

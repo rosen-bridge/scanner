@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { migrations } from '../migrations';
-import PermitEntity from '../entities/PermitEntity';
-import CommitmentEntity from '../entities/CommitmentEntity';
-import EventTriggerEntity from '../entities/EventTriggerEntity';
+import { migrations } from '../../lib/migrations';
+import PermitEntity from '../../lib/entities/PermitEntity';
+import CommitmentEntity from '../../lib/entities/CommitmentEntity';
+import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import {
   commitmentAddress,
@@ -11,7 +11,7 @@ import {
   permitAddress,
   RWTId,
 } from './utilsVariable.mock';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 import { Transaction } from '@rosen-bridge/scanner';
 
 /**
@@ -19,12 +19,10 @@ import { Transaction } from '@rosen-bridge/scanner';
  *  used for test datasource
  * @param name
  */
-export const loadDataBase = async (
-  name = 'rosen-extractor'
-): Promise<DataSource> => {
+export const createDatabase = async (): Promise<DataSource> => {
   const dataSource = new DataSource({
     type: 'sqlite',
-    database: `./sqlite/${name}-test.sqlite`,
+    database: `:memory:`,
     entities: [PermitEntity, CommitmentEntity, EventTriggerEntity],
     migrations: migrations.sqlite,
     synchronize: false,

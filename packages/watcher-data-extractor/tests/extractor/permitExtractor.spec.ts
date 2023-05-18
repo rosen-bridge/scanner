@@ -1,10 +1,6 @@
-import {
-  clearDB,
-  loadDataBase,
-  permitTxGenerator,
-} from './utilsFunctions.mock';
-import PermitExtractor from './permitExtractor';
-import PermitEntity from '../entities/PermitEntity';
+import { permitTxGenerator, createDatabase } from './utilsFunctions.mock';
+import PermitExtractor from '../../lib/extractor/permitExtractor';
+import PermitEntity from '../../lib/entities/PermitEntity';
 import {
   addressBoxes,
   block,
@@ -14,17 +10,13 @@ import {
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../../lib/network/parser';
 
 let dataSource: DataSource;
 
 describe('permitExtractor', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   /**

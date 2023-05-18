@@ -1,15 +1,13 @@
 import { DataSource } from 'typeorm';
-import { BoxEntity } from '../entities/boxEntity';
-import { migrations } from '../migrations';
+import { BoxEntity } from '../../lib';
+import { migrations } from '../../lib';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../network/parser';
 
-const loadDataBase = async (name: string): Promise<DataSource> => {
+const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({
     type: 'sqlite',
-    database: `./sqlite/${name}-test.sqlite`,
+    database: `:memory:`,
     entities: [BlockEntity, BoxEntity],
     migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],
     synchronize: false,
@@ -221,4 +219,4 @@ const addressBoxes = {
   total: 2,
 };
 
-export { loadDataBase, generateBlockEntity, tx1, addressBoxes, tokenBoxes };
+export { createDatabase, generateBlockEntity, tx1, addressBoxes, tokenBoxes };

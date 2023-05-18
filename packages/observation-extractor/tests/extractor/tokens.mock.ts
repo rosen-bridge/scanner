@@ -1,7 +1,10 @@
-import { ErgoObservationExtractor } from './ergo/ergoExtractor';
-import { CardanoKoiosObservationExtractor } from './cardano/koios';
+import { ErgoObservationExtractor } from '../../lib';
+import { CardanoKoiosObservationExtractor } from '../../lib';
 import { RosenTokens } from '@rosen-bridge/tokens';
-import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from './const';
+import {
+  CARDANO_NATIVE_TOKEN,
+  ERGO_NATIVE_TOKEN,
+} from '../../lib/extractor/const';
 
 export const tokens: RosenTokens = {
   idKeys: {

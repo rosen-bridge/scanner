@@ -1,8 +1,14 @@
-import { loadDataBase } from '../utils.mock';
+import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosTxIdExtractor, TxIdEntity } from '../../lib';
 import txs from './data/cardanoOgmiosTxIdExtractor.data';
+import { DataSource } from 'typeorm';
+
+let dataSource: DataSource;
 
 describe('CardanoOgmiosTxIdExtractor', () => {
+  beforeEach(async () => {
+    dataSource = await createDatabase();
+  });
   describe('processTransactions', () => {
     /**
      * @target CardanoOgmiosTxIdExtractor.processTransactions should store all transaction ids of block in database
@@ -13,7 +19,6 @@ describe('CardanoOgmiosTxIdExtractor', () => {
      * - three instance of txId must insert to database with expected data
      */
     it('should store all transaction ids of block in database', async () => {
-      const dataSource = await loadDataBase();
       const extractor = new CardanoOgmiosTxIdExtractor(
         dataSource,
         'extractor1'

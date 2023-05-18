@@ -1,7 +1,7 @@
-import { clearDB, loadDataBase } from '../extractor/utilsFunctions.mock';
-import EventTriggerEntity from '../entities/EventTriggerEntity';
-import EventTriggerDB from './EventTriggerDB';
-import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
+import { clearDB, createDatabase } from '../extractor/utilsFunctions.mock';
+import { EventTriggerEntity } from '../../lib';
+import EventTriggerDB from '../../lib/actions/EventTriggerDB';
+import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
 import { block } from '../extractor/utilsVariable.mock';
 import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
@@ -83,12 +83,8 @@ export const sampleEventEntity = {
 let dataSource: DataSource;
 
 describe('EventTrigger', () => {
-  beforeAll(async () => {
-    dataSource = await loadDataBase();
-  });
-
   beforeEach(async () => {
-    await clearDB(dataSource);
+    dataSource = await createDatabase();
   });
 
   describe('storeEventTriggers', () => {

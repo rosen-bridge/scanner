@@ -1,14 +1,14 @@
 import { DataSource } from 'typeorm';
-import { BlockEntity } from '../../entities/blockEntity';
+import { BlockEntity } from '../../../lib/entities/blockEntity';
 import {
   Block,
   AbstractExtractor,
   AbstractNetworkConnector,
-} from '../../interfaces';
-import { AbstractScanner } from './scanner';
-import { migrations } from '../../migrations';
-import { BlockDbAction } from '../action';
-import { GeneralScanner } from './generalScanner';
+} from '../../../lib/interfaces';
+import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
+import { migrations } from '../../../lib/migrations';
+import { BlockDbAction } from '../../../lib/scanner/action';
+import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 
 interface TestTransaction {
   height: number;
@@ -97,10 +97,10 @@ export const generateMockGeneralScannerClass = (name: string) => {
   };
 };
 
-export const openDataBase = async (dbName: string) => {
+export const createDatabase = async () => {
   const dataSource = new DataSource({
     type: 'sqlite',
-    database: `./sqlite/testing-${dbName}.sqlite`,
+    database: `:memory:`,
     entities: [BlockEntity],
     synchronize: false,
     migrations: migrations.sqlite,
@@ -108,16 +108,7 @@ export const openDataBase = async (dbName: string) => {
   });
   await dataSource.initialize();
   await dataSource.runMigrations();
-  await resetDatabase(dataSource);
   return dataSource;
-};
-
-export const resetDatabase = async (dataSource: DataSource) => {
-  await dataSource
-    .getRepository(BlockEntity)
-    .createQueryBuilder()
-    .delete()
-    .execute();
 };
 
 export const insertBlocks = async (

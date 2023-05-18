@@ -1,16 +1,25 @@
-import { ObservationEntityAction } from './db';
-import { ObservationEntity } from '../entities/observationEntity';
-import { generateBlockEntity, loadDataBase } from '../extractor/utils.mock';
+import { ObservationEntityAction } from '../../lib/actions/db';
+import { ObservationEntity } from '../../lib';
+import { createDatabase, generateBlockEntity } from '../extractor/utils.mock';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 import {
   firstObservations,
   secondObservations,
 } from '../extractor/observations.mock';
+import { DataSource } from 'typeorm';
 
 const logger = new DummyLogger();
 
+let dataSource: DataSource;
+let action: ObservationEntityAction;
+
 describe('ObservationEntityAction', () => {
+  beforeEach(async () => {
+    dataSource = await createDatabase();
+    action = new ObservationEntityAction(dataSource, logger);
+  });
+
   describe('storeObservation', () => {
     /**
      * 2 valid Observations should save successfully
@@ -20,8 +29,6 @@ describe('ObservationEntityAction', () => {
      *  observations correctly
      */
     it('checks observations saved successfully', async () => {
-      const dataSource = await loadDataBase('savingObservation');
-      const action = new ObservationEntityAction(dataSource, logger);
       const res = await action.storeObservations(
         firstObservations,
         generateBlockEntity(dataSource, '1'),
@@ -56,8 +63,6 @@ describe('ObservationEntityAction', () => {
      * Expected: storeObservations should returns true and each saved observation should have valid fields
      */
     it('checks that observations saved successfully with two different extractor', async () => {
-      const dataSource = await loadDataBase('twoObservation');
-      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -108,8 +113,6 @@ describe('ObservationEntityAction', () => {
      * Expected: storeObservations should returns true and last observation fields should update
      */
     it('checks that duplicated observation updated with same extractor', async () => {
-      const dataSource = await loadDataBase('duplicatedObservationUpdated');
-      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -154,8 +157,6 @@ describe('ObservationEntityAction', () => {
      *  each step and new observations should insert in the database
      */
     it('checks that two observation with different extractor but same requestId added to table', async () => {
-      const dataSource = await loadDataBase('duplicateRequestId');
-      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -199,8 +200,6 @@ describe('ObservationEntityAction', () => {
      *  each step and new observations should insert in the database
      */
     it('checks that two observation with different requestId but same extractor added to table', async () => {
-      const dataSource = await loadDataBase('duplicateExtractor');
-      const action = new ObservationEntityAction(dataSource, logger);
       const repository = dataSource.getRepository(ObservationEntity);
       await repository.insert([
         {
@@ -250,8 +249,6 @@ describe('ObservationEntityAction', () => {
         }
         return output;
       };
-      const dataSource = await loadDataBase('fork');
-      const action = new ObservationEntityAction(dataSource, logger);
       const insertObservation = async (
         extractor: string,
         block: BlockEntity
