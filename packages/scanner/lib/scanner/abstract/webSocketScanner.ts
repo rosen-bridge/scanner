@@ -1,13 +1,24 @@
 import { AbstractScanner } from './scanner';
 import { Block } from '../../interfaces';
 import { Mutex } from 'await-semaphore';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
+
+const DEFAULT_MAX_TRY_BLOCK = 10;
 
 abstract class WebSocketScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
-  readonly MAX_PROCESS_TRANSACTION = 10;
+  readonly maxTryBlock: number;
 
   private mutex = new Mutex();
+
+  protected constructor(
+    logger?: AbstractLogger,
+    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK
+  ) {
+    super(logger);
+    this.maxTryBlock = maxTryBlock;
+  }
   abstract name: () => string;
 
   abstract start: () => Promise<void>;
@@ -17,15 +28,11 @@ abstract class WebSocketScanner<
     fn: () => Promise<boolean>,
     msg: string
   ): Promise<boolean> => {
-    for (
-      let tryRound = 1;
-      tryRound <= this.MAX_PROCESS_TRANSACTION;
-      tryRound++
-    ) {
+    for (let tryRound = 1; tryRound <= this.maxTryBlock; tryRound++) {
       if (await fn()) return true;
     }
     this.logger.error(
-      `${msg} can not be proceed in ${this.MAX_PROCESS_TRANSACTION} try. scanner restarted automatically`
+      `${msg} can not be proceed in ${this.maxTryBlock} try. scanner restarted automatically`
     );
     await this.stop();
     await this.start();

@@ -62,7 +62,7 @@ describe('webSocketScanner', () => {
       };
       const res = await scanner.tryRunningFunction(mockFn, '');
       expect(res).toBeFalsy();
-      expect(callCount).toEqual(scanner.MAX_PROCESS_TRANSACTION);
+      expect(callCount).toEqual(scanner.maxTryBlock);
     });
   });
 
