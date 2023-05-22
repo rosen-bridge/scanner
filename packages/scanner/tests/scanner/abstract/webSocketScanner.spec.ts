@@ -6,6 +6,7 @@ import {
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
+import mock = jest.mock;
 
 let dataSource: DataSource;
 let scanner: TestWebSocketScanner;
@@ -36,17 +37,14 @@ describe('webSocketScanner', () => {
      * - must return true
      */
     it('should call fn once and return true ', async () => {
-      let callCount = 0;
-      const mockFn = async () => {
-        callCount += 1;
-        return true;
-      };
+      const mockFn = jest.fn();
+      mockFn.mockReturnValue(true);
       const res = await scanner.tryRunningFunction(mockFn, '');
       expect(res).toBeTruthy();
-      expect(callCount).toEqual(1);
+      expect(mockFn).toHaveBeenCalledTimes(1);
     });
     /**
-     * @target webSocketScanner.tryRunningFunction should call fn once and return true
+     * @target webSocketScanner.tryRunningFunction should called fn 10 time if returns false and return false
      * @dependency
      * @scenario
      * - call tryRunningFunction with call back function which not throw exception
@@ -54,21 +52,18 @@ describe('webSocketScanner', () => {
      * - must call callback 10 times
      * - must return false
      */
-    it('should called fn 10 time if returns false and return false ', async () => {
-      let callCount = 0;
-      const mockFn = async () => {
-        callCount += 1;
-        return false;
-      };
+    it('should called fn 10 time if returns false and return false', async () => {
+      const mockFn = jest.fn();
+      mockFn.mockReturnValue(false);
       const res = await scanner.tryRunningFunction(mockFn, '');
       expect(res).toBeFalsy();
-      expect(callCount).toEqual(scanner.maxTryBlock);
+      expect(mockFn).toHaveBeenCalledTimes(scanner.maxTryBlock);
     });
   });
 
   describe('stepForward', () => {
     /**
-     * @target webSocketScanner.stepForward should not insert block in database
+     * @target webSocketScanner.stepForward should not insert block in database if current block hash not equals last inserted one
      * if current block hash not equals last inserted one
      * @dependency
      * @scenario
@@ -86,7 +81,7 @@ describe('webSocketScanner', () => {
     });
 
     /**
-     * @target webSocketScanner.stepForward should not insert any block into database if process extractor fails to process transactions
+     * @target webSocketScanner.stepForward should return false if block parent hash is not equals to current block hash
      * @dependency
      * @scenario
      * - insert a block into database
@@ -112,7 +107,7 @@ describe('webSocketScanner', () => {
      * @expected
      * - must store a block entity to database with correct values
      */
-    it('should return false if block parent hash is not equals to current block hash', async () => {
+    it('should store block into database', async () => {
       await scanner.stepForward(
         { hash: 'block 2', parentHash: 'block 1', blockHeight: 101, extra: '' },
         []
