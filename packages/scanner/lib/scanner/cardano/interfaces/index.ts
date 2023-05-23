@@ -12,6 +12,7 @@ interface CardanoOgmiosConfig {
   nodePort: number;
   initialSlot: number;
   initialHash: string;
+  maxTryBlock?: number;
   dataSource: DataSource;
 }
 

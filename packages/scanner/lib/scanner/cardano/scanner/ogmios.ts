@@ -37,13 +37,8 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   port: number;
   name = () => 'cardano-ogmios';
 
-  constructor(
-    config: CardanoOgmiosConfig,
-    logger?: AbstractLogger,
-    stopLimit?: number,
-    restartPoint?: number
-  ) {
-    super(logger, stopLimit, restartPoint);
+  constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
+    super(logger, config.maxTryBlock);
     this.action = new BlockDbAction(config.dataSource, this.name());
     this.host = config.nodeIp;
     this.port = config.nodePort;
@@ -77,7 +72,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         parentHash: savedBlock.parentHash,
         extra: savedBlock.extra,
       };
-      await this.backwardBlock(block);
+      await this.stepBackward(block);
     }
     requestNext();
   };
@@ -101,7 +96,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         parentHash: babbageBlock.header.prevHash,
         extra: `${babbageBlock.header.slot}`,
       };
-      await this.forwardBlock(block, babbageBlock.body);
+      await this.stepForward(block, babbageBlock.body);
     }
     requestNext();
   };
@@ -165,7 +160,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         { sequential: true }
       );
       await this.forkBlock(intersect.height + 1);
-      await this.client.startSync([intersect.point]);
+      await this.client.startSync([intersect.point], 2);
     } else {
       throw Error('Can not start scanner. initial block is invalid');
     }

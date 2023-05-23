@@ -9,6 +9,9 @@ import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
 import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
+import { WebSocketScanner } from '../../../lib';
+import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { log } from 'util';
 
 interface TestTransaction {
   height: number;
@@ -125,3 +128,34 @@ export const insertBlocks = async (
     await scanner.action.updateBlockStatus(index);
   }
 };
+
+export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
+  name = () => 'test scanner';
+
+  constructor(logger: AbstractLogger, dataSource: DataSource) {
+    super(logger);
+    this.action = new BlockDbAction(dataSource, this.name(), logger);
+  }
+
+  mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>
+    this.tryRunningFunction(fn, msg);
+
+  start = async () => Promise.resolve();
+
+  stop = async () => Promise.resolve();
+}
+
+export class FailExtractor extends AbstractExtractor<{ id: string }> {
+  forkBlock = async (hash: string) => {
+    /* empty */
+  };
+
+  getId = () => 'fail extractor';
+
+  initializeBoxes = (initialHeight: number) => Promise.resolve();
+
+  processTransactions = async (
+    txs: Array<{ id: string }>,
+    block: BlockEntity
+  ) => false;
+}
