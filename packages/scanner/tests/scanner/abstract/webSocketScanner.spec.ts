@@ -63,7 +63,7 @@ describe('webSocketScanner', () => {
 
   describe('stepForward', () => {
     /**
-     * @target webSocketScanner.stepForward should not insert block in database if current block hash not equals last inserted one
+     * @target webSocketScanner.stepForward should not insert block in database
      * if current block hash not equals last inserted one
      * @dependency
      * @scenario
@@ -81,7 +81,8 @@ describe('webSocketScanner', () => {
     });
 
     /**
-     * @target webSocketScanner.stepForward should return false if block parent hash is not equals to current block hash
+     * @target webSocketScanner.stepForward should not insert block into database
+     * if block parent hash is not equals to current block hash
      * @dependency
      * @scenario
      * - insert a block into database
@@ -90,7 +91,7 @@ describe('webSocketScanner', () => {
      * @expected
      * - no block inserted to database
      */
-    it('should return false if block parent hash is not equals to current block hash', async () => {
+    it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
       await scanner.stepForward(
         { hash: 'block 2', parentHash: 'block 0', blockHeight: 101, extra: '' },
