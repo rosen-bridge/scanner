@@ -137,13 +137,12 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
     this.action = new BlockDbAction(dataSource, this.name(), logger);
   }
 
-  start = async () => {
-    /* empty */
-  };
+  mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>
+    this.tryRunningFunction(fn, msg);
 
-  stop = async () => {
-    /* empty */
-  };
+  start = async () => Promise.resolve();
+
+  stop = async () => Promise.resolve();
 }
 
 export class FailExtractor extends AbstractExtractor<{ id: string }> {

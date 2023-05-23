@@ -24,7 +24,7 @@ abstract class WebSocketScanner<
   abstract start: () => Promise<void>;
   abstract stop: () => Promise<void>;
 
-  tryRunningFunction = async (
+  protected tryRunningFunction = async (
     fn: () => Promise<boolean>,
     msg: string
   ): Promise<boolean> => {

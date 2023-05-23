@@ -39,7 +39,7 @@ describe('webSocketScanner', () => {
     it('should call fn once and return true ', async () => {
       const mockFn = jest.fn();
       mockFn.mockReturnValue(true);
-      const res = await scanner.tryRunningFunction(mockFn, '');
+      const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeTruthy();
       expect(mockFn).toHaveBeenCalledTimes(1);
     });
@@ -55,7 +55,7 @@ describe('webSocketScanner', () => {
     it('should called fn 10 time if returns false and return false', async () => {
       const mockFn = jest.fn();
       mockFn.mockReturnValue(false);
-      const res = await scanner.tryRunningFunction(mockFn, '');
+      const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeFalsy();
       expect(mockFn).toHaveBeenCalledTimes(scanner.maxTryBlock);
     });
