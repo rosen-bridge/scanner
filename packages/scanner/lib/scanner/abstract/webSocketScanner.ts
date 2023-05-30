@@ -82,7 +82,7 @@ abstract class WebSocketScanner<
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
       try {
-        await this.forkBlock(block.blockHeight);
+        await this.forkBlock(block.blockHeight + 1);
         return true;
       } catch (e: any) {
         this.logger.error(`unknown error occurred ${e}`);
