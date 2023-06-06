@@ -43,6 +43,7 @@ class PermitEntityAction {
           height: permit.height,
           extractor: extractor,
           WID: permit.WID,
+          txId: permit.txId,
         };
         await queryRunner.manager.getRepository(PermitEntity).insert(entity);
         this.logger.info(
@@ -100,6 +101,7 @@ class PermitEntityAction {
           height: block.height,
           extractor: extractor,
           WID: permit.WID,
+          txId: permit.txId,
         };
         if (!saved) {
           this.logger.debug(

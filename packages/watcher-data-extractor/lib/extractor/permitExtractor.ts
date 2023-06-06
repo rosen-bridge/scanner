@@ -78,7 +78,6 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                 );
                 if (r4) {
                   const R4Serialized = r4.to_coll_coll_byte();
-
                   if (R4Serialized.length >= 1) {
                     boxes.push({
                       boxId: output.boxId,
@@ -86,6 +85,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                         boxOutput.sigma_serialize_bytes()
                       ).toString('base64'),
                       WID: Buffer.from(R4Serialized[0]).toString('hex'),
+                      txId: output.transactionId,
                     });
                   }
                 }
@@ -158,6 +158,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
               block: boxJson.blockId,
               height: boxJson.settlementHeight,
               WID: Buffer.from(R4Serialized[0]).toString('hex'),
+              txId: box.tx_id().to_str(),
             });
           }
         }
