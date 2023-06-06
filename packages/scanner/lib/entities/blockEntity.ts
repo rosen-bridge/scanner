@@ -32,6 +32,9 @@ export class BlockEntity {
 
   @Column()
   scanner: string;
+
+  @Column({ nullable: true })
+  timestamp?: number;
 }
 
 export { PROCEED, PROCESSING };

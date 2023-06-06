@@ -5,6 +5,7 @@ interface Block {
   hash: string;
   blockHeight: number;
   extra?: string;
+  timestamp?: number;
 }
 
 abstract class AbstractDataBase<DataT> {
