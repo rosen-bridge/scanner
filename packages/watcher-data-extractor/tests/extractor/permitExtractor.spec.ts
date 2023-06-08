@@ -80,7 +80,6 @@ describe('permitExtractor', () => {
         spendBlock: null,
         spendHeight: null,
         txId: tx1.id,
-        txTimestamp: null,
       });
       expect(permit2).toEqual({
         id: 2,
@@ -95,7 +94,6 @@ describe('permitExtractor', () => {
         spendBlock: null,
         spendHeight: null,
         txId: tx2.id,
-        txTimestamp: null,
       });
       expect(permit3).toEqual({
         id: 3,
@@ -110,7 +108,6 @@ describe('permitExtractor', () => {
         spendBlock: null,
         spendHeight: null,
         txId: tx3.id,
-        txTimestamp: null,
       });
     });
 

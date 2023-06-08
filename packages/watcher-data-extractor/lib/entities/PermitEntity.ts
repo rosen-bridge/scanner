@@ -32,9 +32,6 @@ class PermitEntity {
 
   @Column({ nullable: true })
   txId?: string;
-
-  @Column({ nullable: true })
-  txTimestamp?: number;
 }
 
 export default PermitEntity;

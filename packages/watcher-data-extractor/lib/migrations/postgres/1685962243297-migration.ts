@@ -6,16 +6,14 @@ export class migration1685962243297 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             ALTER TABLE "permit_entity"
-            ADD "txId" varchar,
-            ADD "txTimestamp" bigint;
+            ADD "txId" varchar;
         `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             ALTER TABLE "permit_entity" 
-            DROP COLUMN "txId",
-            DROP COLUMN "txTimestamp";
+            DROP COLUMN "txId";
         `);
   }
 }
