@@ -32,6 +32,7 @@ describe('CardanoOgmiosTxIdExtractor', () => {
         status: '',
         parentHash: '',
         id: 0,
+        timestamp: 10,
       });
       const elements = await repository.find();
       const txIds = [
