@@ -56,6 +56,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
       parentHash: '0',
       hash: '1',
       blockHeight: height,
+      timestamp: 10,
     });
   };
 
@@ -95,7 +96,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
     networkAccess: AbstractNetworkConnector<TestTransaction>;
 
     getFirstBlock = async (): Promise<Block> => {
-      return { blockHeight: 2, hash: '2', parentHash: '1' };
+      return { blockHeight: 2, hash: '2', parentHash: '1', timestamp: 20 };
     };
   };
 };
@@ -124,6 +125,7 @@ export const insertBlocks = async (
       parentHash: parent,
       hash: `${index}`,
       blockHeight: index,
+      timestamp: 10 * index,
     });
     await scanner.action.updateBlockStatus(index);
   }

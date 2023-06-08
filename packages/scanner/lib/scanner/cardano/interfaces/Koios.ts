@@ -1,6 +1,7 @@
 interface KoiosBlock {
   hash: string;
   block_height: number;
+  block_time: number;
 }
 
 interface KoiosBlockInfo {

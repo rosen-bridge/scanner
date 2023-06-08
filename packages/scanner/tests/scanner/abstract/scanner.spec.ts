@@ -149,7 +149,7 @@ describe('AbstractScanner', () => {
     it('should insert block into database', async () => {
       const scanner = new firstScanner(dataSource);
       await scanner.processBlockTransactions(
-        { blockHeight: 1, parentHash: ' ', hash: '1' },
+        { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         []
       );
       const instances = await dataSource.getRepository(BlockEntity).find();
@@ -158,6 +158,7 @@ describe('AbstractScanner', () => {
       expect(instance.scanner).toEqual(scanner.name());
       expect(instance.height).toEqual(1);
       expect(instance.hash).toEqual('1');
+      expect(instance.timestamp).toEqual(10);
       expect(instance.parentHash).toEqual(' ');
     });
 
@@ -173,7 +174,7 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
       await scanner.processBlockTransactions(
-        { blockHeight: 1, parentHash: ' ', hash: '1' },
+        { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [{ height: 1, blockHash: '1' }]
       );
       expect(extractor.txs.length).toEqual(1);
@@ -194,7 +195,7 @@ describe('AbstractScanner', () => {
       scanner.registerExtractor(extractor);
       await expect(() => {
         return scanner.processBlockTransactions(
-          { blockHeight: 1, parentHash: ' ', hash: '1' },
+          { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
           [{ height: 1, blockHash: '1' }]
         );
       }).rejects.toBeTruthy();

@@ -415,6 +415,7 @@ describe('action', () => {
         blockHeight: 12,
         hash: 'blockhash',
         parentHash: 'parenthash',
+        timestamp: 10,
       };
       const res = await action.saveBlock(block);
       expect((res as BlockEntity).hash).toEqual('blockhash');
@@ -434,6 +435,7 @@ describe('action', () => {
         blockHeight: 12,
         hash: 'blockhash',
         parentHash: 'parenthash',
+        timestamp: 10,
       };
       const repository = dataSource.getRepository(BlockEntity);
       await repository.insert({

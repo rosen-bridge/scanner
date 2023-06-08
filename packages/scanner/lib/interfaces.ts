@@ -4,8 +4,8 @@ interface Block {
   parentHash: string;
   hash: string;
   blockHeight: number;
+  timestamp: number;
   extra?: string;
-  timestamp?: number;
 }
 
 abstract class AbstractDataBase<DataT> {

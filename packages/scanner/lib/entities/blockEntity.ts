@@ -33,8 +33,8 @@ export class BlockEntity {
   @Column()
   scanner: string;
 
-  @Column({ nullable: true })
-  timestamp?: number;
+  @Column()
+  timestamp: number;
 }
 
 export { PROCEED, PROCESSING };

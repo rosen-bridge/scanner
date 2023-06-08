@@ -42,7 +42,12 @@ describe('generalScanner', () => {
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
         .mockImplementation((height: number) =>
-          Promise.resolve({ blockHeight: 3, parentHash: '2', hash: '5' })
+          Promise.resolve({
+            blockHeight: 3,
+            parentHash: '2',
+            hash: '5',
+            timestamp: 50,
+          })
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
@@ -62,7 +67,12 @@ describe('generalScanner', () => {
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
         .mockImplementation((height: number) =>
-          Promise.resolve({ blockHeight: 3, parentHash: '2', hash: '3' })
+          Promise.resolve({
+            blockHeight: 3,
+            parentHash: '2',
+            hash: '3',
+            timestamp: 50,
+          })
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
@@ -89,11 +99,17 @@ describe('generalScanner', () => {
       const mockedProcessBlockTransactions = jest
         .spyOn(scanner, 'processBlockTransactions')
         .mockImplementation();
-      const block = { hash: '1', parentHash: ' ', blockHeight: 1 };
+      const block = {
+        hash: '1',
+        parentHash: ' ',
+        blockHeight: 1,
+        timestamp: 50,
+      };
       await scanner.processBlock({
         hash: '1',
         parentHash: ' ',
         blockHeight: 1,
+        timestamp: 50,
       });
       expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
     });
@@ -120,19 +136,39 @@ describe('generalScanner', () => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
-                resolve({ blockHeight: 1, parentHash: ' ', hash: '1' });
+                resolve({
+                  blockHeight: 1,
+                  parentHash: ' ',
+                  hash: '1',
+                  timestamp: 10,
+                });
                 break;
               }
               case 2: {
-                resolve({ blockHeight: 2, parentHash: '1', hash: '2' });
+                resolve({
+                  blockHeight: 2,
+                  parentHash: '1',
+                  hash: '2',
+                  timestamp: 20,
+                });
                 break;
               }
               case 3: {
-                resolve({ blockHeight: 3, parentHash: '2', hash: '3' });
+                resolve({
+                  blockHeight: 3,
+                  parentHash: '2',
+                  hash: '3',
+                  timestamp: 30,
+                });
                 break;
               }
               case 4: {
-                resolve({ blockHeight: 4, parentHash: '3', hash: '4' });
+                resolve({
+                  blockHeight: 4,
+                  parentHash: '3',
+                  hash: '4',
+                  timestamp: 40,
+                });
                 break;
               }
             }
@@ -168,15 +204,30 @@ describe('generalScanner', () => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
-                resolve({ blockHeight: 1, parentHash: ' ', hash: '1' });
+                resolve({
+                  blockHeight: 1,
+                  parentHash: ' ',
+                  hash: '1',
+                  timestamp: 10,
+                });
                 break;
               }
               case 2: {
-                resolve({ blockHeight: 2, parentHash: '1', hash: '32' });
+                resolve({
+                  blockHeight: 2,
+                  parentHash: '1',
+                  hash: '32',
+                  timestamp: 20,
+                });
                 break;
               }
               case 3: {
-                resolve({ blockHeight: 3, parentHash: '32', hash: '42' });
+                resolve({
+                  blockHeight: 3,
+                  parentHash: '32',
+                  hash: '42',
+                  timestamp: 30,
+                });
                 break;
               }
             }
@@ -233,7 +284,12 @@ describe('generalScanner', () => {
         .mockReturnValue(
           new Promise((resolve, reject) => {
             scanner.action
-              .saveBlock({ blockHeight: 2, parentHash: 'parent', hash: 'hash' })
+              .saveBlock({
+                blockHeight: 2,
+                parentHash: 'parent',
+                hash: 'hash',
+                timestamp: 10,
+              })
               .then((res) => {
                 if (typeof res === 'boolean') {
                   reject();
@@ -286,15 +342,30 @@ describe('generalScanner', () => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
-                resolve({ blockHeight: 1, parentHash: ' ', hash: '1' });
+                resolve({
+                  blockHeight: 1,
+                  parentHash: ' ',
+                  hash: '1',
+                  timestamp: 10,
+                });
                 break;
               }
               case 2: {
-                resolve({ blockHeight: 2, parentHash: '1', hash: '2' });
+                resolve({
+                  blockHeight: 2,
+                  parentHash: '1',
+                  hash: '2',
+                  timestamp: 20,
+                });
                 break;
               }
               case 3: {
-                resolve({ blockHeight: 3, parentHash: '2', hash: '3' });
+                resolve({
+                  blockHeight: 3,
+                  parentHash: '2',
+                  hash: '3',
+                  timestamp: 30,
+                });
                 break;
               }
             }
@@ -329,15 +400,30 @@ describe('generalScanner', () => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
-                resolve({ blockHeight: 1, parentHash: ' ', hash: '1' });
+                resolve({
+                  blockHeight: 1,
+                  parentHash: ' ',
+                  hash: '1',
+                  timestamp: 10,
+                });
                 break;
               }
               case 2: {
-                resolve({ blockHeight: 2, parentHash: '1', hash: '2' });
+                resolve({
+                  blockHeight: 2,
+                  parentHash: '1',
+                  hash: '2',
+                  timestamp: 20,
+                });
                 break;
               }
               case 3: {
-                resolve({ blockHeight: 3, parentHash: '2', hash: '5' });
+                resolve({
+                  blockHeight: 3,
+                  parentHash: '2',
+                  hash: '5',
+                  timestamp: 30,
+                });
                 break;
               }
             }

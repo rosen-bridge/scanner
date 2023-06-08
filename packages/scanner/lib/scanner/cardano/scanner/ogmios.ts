@@ -71,6 +71,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         blockHeight: savedBlock.height,
         parentHash: savedBlock.parentHash,
         extra: savedBlock.extra,
+        timestamp: savedBlock.timestamp,
       };
       await this.stepBackward(block);
     }
@@ -95,6 +96,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         blockHeight: babbageBlock.header.blockHeight,
         parentHash: babbageBlock.header.prevHash,
         extra: `${babbageBlock.header.slot}`,
+        timestamp: 0,
       };
       await this.stepForward(block, babbageBlock.body);
     }
