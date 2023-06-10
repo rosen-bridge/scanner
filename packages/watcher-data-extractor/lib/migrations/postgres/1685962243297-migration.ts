@@ -6,7 +6,7 @@ export class migration1685962243297 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             ALTER TABLE "permit_entity"
-            ADD "txId" varchar;
+            ADD "txId" varchar NOT NULL DEFAULT '';
         `);
   }
 

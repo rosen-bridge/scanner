@@ -30,8 +30,8 @@ class PermitEntity {
   @Column({ nullable: true })
   spendHeight?: number;
 
-  @Column({ nullable: true })
-  txId?: string;
+  @Column()
+  txId: string;
 }
 
 export default PermitEntity;

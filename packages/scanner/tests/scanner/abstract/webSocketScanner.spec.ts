@@ -23,6 +23,7 @@ describe('webSocketScanner', () => {
       height: 100,
       status: PROCEED,
       scanner: scanner.name(),
+      timestamp: 1,
     });
   });
 
@@ -157,6 +158,7 @@ describe('webSocketScanner', () => {
         height: 101,
         status: PROCEED,
         scanner: scanner.name(),
+        timestamp: 2,
       });
       await scanner.stepBackward({
         blockHeight: 100,

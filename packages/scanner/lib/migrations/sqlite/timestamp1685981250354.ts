@@ -5,7 +5,7 @@ export class timestamp1685981250354 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            ALTER TABLE "block_entity" ADD "timestamp" bigint;
+            ALTER TABLE "block_entity" ADD "timestamp" bigint NOT NULL DEFAULT 0;
         `);
   }
 

@@ -31,6 +31,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getLastSavedBlock();
@@ -64,6 +65,7 @@ describe('action', () => {
           hash: `${index}`,
           status: index > 5 ? PROCESSING : PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getLastSavedBlock();
@@ -86,6 +88,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getLastSavedBlock();
@@ -110,6 +113,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const blocks = await action.getLastSavedBlocks(2, 5);
@@ -131,6 +135,7 @@ describe('action', () => {
           hash: `${index}`,
           status: index > 5 ? PROCESSING : PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const blocks = await action.getLastSavedBlocks(2, 5);
@@ -152,6 +157,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const blocks = await action.getLastSavedBlocks(2, 2);
@@ -174,6 +180,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getFirstSavedBlock();
@@ -207,6 +214,7 @@ describe('action', () => {
           hash: `${index}`,
           status: index > 5 ? PROCEED : PROCESSING,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getFirstSavedBlock();
@@ -229,6 +237,7 @@ describe('action', () => {
           hash: `${index}`,
           status: PROCEED,
           parentHash: `${index - 1}`,
+          timestamp: index * 10,
         });
       }
       const block = await action.getFirstSavedBlock();
@@ -254,6 +263,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockAtHeight(123, PROCEED);
       expect(block ? block.hash : '').toEqual(hash);
@@ -274,6 +284,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockAtHeight(123, PROCESSING);
       expect(block).toBeUndefined();
@@ -294,6 +305,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockAtHeight(123, PROCEED);
       expect(block).toBeUndefined();
@@ -316,6 +328,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockWithHash(hash, PROCEED);
       expect(block ? block.height : 0).toEqual(123);
@@ -336,6 +349,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockWithHash(hash, PROCESSING);
       expect(block).toBeNull();
@@ -356,6 +370,7 @@ describe('action', () => {
         hash: hash,
         status: PROCEED,
         parentHash: ` `,
+        timestamp: 123,
       });
       const block = await action.getBlockWithHash(hash, PROCEED);
       expect(block).toBeNull();
@@ -380,6 +395,7 @@ describe('action', () => {
           hash: `hash${index - 1}`,
           status: PROCEED,
           parentHash: `hash${index - 1}`,
+          timestamp: 123,
         });
         await repository.insert({
           height: index,
@@ -387,6 +403,7 @@ describe('action', () => {
           hash: `hash${index - 1}`,
           status: PROCEED,
           parentHash: `hash${index - 1}`,
+          timestamp: 123,
         });
       }
       await action.removeBlocksFromHeight(5);
@@ -444,6 +461,7 @@ describe('action', () => {
         parentHash: 'parentHashOld',
         scanner: action.name(),
         status: PROCEED,
+        timestamp: 10,
       });
       const res = await action.saveBlock(block);
       expect((res as BlockEntity).parentHash).toEqual('parenthash');
@@ -470,6 +488,7 @@ describe('action', () => {
         parentHash: 'parentHashOld',
         scanner: action.name(),
         status: PROCESSING,
+        timestamp: 10,
       });
       await action.updateBlockStatus(12);
       const instances = await repository.find();
@@ -494,6 +513,7 @@ describe('action', () => {
         parentHash: 'parentHashOld',
         scanner: action.name(),
         status: PROCEED,
+        timestamp: 10,
       });
       await action.revertBlockStatus(12);
       const instances = await repository.find();
