@@ -31,6 +31,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
         height: 7991037,
         scanner: 'testscanner',
         status: PROCEED,
+        timestamp: 20,
       });
     });
     /**
