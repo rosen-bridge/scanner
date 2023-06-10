@@ -19,6 +19,7 @@ import {
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { SLOT_SHELLY_NUMBER } from '../../../constants';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -96,7 +97,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         blockHeight: babbageBlock.header.blockHeight,
         parentHash: babbageBlock.header.prevHash,
         extra: `${babbageBlock.header.slot}`,
-        timestamp: 0,
+        timestamp: babbageBlock.header.slot + SLOT_SHELLY_NUMBER,
       };
       await this.stepForward(block, babbageBlock.body);
     }
