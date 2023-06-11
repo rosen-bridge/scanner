@@ -137,6 +137,7 @@ export class BlockDbAction {
         status: PROCESSING,
         scanner: this.name(),
         extra: block.extra,
+        timestamp: block.timestamp,
       };
       this.logger.debug(`Block info: ${JSON.stringify(blockInfo)}`);
       if (!instance) {

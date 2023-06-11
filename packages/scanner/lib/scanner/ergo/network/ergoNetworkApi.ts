@@ -24,7 +24,7 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<Transaction> {
    */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.node
-      .get<Array<{ id: string }>>(`/blocks/chainSlice`, {
+      .get<Array<{ id: string; timestamp: number }>>(`/blocks/chainSlice`, {
         params: { fromHeight: height - 2, toHeight: height },
       })
       .then((res) => {
@@ -32,6 +32,7 @@ export class ErgoNetworkApi extends AbstractNetworkConnector<Transaction> {
           hash: res.data[1].id,
           blockHeight: height,
           parentHash: res.data[0].id,
+          timestamp: res.data[0].timestamp,
         };
       });
   };

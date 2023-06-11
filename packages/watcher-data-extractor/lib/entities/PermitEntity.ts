@@ -29,6 +29,9 @@ class PermitEntity {
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column()
+  txId: string;
 }
 
 export default PermitEntity;

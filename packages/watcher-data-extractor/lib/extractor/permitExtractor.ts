@@ -85,6 +85,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                         boxOutput.sigma_serialize_bytes()
                       ).toString('base64'),
                       WID: Buffer.from(R4Serialized[0]).toString('hex'),
+                      txId: output.transactionId,
                     });
                   }
                 }
@@ -157,6 +158,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
               block: boxJson.blockId,
               height: boxJson.settlementHeight,
               WID: Buffer.from(R4Serialized[0]).toString('hex'),
+              txId: box.tx_id().to_str(),
             });
           }
         }

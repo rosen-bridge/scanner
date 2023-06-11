@@ -25,7 +25,10 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.koios
       .get<Array<KoiosBlock>>('/blocks', {
-        params: { block_height: `eq.${height}`, select: 'hash,block_height' },
+        params: {
+          block_height: `eq.${height}`,
+          select: 'hash,block_height,block_time',
+        },
       })
       .then((res) => {
         const hash = res.data[0].hash;
@@ -37,6 +40,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
               hash: row.hash,
               blockHeight: row.block_height,
               parentHash: row.parent_hash,
+              timestamp: res.data[0].block_time,
             };
           })
           .catch((exp) => {

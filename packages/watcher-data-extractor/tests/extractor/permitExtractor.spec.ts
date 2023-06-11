@@ -79,6 +79,7 @@ describe('permitExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        txId: tx1.id,
       });
       expect(permit2).toEqual({
         id: 2,
@@ -92,6 +93,7 @@ describe('permitExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        txId: tx2.id,
       });
       expect(permit3).toEqual({
         id: 3,
@@ -105,6 +107,7 @@ describe('permitExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        txId: tx3.id,
       });
     });
 
@@ -201,6 +204,7 @@ describe('permitExtractor', () => {
             'f6acea8792c6dd98610d5cf50c191160e7c907868077cf6d0347428bf6a58d88',
           height: 295137,
           WID: '6eb97fd94107bd6d8a75b78b4229b5cd1af4ba9562038fa0bd5324306e1e1916',
+          txId: '6911f870b08015822ddd6009b62d626b4af7681f94ce0d5f262abe10752990a5',
         },
         {
           boxId:
@@ -212,6 +216,7 @@ describe('permitExtractor', () => {
             '80a5f45470674c59ec4d439487ea87fbeee43dead742aec82bc9d77d67c539f6',
           height: 284377,
           WID: 'a337e33042eaa1da67bcc7dfa5fcc444f63b8a695c9786494d7d22293eba542e',
+          txId: '209843c56fb09713743a7ec5fe2f5e7923654dcab7fc00bd51120f4cfb29c3f8',
         },
       ];
       expect(spy).toHaveBeenCalled();

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/tx-id-extractor",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Extract and store all transaction ids in ogmios blocks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@rosen-bridge/logger-interface": "^0.1.0",
-    "@rosen-bridge/scanner": "^1.0.3",
+    "@rosen-bridge/scanner": "^1.0.4",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.7"
   },

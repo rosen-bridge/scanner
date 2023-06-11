@@ -23,6 +23,7 @@ describe('webSocketScanner', () => {
       height: 100,
       status: PROCEED,
       scanner: scanner.name(),
+      timestamp: 1,
     });
   });
 
@@ -74,7 +75,13 @@ describe('webSocketScanner', () => {
      */
     it('should not insert block in database if current block hash not equals last inserted one', async () => {
       await scanner.stepForward(
-        { hash: 'block 2', parentHash: 'block 0', blockHeight: 101, extra: '' },
+        {
+          hash: 'block 2',
+          parentHash: 'block 0',
+          blockHeight: 101,
+          extra: '',
+          timestamp: 10,
+        },
         []
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
@@ -94,7 +101,13 @@ describe('webSocketScanner', () => {
     it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
       await scanner.stepForward(
-        { hash: 'block 2', parentHash: 'block 0', blockHeight: 101, extra: '' },
+        {
+          hash: 'block 2',
+          parentHash: 'block 0',
+          blockHeight: 101,
+          extra: '',
+          timestamp: 10,
+        },
         []
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
@@ -110,7 +123,13 @@ describe('webSocketScanner', () => {
      */
     it('should store block into database', async () => {
       await scanner.stepForward(
-        { hash: 'block 2', parentHash: 'block 1', blockHeight: 101, extra: '' },
+        {
+          hash: 'block 2',
+          parentHash: 'block 1',
+          blockHeight: 101,
+          extra: '',
+          timestamp: 10,
+        },
         []
       );
       const inserted = await repository.findBy({ height: 101 });
@@ -139,12 +158,14 @@ describe('webSocketScanner', () => {
         height: 101,
         status: PROCEED,
         scanner: scanner.name(),
+        timestamp: 2,
       });
       await scanner.stepBackward({
         blockHeight: 100,
         hash: 'block 1',
         parentHash: 'block 0',
         extra: '',
+        timestamp: 10,
       });
       const elements = await repository.findBy({ height: 101 });
       expect(elements.length).toEqual(0);

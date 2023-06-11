@@ -9,11 +9,13 @@ const samplePermit1 = {
   boxId: '1',
   boxSerialized: 'serialized1',
   WID: 'wid1',
+  txId: 'txId1',
 };
 const samplePermit2 = {
   boxId: '2',
   boxSerialized: 'serialized2',
   WID: 'wid2',
+  txId: 'txId2',
 };
 
 const samplePermit3 = {

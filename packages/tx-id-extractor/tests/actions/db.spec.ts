@@ -100,6 +100,7 @@ describe('TxAction', () => {
           status: '',
           parentHash: '',
           id: 0,
+          timestamp: 10,
         },
         'extractor 1'
       );

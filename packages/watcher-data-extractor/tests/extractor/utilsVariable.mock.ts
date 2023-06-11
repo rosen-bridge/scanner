@@ -15,6 +15,7 @@ export const block: BlockEntity = {
   parentHash: 'parentHash',
   status: 'hi',
   scanner: '1',
+  timestamp: 10,
 };
 
 export const last10BlockHeader = [
