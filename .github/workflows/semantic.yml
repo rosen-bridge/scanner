@@ -63,9 +63,9 @@ jobs:
 
   pre_release:
     name: publishing_version
-    permissions: write-all
-    needs: typecheck_&_test
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
+      #    permissions: write-all
+      #    needs: typecheck_&_test
+      #    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
     strategy:
       matrix:
         node-version:
