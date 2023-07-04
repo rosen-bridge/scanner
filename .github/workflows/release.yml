@@ -106,7 +106,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
 
         env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  
 
       - name: Publish changeset
         run: npx changeset publish
