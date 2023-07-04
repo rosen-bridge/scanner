@@ -1,0 +1,112 @@
+name: RELEASE
+
+on:
+  push:
+    branches:
+      - '**'
+
+  pull_request:
+    branches:
+      - 'dev'
+
+jobs:
+  typecheck_&_test:
+    name: Typecheck_and_Tests
+    strategy:
+      matrix:
+        node-version:
+          - 16.17
+    runs-on: ${{ matrix.node-vrsion }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Build
+        run: npm run build
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test and coverage
+        run: npm run coverage
+        env:
+          CI: true
+  
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage_report
+          path: packages/*/coverage/cobertura-coverage.xml
+
+      - name: Dist Packages Output artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: package_artifacts
+          path: packages/*/dist
+
+  pre_release:
+    name: publishing_version
+    permissions: write-all
+    needs: typecheck_&_test
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
+    strategy:
+      matrix:
+        node-version:
+          - 16.17
+    runs-on: ${{ matrix.node-vrsion }}
+    steps:
+      - name: Setup Nodejs ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+
+      - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          node_modules
+          packages/*/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: package_artifacts
+          path: packages
+
+      - name: Check changeset status
+        run: npx changeset status --since=origin/dev
+
+      - name: Prepare changeset
+        run: npx changeset pre enter ergo
+
+      - name: Update changeset version
+        run: |
+          sed -i "s/ergo/next-${{ github.sha }}/g" .changeset/pre.json
+          npx changeset version
+
+      - name: Configure npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
+
+      - name: Publish changeset
+        run: npx changeset publish
+
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
