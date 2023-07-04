@@ -70,7 +70,8 @@ jobs:
       matrix:
         node-version:
           - 16.17
-    runs-on: ${{ matrix.node-version }}
+    runs-on: ${{ matrix.node-vrsion }}
+
     steps:
       - name: Setup Nodejs ${{ matrix.node-version }}
         uses: actions/setup-node@v3
