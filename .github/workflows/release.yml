@@ -10,15 +10,15 @@ on:
       - 'dev'
 
 jobs:
-  typecheck_&_test:
-    name: Typecheck_and_Tests
+  tests:
+    name: Typecheck and Tests
     strategy:
       matrix:
         node-version: [ 16.17 ]
     runs-on: ${{ matrix.node-version }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout current branch (full)
         uses: actions/checkout@v3
 
       - name: Install dependencies
@@ -33,7 +33,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
+      
       - name: Build
         run: npm run build
 
@@ -60,18 +60,20 @@ jobs:
           name: package_artifacts
           path: packages/*/dist
 
-  pre_release:
-    name: publishing_version
-      #    permissions: write-all
-      #    needs: typecheck_&_test
-      #    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
+  pre-release:
+    name: publishing version
+    permissions: write-all
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
+    needs: tests
     strategy:
       matrix:
-        node-version:
-          - 16.17
+        node-version: [ 16.17 ]
     runs-on: ${{ matrix.node-version }}
 
     steps:
+      - name: Checkout Nodejs
+        uses: actions/checkout@v3
+      
       - name: Setup Nodejs ${{ matrix.node-version }}
         uses: actions/setup-node@v3
 
@@ -84,7 +86,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -101,13 +102,11 @@ jobs:
         run: |
           sed -i "s/ergo/next-${{ github.sha }}/g" .changeset/pre.json
           npx changeset version
-
       - name: Configure npm authentication
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
 
+        env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  
+
       - name: Publish changeset
         run: npx changeset publish
-
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
