@@ -16,7 +16,7 @@ jobs:
       matrix:
         node-version:
           - 16.17
-    runs-on: ${{ matrix.node-vrsion }}
+    runs-on: ${{ matrix.node-version }}
 
     steps:
       - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
@@ -48,7 +48,7 @@ jobs:
         run: npm run coverage
         env:
           CI: true
-  
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v2
         with:
@@ -70,21 +70,21 @@ jobs:
       matrix:
         node-version:
           - 16.17
-    runs-on: ${{ matrix.node-vrsion }}
+    runs-on: ${{ matrix.node-version }}
 
     steps:
       - name: Setup Nodejs ${{ matrix.node-version }}
         uses: actions/setup-node@v3
 
       - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          node_modules
-          packages/*/node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
@@ -109,5 +109,6 @@ jobs:
       - name: Publish changeset
         run: npx changeset publish
 
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
