@@ -1,77 +1,31 @@
-name: RELEASE
+name: SNAPSHOT_RELEASE
 
 on:
-  push:
-    branches:
-      - '**'
-
+  workflow_run:
+    workflows:
+      - "TEST"
+    types:
+      - success
   pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
-      - 'dev'
+      - dev
 
 jobs:
-  tests:
-    name: Typecheck and Tests
-    strategy:
-      matrix:
-        node-version: [ 18.x ]
-    runs-on: ${{ matrix.node-version }}
-
-    steps:
-      - name: Checkout current branch (full)
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      
-      - name: Build
-        run: npm run build
-
-      - name: Type check
-        run: npm run type-check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test and coverage
-        run: npm run coverage
-        env:
-          CI: true
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage_report
-          path: packages/*/coverage/cobertura-coverage.xml
-
-      - name: Dist Packages Output artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: package_artifacts
-          path: packages/*/dist
-
   pre-release:
-    name: publishing version
+    name: publishing snapshot version
     permissions: write-all
     if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
     needs: tests
     strategy:
       matrix:
-        node-version: [ 18.x ]
+        node-version: [ 16.x , 18.x ]
     runs-on: ${{ matrix.node-version }}
 
     steps:
-      - name: Checkout Nodejs
+      - name: Checkout
         uses: actions/checkout@v3
       
       - name: Setup Nodejs ${{ matrix.node-version }}
@@ -86,6 +40,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
