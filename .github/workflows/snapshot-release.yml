@@ -13,8 +13,9 @@ on:
     branches:
       - dev
 
+
 jobs:
-  pre-release:
+  prerelease:
     name: publishing snapshot version
     permissions: write-all
     if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
