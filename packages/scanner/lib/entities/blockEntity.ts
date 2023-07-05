@@ -35,6 +35,15 @@ export class BlockEntity {
 
   @Column()
   timestamp: number;
+
+  @Column({ nullable: true })
+  year?: string;
+
+  @Column({ nullable: true })
+  month?: string;
+
+  @Column({ nullable: true })
+  day?: string;
 }
 
 export { PROCEED, PROCESSING };

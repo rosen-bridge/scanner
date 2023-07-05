@@ -1,7 +1,7 @@
-import { boxEntity1659770552000 } from './sqlite/boxEntity1659770552000';
-import { boxEntity1671714075083 } from './postgres/boxEntity1671714075083';
+import { migration1688558553044 } from './postgres/1688558553044-migration';
+import { migration1688555566662 } from './sqlite/1688555566662-migration';
 
 export const migrations = {
-  sqlite: [boxEntity1659770552000],
-  postgres: [boxEntity1671714075083],
+  sqlite: [migration1688555566662],
+  postgres: [migration1688558553044],
 };
