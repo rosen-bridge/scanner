@@ -10,7 +10,7 @@ jobs:
     name: Typecheck and Tests
     strategy:
       matrix:
-        node-version: [ 116.x , 8.x ]
+        node-version: [ 16.x , 18.x ]
     runs-on: ${{ matrix.node-version }}
 
     steps:
