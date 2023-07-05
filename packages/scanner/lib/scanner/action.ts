@@ -130,6 +130,7 @@ export class BlockDbAction {
         height: block.blockHeight,
         scanner: this.name(),
       });
+      const date = new Date(block.timestamp);
       const blockInfo = {
         height: block.blockHeight,
         hash: block.hash,
@@ -138,6 +139,9 @@ export class BlockDbAction {
         scanner: this.name(),
         extra: block.extra,
         timestamp: block.timestamp,
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        day: date.getDay(),
       };
       this.logger.debug(`Block info: ${JSON.stringify(blockInfo)}`);
       if (!instance) {

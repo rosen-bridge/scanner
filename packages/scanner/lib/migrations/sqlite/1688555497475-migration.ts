@@ -14,9 +14,9 @@ export class migration1688555497475 implements MigrationInterface {
                 "extra" varchar,
                 "scanner" varchar NOT NULL,
                 "timestamp" integer NOT NULL,
-                "year" varchar,
-                "month" varchar,
-                "day" varchar,
+                "year" integer,
+                "month" integer,
+                "day" integer,
                 CONSTRAINT "UQ_7e20625b11840edf7f120565c3d" UNIQUE ("parentHash", "scanner"),
                 CONSTRAINT "UQ_b1e24c5950a7c3dd48d92bbfbb2" UNIQUE ("hash", "scanner"),
                 CONSTRAINT "UQ_521d830047d5fe08988538289dd" UNIQUE ("height", "scanner")

@@ -37,13 +37,13 @@ export class BlockEntity {
   timestamp: number;
 
   @Column({ nullable: true })
-  year?: string;
+  year?: number;
 
   @Column({ nullable: true })
-  month?: string;
+  month?: number;
 
   @Column({ nullable: true })
-  day?: string;
+  day?: number;
 }
 
 export { PROCEED, PROCESSING };
