@@ -1,5 +1,5 @@
 {
-  "name": "@rosen-bridge/scanner",
+  "name": "@alakipalaki/alakiscanner",
   "version": "1.0.4",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",
