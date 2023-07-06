@@ -23,10 +23,14 @@ jobs:
 
   pre-release:
     name: Second Job
-    needs: dummy-job
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
+    needs:
+      dummy-job
+      #if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
     runs-on: ubuntu-latest
     steps:
+      - name: just to show
+        run: echo ${{ github.base_ref }}
+
       - name: Checkout the code
         uses: actions/checkout@v3
 
