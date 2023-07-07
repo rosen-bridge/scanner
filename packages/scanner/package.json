@@ -1,10 +1,11 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
+  "author": "Rosen Team",
+  "license": "GPL-3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "license": "GPL-3.0",
   "scripts": {
     "prettify": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint --fix . && npm run prettify",
@@ -21,7 +22,6 @@
   "files": [
     "dist"
   ],
-  "author": "Sahand Zoufan",
   "dependencies": {
     "@cardano-ogmios/client": "^5.5.7",
     "@cardano-ogmios/schema": "^5.5.7",

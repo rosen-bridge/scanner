@@ -1,7 +1,7 @@
-import { TxIdEntity1683960673259 } from './sqlite/1683960673259-tx-id-entity';
-import { TxIdEntity1683960694422 } from './postgres/1683960694422-tx-id-entity';
+import { migration1688546418507 } from './postgres/1688546418507-migration';
+import { migration1688555717186 } from './sqlite/1688555717186-migration';
 
 export const migrations = {
-  sqlite: [TxIdEntity1683960673259],
-  postgres: [TxIdEntity1683960694422],
+  sqlite: [migration1688555717186],
+  postgres: [migration1688546418507],
 };

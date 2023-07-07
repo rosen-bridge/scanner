@@ -1,28 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class migration1683776413304 implements MigrationInterface {
-  name = 'migration1683776413304';
+export class migration1688554842087 implements MigrationInterface {
+  name = 'migration1688554842087';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-            CREATE TABLE "commitment_entity" (
-                "id" SERIAL NOT NULL,
-                "txId" character varying NOT NULL,
-                "extractor" character varying NOT NULL,
-                "eventId" character varying NOT NULL,
-                "commitment" character varying NOT NULL,
-                "WID" character varying NOT NULL,
-                "boxId" character varying NOT NULL,
-                "block" character varying NOT NULL,
-                "height" integer NOT NULL,
-                "boxSerialized" character varying NOT NULL,
-                "spendBlock" character varying,
-                "spendHeight" integer,
-                "rwtCount" character varying,
-                CONSTRAINT "UQ_cc294fc304a66f8f194840f1ece" UNIQUE ("boxId", "extractor"),
-                CONSTRAINT "PK_eebaa301006c443985916edfe0c" PRIMARY KEY ("id")
-            )
-        `);
     await queryRunner.query(`
             CREATE TABLE "event_trigger_entity" (
                 "id" SERIAL NOT NULL,
@@ -54,6 +35,25 @@ export class migration1683776413304 implements MigrationInterface {
             )
         `);
     await queryRunner.query(`
+            CREATE TABLE "commitment_entity" (
+                "id" SERIAL NOT NULL,
+                "txId" character varying NOT NULL,
+                "extractor" character varying NOT NULL,
+                "eventId" character varying NOT NULL,
+                "commitment" character varying NOT NULL,
+                "WID" character varying NOT NULL,
+                "boxId" character varying NOT NULL,
+                "block" character varying NOT NULL,
+                "height" integer NOT NULL,
+                "boxSerialized" character varying NOT NULL,
+                "spendBlock" character varying,
+                "spendHeight" integer,
+                "rwtCount" character varying,
+                CONSTRAINT "UQ_cc294fc304a66f8f194840f1ece" UNIQUE ("boxId", "extractor"),
+                CONSTRAINT "PK_eebaa301006c443985916edfe0c" PRIMARY KEY ("id")
+            )
+        `);
+    await queryRunner.query(`
             CREATE TABLE "permit_entity" (
                 "id" SERIAL NOT NULL,
                 "extractor" character varying NOT NULL,
@@ -64,6 +64,7 @@ export class migration1683776413304 implements MigrationInterface {
                 "height" integer NOT NULL,
                 "spendBlock" character varying,
                 "spendHeight" integer,
+                "txId" character varying NOT NULL,
                 CONSTRAINT "UQ_d3226602b909b64bcaeadc39c3c" UNIQUE ("boxId", "extractor"),
                 CONSTRAINT "PK_326e9f1a5442266ee38175eeab9" PRIMARY KEY ("id")
             )
@@ -75,10 +76,10 @@ export class migration1683776413304 implements MigrationInterface {
             DROP TABLE "permit_entity"
         `);
     await queryRunner.query(`
-            DROP TABLE "event_trigger_entity"
+            DROP TABLE "commitment_entity"
         `);
     await queryRunner.query(`
-            DROP TABLE "commitment_entity"
+            DROP TABLE "event_trigger_entity"
         `);
   }
 }

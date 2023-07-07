@@ -1,27 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class migration1683776215472 implements MigrationInterface {
-  name = 'migration1683776215472';
+export class migration1688555766601 implements MigrationInterface {
+  name = 'migration1688555766601';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-            CREATE TABLE "commitment_entity" (
-                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                "txId" varchar NOT NULL,
-                "extractor" varchar NOT NULL,
-                "eventId" varchar NOT NULL,
-                "commitment" varchar NOT NULL,
-                "WID" varchar NOT NULL,
-                "boxId" varchar NOT NULL,
-                "block" varchar NOT NULL,
-                "height" integer NOT NULL,
-                "boxSerialized" varchar NOT NULL,
-                "spendBlock" varchar,
-                "spendHeight" integer,
-                "rwtCount" varchar,
-                CONSTRAINT "UQ_cc294fc304a66f8f194840f1ece" UNIQUE ("boxId", "extractor")
-            )
-        `);
     await queryRunner.query(`
             CREATE TABLE "event_trigger_entity" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -52,6 +34,24 @@ export class migration1683776215472 implements MigrationInterface {
             )
         `);
     await queryRunner.query(`
+            CREATE TABLE "commitment_entity" (
+                "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "txId" varchar NOT NULL,
+                "extractor" varchar NOT NULL,
+                "eventId" varchar NOT NULL,
+                "commitment" varchar NOT NULL,
+                "WID" varchar NOT NULL,
+                "boxId" varchar NOT NULL,
+                "block" varchar NOT NULL,
+                "height" integer NOT NULL,
+                "boxSerialized" varchar NOT NULL,
+                "spendBlock" varchar,
+                "spendHeight" integer,
+                "rwtCount" varchar,
+                CONSTRAINT "UQ_cc294fc304a66f8f194840f1ece" UNIQUE ("boxId", "extractor")
+            )
+        `);
+    await queryRunner.query(`
             CREATE TABLE "permit_entity" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "extractor" varchar NOT NULL,
@@ -62,6 +62,7 @@ export class migration1683776215472 implements MigrationInterface {
                 "height" integer NOT NULL,
                 "spendBlock" varchar,
                 "spendHeight" integer,
+                "txId" varchar NOT NULL,
                 CONSTRAINT "UQ_d3226602b909b64bcaeadc39c3c" UNIQUE ("boxId", "extractor")
             )
         `);
@@ -72,10 +73,10 @@ export class migration1683776215472 implements MigrationInterface {
             DROP TABLE "permit_entity"
         `);
     await queryRunner.query(`
-            DROP TABLE "event_trigger_entity"
+            DROP TABLE "commitment_entity"
         `);
     await queryRunner.query(`
-            DROP TABLE "commitment_entity"
+            DROP TABLE "event_trigger_entity"
         `);
   }
 }
