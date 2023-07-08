@@ -3,6 +3,8 @@
   "verbose": true,
   "testEnvironment": "node",
   "preset": "ts-jest/presets/js-with-babel",
-  "transformIgnorePatterns": ["node_modules/(?!(@rosen-bridge/*)/)"],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@rosen-bridge/*)|(@rosen-clients/*)/)"
+  ],
   "coverageReporters": ["lcov", "cobertura", "text", "text-summary"]
 }
