@@ -28,17 +28,16 @@ jobs:
       #if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/dev' }}
     runs-on: ubuntu-latest
     steps:
-      - name: just to show
-        run: echo ${{ github.base_ref }}
-
       - name: Checkout the code
         uses: actions/checkout@v3
 
       - name: Download artifacts from "TEST Workflow"
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
           name: package_artifacts
           path: packages
+          workflow: ${{ github.event.workflow_run.workflow_id }}
+          workflow_conclusion: success
 
       - name: Restore cached dependencies
         uses: actions/cache@v3
