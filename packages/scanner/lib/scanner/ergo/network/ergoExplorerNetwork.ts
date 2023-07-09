@@ -10,6 +10,11 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     super();
     this.client = ergoExplorerClientFactory(explorerUrl);
   }
+
+  /**
+   * get block at height.
+   * @param height
+   */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.client.v0.getApiV0BlocksAtP1(height).then((res) => {
       return this.client.v1.getApiV1BlocksP1(res[0]).then((blocks) => ({
@@ -21,6 +26,10 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     });
   };
 
+  /**
+   * convert Explorer transaction to scanner transaction type
+   * @param tx
+   */
   private convertToTransaction = (tx: TransactionInfo1): Transaction => {
     return {
       id: tx.id,
@@ -45,6 +54,10 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     };
   };
 
+  /**
+   * get list of all block transactions
+   * @param blockHash
+   */
   getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
     return this.client.v1.getApiV1BlocksP1(blockHash).then((block) => {
       const transactions = block.block.blockTransactions || [];
@@ -52,10 +65,13 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     });
   };
 
+  /**
+   * get current height of blockchain
+   */
   getCurrentHeight = (): Promise<number> => {
     return this.client.v1
-      .getApiV1Blocks({ limit: 1 })
-      .then((headers) => headers.total);
+      .getApiV1Networkstate()
+      .then((res) => Number(res.height));
   };
 }
 

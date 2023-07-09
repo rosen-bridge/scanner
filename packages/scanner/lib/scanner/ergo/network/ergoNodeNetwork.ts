@@ -10,6 +10,11 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
     super();
     this.client = ergoNodeClientFactory(nodeUrl);
   }
+
+  /**
+   * get block at height.
+   * @param height
+   */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.client
       .getChainSlice({
@@ -27,6 +32,10 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
       });
   };
 
+  /**
+   * convert Node transaction to scanner transaction type
+   * @param tx
+   */
   private convertNodeTransactionToTransaction = (
     tx: ErgoTransaction
   ): Transaction => {
@@ -47,12 +56,19 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
     };
   };
 
+  /**
+   * get list of all block transactions
+   * @param blockHash
+   */
   getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
     return this.client.getBlockTransactionsById(blockHash).then((res) => {
       return res.transactions.map(this.convertNodeTransactionToTransaction);
     });
   };
 
+  /**
+   * get current height of blockchain
+   */
   getCurrentHeight = (): Promise<number> => {
     return this.client.getNodeInfo().then((info) => info.fullHeight || 0);
   };
