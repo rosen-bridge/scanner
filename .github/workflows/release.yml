@@ -21,9 +21,7 @@ jobs:
 
   release:
     name: Release Job
-    needs:
-      dummy-job
-      #if: ${{ github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com' }}
+    needs: dummy-job
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:

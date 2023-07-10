@@ -56,8 +56,9 @@ jobs:
       #      - name: Test
       #        run: npm run coverage
       #
-      #      - name: Upload app coverage to Codecov
+      #      - name: Upload coverage report
       #        uses: codecov/codecov-action@v2
       #        with:
-      #          files: packages/*/coverage/coverage-final.json
       #          token: ${{ secrets.CODECOV_TOKEN }}
+      #          file: packages/*/coverage/cobertura-coverage.xml
+      #          flags: pull-request-${{ github.event.pull_request.number }}

@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - opened
+      - synchronize
     branches:
       - dev
   workflow_run:
@@ -20,17 +21,6 @@ jobs:
     steps:
       - name: Dummy Step
         run: |
-          while true; do
-            result=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ needs.test-workflow.id }}" | \
-              jq -r '.workflow_run.conclusion')
-
-            if [[ "$result" != "success" ]]; then
-              break
-            fi
-
-            sleep 10
-          done
           echo "This is a dummy job"
 
   pre-release:
