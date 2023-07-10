@@ -13,8 +13,8 @@ on:
       - dev
 
 jobs:
-  tests:
-    name: Test Job
+  build:
+    name: Install & Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -49,6 +49,28 @@ jobs:
           name: artifact
           path: packages/*/dist
 
+  tests:
+    name: Test, Lint & Typecheck
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Download artifacts from "build"
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: packages
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
       - name: Type check
         run: npm run type-check
 
@@ -76,7 +98,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: Download artifacts from "test"
+      - name: Download artifacts from "build"
         uses: actions/download-artifact@v3
         with:
           name: artifact
@@ -119,7 +141,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: Download artifacts from "test"
+      - name: Download artifacts from "build"
         uses: actions/download-artifact@v3
         with:
           name: artifact
