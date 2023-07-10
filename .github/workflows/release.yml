@@ -1,4 +1,4 @@
-name: Pre-Releae Workflow
+name: Releae
 
 on:
   pull_request:
