@@ -42,7 +42,7 @@ jobs:
       - name: Dist Packages Output artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: package_artifacts
+          name: ergo
           path: packages/*/dist
 
       - name: Type check

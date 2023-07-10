@@ -36,7 +36,7 @@ jobs:
       - name: Download artifacts from "TEST Workflow"
         uses: dawidd6/action-download-artifact@v2
         with:
-          name: package_artifacts
+          name: ergo
           path: packages
           workflow: ${{ github.event.workflow_run.workflow_id }}
           workflow_conclusion: success
