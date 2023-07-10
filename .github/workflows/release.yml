@@ -3,9 +3,7 @@ name: Pre-Releae Workflow
 on:
   pull_request:
     types:
-      - opened
-    branches:
-      - dev
+      - closed
   workflow_run:
     workflows:
       - 'TEST Workflow'
@@ -21,13 +19,12 @@ jobs:
       - name: Dummy Step
         run: echo "This is a dummy job"
 
-  pre-release:
-    name: Pre-Release Job
-    needs: dummy-job
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.base.ref == 'dev' &&
-      github.event.pull_request.state == 'open'
+  release:
+    name: Release Job
+    needs:
+      dummy-job
+      #if: ${{ github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com' }}
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
@@ -49,16 +46,15 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
-      - name: Check changeset status
-        run: npx changeset status --since=origin/dev
-
-      - name: Prepare changeset
-        run: npx changeset pre enter ergo
-
-      - name: Update changeset version
+      - name: Changin Version Using changeset
         run: |
-          sed -i "s/ergo/next-${{ github.sha }}/g" .changeset/pre.json
           npx changeset version
+
+      - name: Commit & Push changes
+        uses: Andro999b/push@v1.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: dev
 
       - name: Configure npm authentication
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
