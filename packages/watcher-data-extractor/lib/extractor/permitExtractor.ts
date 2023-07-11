@@ -135,43 +135,56 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * Initializes the database with older permits related to the address
    */
   initializeBoxes = async (initialHeight: number) => {
-    let allBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
-    // Store or update unspent permits
+    let allStoredBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
+    // Extract unspent permits
     const unspentPermits = await this.getAllUnspentPermits(initialHeight);
-    const unspentBoxIds = map(unspentPermits, (box) => box.boxId);
-    await this.actions.storeInitialPermits(
-      unspentPermits,
-      this.getId(),
-      allBoxIds
+    const unspentBoxIds = unspentPermits.map((box) => box.boxId);
+    // Extract recent spent permits
+    const recentSpentPermits = (await this.getRecentPermits(initialHeight))
+      .filter((box) => !unspentBoxIds.includes(box.boxId))
+      .filter((box) => box.spendHeight! < initialHeight);
+    const recentSpentBoxIds = recentSpentPermits.map((box) => box.boxId);
+    // Storing extracted permits
+    const allPermits = [...unspentPermits, ...recentSpentPermits];
+    await this.actions.insertInitialPermits(
+      allPermits.filter((permit) => !allStoredBoxIds.includes(permit.boxId)),
+      this.getId()
     );
-    // Store or update recent spent permits
-    const recentSpentPermits = (
-      await this.getRecentPermits(initialHeight)
-    ).filter((box) => !unspentBoxIds.includes(box.boxId));
-    const recentSpentBoxIds = map(recentSpentPermits, (box) => box.boxId);
-    await this.actions.storeInitialPermits(
-      recentSpentPermits,
-      this.getId(),
-      allBoxIds
+    await this.actions.updateInitialPermits(
+      allPermits.filter((permit) => allStoredBoxIds.includes(permit.boxId)),
+      this.getId()
     );
     // Remove updated permits from existing permits in database
-    allBoxIds = difference(allBoxIds, unspentBoxIds);
-    allBoxIds = difference(allBoxIds, recentSpentBoxIds);
+    allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
+    allStoredBoxIds = difference(allStoredBoxIds, recentSpentBoxIds);
     // Validating remained permits
-    for (let index = 0; index < allBoxIds.length; index++) {
-      const boxId = allBoxIds[index];
+    for (const boxId of allStoredBoxIds) {
       const permit = await this.getPermitWithBoxId(boxId);
-      if (permit.spendBlock)
-        await this.actions.storeInitialPermits([permit], this.getId(), [boxId]);
-      else await this.actions.removeInvalidPermit(boxId, this.getId());
+      if (permit.spendBlock && permit.spendHeight) {
+        if (permit.spendHeight < initialHeight)
+          await this.actions.updateSpendBlock(
+            boxId,
+            this.getId(),
+            permit.spendBlock,
+            permit.spendHeight
+          );
+      } else await this.actions.removePermit(boxId, this.getId());
     }
   };
 
+  /**
+   * Return extracted permit from a box
+   * @param boxId
+   */
   getPermitWithBoxId = async (boxId: string): Promise<ExtractedPermit> => {
     const box = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
     return (await this.extractPermitData([box]))[0];
   };
 
+  /**
+   * Return recent existing permits
+   * @param initialHeight
+   */
   getRecentPermits = async (
     initialHeight: number
   ): Promise<Array<ExtractedPermit>> => {
@@ -206,6 +219,11 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     return extractedBoxes;
   };
 
+  /**
+   * Return all unspent permits
+   * @param initialHeight
+   * @returns
+   */
   getAllUnspentPermits = async (
     initialHeight: number
   ): Promise<Array<ExtractedPermit>> => {
@@ -231,6 +249,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     return extractedBoxes;
   };
 
+  /**
+   * Returns block information of tx
+   * @param txId
+   */
   getTxBlock = async (txId: string) => {
     const tx = await this.explorerApi.v1.getApiV1TransactionsP1(txId);
     return {
@@ -239,14 +261,21 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     };
   };
 
+  /**
+   * Extract permit data from json boxes
+   * and filter to fit in a specified height range
+   * @param boxes
+   * @param toHeight
+   * @param heightDifference
+   * @returns extracted permit
+   */
   extractPermitData = async (
     boxes: Array<OutputInfo>,
     toHeight?: number,
     heightDifference?: number
   ) => {
     const extractedBoxes: Array<ExtractedPermit> = [];
-    for (let index = 0; index < boxes.length; index++) {
-      const boxJson = boxes[index];
+    for (const boxJson of boxes) {
       if (
         (!toHeight || boxJson.settlementHeight < toHeight) &&
         (!toHeight ||

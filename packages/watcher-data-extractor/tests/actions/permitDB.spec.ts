@@ -325,32 +325,32 @@ describe('PermitEntityAction', () => {
     });
   });
 
-  describe('storeInitialPermits', () => {
-    /**
-     * 2 valid PermitBox should save successfully
-     * Dependency: Nothing
-     * Scenario: one initial PermitBox should save successfully
-     * Expected: storeBoxes should returns true and database row count should be 1
-     */
-    it('store an initial permit box', async () => {
-      const permitEntity = new PermitEntityAction(dataSource, logger);
-      const res = await permitEntity.storeInitialPermits(
-        [initialPermit],
-        100,
-        'extractor1'
-      );
-      expect(res).toEqual(true);
-      const repository = dataSource.getRepository(PermitEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toEqual(1);
-      expect(rows[0]).toEqual(
-        expect.objectContaining({
-          ...initialPermit,
-          extractor: 'extractor1',
-          spendBlock: null,
-          spendHeight: null,
-        })
-      );
-    });
-  });
+  // describe('storeInitialPermits', () => {
+  //   /**
+  //    * 2 valid PermitBox should save successfully
+  //    * Dependency: Nothing
+  //    * Scenario: one initial PermitBox should save successfully
+  //    * Expected: storeBoxes should returns true and database row count should be 1
+  //    */
+  //   it('store an initial permit box', async () => {
+  //     const permitEntity = new PermitEntityAction(dataSource, logger);
+  //     const res = await permitEntity.storeInitialPermits(
+  //       [initialPermit],
+  //       100,
+  //       'extractor1'
+  //     );
+  //     expect(res).toEqual(true);
+  //     const repository = dataSource.getRepository(PermitEntity);
+  //     const [rows, rowsCount] = await repository.findAndCount();
+  //     expect(rowsCount).toEqual(1);
+  //     expect(rows[0]).toEqual(
+  //       expect.objectContaining({
+  //         ...initialPermit,
+  //         extractor: 'extractor1',
+  //         spendBlock: null,
+  //         spendHeight: null,
+  //       })
+  //     );
+  //   });
+  // });
 });

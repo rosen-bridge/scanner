@@ -6,7 +6,6 @@ import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';
-import { log } from 'console';
 
 class PermitEntityAction {
   readonly logger: AbstractLogger;
@@ -25,10 +24,9 @@ class PermitEntityAction {
    * @param initialHeight
    * @param extractor
    */
-  storeInitialPermits = async (
+  insertInitialPermits = async (
     permits: Array<ExtractedPermit>,
-    extractor: string,
-    existingBoxIds: Array<string>
+    extractor: string
   ): Promise<boolean> => {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
@@ -46,27 +44,70 @@ class PermitEntityAction {
           spendBlock: permit.spendBlock,
           spendHeight: permit.spendHeight,
         };
-        if (existingBoxIds.includes(permit.boxId)) {
-          const storedEntity = await this.permitRepository.findOne({
-            where: { boxId: permit.boxId, extractor: extractor },
-          });
-          if (!storedEntity) {
-            this.logger.warn(
-              'Permit must exists but not found in the database.'
-            );
-            throw new Error('Permit not found in the database.');
-          }
-          await queryRunner.manager
-            .getRepository(PermitEntity)
-            .update({ id: storedEntity.id }, entity);
-        } else {
-          await queryRunner.manager.getRepository(PermitEntity).insert(entity);
-        }
+        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
         this.logger.info(
-          `Storing initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
+          `Storing new initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
         );
         this.logger.debug(
-          `Stored permit Entity: [${JSON.stringify(
+          `Stored new permit Entity: [${JSON.stringify(
+            entity
+          )}] and extractor ${extractor}`
+        );
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      this.logger.error(
+        `An error occurred during storing initial permits action: ${e}`
+      );
+      await queryRunner.rollbackTransaction();
+      throw new Error('Initialization failed while storing initial permits');
+    } finally {
+      await queryRunner.release();
+    }
+    return true;
+  };
+
+  /**
+   * stores initial permit boxes in the database
+   * @param permits
+   * @param initialHeight
+   * @param extractor
+   */
+  updateInitialPermits = async (
+    permits: Array<ExtractedPermit>,
+    extractor: string
+  ): Promise<boolean> => {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const permit of permits) {
+        const entity = {
+          boxId: permit.boxId,
+          boxSerialized: permit.boxSerialized,
+          block: permit.block,
+          height: permit.height,
+          extractor: extractor,
+          WID: permit.WID,
+          txId: permit.txId,
+          spendBlock: permit.spendBlock,
+          spendHeight: permit.spendHeight,
+        };
+        const storedEntity = await this.permitRepository.findOne({
+          where: { boxId: permit.boxId, extractor: extractor },
+        });
+        if (!storedEntity) {
+          this.logger.warn('Permit must exists but not found in the database.');
+          throw new Error('Permit not found in the database.');
+        }
+        await queryRunner.manager
+          .getRepository(PermitEntity)
+          .update({ id: storedEntity.id }, entity);
+        this.logger.info(
+          `Updated existing permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
+        );
+        this.logger.debug(
+          `Updated existing permit Entity: [${JSON.stringify(
             entity
           )}] and extractor ${extractor}`
         );
@@ -221,16 +262,42 @@ class PermitEntityAction {
     const boxIds = await this.permitRepository
       .createQueryBuilder()
       .where({ extractor: extractor })
-      .select('box_id', 'box_id')
+      .select('boxId', 'boxId')
       .getRawMany();
-    return boxIds.map((item: { box_id: string }) => item.box_id);
+    return boxIds.map((item: { boxId: string }) => item.boxId);
   };
 
-  removeInvalidPermit = async (boxId: string, extractor: string) => {
+  /**
+   * Removes specified permit
+   * @param boxId
+   * @param extractor
+   */
+  removePermit = async (boxId: string, extractor: string) => {
     return await this.permitRepository
       .createQueryBuilder()
       .where({ boxId: boxId, extractor: extractor })
-      .delete();
+      .delete()
+      .execute();
+  };
+
+  /**
+   * Update the permit spending information
+   * @param boxId
+   * @param extractor
+   * @param blockId
+   * @param blockHeight
+   */
+  updateSpendBlock = async (
+    boxId: string,
+    extractor: string,
+    blockId: string,
+    blockHeight: number
+  ) => {
+    return await this.permitRepository
+      .createQueryBuilder()
+      .where({ boxId: boxId, extractor: extractor })
+      .update({ spendBlock: blockId, spendHeight: blockHeight })
+      .execute();
   };
 }
 
