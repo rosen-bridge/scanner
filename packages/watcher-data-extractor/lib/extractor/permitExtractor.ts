@@ -1,7 +1,5 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import PermitEntityAction from '../actions/permitDB';
-import { ExtractedPermit } from '../interfaces/extractedPermit';
 import {
   AbstractExtractor,
   BlockEntity,
@@ -10,8 +8,14 @@ import {
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
-import { ExplorerApi } from '../network/ergoNetworkApi';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+
+import PermitEntityAction from '../actions/permitDB';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 import { JsonBI } from '../network/parser';
+import { difference, map } from 'lodash-es';
+import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
+import { confirmedBlocks } from '../constants';
 
 class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -20,7 +24,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly actions: PermitEntityAction;
   private readonly permitErgoTree: string;
   private readonly RWT: string;
-  readonly explorerApi: ExplorerApi;
+  readonly explorerApi;
 
   constructor(
     id: string,
@@ -28,8 +32,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     address: string,
     RWT: string,
     explorerUrl: string,
-    logger?: AbstractLogger,
-    timeout?: number
+    logger?: AbstractLogger
   ) {
     super();
     this.id = id;
@@ -40,7 +43,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new PermitEntityAction(dataSource, this.logger);
-    this.explorerApi = new ExplorerApi(explorerUrl, timeout);
+    this.explorerApi = ergoExplorerClientFactory(explorerUrl);
   }
 
   getId = () => this.id;
@@ -132,45 +135,152 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * Initializes the database with older permits related to the address
    */
   initializeBoxes = async (initialHeight: number) => {
-    const extractedBoxes: Array<ExtractedPermit> = [];
+    let allBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
+    // Store or update unspent permits
+    const unspentPermits = await this.getAllUnspentPermits(initialHeight);
+    const unspentBoxIds = map(unspentPermits, (box) => box.boxId);
+    await this.actions.storeInitialPermits(
+      unspentPermits,
+      this.getId(),
+      allBoxIds
+    );
+    // Store or update recent spent permits
+    const recentSpentPermits = (
+      await this.getRecentPermits(initialHeight)
+    ).filter((box) => !unspentBoxIds.includes(box.boxId));
+    const recentSpentBoxIds = map(recentSpentPermits, (box) => box.boxId);
+    await this.actions.storeInitialPermits(
+      recentSpentPermits,
+      this.getId(),
+      allBoxIds
+    );
+    // Remove updated permits from existing permits in database
+    allBoxIds = difference(allBoxIds, unspentBoxIds);
+    allBoxIds = difference(allBoxIds, recentSpentBoxIds);
+    // Validating remained permits
+    for (let index = 0; index < allBoxIds.length; index++) {
+      const boxId = allBoxIds[index];
+      const permit = await this.getPermitWithBoxId(boxId);
+      if (permit.spendBlock)
+        await this.actions.storeInitialPermits([permit], this.getId(), [boxId]);
+      else await this.actions.removeInvalidPermit(boxId, this.getId());
+    }
+  };
+
+  getPermitWithBoxId = async (boxId: string): Promise<ExtractedPermit> => {
+    const box = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
+    return (await this.extractPermitData([box]))[0];
+  };
+
+  getRecentPermits = async (
+    initialHeight: number
+  ): Promise<Array<ExtractedPermit>> => {
+    let extractedBoxes: Array<ExtractedPermit> = [];
     let offset = 0,
       total = 100;
     while (offset < total) {
-      const boxes = await this.explorerApi.getBoxesForAddress(
+      const boxes = await this.explorerApi.v1.getApiV1BoxesByergotreeP1(
         this.permitErgoTree,
-        offset
+        { offset: offset, limit: 100 }
       );
-      boxes.items.forEach((boxJson) => {
-        if (
-          boxJson.settlementHeight < initialHeight &&
-          boxJson.assets.length > 0 &&
-          boxJson.assets[0].tokenId == this.RWT
-        ) {
-          const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
-          const r4 = box.register_value(4);
-          if (r4) {
-            const R4Serialized = r4.to_coll_coll_byte();
-            extractedBoxes.push({
-              boxId: box.box_id().to_str(),
-              boxSerialized: Buffer.from(box.sigma_serialize_bytes()).toString(
-                'base64'
-              ),
-              block: boxJson.blockId,
-              height: boxJson.settlementHeight,
-              WID: Buffer.from(R4Serialized[0]).toString('hex'),
-              txId: box.tx_id().to_str(),
-            });
-          }
-        }
-      });
+      if (!boxes.items) {
+        this.logger.warn('Explorer api output items should not be undefined.');
+        throw new Error('Incorrect explorer api output');
+      }
+      extractedBoxes = [
+        ...extractedBoxes,
+        ...(await this.extractPermitData(
+          boxes.items,
+          initialHeight,
+          confirmedBlocks
+        )),
+      ];
+      if (
+        boxes.items[boxes.items.length - 1].settlementHeight <
+        initialHeight - confirmedBlocks
+      )
+        break;
       total = boxes.total;
       offset += 100;
     }
-    await this.actions.storeInitialPermits(
-      extractedBoxes,
-      initialHeight,
-      this.getId()
-    );
+    return extractedBoxes;
+  };
+
+  getAllUnspentPermits = async (
+    initialHeight: number
+  ): Promise<Array<ExtractedPermit>> => {
+    let extractedBoxes: Array<ExtractedPermit> = [];
+    let offset = 0,
+      total = 100;
+    while (offset < total) {
+      const boxes = await this.explorerApi.v1.getApiV1BoxesUnspentByergotreeP1(
+        this.permitErgoTree,
+        { offset: offset, limit: 100 }
+      );
+      if (!boxes.items) {
+        this.logger.warn('Explorer api output items should not be undefined.');
+        throw new Error('Incorrect explorer api output');
+      }
+      extractedBoxes = [
+        ...extractedBoxes,
+        ...(await this.extractPermitData(boxes.items, initialHeight)),
+      ];
+      total = boxes.total;
+      offset += 100;
+    }
+    return extractedBoxes;
+  };
+
+  getTxBlock = async (txId: string) => {
+    const tx = await this.explorerApi.v1.getApiV1TransactionsP1(txId);
+    return {
+      id: tx.blockId,
+      height: tx.inclusionHeight,
+    };
+  };
+
+  extractPermitData = async (
+    boxes: Array<OutputInfo>,
+    toHeight?: number,
+    heightDifference?: number
+  ) => {
+    const extractedBoxes: Array<ExtractedPermit> = [];
+    for (let index = 0; index < boxes.length; index++) {
+      const boxJson = boxes[index];
+      if (
+        (!toHeight || boxJson.settlementHeight < toHeight) &&
+        (!toHeight ||
+          !heightDifference ||
+          boxJson.settlementHeight > toHeight - heightDifference) &&
+        boxJson.assets!.length > 0 &&
+        boxJson.assets![0].tokenId == this.RWT
+      ) {
+        const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+        const r4 = box.register_value(4);
+        if (r4) {
+          const R4Serialized = r4.to_coll_coll_byte();
+          let spendBlock, SpendHeight;
+          if (boxJson.spentTransactionId) {
+            const block = await this.getTxBlock(boxJson.spentTransactionId);
+            spendBlock = block.id;
+            SpendHeight = block.height;
+          }
+          extractedBoxes.push({
+            boxId: box.box_id().to_str(),
+            boxSerialized: Buffer.from(box.sigma_serialize_bytes()).toString(
+              'base64'
+            ),
+            block: boxJson.blockId,
+            height: boxJson.settlementHeight,
+            WID: Buffer.from(R4Serialized[0]).toString('hex'),
+            txId: box.tx_id().to_str(),
+            spendBlock: spendBlock,
+            spendHeight: SpendHeight,
+          });
+        }
+      }
+    }
+    return extractedBoxes;
   };
 }
 

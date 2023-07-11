@@ -6,6 +6,7 @@ import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';
+import { log } from 'console';
 
 class PermitEntityAction {
   readonly logger: AbstractLogger;
@@ -26,15 +27,13 @@ class PermitEntityAction {
    */
   storeInitialPermits = async (
     permits: Array<ExtractedPermit>,
-    initialHeight: number,
-    extractor: string
+    extractor: string,
+    existingBoxIds: Array<string>
   ): Promise<boolean> => {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const repository = queryRunner.manager.getRepository(PermitEntity);
-      await repository.delete({ height: LessThan(initialHeight) });
       for (const permit of permits) {
         const entity = {
           boxId: permit.boxId,
@@ -44,8 +43,25 @@ class PermitEntityAction {
           extractor: extractor,
           WID: permit.WID,
           txId: permit.txId,
+          spendBlock: permit.spendBlock,
+          spendHeight: permit.spendHeight,
         };
-        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+        if (existingBoxIds.includes(permit.boxId)) {
+          const storedEntity = await this.permitRepository.findOne({
+            where: { boxId: permit.boxId, extractor: extractor },
+          });
+          if (!storedEntity) {
+            this.logger.warn(
+              'Permit must exists but not found in the database.'
+            );
+            throw new Error('Permit not found in the database.');
+          }
+          await queryRunner.manager
+            .getRepository(PermitEntity)
+            .update({ id: storedEntity.id }, entity);
+        } else {
+          await queryRunner.manager.getRepository(PermitEntity).insert(entity);
+        }
         this.logger.info(
           `Storing initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
         );
@@ -196,6 +212,25 @@ class PermitEntityAction {
         block: block,
       })
       .execute();
+  };
+
+  /**
+   *  Returns all stored permit box ids
+   */
+  getAllPermitBoxIds = async (extractor: string): Promise<Array<string>> => {
+    const boxIds = await this.permitRepository
+      .createQueryBuilder()
+      .where({ extractor: extractor })
+      .select('box_id', 'box_id')
+      .getRawMany();
+    return boxIds.map((item: { box_id: string }) => item.box_id);
+  };
+
+  removeInvalidPermit = async (boxId: string, extractor: string) => {
+    return await this.permitRepository
+      .createQueryBuilder()
+      .where({ boxId: boxId, extractor: extractor })
+      .delete();
   };
 }
 
