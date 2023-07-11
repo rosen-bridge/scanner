@@ -9,13 +9,13 @@ import { Transaction } from './network/types';
 
 class ErgoScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
-  readonly network: ErgoNetworkType;
-  readonly networkAccess: AbstractNetworkConnector<Transaction>;
+  readonly networkType: ErgoNetworkType;
+  readonly network: AbstractNetworkConnector<Transaction>;
   readonly logger: AbstractLogger;
 
   constructor(config: ErgoScannerConfig, logger?: AbstractLogger) {
     super(logger);
-    this.network = config.type;
+    this.networkType = config.type;
     this.action = new BlockDbAction(config.dataSource, this.name());
     /**
      * In order to keep the scanners functionalities consistent, we add config
@@ -23,12 +23,12 @@ class ErgoScanner extends GeneralScanner<Transaction> {
      * works.
      */
     this.initialHeight = config.initialHeight + 1;
-    switch (this.network) {
+    switch (this.networkType) {
       case ErgoNetworkType.Explorer:
-        this.networkAccess = new ErgoExplorerNetwork(config.url);
+        this.network = new ErgoExplorerNetwork(config.url);
         break;
       case ErgoNetworkType.Node:
-        this.networkAccess = new ErgoNodeNetwork(config.url);
+        this.network = new ErgoNodeNetwork(config.url);
         break;
       default:
         throw Error('invalid network entered');
@@ -37,9 +37,9 @@ class ErgoScanner extends GeneralScanner<Transaction> {
   }
 
   getFirstBlock = (): Promise<Block> => {
-    return this.networkAccess.getBlockAtHeight(this.initialHeight);
+    return this.network.getBlockAtHeight(this.initialHeight);
   };
 
-  name = () => `ergo-${this.network}`;
+  name = () => `ergo-${this.networkType}`;
 }
 export { ErgoScanner };

@@ -5,7 +5,7 @@ import { BlockEntity } from '../../entities/blockEntity';
 abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
-  abstract networkAccess: AbstractNetworkConnector<TransactionType>;
+  abstract network: AbstractNetworkConnector<TransactionType>;
   abstract getFirstBlock: () => Promise<Block>;
 
   /**
@@ -15,8 +15,9 @@ abstract class GeneralScanner<
   isForkHappen = async (): Promise<boolean> => {
     const lastSavedBlock = await this.action.getLastSavedBlock();
     if (lastSavedBlock !== undefined) {
-      const lastSavedBlockFromNetwork =
-        await this.networkAccess.getBlockAtHeight(lastSavedBlock.height);
+      const lastSavedBlockFromNetwork = await this.network.getBlockAtHeight(
+        lastSavedBlock.height
+      );
       return lastSavedBlockFromNetwork.hash !== lastSavedBlock.hash;
     } else {
       return false;
@@ -33,7 +34,7 @@ abstract class GeneralScanner<
         block.blockHeight
       }] in scanner ${this.name()}`
     );
-    const txs = await this.networkAccess.getBlockTxs(block.hash);
+    const txs = await this.network.getBlockTxs(block.hash);
     return await this.processBlockTransactions(block, txs);
   };
 
@@ -42,7 +43,7 @@ abstract class GeneralScanner<
    * @param lastSavedBlock: last saved block entity in database
    */
   stepForward = async (lastSavedBlock: BlockEntity) => {
-    const currentHeight = await this.networkAccess.getCurrentHeight();
+    const currentHeight = await this.network.getCurrentHeight();
     const firstBlock = await this.action.getFirstSavedBlock();
     if (!firstBlock || firstBlock.height >= currentHeight) {
       return;
@@ -52,7 +53,7 @@ abstract class GeneralScanner<
       height <= currentHeight;
       height++
     ) {
-      const block = await this.networkAccess.getBlockAtHeight(height);
+      const block = await this.network.getBlockAtHeight(height);
       if (lastSavedBlock !== undefined) {
         if (block.parentHash === lastSavedBlock.hash) {
           const savedBlock = await this.processBlock(block);
@@ -75,7 +76,7 @@ abstract class GeneralScanner<
   stepBackward = async () => {
     let block = await this.action.getLastSavedBlock();
     while (block) {
-      const blockFromNetwork = await this.networkAccess.getBlockAtHeight(
+      const blockFromNetwork = await this.network.getBlockAtHeight(
         block.height
       );
       if (

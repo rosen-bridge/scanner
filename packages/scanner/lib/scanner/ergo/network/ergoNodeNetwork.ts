@@ -15,21 +15,18 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
    * get block at height.
    * @param height
    */
-  getBlockAtHeight = (height: number): Promise<Block> => {
-    return this.client
-      .getChainSlice({
-        fromHeight: height,
-        toHeight: height,
-      })
-      .then((blocks) => {
-        const block = blocks[0];
-        return {
-          hash: block.id,
-          blockHeight: block.height,
-          parentHash: block.parentId,
-          timestamp: Number(block.timestamp),
-        };
-      });
+  getBlockAtHeight = async (height: number): Promise<Block> => {
+    const blocks = await this.client.getChainSlice({
+      fromHeight: height,
+      toHeight: height,
+    });
+    const block = blocks[0];
+    return {
+      hash: block.id,
+      blockHeight: block.height,
+      parentHash: block.parentId,
+      timestamp: Number(block.timestamp),
+    };
   };
 
   /**
@@ -60,17 +57,21 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
    * get list of all block transactions
    * @param blockHash
    */
-  getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
-    return this.client.getBlockTransactionsById(blockHash).then((res) => {
-      return res.transactions.map(this.convertNodeTransactionToTransaction);
-    });
+  getBlockTxs = async (blockHash: string): Promise<Array<Transaction>> => {
+    const blockTransaction = await this.client.getBlockTransactionsById(
+      blockHash
+    );
+    return blockTransaction.transactions.map(
+      this.convertNodeTransactionToTransaction
+    );
   };
 
   /**
    * get current height of blockchain
    */
-  getCurrentHeight = (): Promise<number> => {
-    return this.client.getNodeInfo().then((info) => info.fullHeight || 0);
+  getCurrentHeight = async (): Promise<number> => {
+    const info = await this.client.getNodeInfo();
+    return info.fullHeight || 0;
   };
 }
 

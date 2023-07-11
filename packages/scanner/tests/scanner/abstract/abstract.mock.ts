@@ -90,10 +90,10 @@ export const generateMockGeneralScannerClass = (name: string) => {
     ) {
       super();
       this.action = new BlockDbAction(dataSource, this.name());
-      this.networkAccess = networkConnector;
+      this.network = networkConnector;
     }
 
-    networkAccess: AbstractNetworkConnector<TestTransaction>;
+    network: AbstractNetworkConnector<TestTransaction>;
 
     getFirstBlock = async (): Promise<Block> => {
       return { blockHeight: 2, hash: '2', parentHash: '1', timestamp: 20 };
