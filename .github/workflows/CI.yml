@@ -129,7 +129,7 @@ jobs:
 
       - name: Update changeset version
         run: |
-          sed -i "s/ergo/next-${{ github.sha }}/g" .changeset/pre.json
+          sed -i "s/ergo/next-${{ github.sha[0:8] }}/g" .changeset/pre.json
           npx changeset version
 
       - name: Configure npm authentication
