@@ -1,6 +1,6 @@
 {
   "name": "@alakipalaki/alakitx-id-extractor",
-  "version": "60.0.0",
+  "version": "61.0.0",
   "description": "Extract and store all transaction ids in ogmios blocks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

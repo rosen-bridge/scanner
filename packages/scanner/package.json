@@ -1,6 +1,6 @@
 {
   "name": "@alakipalaki/alakiscanner",
-  "version": "60.0.0",
+  "version": "61.0.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
