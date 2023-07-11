@@ -169,10 +169,6 @@ jobs:
       - name: Commit & Push
         uses: EndBug/add-and-commit@v9
         with:
-          author_name: github-actions[bot]
-          author_email: github-actions[bot]@users.noreply.github.com
-          committer_name: Committer Name
-          committer_email: mail@example.com
           message: 'automated push'
 
       - name: Configure npm Authentication
