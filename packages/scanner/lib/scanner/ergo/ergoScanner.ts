@@ -1,18 +1,21 @@
-import { Block } from '../../interfaces';
-import { ErgoNetworkApi } from './network/ergoNetworkApi';
-import { ErgoScannerConfig } from './interfaces';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import { Transaction } from './network/types';
+import { AbstractNetworkConnector, Block } from '../../interfaces';
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';
+import { ErgoNetworkType, ErgoScannerConfig } from './interfaces';
+import ErgoExplorerNetwork from './network/ergoExplorerNetwork';
+import ErgoNodeNetwork from './network/ergoNodeNetwork';
+import { Transaction } from './network/types';
 
-class ErgoNodeScanner extends GeneralScanner<Transaction> {
+class ErgoScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
-  networkAccess: ErgoNetworkApi;
+  readonly networkType: ErgoNetworkType;
+  readonly network: AbstractNetworkConnector<Transaction>;
   readonly logger: AbstractLogger;
 
   constructor(config: ErgoScannerConfig, logger?: AbstractLogger) {
     super(logger);
+    this.networkType = config.type;
     this.action = new BlockDbAction(config.dataSource, this.name());
     /**
      * In order to keep the scanners functionalities consistent, we add config
@@ -20,14 +23,23 @@ class ErgoNodeScanner extends GeneralScanner<Transaction> {
      * works.
      */
     this.initialHeight = config.initialHeight + 1;
-    this.networkAccess = new ErgoNetworkApi(config.nodeUrl, config.timeout);
+    switch (this.networkType) {
+      case ErgoNetworkType.Explorer:
+        this.network = new ErgoExplorerNetwork(config.url);
+        break;
+      case ErgoNetworkType.Node:
+        this.network = new ErgoNodeNetwork(config.url);
+        break;
+      default:
+        throw Error('invalid network entered');
+    }
     this.logger = logger ? logger : new DummyLogger();
   }
 
   getFirstBlock = (): Promise<Block> => {
-    return this.networkAccess.getBlockAtHeight(this.initialHeight);
+    return this.network.getBlockAtHeight(this.initialHeight);
   };
 
-  name = () => 'ergo-node';
+  name = () => `ergo-${this.networkType}`;
 }
-export { ErgoNodeScanner };
+export { ErgoScanner };
