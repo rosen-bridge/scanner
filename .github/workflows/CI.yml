@@ -127,9 +127,13 @@ jobs:
       - name: Prepare changeset
         run: npx changeset pre enter ergo
 
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Update changeset version
         run: |
-          sed -i "s/ergo/next-${{ github.sha[0:8] }}/g" .changeset/pre.json
+          sed -i "s/ergo/next-${{ steps.vars.outputs.sha_short }}/g" .changeset/pre.json
           npx changeset version
 
       - name: Configure npm authentication
