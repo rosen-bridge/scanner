@@ -12,7 +12,7 @@ export class migration1689143753142 implements MigrationInterface {
                 "createBlock" varchar NOT NULL,
                 "creationHeight" integer NOT NULL,
                 "serialized" varchar NOT NULL,
-                "spendBlock" varchar,
+                "spendBlock" text,
                 "extractor" varchar NOT NULL,
                 "spendHeight" integer
             )

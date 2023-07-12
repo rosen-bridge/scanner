@@ -210,7 +210,7 @@ export class BoxEntityAction {
       .getRepository(BoxEntity)
       .createQueryBuilder()
       .update()
-      .set({ spendBlock: undefined, spendHeight: 0 })
+      .set({ spendBlock: null, spendHeight: 0 })
       .where('spendBlock = :block AND extractor = :extractor', {
         block: block,
         extractor: extractor,

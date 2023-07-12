@@ -273,11 +273,10 @@ class PermitEntityAction {
    * @param extractor
    */
   removePermit = async (boxId: string, extractor: string) => {
-    return await this.permitRepository
-      .createQueryBuilder()
-      .where({ boxId: boxId, extractor: extractor })
-      .delete()
-      .execute();
+    return await this.permitRepository.delete({
+      boxId: boxId,
+      extractor: extractor,
+    });
   };
 
   /**
@@ -293,11 +292,10 @@ class PermitEntityAction {
     blockId: string,
     blockHeight: number
   ) => {
-    return await this.permitRepository
-      .createQueryBuilder()
-      .where({ boxId: boxId, extractor: extractor })
-      .update({ spendBlock: blockId, spendHeight: blockHeight })
-      .execute();
+    return await this.permitRepository.update(
+      { boxId: boxId, extractor: extractor },
+      { spendBlock: blockId, spendHeight: blockHeight }
+    );
   };
 }
 
