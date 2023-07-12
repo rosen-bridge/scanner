@@ -1,5 +1,11 @@
 # @alakipalaki/alakiscanner
 
+## 61.0.1
+
+### Patch Changes
+
+- b219200: test mest
+
 ## 61.0.0
 
 ### Major Changes
