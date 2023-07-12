@@ -1,14 +1,15 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { DataSource } from 'typeorm';
-import CommitmentEntityAction from '../actions/commitmentDB';
 import {
   AbstractExtractor,
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import { JsonBI } from '../network/parser';
+
+import CommitmentEntityAction from '../actions/commitmentDB';
+import { extractedCommitment } from '../interfaces/extractedCommitment';
+import { JsonBI } from '../utils';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

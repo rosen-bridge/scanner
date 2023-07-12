@@ -1,4 +1,4 @@
 const dbIdChunkSize = 100;
-const confirmedBlocks = 720;
+const DefaultApiLimit = 100;
 
-export { dbIdChunkSize, confirmedBlocks };
+export { dbIdChunkSize, DefaultApiLimit };

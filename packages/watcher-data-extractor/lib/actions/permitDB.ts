@@ -1,10 +1,11 @@
-import { DataSource, In, LessThan, Repository } from 'typeorm';
-import { ExtractedPermit } from '../interfaces/extractedPermit';
-import PermitEntity from '../entities/PermitEntity';
+import { DataSource, In, Repository } from 'typeorm';
+import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
+
+import { ExtractedPermit } from '../interfaces/extractedPermit';
+import PermitEntity from '../entities/PermitEntity';
 import CommitmentEntity from '../entities/CommitmentEntity';
-import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';
 
 class PermitEntityAction {
@@ -68,7 +69,7 @@ class PermitEntityAction {
   };
 
   /**
-   * stores initial permit boxes in the database
+   * updates permits boxes in the database
    * @param permits
    * @param initialHeight
    * @param extractor
@@ -81,6 +82,7 @@ class PermitEntityAction {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      const repository = queryRunner.manager.getRepository(PermitEntity);
       for (const permit of permits) {
         const entity = {
           boxId: permit.boxId,
@@ -93,16 +95,14 @@ class PermitEntityAction {
           spendBlock: permit.spendBlock,
           spendHeight: permit.spendHeight,
         };
-        const storedEntity = await this.permitRepository.findOne({
+        const storedEntity = await repository.findOne({
           where: { boxId: permit.boxId, extractor: extractor },
         });
         if (!storedEntity) {
           this.logger.warn('Permit must exists but not found in the database.');
           throw new Error('Permit not found in the database.');
         }
-        await queryRunner.manager
-          .getRepository(PermitEntity)
-          .update({ id: storedEntity.id }, entity);
+        await repository.update({ id: storedEntity.id }, entity);
         this.logger.info(
           `Updated existing permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
         );
