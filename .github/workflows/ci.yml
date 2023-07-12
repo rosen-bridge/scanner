@@ -48,6 +48,7 @@ jobs:
         with:
           name: artifact
           path: packages/*/dist
+          retention-days: 30
 
   tests:
     name: Test, Lint & Typecheck

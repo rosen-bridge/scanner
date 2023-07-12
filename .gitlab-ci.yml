@@ -33,7 +33,7 @@ build:
         - node_modules
         - packages/*/node_modules
   artifacts:
-    expire_in: 1h
+    expire_in: 1 month
     paths:
       - packages/*/dist
   script:
@@ -112,4 +112,3 @@ snapshot-release:
     - npx changeset version
     - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
     - npx changeset publish
-
