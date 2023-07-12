@@ -48,6 +48,7 @@ jobs:
         with:
           name: artifact
           path: packages/*/dist
+          expire-in: 1 month
 
   tests:
     name: Test, Lint & Typecheck
