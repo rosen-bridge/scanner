@@ -5,7 +5,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
   extractors: Array<AbstractExtractor<TransactionType>>;
-  extractorInitialization: Array<boolean>;
+  extractorInitialization: Array<number>; // Stores the initialization height of each extractor (-1 if it's not initialized yet)
   logger: AbstractLogger;
 
   constructor(logger?: AbstractLogger) {
@@ -78,7 +78,7 @@ export abstract class AbstractScanner<TransactionType> {
       ).length === 0
     ) {
       this.extractors.push(extractor);
-      this.extractorInitialization.push(false);
+      this.extractorInitialization.push(-1);
     }
   };
 

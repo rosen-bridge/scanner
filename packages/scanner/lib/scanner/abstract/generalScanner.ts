@@ -85,6 +85,7 @@ abstract class GeneralScanner<
       ) {
         await this.forkBlock(block.height);
       } else {
+        this.initializeExtractors(block);
         return;
       }
       block = await this.action.getLastSavedBlock();
@@ -111,15 +112,7 @@ abstract class GeneralScanner<
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       }
-      for (const [
-        index,
-        extractorInitialized,
-      ] of this.extractorInitialization.entries()) {
-        if (!extractorInitialized) {
-          await this.extractors[index].initializeBoxes(lastSavedBlock.height);
-          this.extractorInitialization[index] = true;
-        }
-      }
+      this.initializeExtractors(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {
@@ -127,6 +120,26 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
+    }
+  };
+
+  /**
+   * Initializes the extractors if they're not initialized yet,
+   * or they have been initialized on a forked block
+   * @param block
+   */
+  initializeExtractors = async (block: BlockEntity) => {
+    for (const [
+      index,
+      extractorInitializedHeight,
+    ] of this.extractorInitialization.entries()) {
+      if (
+        extractorInitializedHeight === -1 ||
+        extractorInitializedHeight > block.height
+      ) {
+        await this.extractors[index].initializeBoxes(block.height);
+        this.extractorInitialization[index] = block.height;
+      }
     }
   };
 }
