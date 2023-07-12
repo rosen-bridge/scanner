@@ -1,16 +1,19 @@
-import { BoxEntity } from '../entities/boxEntity';
-import { DataSource, In, LessThan } from 'typeorm';
-import ExtractedBox from '../interfaces/ExtractedBox';
+import { DataSource, In, Repository } from 'typeorm';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import { BlockEntity } from '@rosen-bridge/scanner';
+
+import { BoxEntity } from '../entities/boxEntity';
+import ExtractedBox from '../interfaces/ExtractedBox';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;
   readonly logger: AbstractLogger;
+  private readonly repository: Repository<BoxEntity>;
 
   constructor(dataSource: DataSource, logger: AbstractLogger) {
     this.datasource = dataSource;
     this.logger = logger;
+    this.repository = dataSource.getRepository(BoxEntity);
   }
 
   /**
@@ -19,9 +22,8 @@ export class BoxEntityAction {
    * @param initializationHeight
    * @param extractor
    */
-  storeInitialBoxes = async (
+  insertInitialBoxes = async (
     boxes: Array<ExtractedBox>,
-    initializationHeight: number,
     extractor: string
   ) => {
     const queryRunner = this.datasource.createQueryRunner();
@@ -29,9 +31,6 @@ export class BoxEntityAction {
     await queryRunner.startTransaction();
     try {
       const repository = queryRunner.manager.getRepository(BoxEntity);
-      await repository.delete({
-        creationHeight: LessThan(initializationHeight),
-      });
       for (const box of boxes) {
         const entity = {
           address: box.address,
@@ -43,10 +42,63 @@ export class BoxEntityAction {
           extractor: extractor,
         };
         this.logger.info(
-          `Storing initial box ${box.boxId} with extractor ${extractor}`
+          `Storing new initial address box ${box.boxId} with extractor ${extractor}`
         );
-        this.logger.debug(`Stored box entity: [${JSON.stringify(entity)}]`);
+        this.logger.debug(`Stored new box entity: [${JSON.stringify(entity)}]`);
         await repository.insert(entity);
+      }
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      this.logger.error(`An error occurred during store boxes action: ${e}`);
+      await queryRunner.rollbackTransaction();
+      throw new Error(
+        'Initialization failed while storing initial address boxes'
+      );
+    } finally {
+      await queryRunner.release();
+    }
+    return true;
+  };
+
+  /**
+   * stores initial extracted boxes to the database
+   * @param boxes
+   * @param initializationHeight
+   * @param extractor
+   */
+  updateInitialBoxes = async (
+    boxes: Array<ExtractedBox>,
+    extractor: string
+  ) => {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const repository = queryRunner.manager.getRepository(BoxEntity);
+      for (const box of boxes) {
+        const storedBox = await repository.findOne({
+          where: { boxId: box.boxId, extractor: extractor },
+        });
+        if (!storedBox) {
+          this.logger.warn(
+            `Box with id [${box.boxId}] must exists but not found in the database.`
+          );
+          throw new Error('Box not found in the database.');
+        }
+        const entity = {
+          address: box.address,
+          boxId: box.boxId,
+          createBlock: box.blockId,
+          creationHeight: box.height,
+          spendBlock: undefined,
+          serialized: box.serialized,
+          extractor: extractor,
+        };
+        await repository.update({ id: storedBox.id }, entity);
+        this.logger.info(
+          `Updating initial address box ${box.boxId} with extractor ${extractor}`
+        );
+        this.logger.debug(`Updating box entity: [${JSON.stringify(entity)}]`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
@@ -158,11 +210,51 @@ export class BoxEntityAction {
       .getRepository(BoxEntity)
       .createQueryBuilder()
       .update()
-      .set({ spendBlock: null })
+      .set({ spendBlock: undefined, spendHeight: 0 })
       .where('spendBlock = :block AND extractor = :extractor', {
         block: block,
         extractor: extractor,
       })
       .execute();
+  };
+
+  /**
+   *  Returns all stored box ids
+   */
+  getAllBoxIds = async (extractor: string): Promise<Array<string>> => {
+    const boxIds = await this.repository
+      .createQueryBuilder()
+      .where({ extractor: extractor })
+      .select('boxId', 'boxId')
+      .getRawMany();
+    return boxIds.map((item: { boxId: string }) => item.boxId);
+  };
+
+  /**
+   * Removes specified box
+   * @param boxId
+   * @param extractor
+   */
+  removeBox = async (boxId: string, extractor: string) => {
+    return await this.repository.delete({ boxId: boxId, extractor: extractor });
+  };
+
+  /**
+   * Update the box spending information
+   * @param boxId
+   * @param extractor
+   * @param blockId
+   * @param blockHeight
+   */
+  updateSpendBlock = async (
+    boxId: string,
+    extractor: string,
+    blockId: string,
+    blockHeight: number
+  ) => {
+    return await this.repository.update(
+      { boxId: boxId, extractor: extractor },
+      { spendBlock: blockId, spendHeight: blockHeight }
+    );
   };
 }
