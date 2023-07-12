@@ -4,4 +4,6 @@ export default class ExtractedBox {
   serialized: string;
   blockId?: string;
   height?: number;
+  spendBlock?: string;
+  spendHeight?: number;
 }
