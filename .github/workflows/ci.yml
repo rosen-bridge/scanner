@@ -1,0 +1,189 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Dist Packages Output artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: packages/*/dist
+
+  tests:
+    name: Test, Lint & Typecheck
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Download artifacts from "build"
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: packages
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run coverage
+
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: packages/*/coverage/cobertura-coverage.xml
+          format: markdown
+          output: both
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+  pre-release:
+    name: Pre-Release Job
+    needs: tests
+    if: |
+      (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'dev' && github.event.pull_request.state == 'open') ||
+      (github.event_name == 'push' && github.event.pull_request != null && github.event.pull_request.base.ref == 'dev')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts from "build"
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: packages
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Check changeset status
+        run: npx changeset status --since=origin/dev
+
+      - name: Prepare changeset
+        run: npx changeset pre enter ergo
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Update changeset version
+        run: |
+          sed -i "s/ergo/next-${{ steps.vars.outputs.sha_short }}/g" .changeset/pre.json
+          npx changeset version
+
+      - name: Configure npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
+
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish changeset
+        run: npx changeset publish
+
+  release:
+    name: Release Job
+    needs: tests
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts from "build"
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: packages
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Changing Version Using changeset
+        run: |
+          npx changeset version
+
+      - name: Commit & Push
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'automated push'
+
+      - name: Configure npm Authentication
+        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
+
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish changeset
+        run: npx changeset publish
