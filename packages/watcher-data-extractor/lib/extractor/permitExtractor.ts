@@ -155,7 +155,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     // Validating remained permits
     for (const boxId of allStoredBoxIds) {
       const permit = await this.getPermitWithBoxId(boxId);
-      if (permit.spendBlock && permit.spendHeight) {
+      if (permit && permit.spendBlock && permit.spendHeight) {
         if (permit.spendHeight < initialHeight)
           await this.actions.updateSpendBlock(
             boxId,
@@ -163,7 +163,12 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
             permit.spendBlock,
             permit.spendHeight
           );
-      } else await this.actions.removePermit(boxId, this.getId());
+      } else {
+        await this.actions.removePermit(boxId, this.getId());
+        this.logger.info(
+          `Removed invalid box [${boxId}] in initialization validation`
+        );
+      }
     }
   };
 
@@ -171,9 +176,16 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * Return extracted permit from a box
    * @param boxId
    */
-  getPermitWithBoxId = async (boxId: string): Promise<ExtractedPermit> => {
-    const box = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
-    return (await this.extractPermitData([box]))[0];
+  getPermitWithBoxId = async (
+    boxId: string
+  ): Promise<ExtractedPermit | undefined> => {
+    try {
+      const box = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
+      return (await this.extractPermitData([box]))[0];
+    } catch {
+      this.logger.warn(`Permit with boxId ${boxId} does not exist`);
+      return undefined;
+    }
   };
 
   /**

@@ -1,3 +1,7 @@
+import { DataSource } from 'typeorm';
+import { Buffer } from 'buffer';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
 import { permitTxGenerator, createDatabase } from './utilsFunctions.mock';
 import PermitExtractor from '../../lib/extractor/permitExtractor';
 import PermitEntity from '../../lib/entities/PermitEntity';
@@ -7,10 +11,7 @@ import {
   permitAddress,
   RWTId,
 } from './utilsVariable.mock';
-import { DataSource } from 'typeorm';
-import { Buffer } from 'buffer';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../../lib/network/parser';
+import { JsonBI } from '../../lib/utils';
 
 let dataSource: DataSource;
 
