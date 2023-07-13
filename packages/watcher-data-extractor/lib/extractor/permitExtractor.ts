@@ -1,15 +1,15 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import PermitEntityAction from '../actions/permitDB';
-import { ExtractedPermit } from '../interfaces/extractedPermit';
+import { Buffer } from 'buffer';
 import {
   AbstractExtractor,
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { Buffer } from 'buffer';
+
+import PermitAction from '../actions/permitAction';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 import { ExplorerApi } from '../network/ergoNetworkApi';
 import { JsonBI } from '../network/parser';
 
@@ -17,7 +17,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
-  readonly actions: PermitEntityAction;
+  readonly actions: PermitAction;
   private readonly permitErgoTree: string;
   private readonly RWT: string;
   readonly explorerApi: ExplorerApi;
@@ -39,7 +39,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new PermitEntityAction(dataSource, this.logger);
+    this.actions = new PermitAction(dataSource, this.logger);
     this.explorerApi = new ExplorerApi(explorerUrl, timeout);
   }
 
@@ -146,7 +146,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
           boxJson.assets.length > 0 &&
           boxJson.assets[0].tokenId == this.RWT
         ) {
-          const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
+          const box = wasm.ErgoBox.from_json(JsonBI.stringify(boxJson));
           const r4 = box.register_value(4);
           if (r4) {
             const R4Serialized = r4.to_coll_coll_byte();

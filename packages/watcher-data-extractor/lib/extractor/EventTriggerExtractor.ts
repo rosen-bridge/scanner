@@ -1,21 +1,22 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import EventTriggerDB from '../actions/EventTriggerDB';
+import { blake2b } from 'blakejs';
 import {
   AbstractExtractor,
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+
+import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
-import { blake2b } from 'blakejs';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
-  private readonly actions: EventTriggerDB;
+  private readonly actions: EventTriggerAction;
   private readonly eventTriggerErgoTree: string;
   private readonly RWT: string;
 
@@ -34,7 +35,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new EventTriggerDB(dataSource, this.logger);
+    this.actions = new EventTriggerAction(dataSource, this.logger);
   }
 
   getId = () => this.id;

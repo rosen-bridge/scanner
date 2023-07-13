@@ -1,13 +1,13 @@
 import { DataSource, In, LessThan, Repository } from 'typeorm';
-import { ExtractedPermit } from '../interfaces/extractedPermit';
-import PermitEntity from '../entities/PermitEntity';
+import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
-import CommitmentEntity from '../entities/CommitmentEntity';
-import { chunk } from 'lodash-es';
+
+import { ExtractedPermit } from '../interfaces/extractedPermit';
+import PermitEntity from '../entities/PermitEntity';
 import { dbIdChunkSize } from '../constants';
 
-class PermitEntityAction {
+class PermitAction {
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
@@ -134,7 +134,7 @@ class PermitEntityAction {
   };
 
   /**
-   * update spendBlock Column of the permits in the dataBase
+   * Update spendBlock and spendHeight of permits spent on the block
    * @param spendId
    * @param block
    * @param extractor
@@ -146,13 +146,10 @@ class PermitEntityAction {
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
-      const updateResult = await this.datasource
-        .createQueryBuilder()
-        .update(PermitEntity)
-        .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where({ boxId: In(spendIdChunk) })
-        .andWhere({ extractor: extractor })
-        .execute();
+      const updateResult = await this.permitRepository.update(
+        { boxId: In(spendIdChunk), extractor: extractor },
+        { spendBlock: block.hash, spendHeight: block.height }
+      );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.permitRepository.findBy({
@@ -169,34 +166,21 @@ class PermitEntityAction {
   };
 
   /**
-   * deleting all permits corresponding to the block(id) and extractor(id)
+   * Delete all permits corresponding to the block(id) and extractor(id)
+   * and update all permits spent on the specified block
    * @param block
    * @param extractor
    */
-  //TODO: should check if deleted or not Promise<Boolean>
   deleteBlock = async (block: string, extractor: string): Promise<void> => {
     this.logger.info(
       `Deleting permits at block ${block} and extractor ${extractor}`
     );
-    await this.datasource
-      .createQueryBuilder()
-      .delete()
-      .from(PermitEntity)
-      .where('extractor = :extractor AND block = :block', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
-    //TODO: should handled null value in spendBlockHeight
-    await this.datasource
-      .createQueryBuilder()
-      .update(CommitmentEntity)
-      .set({ spendBlock: undefined, spendHeight: 0 })
-      .where('spendBlock = :block AND block = :block', {
-        block: block,
-      })
-      .execute();
+    await this.permitRepository.delete({ block: block, extractor: extractor });
+    await this.permitRepository.update(
+      { spendBlock: block, extractor: extractor },
+      { spendBlock: null, spendHeight: 0 }
+    );
   };
 }
 
-export default PermitEntityAction;
+export default PermitAction;
