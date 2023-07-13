@@ -37,7 +37,6 @@ export class BoxEntityAction {
           boxId: box.boxId,
           createBlock: box.blockId,
           creationHeight: box.height,
-          spendBlock: undefined,
           serialized: box.serialized,
           extractor: extractor,
         };
@@ -90,9 +89,10 @@ export class BoxEntityAction {
           boxId: box.boxId,
           createBlock: box.blockId,
           creationHeight: box.height,
-          spendBlock: undefined,
           serialized: box.serialized,
           extractor: extractor,
+          spendBlock: box.spendBlock,
+          spendHeight: box.spendHeight,
         };
         await repository.update({ id: storedBox.id }, entity);
         this.logger.info(

@@ -13,7 +13,7 @@ import {
 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 import ExtractedBox from '../interfaces/ExtractedBox';
-import { BoxEntityAction } from '../actions/db';
+import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';
 import { DefaultApiLimit } from '../constants';
 
