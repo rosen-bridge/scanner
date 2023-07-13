@@ -1,6 +1,10 @@
 import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
+import {
+  ItemsOutputInfo,
+  OutputInfo,
+} from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 import { ErgoUTXOExtractor } from '../../lib';
 import { BoxEntity } from '../../lib';
@@ -126,6 +130,68 @@ describe('extractorErgo', () => {
       expect(boxEntity.boxId).toEqual(
         '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542'
       );
+    });
+  });
+
+  describe('boxHasToken', () => {
+    let extractor: ErgoUTXOExtractor;
+    beforeAll(() => {
+      extractor = new ErgoUTXOExtractor(
+        dataSource,
+        'extractor1',
+        ergoLib.NetworkPrefix.Mainnet,
+        'url',
+        undefined,
+        ['tokenId']
+      );
+    });
+
+    /**
+     * @target ergoUtxoExtractor.boxHasToken should return true when box has the required token
+     * @dependencies
+     * @scenario
+     * - mock a box with token
+     * - check boxHasToken for the box
+     * @expected
+     * - it should return true when box has the required token
+     */
+    it('should return true when box has the required token', () => {
+      const box: OutputInfo = {
+        assets: [
+          {
+            tokenId: 'tokenId',
+            amount: 1000n,
+          },
+          {
+            tokenId: 'tokenId2',
+            amount: 1000n,
+          },
+        ],
+      } as any;
+      const result = extractor.boxHasToken(box);
+      expect(result).toEqual(true);
+    });
+
+    /**
+     * @target ergoUtxoExtractor.boxHasToken should return false when box doesn't have the required token
+     * @dependencies
+     * @scenario
+     * - mock a box without token
+     * - check boxHasToken for the box
+     * @expected
+     * - it should return false when box doesn't have the required token
+     */
+    it("should return false when box doesn't have the required token", () => {
+      const box: OutputInfo = {
+        assets: [
+          {
+            tokenId: 'tokenId2',
+            amount: 1000n,
+          },
+        ],
+      } as any;
+      const result = extractor.boxHasToken(box);
+      expect(result).toEqual(false);
     });
   });
 
