@@ -1,13 +1,14 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { extractedCommitment } from '../interfaces/extractedCommitment';
-import { DataSource } from 'typeorm';
-import CommitmentEntityAction from '../actions/commitmentDB';
 import {
   AbstractExtractor,
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+
+import { extractedCommitment } from '../interfaces/extractedCommitment';
+import { DataSource } from 'typeorm';
+import CommitmentEntityAction from '../actions/commitmentDB';
 import { JsonBI } from '../network/parser';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
@@ -130,7 +131,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockCommitment(hash, this.getId());
+    await this.actions.deleteBlock(hash, this.getId());
   };
 
   /**

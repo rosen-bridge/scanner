@@ -1,9 +1,10 @@
+import { DataSource } from 'typeorm';
+import { DummyLogger } from '@rosen-bridge/logger-interface';
+
 import CommitmentEntityAction from '../../lib/actions/commitmentDB';
 import { CommitmentEntity } from '../../lib';
-import { block } from '../extractor/utilsVariable.mock';
+import { block, block2 } from '../extractor/utilsVariable.mock';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
-import { DataSource } from 'typeorm';
 
 const commitment1 = {
   txId: 'txId1',
@@ -283,30 +284,68 @@ describe('commitmentEntityAction', () => {
   });
 
   describe('deleteBlockCommitment', () => {
-    /**
-     * deleting all commitments correspond to a block hash
-     * Dependency: Nothing
-     * Scenario: 1 commitment should exist in the dataBase
-     * Expected: deleteBlock should call without no error and database row count should be 1
-     */
-    it('should deleted one row of the dataBase correspond to one block', async () => {
-      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
-      await commitmentEntity.storeCommitments(
+    let commitmentAction: CommitmentEntityAction;
+    beforeEach(async () => {
+      commitmentAction = new CommitmentEntityAction(dataSource, logger);
+      await commitmentAction.storeCommitments(
         [commitment1],
         block,
         'extractor1'
       );
-      await commitmentEntity.storeCommitments(
+      await commitmentAction.storeCommitments(
         [commitment2],
         { ...block, hash: 'hash2' },
         'extractor1'
       );
+    });
+
+    /**
+     * @target commitmentEntityAction.deleteBlock should remove the commitment existed on the removed block
+     * @dependencies
+     * @scenario
+     * - delete the block which is the commitment created on
+     * - check commitment to be deleted
+     * @expected
+     * - it should have two commitments at first
+     * - it should remove one commitment within the removed block
+     */
+    it('should remove the commitment existed on the removed block', async () => {
       const repository = dataSource.getRepository(CommitmentEntity);
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await commitmentEntity.deleteBlockCommitment('hash', 'extractor1');
+      await commitmentAction.deleteBlock('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
+    });
+
+    /**
+     * @target commitmentEntityAction.deleteBlock should set the spendBlock to null when spent block is forked
+     * @dependencies
+     * @scenario
+     * - spend the stored commitment in the database
+     * - delete the block which is the commitment is spent on
+     * - check commitment spend block status
+     * @expected
+     * - it should set the spent correct block id when spent on a block
+     * - it should set the spent block to null when the block is removed
+     */
+    it('should set the spendBlock to null when spent block is forked', async () => {
+      await commitmentAction.spendCommitments(
+        [commitment1.boxId],
+        block2,
+        'extractor1'
+      );
+      const repository = dataSource.getRepository(CommitmentEntity);
+      let storedEntity = await repository.findOne({
+        where: { boxId: commitment1.boxId, extractor: 'extractor1' },
+      });
+      expect(storedEntity!.spendBlock).toEqual(block2.hash);
+
+      await commitmentAction.deleteBlock(block2.hash, 'extractor1');
+      storedEntity = await repository.findOne({
+        where: { boxId: commitment1.boxId, extractor: 'extractor1' },
+      });
+      expect(storedEntity!.spendBlock).toBeNull();
     });
   });
 });

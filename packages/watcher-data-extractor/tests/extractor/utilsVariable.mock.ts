@@ -17,6 +17,15 @@ export const block: BlockEntity = {
   scanner: '1',
   timestamp: 10,
 };
+export const block2: BlockEntity = {
+  id: 2,
+  height: 11,
+  hash: 'hash2',
+  parentHash: 'parentHash2',
+  status: 'hi',
+  scanner: '1',
+  timestamp: 11,
+};
 
 export const last10BlockHeader = [
   {

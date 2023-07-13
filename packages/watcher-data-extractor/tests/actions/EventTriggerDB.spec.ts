@@ -1,10 +1,11 @@
-import { clearDB, createDatabase } from '../extractor/utilsFunctions.mock';
-import { EventTriggerEntity } from '../../lib';
-import EventTriggerDB from '../../lib/actions/EventTriggerDB';
-import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
-import { block } from '../extractor/utilsVariable.mock';
 import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
+
+import { createDatabase } from '../extractor/utilsFunctions.mock';
+import { EventTriggerEntity } from '../../lib';
+import EventTriggerAction from '../../lib/actions/EventTriggerDB';
+import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
+import { block, block2 } from '../extractor/utilsVariable.mock';
 
 const sampleEventTrigger1: ExtractedEventTrigger = {
   eventId: 'eventId',
@@ -95,7 +96,7 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and database row count should be 2
      */
     it('gets two EventBoxes and dataBase row should be 2', async () => {
-      const eventTrigger = new EventTriggerDB(dataSource, logger);
+      const eventTrigger = new EventTriggerAction(dataSource, logger);
       const res = await eventTrigger.storeEventTriggers(
         [sampleEventTrigger1, sampleEventTrigger2],
         block,
@@ -131,7 +132,7 @@ describe('EventTrigger', () => {
      * Expected: eventTriggers should returns true and each saved eventTrigger should have valid fields
      */
     it('checks that eventTrigger saved successfully with two different extractor', async () => {
-      const action = new EventTriggerDB(dataSource, logger);
+      const action = new EventTriggerAction(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -187,7 +188,7 @@ describe('EventTrigger', () => {
      * Expected: storeEventTriggers should returns true and last eventTrigger fields should update
      */
     it('checks that duplicated eventTrigger updated with same extractor', async () => {
-      const action = new EventTriggerDB(dataSource, logger);
+      const action = new EventTriggerAction(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -235,7 +236,7 @@ describe('EventTrigger', () => {
      *  each step and new eventTrigger should insert in the database
      */
     it('two eventTrigger with two different extractor but same boxId', async () => {
-      const action = new EventTriggerDB(dataSource, logger);
+      const action = new EventTriggerAction(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -282,7 +283,7 @@ describe('EventTrigger', () => {
      *  each step and new eventTriggers should insert in the database
      */
     it('two eventTrigger with two different boxId but same extractor', async () => {
-      const action = new EventTriggerDB(dataSource, logger);
+      const action = new EventTriggerAction(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         {
@@ -329,7 +330,7 @@ describe('EventTrigger', () => {
    */
   describe('spendEventTriggers', () => {
     it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
-      const eventTriggerAction = new EventTriggerDB(dataSource, logger);
+      const eventTriggerAction = new EventTriggerAction(dataSource, logger);
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([
         sampleEventEntity,
@@ -351,34 +352,69 @@ describe('EventTrigger', () => {
   });
 
   describe('deleteBlock', () => {
-    /**
-     * deleting all EventTrigger correspond to a block hash
-     * Dependency: Nothing
-     * Scenario: 1 EventTrigger should exist in the dataBase
-     * Expected: deleteBlock should call without no error and database row count should be 1
-     */
-    it('should deleted one row of the dataBase correspond to one block', async () => {
-      const eventTrigger = new EventTriggerDB(dataSource, logger);
-      await eventTrigger.storeEventTriggers(
+    let eventTriggerAction: EventTriggerAction;
+    beforeEach(async () => {
+      eventTriggerAction = new EventTriggerAction(dataSource, logger);
+      await eventTriggerAction.storeEventTriggers(
         [sampleEventTrigger1],
         block,
         'extractor1'
       );
-      await eventTrigger.storeEventTriggers(
+      await eventTriggerAction.storeEventTriggers(
         [sampleEventTrigger2],
-        { ...block, hash: 'hash2' },
+        block2,
         'extractor2'
       );
+    });
+
+    /**
+     * @target eventTriggerActions.deleteBlock should remove the trigger existed on the removed block
+     * @dependencies
+     * @scenario
+     * - delete the block which is the trigger created on
+     * - check trigger to be deleted
+     * @expected
+     * - it should have two triggers at first
+     * - it should remove one trigger within the removed block
+     */
+    it('should remove the trigger existed on the removed block', async () => {
       const repository = dataSource.getRepository(EventTriggerEntity);
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await eventTrigger.deleteBlock('hash', 'extractor1');
+      await eventTriggerAction.deleteBlock('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
-      await dataSource
-        .getRepository(EventTriggerEntity)
-        .createQueryBuilder()
-        .softDelete();
+    });
+
+    /**
+     * @target eventTriggerActions.deleteBlock should set the spendBlock to null when spent block is forked
+     * @dependencies
+     * @scenario
+     * - spend the stored trigger in the database
+     * - delete the block which is the trigger is spent on
+     * - check trigger spend block status
+     * @expected
+     * - it should set the spent correct block id when spent on a block
+     * - it should set the spent block to null when the block is removed
+     */
+    it('should set the spendBlock to null when spent block is forked', async () => {
+      await eventTriggerAction.spendEventTriggers(
+        [sampleEventTrigger1.boxId],
+        block2,
+        'extractor1',
+        'txId'
+      );
+      const repository = dataSource.getRepository(EventTriggerEntity);
+      let storedEntity = await repository.findOne({
+        where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
+      });
+      expect(storedEntity!.spendBlock).toEqual(block2.hash);
+
+      await eventTriggerAction.deleteBlock(block2.hash, 'extractor1');
+      storedEntity = await repository.findOne({
+        where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
+      });
+      expect(storedEntity!.spendBlock).toBeNull();
     });
   });
 });

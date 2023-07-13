@@ -1,9 +1,10 @@
 import { DataSource, In, Repository } from 'typeorm';
-import { extractedCommitment } from '../interfaces/extractedCommitment';
-import CommitmentEntity from '../entities/CommitmentEntity';
+import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
-import { chunk } from 'lodash-es';
+
+import { extractedCommitment } from '../interfaces/extractedCommitment';
+import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
 
 class CommitmentEntityAction {
@@ -88,7 +89,7 @@ class CommitmentEntityAction {
   };
 
   /**
-   * update spendBlock Column of the commitments in the dataBase
+   * Update spendBlock and spendHeight of commitments spent on the block
    * @param spendId
    * @param block
    * @param extractor
@@ -100,13 +101,10 @@ class CommitmentEntityAction {
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
-      const updateResult = await this.datasource
-        .createQueryBuilder()
-        .update(CommitmentEntity)
-        .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where({ boxId: In(spendIdChunk) })
-        .andWhere({ extractor: extractor })
-        .execute();
+      const updateResult = await this.commitmentRepository.update(
+        { boxId: In(spendIdChunk), extractor: extractor },
+        { spendBlock: block.hash, spendHeight: block.height }
+      );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.commitmentRepository.findBy({
@@ -124,32 +122,23 @@ class CommitmentEntityAction {
   };
 
   /**
-   * deleting all permits corresponding to the block(id) and extractor(id)
+   * Delete all commitments corresponding to the block(id) and extractor(id)
+   * and update all commitments spent on the specified block
    * @param block
    * @param extractor
    */
-  deleteBlockCommitment = async (block: string, extractor: string) => {
+  deleteBlock = async (block: string, extractor: string) => {
     this.logger.info(
       `Deleting commitments of block [${block}] and extractor ${extractor}`
     );
-    await this.datasource
-      .createQueryBuilder()
-      .delete()
-      .from(CommitmentEntity)
-      .where('extractor = :extractor AND block = :block', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
-    //TODO: should handled null value in spendBlockHeight
-    await this.datasource
-      .createQueryBuilder()
-      .update(CommitmentEntity)
-      .set({ spendBlock: undefined, spendHeight: 0 })
-      .where('spendBlock = :block AND block = :block', {
-        block: block,
-      })
-      .execute();
+    await this.commitmentRepository.delete({
+      block: block,
+      extractor: extractor,
+    });
+    await this.commitmentRepository.update(
+      { spendBlock: block, extractor: extractor },
+      { spendBlock: null, spendHeight: 0 }
+    );
   };
 }
 
