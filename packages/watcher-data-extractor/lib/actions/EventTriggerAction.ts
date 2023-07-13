@@ -1,13 +1,13 @@
 import { DataSource, In, Repository } from 'typeorm';
-import EventTriggerEntity from '../entities/EventTriggerEntity';
+import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
+
+import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
-import eventTriggerEntity from '../entities/EventTriggerEntity';
-import { chunk } from 'lodash-es';
 import { dbIdChunkSize } from '../constants';
 
-class EventTriggerDB {
+class EventTriggerAction {
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly triggerEventRepository: Repository<EventTriggerEntity>;
@@ -99,7 +99,8 @@ class EventTriggerDB {
   };
 
   /**
-   * update spendBlock Column of the commitments in the dataBase
+   * Update spendBlock and spendHeight of eventTriggers spent on the block
+   * also update the spendTxId with the specified txId
    * @param spendId
    * @param block
    * @param extractor
@@ -113,17 +114,10 @@ class EventTriggerDB {
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
-      const updateResult = await this.datasource
-        .createQueryBuilder()
-        .update(eventTriggerEntity)
-        .set({
-          spendBlock: block.hash,
-          spendHeight: block.height,
-          spendTxId: txId,
-        })
-        .where({ boxId: In(spendIdChunk) })
-        .andWhere({ extractor: extractor })
-        .execute();
+      const updateResult = await this.triggerEventRepository.update(
+        { boxId: In(spendIdChunk), extractor: extractor },
+        { spendBlock: block.hash, spendHeight: block.height, spendTxId: txId }
+      );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.triggerEventRepository.findBy({
@@ -141,7 +135,8 @@ class EventTriggerDB {
   };
 
   /**
-   * deleting all permits corresponding to the block(id) and extractor(id)
+   * Delete all eventTriggers corresponding to the block(id) and extractor(id)
+   * and update all eventTriggers spent on the specified block
    * @param block
    * @param extractor
    */
@@ -149,25 +144,15 @@ class EventTriggerDB {
     this.logger.info(
       `Deleting event triggers at block ${block} and extractor ${extractor}`
     );
-    await this.datasource
-      .createQueryBuilder()
-      .delete()
-      .from(EventTriggerEntity)
-      .where('extractor = :extractor AND block = :block', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
-    //TODO: should handled null value in spendBlockHeight
-    await this.datasource
-      .createQueryBuilder()
-      .update(EventTriggerEntity)
-      .set({ spendBlock: undefined, spendHeight: 0 })
-      .where('spendBlock = :block AND block = :block', {
-        block: block,
-      })
-      .execute();
+    await this.triggerEventRepository.delete({
+      block: block,
+      extractor: extractor,
+    });
+    await this.triggerEventRepository.update(
+      { spendBlock: block, extractor: extractor },
+      { spendBlock: null, spendHeight: 0 }
+    );
   };
 }
 
-export default EventTriggerDB;
+export default EventTriggerAction;

@@ -12,16 +12,16 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
-import PermitEntityAction from '../actions/permitDB';
-import { ExtractedPermit } from '../interfaces/extractedPermit';
 import { DefaultApiLimit } from '../constants';
 import { JsonBI } from '../utils';
+import PermitAction from '../actions/permitAction';
+import { ExtractedPermit } from '../interfaces/extractedPermit';
 
 class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   id: string;
   private readonly dataSource: DataSource;
-  readonly actions: PermitEntityAction;
+  readonly actions: PermitAction;
   private readonly permitErgoTree: string;
   private readonly RWT: string;
   readonly explorerApi;
@@ -42,7 +42,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new PermitEntityAction(dataSource, this.logger);
+    this.actions = new PermitAction(dataSource, this.logger);
     this.explorerApi = ergoExplorerClientFactory(explorerUrl);
   }
 

@@ -1,4 +1,5 @@
 import { BlockEntity } from '@rosen-bridge/scanner';
+import { EventTriggerEntity } from '../../lib';
 
 export const permitAddress =
   'EE7687i4URb4YuSGSQXPCbAjMfN4dUt5Qx8BqKZJiZhDY8fdnSUwcAGqAsqfn1tW1byXB8nDrgkFzkAFgaaempKxfcPtDzAbnu9QfknzmtfnLYHdxPPg7Qtjy7jK5yUpPQ2M4Ps3h5kH57xWDJxcKviEMY11rQnxATjTKTQgGtfzsAPpqsUyT2ZpVYsFzUGJ4nSj4WaDZSU1Hovv6dPkSTArLQSjp38wE72ae6hbNJwXGkqgfBtdVXcZVtnqevw9xUNcE6i942CQ9hVMfbdRobnsaLgsDLQomsh8jLMXqkMde5qH2vGBUqnLKgjxCZaa7vStpPXT5EuzLn9napGwUcbJjgRk69FsRSfCrcydZbYxw4Gnh6ZB9at2USpwL1HdVkHVh8M6Kbw6ppRfeG4JeFsUw33H4sSRk6UPqfuFcRUf7Cec2vmPezXTPT7CXQqEeCjxmWXqfyEQUfnCwpiH5fQ9A8CQ3jTyFhxBTpoGDdtiVCmhqhKxjh9M7gcjpr1dUjGMCWxjir94ejfq24XQrSscrZuUT5NVHTWAkzQ';
@@ -16,6 +17,39 @@ export const block: BlockEntity = {
   status: 'hi',
   scanner: '1',
   timestamp: 10,
+};
+export const block2: BlockEntity = {
+  id: 2,
+  height: 11,
+  hash: 'hash2',
+  parentHash: 'parentHash2',
+  status: 'hi',
+  scanner: '1',
+  timestamp: 11,
+};
+
+export const sampleEventEntity: EventTriggerEntity = {
+  id: 10,
+  txId: 'txId',
+  eventId: 'eventId',
+  extractor: 'extractorId',
+  boxId: 'id',
+  boxSerialized: 'boxSerialized',
+  block: 'hash',
+  height: 10,
+  toAddress: 'cardanoAddr2',
+  fromChain: 'ergo',
+  toChain: 'cardano',
+  fromAddress: 'address',
+  amount: '17',
+  bridgeFee: '34',
+  networkFee: '51',
+  sourceChainTokenId: 'sourceToken',
+  targetChainTokenId: 'targetToken',
+  sourceTxId: 'txId',
+  sourceBlockId: 'blockId',
+  WIDs: 'ff',
+  sourceChainHeight: 10,
 };
 
 export const last10BlockHeader = [
