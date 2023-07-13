@@ -7,7 +7,7 @@ import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
 
-class CommitmentEntityAction {
+class CommitmentAction {
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly commitmentRepository: Repository<CommitmentEntity>;
@@ -142,4 +142,4 @@ class CommitmentEntityAction {
   };
 }
 
-export default CommitmentEntityAction;
+export default CommitmentAction;

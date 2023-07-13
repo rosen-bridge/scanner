@@ -8,7 +8,7 @@ import {
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 
-import EventTriggerAction from '../actions/EventTriggerDB';
+import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../network/parser';
 

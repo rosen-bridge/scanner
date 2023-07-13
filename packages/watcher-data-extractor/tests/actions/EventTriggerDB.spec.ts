@@ -3,7 +3,7 @@ import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventTriggerEntity } from '../../lib';
-import EventTriggerAction from '../../lib/actions/EventTriggerDB';
+import EventTriggerAction from '../../lib/actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
 import { block, block2 } from '../extractor/utilsVariable.mock';
 

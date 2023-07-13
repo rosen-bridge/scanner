@@ -7,7 +7,7 @@ import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { dbIdChunkSize } from '../constants';
 
-class PermitEntityAction {
+class PermitAction {
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
@@ -183,4 +183,4 @@ class PermitEntityAction {
   };
 }
 
-export default PermitEntityAction;
+export default PermitAction;

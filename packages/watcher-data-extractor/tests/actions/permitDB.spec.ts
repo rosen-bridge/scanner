@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 
-import PermitEntityAction from '../../lib/actions/permitDB';
+import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import { block, block2 } from '../extractor/utilsVariable.mock';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
@@ -50,7 +50,7 @@ describe('PermitEntityAction', () => {
      * Expected: storeBoxes should returns true and database row count should be 2
      */
     it('gets two PermitBox and dataBase row should be 2', async () => {
-      const permitEntity = new PermitEntityAction(dataSource, logger);
+      const permitEntity = new PermitAction(dataSource, logger);
       const res = await permitEntity.storePermits(
         [samplePermit1, samplePermit2],
         block,
@@ -89,7 +89,7 @@ describe('PermitEntityAction', () => {
      * Expected: storePermits should returns true and each saved permit should have valid fields
      */
     it('checks that permit saved successfully with two different extractor', async () => {
-      const action = new PermitEntityAction(dataSource, logger);
+      const action = new PermitAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
         {
@@ -142,7 +142,7 @@ describe('PermitEntityAction', () => {
      * Expected: storePermits should returns true and last permit fields should update
      */
     it('checks that duplicated permit updated with same extractor', async () => {
-      const action = new PermitEntityAction(dataSource, logger);
+      const action = new PermitAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
         {
@@ -190,7 +190,7 @@ describe('PermitEntityAction', () => {
      *  each step and new permit should insert in the database
      */
     it('Two permit with two different extractor but same boxId', async () => {
-      const action = new PermitEntityAction(dataSource, logger);
+      const action = new PermitAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
         {
@@ -237,7 +237,7 @@ describe('PermitEntityAction', () => {
      *  each step and new permits should insert in the database
      */
     it('two permit with two different boxId but same extractor', async () => {
-      const action = new PermitEntityAction(dataSource, logger);
+      const action = new PermitAction(dataSource, logger);
       const repository = dataSource.getRepository(PermitEntity);
       await repository.insert([
         {
@@ -278,7 +278,7 @@ describe('PermitEntityAction', () => {
 
   describe('spendPermits', () => {
     it('sets one spendBlock for one permit & one row should have spendBlock', async () => {
-      const permitEntity = new PermitEntityAction(dataSource, logger);
+      const permitEntity = new PermitAction(dataSource, logger);
       const res = await permitEntity.storePermits(
         [samplePermit1, samplePermit2],
         block,
@@ -297,9 +297,9 @@ describe('PermitEntityAction', () => {
   });
 
   describe('deleteBlock', () => {
-    let permitEntityAction: PermitEntityAction;
+    let permitEntityAction: PermitAction;
     beforeEach(async () => {
-      permitEntityAction = new PermitEntityAction(dataSource, logger);
+      permitEntityAction = new PermitAction(dataSource, logger);
       await permitEntityAction.storePermits(
         [samplePermit1],
         block,
@@ -370,7 +370,7 @@ describe('PermitEntityAction', () => {
      * Expected: storeBoxes should returns true and database row count should be 1
      */
     it('store an initial permit box', async () => {
-      const permitEntity = new PermitEntityAction(dataSource, logger);
+      const permitEntity = new PermitAction(dataSource, logger);
       const res = await permitEntity.storeInitialPermits(
         [initialPermit],
         100,

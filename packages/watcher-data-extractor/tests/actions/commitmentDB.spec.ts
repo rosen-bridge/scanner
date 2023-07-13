@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 
-import CommitmentEntityAction from '../../lib/actions/commitmentDB';
+import CommitmentAction from '../../lib/actions/commitmentAction';
 import { CommitmentEntity } from '../../lib';
 import { block, block2 } from '../extractor/utilsVariable.mock';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
@@ -49,7 +49,7 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and database row count should be 2
      */
     it('gets two commitments and dataBase row should be 2', async () => {
-      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
+      const commitmentEntity = new CommitmentAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
         block,
@@ -68,7 +68,7 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and each saved commitments should have valid fields
      */
     it('checks that commitments saved successfully with two different extractor', async () => {
-      const action = new CommitmentEntityAction(dataSource, logger);
+      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -121,7 +121,7 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and last commitment fields should update
      */
     it('checks that duplicated commitment updated with same extractor', async () => {
-      const action = new CommitmentEntityAction(dataSource, logger);
+      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -168,7 +168,7 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different extractor but same boxId', async () => {
-      const action = new CommitmentEntityAction(dataSource, logger);
+      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -214,7 +214,7 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different boxId but same extractor', async () => {
-      const action = new CommitmentEntityAction(dataSource, logger);
+      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -260,7 +260,7 @@ describe('commitmentEntityAction', () => {
    */
   describe('spendCommitments', () => {
     it('sets one spendBlock for one commitment & one row should have spendBlock', async () => {
-      const commitmentEntity = new CommitmentEntityAction(dataSource, logger);
+      const commitmentEntity = new CommitmentAction(dataSource, logger);
       const res = await commitmentEntity.storeCommitments(
         [commitment1, commitment2],
         block,
@@ -284,9 +284,9 @@ describe('commitmentEntityAction', () => {
   });
 
   describe('deleteBlockCommitment', () => {
-    let commitmentAction: CommitmentEntityAction;
+    let commitmentAction: CommitmentAction;
     beforeEach(async () => {
-      commitmentAction = new CommitmentEntityAction(dataSource, logger);
+      commitmentAction = new CommitmentAction(dataSource, logger);
       await commitmentAction.storeCommitments(
         [commitment1],
         block,
