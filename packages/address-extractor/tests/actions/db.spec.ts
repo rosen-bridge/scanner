@@ -275,30 +275,30 @@ describe('BoxEntityAction', () => {
     });
   });
 
-  // describe('storeInitialBoxes', () => {
-  //   /**
-  //    * store initial boxes in database
-  //    * Dependency: -
-  //    * Scenario: mock extracted box and store it on the database
-  //    * Expected: must store thr correct box
-  //    */
-  //   it('should store initial boxes in the database', async () => {
-  //     const box: ExtractedBox = {
-  //       boxId: 'boxId',
-  //       serialized: 'serialized',
-  //       address: 'address',
-  //       blockId: 'blockId',
-  //       height: 100,
-  //     };
-  //     await action.storeInitialBoxes([box], 100, 'extractor');
-  //     const repository = dataSource.getRepository(BoxEntity);
-  //     expect(await repository.count()).toEqual(1);
-  //     const stored = (await repository.find())[0];
-  //     expect(stored.address).toEqual('address');
-  //     expect(stored.boxId).toEqual('boxId');
-  //     expect(stored.serialized).toEqual('serialized');
-  //     expect(stored.creationHeight).toEqual(100);
-  //     expect(stored.createBlock).toEqual('blockId');
-  //   });
-  // });
+  describe('storeInitialBoxes', () => {
+    /**
+     * store initial boxes in database
+     * Dependency: -
+     * Scenario: mock extracted box and store it on the database
+     * Expected: must store thr correct box
+     */
+    it('should store new initial boxes in the database', async () => {
+      const box: ExtractedBox = {
+        boxId: 'boxId',
+        serialized: 'serialized',
+        address: 'address',
+        blockId: 'blockId',
+        height: 100,
+      };
+      await action.insertInitialBoxes([box], 'extractor');
+      const repository = dataSource.getRepository(BoxEntity);
+      expect(await repository.count()).toEqual(1);
+      const stored = (await repository.find())[0];
+      expect(stored.address).toEqual('address');
+      expect(stored.boxId).toEqual('boxId');
+      expect(stored.serialized).toEqual('serialized');
+      expect(stored.creationHeight).toEqual(100);
+      expect(stored.createBlock).toEqual('blockId');
+    });
+  });
 });
