@@ -3,8 +3,8 @@ import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 import { BoxEntityAction } from '../../lib/actions/boxAction';
 import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';
-import ExtractedBox from '../../lib/interfaces/ExtractedBox';
 import { BoxEntity } from '../../lib';
+import { ExtractedBox } from '../../lib/interfaces/types';
 
 const logger = new DummyLogger();
 let dataSource: DataSource;

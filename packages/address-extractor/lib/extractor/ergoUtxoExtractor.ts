@@ -12,10 +12,10 @@ import {
   OutputInfo,
 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
-import ExtractedBox from '../interfaces/ExtractedBox';
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';
 import { DefaultApiLimit } from '../constants';
+import { ExtractedBox } from '../interfaces/types';
 
 export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -151,7 +151,20 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     // Remove updated boxes from existing boxes in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained boxes
-    for (const boxId of allStoredBoxIds) {
+    await this.validateOldStoredBoxes(allStoredBoxIds, initialHeight);
+  };
+
+  /**
+   * Validate all remaining boxes in the database
+   * update the correct ones and remove the invalid ones
+   * @param unchangedStoredBoxIds
+   * @param initialHeight
+   */
+  validateOldStoredBoxes = async (
+    unchangedStoredBoxIds: Array<string>,
+    initialHeight: number
+  ) => {
+    for (const boxId of unchangedStoredBoxIds) {
       const box = await this.getBoxInfoWithBoxId(boxId);
       if (box && box.spendBlock && box.spendHeight) {
         if (box.spendHeight < initialHeight)

@@ -3,7 +3,7 @@ import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import { BlockEntity } from '@rosen-bridge/scanner';
 
 import { BoxEntity } from '../entities/boxEntity';
-import ExtractedBox from '../interfaces/ExtractedBox';
+import { ExtractedBox } from '../interfaces/types';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;
