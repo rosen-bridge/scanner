@@ -52,6 +52,15 @@ export const sampleEventEntity: EventTriggerEntity = {
   sourceChainHeight: 10,
 };
 
+export const sampleExtractedPermit = {
+  boxId: '1',
+  boxSerialized: 'serialized1',
+  WID: 'wid1',
+  txId: 'txId1',
+  block: 'blockId',
+  height: 100,
+};
+
 export const last10BlockHeader = [
   {
     extensionId:
@@ -383,9 +392,9 @@ export const addressBoxes = {
         '4a61b347bc82b61f56904171423ebdaf9ebe1221f5f930e6910e3e69f6276c23',
       blockId:
         '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
-      value: BigInt(1100000),
+      value: 1100000n,
       index: 0,
-      globalIndex: 632076,
+      globalIndex: 632076n,
       creationHeight: 295143,
       settlementHeight: 295145,
       ergoTree:
@@ -404,136 +413,33 @@ export const addressBoxes = {
         },
       ],
       additionalRegisters: {
-        R4: {
-          serializedValue:
-            '1a01203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
-          sigmaType: 'Coll[Coll[SByte]]',
-          renderedValue:
-            '[3582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157]',
-        },
-        R5: {
-          serializedValue: '0e0100',
-          sigmaType: 'Coll[SByte]',
-          renderedValue: '00',
-        },
+        R4: '1a01203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
+        R5: '0e0100',
       },
-      spentTransactionId: null,
-      mainChain: true,
-    },
-    {
-      boxId: '4563bca501f0ffaac43464843f5343b82a42ebc9fa6e78d4d13faa4ca873daff',
-      transactionId:
-        '6911f870b08015822ddd6009b62d626b4af7681f94ce0d5f262abe10752990a5',
-      blockId:
-        'f6acea8792c6dd98610d5cf50c191160e7c907868077cf6d0347428bf6a58d88',
-      value: BigInt(1100000),
-      index: 0,
-      globalIndex: 632056,
-      creationHeight: 295134,
-      settlementHeight: 295137,
-      ergoTree:
-        '10130400040004040400040204000e20a29d9bb0d622eb8b4f83a34c4ab1b7d3f18aaaabc3aa6876912a3ebaf0da10180404040004000400010104020400040004000e2064cc72f329f5db7b69667a10af3e1726161b9b7ce918a794ea80b9c32c4ce38805020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
-      address:
-        'EE7687i4URb4YuSGSQXPCbAgnr73Bb67aXgwzpjguuNwyRrWwVamRPKsiE3hbewDFDzkQa2PDdQG1S3KGcPbbPqvaT15RXFcCELtrAJ5BeZJFf9EfumFNWKztr7Me5Z23TRUPNgbcYEpCkC3RJeui3Tv6jXbEF2v284inu65FisnWoicPvpbuJb3fHpLkr5JAFPcp6uGTqTaaNWMJxWrHRbpKtvwVjG2VibGBGZJPtMbG3pzryH7Aq6CtLKtCAkSivDUkQWbXpm7TuvMnRCL78LvdoqauB8fRHxxxMw5BbmhVqBsKigUa92WBJCdyM7efp5SM1EXvNskbDEtuHHiYbLPxBJHXvZWWa8XCKvbWVV5eWdWExzASe3KzPCDEFm5JY2Peq64SY5gz6yu9n23BxDtb7PueWCMYfJs2VaYcLbndFJpkcDJKDiaEm18wSd3oKQ9eENKNZ74H2JyqmjnX6yVXcecP6NUj5gE3N2b5Pm5MjL37wveibdWHeSRQZFepWQdVAK5TLTgDL9YEE4jv5RLqB6vZ5eMtfSjhZ2',
-      assets: [
-        {
-          tokenId:
-            '497287b9a1eff643791277744a74b7d598b834dc613f2ebc972e33767c61ac2b',
-          index: 0,
-          amount: BigInt(99),
-          name: 'RWT',
-          decimals: 0,
-          type: 'EIP-004',
-        },
-      ],
-      additionalRegisters: {
-        R4: {
-          serializedValue:
-            '1a01206eb97fd94107bd6d8a75b78b4229b5cd1af4ba9562038fa0bd5324306e1e1916',
-          sigmaType: 'Coll[Coll[SByte]]',
-          renderedValue:
-            '[6eb97fd94107bd6d8a75b78b4229b5cd1af4ba9562038fa0bd5324306e1e1916]',
-        },
-        R5: {
-          serializedValue: '0e0100',
-          sigmaType: 'Coll[SByte]',
-          renderedValue: '00',
-        },
-      },
-      spentTransactionId: null,
-      mainChain: true,
-    },
-    {
-      boxId: '1185fe1c2a179d927d70002b9d2c0d5d1c88557a7562ecad37d1371338b231e1',
-      transactionId:
-        'f4e000e3184b242427f79fd146ceb5acdddaf497d9ede5deeb86cb8a7498dd38',
-      blockId:
-        '3407a0731e748f171cd4f9d526a008775816f74e758568e0c4f2967903ebaee7',
-      value: BigInt(300000),
-      index: 0,
-      globalIndex: 622412,
-      creationHeight: 290349,
-      settlementHeight: 290352,
-      ergoTree:
-        '10130400040004040400040204000e20a29d9bb0d622eb8b4f83a34c4ab1b7d3f18aaaabc3aa6876912a3ebaf0da10180404040004000400010104020400040004000e2064cc72f329f5db7b69667a10af3e1726161b9b7ce918a794ea80b9c32c4ce38805020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
-      address:
-        'EE7687i4URb4YuSGSQXPCbAgnr73Bb67aXgwzpjguuNwyRrWwVamRPKsiE3hbewDFDzkQa2PDdQG1S3KGcPbbPqvaT15RXFcCELtrAJ5BeZJFf9EfumFNWKztr7Me5Z23TRUPNgbcYEpCkC3RJeui3Tv6jXbEF2v284inu65FisnWoicPvpbuJb3fHpLkr5JAFPcp6uGTqTaaNWMJxWrHRbpKtvwVjG2VibGBGZJPtMbG3pzryH7Aq6CtLKtCAkSivDUkQWbXpm7TuvMnRCL78LvdoqauB8fRHxxxMw5BbmhVqBsKigUa92WBJCdyM7efp5SM1EXvNskbDEtuHHiYbLPxBJHXvZWWa8XCKvbWVV5eWdWExzASe3KzPCDEFm5JY2Peq64SY5gz6yu9n23BxDtb7PueWCMYfJs2VaYcLbndFJpkcDJKDiaEm18wSd3oKQ9eENKNZ74H2JyqmjnX6yVXcecP6NUj5gE3N2b5Pm5MjL37wveibdWHeSRQZFepWQdVAK5TLTgDL9YEE4jv5RLqB6vZ5eMtfSjhZ2',
-      assets: [],
-      additionalRegisters: {
-        R4: {
-          serializedValue:
-            '1a0120a337e33042eaa1da67bcc7dfa5fcc444f63b8a695c9786494d7d22293eba542e',
-          sigmaType: 'Coll[Coll[SByte]]',
-          renderedValue:
-            '[a337e33042eaa1da67bcc7dfa5fcc444f63b8a695c9786494d7d22293eba542e]',
-        },
-      },
-      spentTransactionId: null,
-      mainChain: true,
-    },
-    {
-      boxId: 'df4aad257f5285621fdd1b5cb6e7b3d091cc551ed7952772bac9737e5660de2f',
-      transactionId:
-        '209843c56fb09713743a7ec5fe2f5e7923654dcab7fc00bd51120f4cfb29c3f8',
-      blockId:
-        '80a5f45470674c59ec4d439487ea87fbeee43dead742aec82bc9d77d67c539f6',
-      value: BigInt(1100000),
-      index: 0,
-      globalIndex: 610424,
-      creationHeight: 284375,
-      settlementHeight: 284377,
-      ergoTree:
-        '10130400040004040400040204000e20a29d9bb0d622eb8b4f83a34c4ab1b7d3f18aaaabc3aa6876912a3ebaf0da10180404040004000400010104020400040004000e2064cc72f329f5db7b69667a10af3e1726161b9b7ce918a794ea80b9c32c4ce38805020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
-      address:
-        'EE7687i4URb4YuSGSQXPCbAgnr73Bb67aXgwzpjguuNwyRrWwVamRPKsiE3hbewDFDzkQa2PDdQG1S3KGcPbbPqvaT15RXFcCELtrAJ5BeZJFf9EfumFNWKztr7Me5Z23TRUPNgbcYEpCkC3RJeui3Tv6jXbEF2v284inu65FisnWoicPvpbuJb3fHpLkr5JAFPcp6uGTqTaaNWMJxWrHRbpKtvwVjG2VibGBGZJPtMbG3pzryH7Aq6CtLKtCAkSivDUkQWbXpm7TuvMnRCL78LvdoqauB8fRHxxxMw5BbmhVqBsKigUa92WBJCdyM7efp5SM1EXvNskbDEtuHHiYbLPxBJHXvZWWa8XCKvbWVV5eWdWExzASe3KzPCDEFm5JY2Peq64SY5gz6yu9n23BxDtb7PueWCMYfJs2VaYcLbndFJpkcDJKDiaEm18wSd3oKQ9eENKNZ74H2JyqmjnX6yVXcecP6NUj5gE3N2b5Pm5MjL37wveibdWHeSRQZFepWQdVAK5TLTgDL9YEE4jv5RLqB6vZ5eMtfSjhZ2',
-      assets: [
-        {
-          tokenId:
-            '497287b9a1eff643791277744a74b7d598b834dc613f2ebc972e33767c61ac2b',
-          index: 0,
-          amount: BigInt(94),
-          name: 'RWT',
-          decimals: 0,
-          type: 'EIP-004',
-        },
-      ],
-      additionalRegisters: {
-        R4: {
-          serializedValue:
-            '1a0120a337e33042eaa1da67bcc7dfa5fcc444f63b8a695c9786494d7d22293eba542e',
-          sigmaType: 'Coll[Coll[SByte]]',
-          renderedValue:
-            '[a337e33042eaa1da67bcc7dfa5fcc444f63b8a695c9786494d7d22293eba542e]',
-        },
-        R5: {
-          serializedValue: '0e0100',
-          sigmaType: 'Coll[SByte]',
-          renderedValue: '00',
-        },
-      },
-      spentTransactionId: null,
       mainChain: true,
     },
   ],
-  total: 4,
+  total: 1,
+};
+
+export const box = {
+  boxId: 'd4e292dbd4df2378f1392044b43922540ae7a0e9e9c3553549aa39557372e671',
+  value: 1100000,
+  ergoTree:
+    '10130400040004040400040204000e20a29d9bb0d622eb8b4f83a34c4ab1b7d3f18aaaabc3aa6876912a3ebaf0da10180404040004000400010104020400040004000e2064cc72f329f5db7b69667a10af3e1726161b9b7ce918a794ea80b9c32c4ce38805020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
+  assets: [
+    {
+      tokenId:
+        '497287b9a1eff643791277744a74b7d598b834dc613f2ebc972e33767c61ac2b',
+      amount: 9,
+    },
+  ],
+  creationHeight: 295143,
+  additionalRegisters: {
+    R4: '1a01203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
+    R5: '0e0100',
+  },
+  transactionId:
+    '4a61b347bc82b61f56904171423ebdaf9ebe1221f5f930e6910e3e69f6276c23',
+  index: 0,
 };

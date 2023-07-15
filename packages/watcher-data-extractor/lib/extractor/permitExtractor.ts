@@ -153,7 +153,20 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     // Remove updated permits from existing permits in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained permits
-    for (const boxId of allStoredBoxIds) {
+    await this.validateOldStoredPermits(allStoredBoxIds, initialHeight);
+  };
+
+  /**
+   * Validate all remaining permits in the database
+   * update the correct ones and remove the invalid ones
+   * @param unchangedStoredBoxIds
+   * @param initialHeight
+   */
+  validateOldStoredPermits = async (
+    unchangedStoredBoxIds: Array<string>,
+    initialHeight: number
+  ) => {
+    for (const boxId of unchangedStoredBoxIds) {
       const permit = await this.getPermitWithBoxId(boxId);
       if (permit && permit.spendBlock && permit.spendHeight) {
         if (permit.spendHeight < initialHeight)
@@ -208,8 +221,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
         this.logger.warn('Explorer api output items should not be undefined.');
         throw new Error('Incorrect explorer api output');
       }
-      const filteredBoxes = (await this.extractPermitData(boxes.items)).filter(
-        (box) => box.height && box.height < initialHeight
+      const filteredBoxes = await this.extractPermitData(
+        boxes.items.filter(
+          (box) => box.creationHeight && box.creationHeight < initialHeight
+        )
       );
       extractedBoxes = [...extractedBoxes, ...filteredBoxes];
       total = boxes.total;

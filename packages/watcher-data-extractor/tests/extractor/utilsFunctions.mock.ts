@@ -331,3 +331,20 @@ export const eventTriggerTxGenerator = (
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
+
+export const insertPermitEntity = (
+  dataSource: DataSource,
+  boxId?: string,
+  height?: number
+) => {
+  const repository = dataSource.getRepository(PermitEntity);
+  return repository.insert({
+    height: height || 1,
+    block: 'blockId',
+    boxId: boxId || 'boxId',
+    txId: 'txID',
+    boxSerialized: 'serialized',
+    extractor: 'extractor',
+    WID: 'wid',
+  });
+};
