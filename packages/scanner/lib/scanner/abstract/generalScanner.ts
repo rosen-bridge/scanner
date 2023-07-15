@@ -85,7 +85,7 @@ abstract class GeneralScanner<
       ) {
         await this.forkBlock(block.height);
       } else {
-        this.initializeExtractors(block);
+        await this.initializeExtractors(block);
         return;
       }
       block = await this.action.getLastSavedBlock();
@@ -112,7 +112,7 @@ abstract class GeneralScanner<
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       }
-      this.initializeExtractors(lastSavedBlock);
+      await this.initializeExtractors(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {
