@@ -268,9 +268,9 @@ describe('BoxEntityAction', () => {
     });
   });
 
-  describe('insertInitialBoxes', () => {
+  describe('insertBox', () => {
     /**
-     * @target boxAction.insertInitialBoxes should insert the new box at initialization
+     * @target boxAction.insertBox should insert the new box at initialization
      * @dependencies
      * @scenario
      * - insert an initial box
@@ -286,7 +286,7 @@ describe('BoxEntityAction', () => {
         blockId: 'blockId',
         height: 100,
       };
-      await action.insertInitialBoxes([box], 'extractor');
+      await action.insertBox(box, 'extractor');
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address');
       expect(stored.boxId).toEqual('boxId');
@@ -296,9 +296,9 @@ describe('BoxEntityAction', () => {
     });
   });
 
-  describe('updateInitialBoxes', () => {
+  describe('updateBox', () => {
     /**
-     * @target boxAction.updateInitialBoxes should update the initial box spend block information
+     * @target boxAction.updateBox should update the initial box spend block information
      * @dependencies
      * @scenario
      * - insert a mocked box
@@ -327,7 +327,7 @@ describe('BoxEntityAction', () => {
         spendBlock: 'spendBlock-new',
         spendHeight: 110,
       };
-      await action.updateInitialBoxes([box], 'extractor');
+      await action.updateBox(box, 'extractor');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('spendBlock-new');
       expect(stored.spendHeight).toEqual(110);

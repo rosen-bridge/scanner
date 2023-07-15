@@ -17,100 +17,36 @@ export class BoxEntityAction {
   }
 
   /**
-   * stores initial extracted boxes to the database
-   * @param boxes
-   * @param initializationHeight
+   * insert new box into database
+   * @param box
    * @param extractor
    */
-  insertInitialBoxes = async (
-    boxes: Array<ExtractedBox>,
-    extractor: string
-  ) => {
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const repository = queryRunner.manager.getRepository(BoxEntity);
-      for (const box of boxes) {
-        const entity = {
-          address: box.address,
-          boxId: box.boxId,
-          createBlock: box.blockId,
-          creationHeight: box.height,
-          serialized: box.serialized,
-          extractor: extractor,
-        };
-        this.logger.info(
-          `Storing new initial address box ${box.boxId} with extractor ${extractor}`
-        );
-        this.logger.debug(`Stored new box entity: [${JSON.stringify(entity)}]`);
-        await repository.insert(entity);
-      }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(`An error occurred during store boxes action: ${e}`);
-      await queryRunner.rollbackTransaction();
-      throw new Error(
-        'Initialization failed while storing initial address boxes'
-      );
-    } finally {
-      await queryRunner.release();
-    }
-    return true;
+  insertBox = async (box: ExtractedBox, extractor: string) => {
+    return this.repository.insert({
+      address: box.address,
+      boxId: box.boxId,
+      createBlock: box.blockId,
+      creationHeight: box.height,
+      serialized: box.serialized,
+      extractor: extractor,
+    });
   };
 
   /**
-   * stores initial extracted boxes to the database
-   * @param boxes
-   * @param initializationHeight
+   * insert new box into database
+   * @param box
    * @param extractor
    */
-  updateInitialBoxes = async (
-    boxes: Array<ExtractedBox>,
-    extractor: string
-  ) => {
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const repository = queryRunner.manager.getRepository(BoxEntity);
-      for (const box of boxes) {
-        const storedBox = await repository.findOne({
-          where: { boxId: box.boxId, extractor: extractor },
-        });
-        if (!storedBox) {
-          this.logger.warn(
-            `Box with id [${box.boxId}] must exists but not found in the database.`
-          );
-          throw new Error('Box not found in the database.');
-        }
-        const entity = {
-          address: box.address,
-          boxId: box.boxId,
-          createBlock: box.blockId,
-          creationHeight: box.height,
-          serialized: box.serialized,
-          extractor: extractor,
-          spendBlock: box.spendBlock,
-          spendHeight: box.spendHeight,
-        };
-        await repository.update({ id: storedBox.id }, entity);
-        this.logger.info(
-          `Updating initial address box ${box.boxId} with extractor ${extractor}`
-        );
-        this.logger.debug(`Updating box entity: [${JSON.stringify(entity)}]`);
+  updateBox = async (box: ExtractedBox, extractor: string) => {
+    return this.repository.update(
+      { boxId: box.boxId, extractor: extractor },
+      {
+        address: box.address,
+        createBlock: box.blockId,
+        creationHeight: box.height,
+        serialized: box.serialized,
       }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(`An error occurred during store boxes action: ${e}`);
-      await queryRunner.rollbackTransaction();
-      throw new Error(
-        'Initialization failed while storing initial address boxes'
-      );
-    } finally {
-      await queryRunner.release();
-    }
-    return true;
+    );
   };
 
   /**

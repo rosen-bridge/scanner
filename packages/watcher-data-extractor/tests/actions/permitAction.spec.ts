@@ -353,9 +353,9 @@ describe('PermitEntityAction', () => {
     });
   });
 
-  describe('insertInitialPermits', () => {
+  describe('insertPermit', () => {
     /**
-     * @target permitAction.insertInitialPermits should insert the new permit at initialization
+     * @target permitAction.insertPermit should insert the new permit at initialization
      * @dependencies
      * @scenario
      * - insert an initial permit
@@ -364,7 +364,7 @@ describe('PermitEntityAction', () => {
      * - it should insert the new permit
      */
     it('should insert the new permit at initialization', async () => {
-      await action.insertInitialPermits([samplePermit1], 'extractor');
+      await action.insertPermit(samplePermit1, 'extractor');
       const stored = (await repository.find())[0];
       expect(stored.WID).toEqual(samplePermit1.WID);
       expect(stored.boxId).toEqual(samplePermit1.boxId);
@@ -374,9 +374,9 @@ describe('PermitEntityAction', () => {
     });
   });
 
-  describe('updateInitialPermits', () => {
+  describe('updatePermit', () => {
     /**
-     * @target permitAction.updateInitialPermits should update the initial permit spend block information
+     * @target permitAction.updatePermit should update the initial permit spend block information
      * @dependencies
      * @scenario
      * - insert a mocked permit
@@ -396,7 +396,7 @@ describe('PermitEntityAction', () => {
         spendBlock: 'spendBlock-new',
         spendHeight: 110,
       };
-      await action.updateInitialPermits([permit], 'extractor');
+      await action.updatePermit(permit, 'extractor');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('spendBlock-new');
       expect(stored.spendHeight).toEqual(110);

@@ -19,109 +19,43 @@ class PermitAction {
   }
 
   /**
-   * stores initial permit boxes in the database
+   * insert a new permit boxes in the database
    * @param permits
    * @param initialHeight
    * @param extractor
    */
-  insertInitialPermits = async (
-    permits: Array<ExtractedPermit>,
-    extractor: string
-  ): Promise<boolean> => {
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      for (const permit of permits) {
-        const entity = {
-          boxId: permit.boxId,
-          boxSerialized: permit.boxSerialized,
-          block: permit.block,
-          height: permit.height,
-          extractor: extractor,
-          WID: permit.WID,
-          txId: permit.txId,
-          spendBlock: permit.spendBlock,
-          spendHeight: permit.spendHeight,
-        };
-        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
-        this.logger.info(
-          `Storing new initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
-        );
-        this.logger.debug(
-          `Stored new permit Entity: [${JSON.stringify(
-            entity
-          )}] and extractor ${extractor}`
-        );
-      }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(
-        `An error occurred during storing initial permits action: ${e}`
-      );
-      await queryRunner.rollbackTransaction();
-      throw new Error('Initialization failed while storing initial permits');
-    } finally {
-      await queryRunner.release();
-    }
-    return true;
+  insertPermit = async (permit: ExtractedPermit, extractor: string) => {
+    return this.permitRepository.insert({
+      boxId: permit.boxId,
+      boxSerialized: permit.boxSerialized,
+      block: permit.block,
+      height: permit.height,
+      extractor: extractor,
+      WID: permit.WID,
+      txId: permit.txId,
+      spendBlock: permit.spendBlock,
+      spendHeight: permit.spendHeight,
+    });
   };
 
   /**
-   * updates permits boxes in the database
-   * @param permits
-   * @param initialHeight
+   * updates the specified permit in the database
+   * @param permit
    * @param extractor
    */
-  updateInitialPermits = async (
-    permits: Array<ExtractedPermit>,
-    extractor: string
-  ): Promise<boolean> => {
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const repository = queryRunner.manager.getRepository(PermitEntity);
-      for (const permit of permits) {
-        const entity = {
-          boxId: permit.boxId,
-          boxSerialized: permit.boxSerialized,
-          block: permit.block,
-          height: permit.height,
-          extractor: extractor,
-          WID: permit.WID,
-          txId: permit.txId,
-          spendBlock: permit.spendBlock,
-          spendHeight: permit.spendHeight,
-        };
-        const storedEntity = await repository.findOne({
-          where: { boxId: permit.boxId, extractor: extractor },
-        });
-        if (!storedEntity) {
-          this.logger.warn('Permit must exists but not found in the database.');
-          throw new Error('Permit not found in the database.');
-        }
-        await repository.update({ id: storedEntity.id }, entity);
-        this.logger.info(
-          `Updated existing permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
-        );
-        this.logger.debug(
-          `Updated existing permit Entity: [${JSON.stringify(
-            entity
-          )}] and extractor ${extractor}`
-        );
+  updatePermit = async (permit: ExtractedPermit, extractor: string) => {
+    await this.permitRepository.update(
+      { boxId: permit.boxId, extractor: extractor },
+      {
+        boxSerialized: permit.boxSerialized,
+        block: permit.block,
+        height: permit.height,
+        WID: permit.WID,
+        txId: permit.txId,
+        spendBlock: permit.spendBlock,
+        spendHeight: permit.spendHeight,
       }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(
-        `An error occurred during storing initial permits action: ${e}`
-      );
-      await queryRunner.rollbackTransaction();
-      throw new Error('Initialization failed while storing initial permits');
-    } finally {
-      await queryRunner.release();
-    }
-    return true;
+    );
   };
 
   /**

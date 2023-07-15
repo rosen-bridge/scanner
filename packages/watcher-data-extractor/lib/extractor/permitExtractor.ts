@@ -140,16 +140,21 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     const unspentPermits = await this.getAllUnspentPermits(initialHeight);
     const unspentBoxIds = unspentPermits.map((box) => box.boxId);
     // Storing extracted permits
-    await this.actions.insertInitialPermits(
-      unspentPermits.filter(
-        (permit) => !allStoredBoxIds.includes(permit.boxId)
-      ),
-      this.getId()
-    );
-    await this.actions.updateInitialPermits(
-      unspentPermits.filter((permit) => allStoredBoxIds.includes(permit.boxId)),
-      this.getId()
-    );
+    for (const permit of unspentPermits) {
+      if (allStoredBoxIds.includes(permit.boxId)) {
+        await this.actions.updatePermit(permit, this.getId());
+        this.logger.info(
+          `Updated the existing unspent permit with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Updated permit [${JSON.stringify(permit)}]`);
+      } else {
+        await this.actions.insertPermit(permit, this.getId());
+        this.logger.info(
+          `Inserted new unspent permit with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Inserted permit [${JSON.stringify(permit)}]`);
+      }
+    }
     // Remove updated permits from existing permits in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained permits

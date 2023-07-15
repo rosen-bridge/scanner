@@ -139,16 +139,23 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
 
     // Storing extracted boxes
     let allStoredBoxIds = await this.actions.getAllBoxIds(this.getId());
-    await this.actions.insertInitialBoxes(
-      unspentBoxes.filter((box) => !allStoredBoxIds.includes(box.boxId)),
-      this.getId()
-    );
-    await this.actions.updateInitialBoxes(
-      unspentBoxes.filter((box) => allStoredBoxIds.includes(box.boxId)),
-      this.getId()
-    );
+    for (const permit of unspentBoxes) {
+      if (allStoredBoxIds.includes(permit.boxId)) {
+        await this.actions.updateBox(permit, this.getId());
+        this.logger.info(
+          `Updated the existing unspent box with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Updated box [${JSON.stringify(permit)}]`);
+      } else {
+        await this.actions.insertBox(permit, this.getId());
+        this.logger.info(
+          `Inserted new unspent box with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Inserted permit [${JSON.stringify(permit)}]`);
+      }
+    }
 
-    // Remove updated boxes from existing boxes in database
+    // Remove updated box ids from existing boxes in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained boxes
     await this.validateOldStoredBoxes(allStoredBoxIds, initialHeight);
