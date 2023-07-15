@@ -1,10 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { Buffer } from 'buffer';
-import {
-  ItemsOutputInfo,
-  OutputInfo,
-} from '@rosen-clients/ergo-explorer/dist/src/v1/types';
+import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 import { ErgoUTXOExtractor } from '../../lib';
@@ -13,13 +9,9 @@ import {
   addressBoxes,
   generateBlockEntity,
   createDatabase,
-  tokenBoxes,
   tx1,
   insertBoxEntity,
 } from './utils.mock';
-
-import { JsonBI } from '../../lib/utils';
-import { BoxEntityAction } from '../../lib/actions/boxAction';
 import { ExtractedBox } from '../../lib/interfaces/types';
 
 jest.mock('@rosen-clients/ergo-explorer');
@@ -241,7 +233,7 @@ describe('extractorErgo', () => {
      * - call getTxBlock with api output
      * - check the extract info
      * @expected
-     * - should extract box data from api output
+     * - should extract block data from api output
      */
     it('should extract block id and height for a transaction', async () => {
       jest.mocked(ergoExplorerClientFactory).mockReturnValue({
@@ -315,7 +307,7 @@ describe('extractorErgo', () => {
      * @dependencies
      * @scenario
      * - mock getApiV1BoxesUnspentBytokenidP1 to return 3 boxes with different conditions
-     * - call getTxBlock with api output
+     * - call getUnspentBoxes
      * - check the extractBoxData to have been called with the correct box
      * @expected
      * - should filter one box with proper height and token and extract its data
@@ -412,7 +404,7 @@ describe('extractorErgo', () => {
     });
   });
 
-  describe('validateAllStoredBoxes', () => {
+  describe('validateOldStoredBoxes', () => {
     let extractor: ErgoUTXOExtractor;
     beforeEach(() => {
       extractor = new ErgoUTXOExtractor(
@@ -423,18 +415,15 @@ describe('extractorErgo', () => {
         undefined,
         ['tokenId']
       );
-      jest.resetAllMocks();
     });
 
-    afterEach(() => jest.resetAllMocks());
-
     /**
-     * @target ergoUtxoExtractor.validateAllStoredBoxes should remove invalid box from database
+     * @target ergoUtxoExtractor.validateOldStoredBoxes should remove invalid box from database
      * @dependencies
      * @scenario
      * - insert a mocked box in database
      * - mock getBoxInfoWithBoxId to return undefined (no information found for this box)
-     * - run validateAllStoredBoxes
+     * - run validateOldStoredBoxes
      * - check removing the box
      * @expected
      * - since box data doesn't exist in network, its invalid,
@@ -453,12 +442,12 @@ describe('extractorErgo', () => {
     });
 
     /**
-     * @target ergoUtxoExtractor.validateAllStoredBoxes should update valid box information when spent bellow the initial height
+     * @target ergoUtxoExtractor.validateOldStoredBoxes should update valid box information when spent bellow the initial height
      * @dependencies
      * @scenario
      * - insert a mocked box in database
      * - mock getBoxInfoWithBoxId to return box information
-     * - run validateAllStoredBoxes
+     * - run validateOldStoredBoxes
      * - check updated box fields
      * @expected
      * - it should update spending information of a valid box spent bellow the initial height
@@ -481,12 +470,12 @@ describe('extractorErgo', () => {
     });
 
     /**
-     * @target ergoUtxoExtractor.validateAllStoredBoxes should not change valid box information when spent after the initial height
+     * @target ergoUtxoExtractor.validateOldStoredBoxes should not change valid box information when spent after the initial height
      * @dependencies
      * @scenario
      * - insert a mocked box in database
      * - mock getBoxInfoWithBoxId to return box information
-     * - run validateAllStoredBoxes
+     * - run validateOldStoredBoxes
      * - check updated box fields
      * @expected
      * - it should not change the box information since its valid and spent after the initial height

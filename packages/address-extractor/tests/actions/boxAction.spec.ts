@@ -303,7 +303,7 @@ describe('BoxEntityAction', () => {
      * @scenario
      * - insert a mocked box
      * - update the box with new spend block information
-     * - fetch that block and check the result
+     * - fetch that box and check the result
      * @expected
      * - it should update the initial box spend block id and height
      */
@@ -339,9 +339,9 @@ describe('BoxEntityAction', () => {
      * @target boxAction.getAllBoxIds should return all boxIds in the database
      * @dependencies
      * @scenario
-     * - insert a mocked box
-     * - update the box with new spend block information
-     * - fetch that block and check the result
+     * - insert two mocked boxes
+     * - call getAllBoxIds
+     * - check to have both boxIds
      * @expected
      * - it should return two boxIds stored in the database
      */
@@ -394,7 +394,7 @@ describe('BoxEntityAction', () => {
      * @scenario
      * - insert a mocked box
      * - update the box with new spend block information
-     * - fetch that block and check the result
+     * - fetch that box and check the result
      * @expected
      * - it should update the box spend block id and height
      */
