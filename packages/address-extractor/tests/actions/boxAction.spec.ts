@@ -11,7 +11,7 @@ let dataSource: DataSource;
 let action: BoxEntityAction;
 let repository: Repository<BoxEntity>;
 
-describe('BoxEntityAction', () => {
+describe('BoxAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
     action = new BoxEntityAction(dataSource, logger);
@@ -298,16 +298,16 @@ describe('BoxEntityAction', () => {
 
   describe('updateBox', () => {
     /**
-     * @target boxAction.updateBox should update the initial box spend block information
+     * @target boxAction.updateBox should update the unspent box information
      * @dependencies
      * @scenario
      * - insert a mocked box
      * - update the box with new spend block information
      * - fetch that box and check the result
      * @expected
-     * - it should update the initial box spend block id and height
+     * - it should remove the spend block and spend height from existing entity
      */
-    it('should update the initial box spend block information', async () => {
+    it('should update the unspent box information', async () => {
       await dataSource.getRepository(BoxEntity).insert({
         boxId: 'boxId',
         serialized: 'serialized',
@@ -324,13 +324,11 @@ describe('BoxEntityAction', () => {
         address: 'address',
         blockId: 'createBlock',
         height: 100,
-        spendBlock: 'spendBlock-new',
-        spendHeight: 110,
       };
       await action.updateBox(box, 'extractor');
       const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toEqual('spendBlock-new');
-      expect(stored.spendHeight).toEqual(110);
+      expect(stored.spendBlock).toBeNull();
+      expect(stored.spendHeight).toEqual(0);
     });
   });
 

@@ -39,7 +39,7 @@ class PermitAction {
   };
 
   /**
-   * updates the specified permit in the database
+   * update an unspent permit in the database
    * @param permit
    * @param extractor
    */
@@ -52,8 +52,8 @@ class PermitAction {
         height: permit.height,
         WID: permit.WID,
         txId: permit.txId,
-        spendBlock: permit.spendBlock,
-        spendHeight: permit.spendHeight,
+        spendBlock: null,
+        spendHeight: 0,
       }
     );
   };

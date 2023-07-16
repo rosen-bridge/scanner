@@ -376,16 +376,16 @@ describe('PermitEntityAction', () => {
 
   describe('updatePermit', () => {
     /**
-     * @target permitAction.updatePermit should update the initial permit spend block information
+     * @target permitAction.updatePermit should update the unspent permit information
      * @dependencies
      * @scenario
      * - insert a mocked permit
      * - update the permit with new spend block information
      * - fetch that permit and check the result
      * @expected
-     * - it should update the initial permit spend block id and height
+     * - it should remove the spend height and spend block from an unspent permit existing in the database
      */
-    it('should update the initial permit spend block information', async () => {
+    it('should update the unspent permit information', async () => {
       await repository.insert({
         ...samplePermit1,
         spendBlock: 'spendBlock',
@@ -393,13 +393,11 @@ describe('PermitEntityAction', () => {
       });
       const permit: ExtractedPermit = {
         ...samplePermit1,
-        spendBlock: 'spendBlock-new',
-        spendHeight: 110,
       };
       await action.updatePermit(permit, 'extractor');
       const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toEqual('spendBlock-new');
-      expect(stored.spendHeight).toEqual(110);
+      expect(stored.spendBlock).toBeNull();
+      expect(stored.spendHeight).toEqual(0);
     });
   });
 

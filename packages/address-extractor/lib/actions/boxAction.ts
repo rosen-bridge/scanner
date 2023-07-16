@@ -33,7 +33,7 @@ export class BoxEntityAction {
   };
 
   /**
-   * insert new box into database
+   * Update an unspent box information in the database
    * @param box
    * @param extractor
    */
@@ -45,6 +45,8 @@ export class BoxEntityAction {
         createBlock: box.blockId,
         creationHeight: box.height,
         serialized: box.serialized,
+        spendBlock: null,
+        spendHeight: 0,
       }
     );
   };
