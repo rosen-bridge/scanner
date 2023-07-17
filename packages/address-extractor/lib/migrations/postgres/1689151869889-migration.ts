@@ -12,7 +12,7 @@ export class migration1689151869889 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            ALTER TABLE "box_entity" DROP COLUMN "spendBlock"
+            ALTER TABLE "box_entity" DROP COLUMN "spendHeight"
         `);
   }
 }

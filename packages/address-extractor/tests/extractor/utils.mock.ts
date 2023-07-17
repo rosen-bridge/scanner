@@ -210,6 +210,8 @@ const addressBoxes = {
       ],
       additionalRegisters: {},
       mainChain: true,
+      spentTransactionId:
+        'c5fe05781cfb76eaafd49653654d8612c246b9986cba8a7f3b4ce4cd86f0ec69',
     },
     {
       boxId: '25e73eaeed1117ad896f01f5dafe02630b58048c39012094ca8c561dc90765b5',

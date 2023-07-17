@@ -201,6 +201,14 @@ describe('extractorErgo', () => {
      * - should extract box data from api output
      */
     it('should extract box data from api output', async () => {
+      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+        v1: {
+          getApiV1TransactionsP1: async () => ({
+            blockId: 'blockId',
+            inclusionHeight: 100,
+          }),
+        },
+      } as any);
       const extractor = new ErgoUTXOExtractor(
         dataSource,
         'extractor1',
@@ -219,8 +227,8 @@ describe('extractorErgo', () => {
         blockId:
           'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
         height: 297230,
-        spendBlock: undefined,
-        spendHeight: undefined,
+        spendBlock: 'blockId',
+        spendHeight: 100,
       });
     });
   });

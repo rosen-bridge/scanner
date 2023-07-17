@@ -184,6 +184,14 @@ describe('permitExtractor', () => {
      * - should extract permit data from api output
      */
     it('should extract permit data from api output', async () => {
+      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+        v1: {
+          getApiV1TransactionsP1: async () => ({
+            blockId: 'blockId',
+            inclusionHeight: 100,
+          }),
+        },
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -204,8 +212,8 @@ describe('permitExtractor', () => {
         block:
           '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
         height: 295145,
-        spendBlock: undefined,
-        spendHeight: undefined,
+        spendBlock: 'blockId',
+        spendHeight: 100,
       });
     });
   });
