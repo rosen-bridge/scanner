@@ -1,9 +1,11 @@
 import { DataSource } from 'typeorm';
+import * as wasm from 'ergo-lib-wasm-nodejs';
+import { Transaction } from '@rosen-bridge/scanner';
+
 import { migrations } from '../../lib/migrations';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
 import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import {
   commitmentAddress,
   eventTriggerAddress,
@@ -11,8 +13,7 @@ import {
   permitAddress,
   RWTId,
 } from './utilsVariable.mock';
-import { JsonBI } from '../../lib/network/parser';
-import { Transaction } from '@rosen-bridge/scanner';
+import { JsonBI } from '../../lib/utils';
 
 /**
  * generates a dataSource with filename passed to the function for database file name
@@ -329,4 +330,21 @@ export const eventTriggerTxGenerator = (
     wasm.ErgoBoxes.from_boxes_json([])
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
+};
+
+export const insertPermitEntity = (
+  dataSource: DataSource,
+  boxId?: string,
+  height?: number
+) => {
+  const repository = dataSource.getRepository(PermitEntity);
+  return repository.insert({
+    height: height || 1,
+    block: 'blockId',
+    boxId: boxId || 'boxId',
+    txId: 'txID',
+    boxSerialized: 'serialized',
+    extractor: 'extractor',
+    WID: 'wid',
+  });
 };

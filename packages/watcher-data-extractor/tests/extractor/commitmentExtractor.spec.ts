@@ -1,10 +1,11 @@
+import { DataSource } from 'typeorm';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
 import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
 import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
-import { DataSource } from 'typeorm';
-import { JsonBI } from '../../lib/network/parser';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { JsonBI } from '../../lib/utils';
 
 let dataSource: DataSource;
 

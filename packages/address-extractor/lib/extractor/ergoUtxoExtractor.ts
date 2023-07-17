@@ -1,15 +1,21 @@
 import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
-import { BoxEntityAction } from '../actions/db';
+import { intersection, difference } from 'lodash-es';
 import { AbstractExtractor } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import ExtractedBox from '../interfaces/ExtractedBox';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { ExplorerApi } from '../network/ergoNetworkApi';
-import { JsonBI } from '../network/parser';
-import { Boxes, ErgoBoxJson } from '../interfaces/types';
 import { Transaction } from '@rosen-bridge/scanner';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import {
+  ItemsOutputInfo,
+  OutputInfo,
+} from '@rosen-clients/ergo-explorer/dist/src/v1/types';
+
+import { BoxEntityAction } from '../actions/boxAction';
+import { JsonBI } from '../utils';
+import { DefaultApiLimit } from '../constants';
+import { ExtractedBox } from '../interfaces/types';
 
 export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -19,7 +25,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
   private readonly networkType: ergoLib.NetworkPrefix;
   private readonly ergoTree?: string;
   private readonly tokens: Array<string>;
-  readonly explorerApi: ExplorerApi;
+  readonly api;
 
   constructor(
     dataSource: DataSource,
@@ -28,8 +34,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
     explorerUrl: string,
     address?: string,
     tokens?: Array<string>,
-    logger?: AbstractLogger,
-    timeout?: number
+    logger?: AbstractLogger
   ) {
     this.dataSource = dataSource;
     this.id = id;
@@ -39,22 +44,10 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
       : undefined;
     this.tokens = tokens ? tokens : [];
     this.logger = logger ? logger : new DummyLogger();
-    this.explorerApi = new ExplorerApi(explorerUrl, this.logger, timeout);
     this.actions = new BoxEntityAction(dataSource, this.logger);
+    this.api = ergoExplorerClientFactory(explorerUrl);
   }
 
-  private extractBoxFromJson = (boxJson: ErgoBoxJson) => {
-    const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
-    return {
-      boxId: box.box_id().to_str(),
-      address: ergoLib.Address.recreate_from_ergo_tree(
-        ergoLib.ErgoTree.from_base16_bytes(box.ergo_tree().to_base16_bytes())
-      ).to_base58(this.networkType),
-      serialized: Buffer.from(box.sigma_serialize_bytes()).toString('base64'),
-      blockId: boxJson.blockId,
-      height: boxJson.settlementHeight,
-    };
-  };
   /**
    * get Id for current extractor
    */
@@ -140,46 +133,177 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
    * Initializes the database with older boxes related to the address
    */
   initializeBoxes = async (initialHeight: number) => {
-    // 1. Get Boxes
-    const allBoxes: Array<ErgoBoxJson> = [];
+    // Getting unspent boxes
+    const unspentBoxes = await this.getUnspentBoxes(initialHeight);
+    const unspentBoxIds = unspentBoxes.map((box) => box.boxId);
+
+    // Storing extracted boxes
+    let allStoredBoxIds = await this.actions.getAllBoxIds(this.getId());
+    for (const permit of unspentBoxes) {
+      if (allStoredBoxIds.includes(permit.boxId)) {
+        await this.actions.updateBox(permit, this.getId());
+        this.logger.info(
+          `Updated the existing unspent box with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Updated box [${JSON.stringify(permit)}]`);
+      } else {
+        await this.actions.insertBox(permit, this.getId());
+        this.logger.info(
+          `Inserted new unspent box with boxId, [${permit.boxId}]`
+        );
+        this.logger.debug(`Inserted permit [${JSON.stringify(permit)}]`);
+      }
+    }
+
+    // Remove updated box ids from existing boxes in database
+    allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
+    // Validating remained boxes
+    await this.validateOldStoredBoxes(allStoredBoxIds, initialHeight);
+  };
+
+  /**
+   * Validate all remaining boxes in the database
+   * update the correct ones and remove the invalid ones
+   * @param unchangedStoredBoxIds
+   * @param initialHeight
+   */
+  validateOldStoredBoxes = async (
+    unchangedStoredBoxIds: Array<string>,
+    initialHeight: number
+  ) => {
+    for (const boxId of unchangedStoredBoxIds) {
+      const box = await this.getBoxInfoWithBoxId(boxId);
+      if (box && box.spendBlock && box.spendHeight) {
+        if (box.spendHeight < initialHeight)
+          await this.actions.updateSpendBlock(
+            boxId,
+            this.getId(),
+            box.spendBlock,
+            box.spendHeight
+          );
+      } else {
+        await this.actions.removeBox(boxId, this.getId());
+        this.logger.info(
+          `Removed invalid box [${boxId}] in initialization validation`
+        );
+      }
+    }
+  };
+
+  /**
+   * Return extracted information of a box
+   * @param boxId
+   */
+  getBoxInfoWithBoxId = async (
+    boxId: string
+  ): Promise<ExtractedBox | undefined> => {
+    try {
+      const box = await this.api.v1.getApiV1BoxesP1(boxId);
+      return (await this.extractBoxData([box]))[0];
+    } catch {
+      this.logger.warn(`Box with id [${boxId}] does not exists`);
+      return undefined;
+    }
+  };
+
+  /**
+   * Get unspent boxes created bellow the initial height
+   * @param initialHeight
+   * @returns
+   */
+  getUnspentBoxes = async (
+    initialHeight: number
+  ): Promise<Array<ExtractedBox>> => {
+    let allBoxes: Array<ExtractedBox> = [];
     let offset = 0,
-      total = 100,
-      boxes: Boxes;
+      total = DefaultApiLimit,
+      boxes: ItemsOutputInfo;
     while (offset < total) {
       if (this.ergoTree) {
-        boxes = await this.explorerApi.getBoxesForAddress(
+        boxes = await this.api.v1.getApiV1BoxesUnspentByergotreeP1(
           this.ergoTree,
-          offset
+          { offset: offset, limit: DefaultApiLimit }
         );
       } else if (!this.ergoTree && this.tokens.length > 0) {
-        boxes = await this.explorerApi.getBoxesByTokenId(
+        boxes = await this.api.v1.getApiV1BoxesUnspentBytokenidP1(
           this.tokens[0],
-          offset
+          { offset: offset, limit: DefaultApiLimit }
         );
-      } else return;
-      allBoxes.push(...boxes.items);
+      } else return [];
+      if (!boxes.items) {
+        this.logger.warn('Explorer api output items should not be undefined.');
+        throw new Error('Incorrect explorer api output');
+      }
+      allBoxes = [
+        ...allBoxes,
+        ...(await this.extractBoxData(
+          boxes.items.filter(
+            (box) =>
+              box.creationHeight < initialHeight &&
+              (this.tokens.length == 0 || this.boxHasToken(box))
+          )
+        )),
+      ];
       total = boxes.total;
-      offset += 100;
+      offset += DefaultApiLimit;
     }
-    // 2. Filter Boxes
-    const extractedBoxes = allBoxes
-      .filter((boxJson) => boxJson.settlementHeight < initialHeight)
-      .filter((boxJson) => {
-        if (this.tokens.length > 0) {
-          const boxTokens = boxJson.assets.map((token) => token.tokenId);
-          const requiredTokens = this.tokens.filter((token) =>
-            boxTokens.includes(token)
-          );
-          if (requiredTokens.length < this.tokens.length) return false;
-        }
-        return true;
-      })
-      .map((boxJson) => this.extractBoxFromJson(boxJson));
-    // 3. Store Boxes
-    await this.actions.storeInitialBoxes(
-      extractedBoxes,
-      initialHeight,
-      this.getId()
-    );
+    return allBoxes;
+  };
+
+  /**
+   * Returns block information of tx
+   * @param txId
+   */
+  getTxBlock = async (txId: string) => {
+    const tx = await this.api.v1.getApiV1TransactionsP1(txId);
+    return {
+      id: tx.blockId,
+      height: tx.inclusionHeight,
+    };
+  };
+
+  /**
+   * Extract needed information for storing in database from api json outputs
+   * @param boxes
+   */
+  extractBoxData = async (boxes: Array<OutputInfo>) => {
+    const extractedBoxes: Array<ExtractedBox> = [];
+    for (const box of boxes) {
+      let spendBlock, spendHeight;
+      if (box.spentTransactionId) {
+        const block = await this.getTxBlock(box.spentTransactionId);
+        spendBlock = block.id;
+        spendHeight = block.height;
+      }
+      const ergoBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
+      extractedBoxes.push({
+        boxId: ergoBox.box_id().to_str(),
+        address: ergoLib.Address.recreate_from_ergo_tree(
+          ergoLib.ErgoTree.from_base16_bytes(
+            ergoBox.ergo_tree().to_base16_bytes()
+          )
+        ).to_base58(this.networkType),
+        serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
+          'base64'
+        ),
+        blockId: box.blockId,
+        height: box.settlementHeight,
+        spendBlock: spendBlock,
+        spendHeight: spendHeight,
+      });
+    }
+    return extractedBoxes;
+  };
+
+  /**
+   * Returns true if box has the required token and false otherwise
+   * @param box
+   */
+  boxHasToken = (box: OutputInfo) => {
+    if (!box.assets) return false;
+    const boxTokens = box.assets.map((token) => token.tokenId);
+    const requiredTokens = intersection(this.tokens, boxTokens);
+    if (requiredTokens.length == this.tokens.length) return true;
+    return false;
   };
 }

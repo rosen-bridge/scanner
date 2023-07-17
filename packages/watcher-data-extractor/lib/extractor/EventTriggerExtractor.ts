@@ -10,7 +10,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
-import { JsonBI } from '../network/parser';
+import { JsonBI } from '../utils';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

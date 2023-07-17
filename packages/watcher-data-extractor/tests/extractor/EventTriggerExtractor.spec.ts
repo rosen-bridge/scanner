@@ -5,8 +5,8 @@ import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
 import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
 import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
+import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
-import { JsonBI } from '../../lib/network/parser';
 
 let dataSource: DataSource;
 const sampleEventData = [

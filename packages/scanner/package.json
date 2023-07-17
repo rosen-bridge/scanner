@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "author": "Rosen Team",
   "license": "GPL-3.0",

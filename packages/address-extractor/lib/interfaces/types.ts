@@ -4,7 +4,7 @@ type Asset = {
   amount: bigint;
 };
 
-export interface ErgoBoxJson {
+interface ErgoBoxJson {
   boxId: string;
   address: string;
   value: bigint;
@@ -13,7 +13,19 @@ export interface ErgoBoxJson {
   assets: Array<Asset>;
 }
 
-export interface Boxes {
+interface Boxes {
   items: Array<ErgoBoxJson>;
   total: number;
 }
+
+interface ExtractedBox {
+  boxId: string;
+  address: string;
+  serialized: string;
+  blockId?: string;
+  height?: number;
+  spendBlock?: string;
+  spendHeight?: number;
+}
+
+export { ErgoBoxJson, Boxes, ExtractedBox };

@@ -34,6 +34,22 @@ const generateBlockEntity = (
   });
 };
 
+const insertBoxEntity = (
+  dataSource: DataSource,
+  boxId?: string,
+  height?: number
+) => {
+  const repository = dataSource.getRepository(BoxEntity);
+  return repository.insert({
+    creationHeight: height || 1,
+    createBlock: 'blockId',
+    boxId: boxId || 'boxId',
+    address: 'address',
+    serialized: 'serialized',
+    extractor: 'extractor',
+  });
+};
+
 const tx1 = {
   id: '3b91fbd2b6f4f3f971098655ffa320841001b071908de057cdf8c425cd3b3e61',
   inputs: [
@@ -175,7 +191,7 @@ const addressBoxes = {
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       value: BigInt(9991200000),
       index: 1,
-      globalIndex: 636254,
+      globalIndex: 636254n,
       creationHeight: 297228,
       settlementHeight: 297230,
       ergoTree:
@@ -193,8 +209,9 @@ const addressBoxes = {
         },
       ],
       additionalRegisters: {},
-      spentTransactionId: null,
       mainChain: true,
+      spentTransactionId:
+        'c5fe05781cfb76eaafd49653654d8612c246b9986cba8a7f3b4ce4cd86f0ec69',
     },
     {
       boxId: '25e73eaeed1117ad896f01f5dafe02630b58048c39012094ca8c561dc90765b5',
@@ -204,7 +221,7 @@ const addressBoxes = {
         '938d088d28030f17fa505283b4d0a1abbcd0b57e78399b3ab1fe03799374929c',
       value: BigInt(1017800000),
       index: 1,
-      globalIndex: 539461,
+      globalIndex: 539461n,
       creationHeight: 249172,
       settlementHeight: 249174,
       ergoTree:
@@ -212,11 +229,17 @@ const addressBoxes = {
       address: '9fadVRGYyiSBCgD7QtZU13BfGoDyTQ1oX918P8py22MJuMEwSuo',
       assets: [],
       additionalRegisters: {},
-      spentTransactionId: null,
       mainChain: true,
     },
   ],
   total: 2,
 };
 
-export { createDatabase, generateBlockEntity, tx1, addressBoxes, tokenBoxes };
+export {
+  createDatabase,
+  generateBlockEntity,
+  insertBoxEntity,
+  tx1,
+  addressBoxes,
+  tokenBoxes,
+};

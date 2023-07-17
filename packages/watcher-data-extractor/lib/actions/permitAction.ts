@@ -1,4 +1,4 @@
-import { DataSource, In, LessThan, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
@@ -19,53 +19,43 @@ class PermitAction {
   }
 
   /**
-   * stores initial permit boxes in the database
+   * insert a new permit boxes in the database
    * @param permits
    * @param initialHeight
    * @param extractor
    */
-  storeInitialPermits = async (
-    permits: Array<ExtractedPermit>,
-    initialHeight: number,
-    extractor: string
-  ): Promise<boolean> => {
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const repository = queryRunner.manager.getRepository(PermitEntity);
-      await repository.delete({ height: LessThan(initialHeight) });
-      for (const permit of permits) {
-        const entity = {
-          boxId: permit.boxId,
-          boxSerialized: permit.boxSerialized,
-          block: permit.block,
-          height: permit.height,
-          extractor: extractor,
-          WID: permit.WID,
-          txId: permit.txId,
-        };
-        await queryRunner.manager.getRepository(PermitEntity).insert(entity);
-        this.logger.info(
-          `Storing initial permit ${permit.boxId} belonging to watcher [${permit.WID}] and extractor ${extractor}`
-        );
-        this.logger.debug(
-          `Stored permit Entity: [${JSON.stringify(
-            entity
-          )}] and extractor ${extractor}`
-        );
+  insertPermit = async (permit: ExtractedPermit, extractor: string) => {
+    return this.permitRepository.insert({
+      boxId: permit.boxId,
+      boxSerialized: permit.boxSerialized,
+      block: permit.block,
+      height: permit.height,
+      extractor: extractor,
+      WID: permit.WID,
+      txId: permit.txId,
+      spendBlock: permit.spendBlock,
+      spendHeight: permit.spendHeight,
+    });
+  };
+
+  /**
+   * update an unspent permit in the database
+   * @param permit
+   * @param extractor
+   */
+  updatePermit = async (permit: ExtractedPermit, extractor: string) => {
+    await this.permitRepository.update(
+      { boxId: permit.boxId, extractor: extractor },
+      {
+        boxSerialized: permit.boxSerialized,
+        block: permit.block,
+        height: permit.height,
+        WID: permit.WID,
+        txId: permit.txId,
+        spendBlock: null,
+        spendHeight: 0,
       }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(
-        `An error occurred during storing initial permits action: ${e}`
-      );
-      await queryRunner.rollbackTransaction();
-      throw new Error('Initialization failed while storing initial permits');
-    } finally {
-      await queryRunner.release();
-    }
-    return true;
+    );
   };
 
   /**
@@ -179,6 +169,49 @@ class PermitAction {
     await this.permitRepository.update(
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: 0 }
+    );
+  };
+
+  /**
+   *  Returns all stored permit box ids
+   */
+  getAllPermitBoxIds = async (extractor: string): Promise<Array<string>> => {
+    const boxIds = await this.permitRepository
+      .createQueryBuilder()
+      .where({ extractor: extractor })
+      .select('boxId', 'boxId')
+      .getRawMany();
+    return boxIds.map((item: { boxId: string }) => item.boxId);
+  };
+
+  /**
+   * Removes specified permit
+   * @param boxId
+   * @param extractor
+   */
+  removePermit = async (boxId: string, extractor: string) => {
+    return await this.permitRepository.delete({
+      boxId: boxId,
+      extractor: extractor,
+    });
+  };
+
+  /**
+   * Update the permit spending information
+   * @param boxId
+   * @param extractor
+   * @param blockId
+   * @param blockHeight
+   */
+  updateSpendBlock = async (
+    boxId: string,
+    extractor: string,
+    blockId: string,
+    blockHeight: number
+  ) => {
+    return await this.permitRepository.update(
+      { boxId: boxId, extractor: extractor },
+      { spendBlock: blockId, spendHeight: blockHeight }
     );
   };
 }
