@@ -140,8 +140,8 @@ export class BlockDbAction {
         extra: block.extra,
         timestamp: block.timestamp,
         year: date.getFullYear(),
-        month: date.getMonth(),
-        day: date.getDay(),
+        month: date.getMonth() + 1,
+        day: date.getDate(),
       };
       this.logger.debug(`Block info: ${JSON.stringify(blockInfo)}`);
       if (!instance) {

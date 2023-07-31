@@ -98,7 +98,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         parentHash: babbageBlock.header.prevHash,
         extra: `${babbageBlock.header.slot}`,
         // Caution: In case of a hard fork and change in slot duration, this must change!
-        timestamp: babbageBlock.header.slot + SLOT_SHELLY_NUMBER,
+        timestamp: (babbageBlock.header.slot + SLOT_SHELLY_NUMBER) * 1000,
       };
       await this.stepForward(block, babbageBlock.body);
     }
