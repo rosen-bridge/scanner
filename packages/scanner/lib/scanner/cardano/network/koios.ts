@@ -40,7 +40,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
               hash: row.hash,
               blockHeight: row.block_height,
               parentHash: row.parent_hash,
-              timestamp: res.data[0].block_time,
+              timestamp: res.data[0].block_time * 1000,
             };
           })
           .catch((exp) => {
