@@ -22,6 +22,8 @@ jobs:
 
     steps:
       - name: printing
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github.event) }}
         run: |
           echo ${{ github.event.action }}
           echo hmmm1
@@ -29,7 +31,13 @@ jobs:
           echo hmmm1
           echo ${{ github.event.pull_request }}
           echo hmmm2
+          echo ${{ github.event.pull_request.type }}
+          echo hmmm2
           echo ${{ github.event.pull_request.state }}
+          echo hmmm3
+          echo ${{ github.event.pull_request.title }}
+          echo hmmm3
+          echo "$GITHUB_CONTEXT"
 
       - name: Setup node
         uses: actions/setup-node@v3
