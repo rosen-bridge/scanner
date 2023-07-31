@@ -21,24 +21,6 @@ jobs:
         node-version: [16.x]
 
     steps:
-      - name: printing
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github.event) }}
-        run: |
-          echo ${{ github.event.action }}
-          echo hmmm1
-          echo ${{ github.event_name }}
-          echo hmmm1
-          echo ${{ github.event.pull_request }}
-          echo hmmm2
-          echo ${{ github.event.pull_request.type }}
-          echo hmmm2
-          echo ${{ github.event.pull_request.state }}
-          echo hmmm3
-          echo ${{ github.event.pull_request.title }}
-          echo hmmm3
-          echo "$GITHUB_CONTEXT"
-
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -117,7 +99,7 @@ jobs:
     name: Pre-Release Job
     needs: tests
     if: |
-      github.event.pull_request.base.ref == 'dev' && (github.event.pull_request.state == 'open' || github.event.pull_request.state == 'synchronize')
+      github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'dev' && (github.event.action == 'opened' || github.event.action =='synchronize')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
