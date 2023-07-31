@@ -29,13 +29,13 @@ jobs:
           echo hmmm1
           echo ${{ github.event_name }}
           echo hmmm1
-          echo ${{ github.event.pull_request }}
-          echo hmmm2
-          echo ${{ github.event.pull_request.type }}
-          echo hmmm2
-          echo ${{ github.event.pull_request.state }}
-          echo hmmm3
-          echo ${{ github.event.pull_request.title }}
+          echo ${{ github.event.pull_request_target }}
+          echo hmmm2                        
+          echo ${{ github.event.pull_request_target.type }}
+          echo hmmm2                        
+          echo ${{ github.event.pull_request_target.state }}
+          echo hmmm3                        
+          echo ${{ github.event.pull_request_target.title }}
           echo hmmm3
           echo "$GITHUB_CONTEXT"
 
