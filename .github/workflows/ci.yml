@@ -138,7 +138,6 @@ jobs:
 
       - name: Configure npm authentication
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
-
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -181,7 +180,6 @@ jobs:
 
       - name: Configure npm Authentication
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
-
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
