@@ -15,8 +15,7 @@
     "test": "jest --detectOpenHandles",
     "coverage": "jest --detectOpenHandles --coverage",
     "build": "tsc --build",
-    "type-check": "tsc --noEmit",
-    "release": "npm run test && npm run build && npm publish --access public"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@rosen-bridge/logger-interface": "^0.1.0",

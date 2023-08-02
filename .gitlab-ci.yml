@@ -4,11 +4,13 @@ stages:
   - installation
   - build
   - type_check
-  - lint
   - test
+  - snapshot
 
 installation:
   stage: installation
+  rules:
+    - when: always
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: push
@@ -20,49 +22,67 @@ installation:
 
 build:
   stage: build
+  needs:
+    - installation
+  rules:
+    - when: on_success
   cache:
     - key: $CI_COMMIT_REF_NAME
       policy: pull-push
       paths:
         - node_modules
         - packages/*/node_modules
-        - packages/*/dist
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - packages/*/dist
   script:
     - npm run build
 
 type_check:
   stage: type_check
+  needs:
+    - build
+  rules:
+    - when: on_success
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull
     paths:
       - node_modules
       - packages/*/node_modules
-      - packages/*/dist
   script:
     - npm run type-check
 
 lint:
-  stage: lint
+  stage: type_check
+  needs:
+    - build
+  rules:
+    - when: on_success
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull
     paths:
       - node_modules
       - packages/*/node_modules
-      - packages/*/dist
   script:
     - npm run lint
 
 test:
   stage: test
+  needs:
+    - type_check
+    - lint
+    - build
+  rules:
+    - when: on_success
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull
     paths:
       - node_modules
       - packages/*/node_modules
-      - packages/*/dist
   script:
     - npm run coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
@@ -71,3 +91,24 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: packages/*/coverage/cobertura-coverage.xml
+
+snapshot-release:
+  stage: snapshot
+  needs:
+    - test
+    - build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - packages/*/node_modules
+  script:
+    - npx changeset status --since=origin/dev
+    - npx changeset pre enter ergo
+    - sed -i "s/ergo/next-$CI_COMMIT_SHORT_SHA/g" .changeset/pre.json
+    - npx changeset version
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
+    - npx changeset publish

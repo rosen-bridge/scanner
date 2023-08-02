@@ -12,14 +12,17 @@
     "coverage": "npm run coverage --workspaces",
     "build": "npm run build --workspaces",
     "type-check": "npm run type-check --workspaces",
-    "release": "npm run release --workspaces",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.3"
   },
   "engines": {
     "node": ">=16.14.0"
+  },
+  "dependencies": {
+    "changeset": "^0.2.6"
   }
 }
