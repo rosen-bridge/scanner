@@ -147,7 +147,7 @@ jobs:
   release:
     name: Release Job
     needs: tests
-    if: github.ref == 'dev'
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
