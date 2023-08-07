@@ -8,7 +8,6 @@ on:
     types:
       - opened
       - synchronize
-      - closed
     branches:
       - dev
 
@@ -148,7 +147,7 @@ jobs:
   release:
     name: Release Job
     needs: tests
-    if: github.event.pull_request.merged == true
+    if: github.ref == "dev"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
