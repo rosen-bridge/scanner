@@ -21,7 +21,7 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     return {
       parentHash: blockSummary.block.header.parentId,
       blockHeight: blockSummary.block.header.height,
-      timestamp: Number(blockSummary.block.header.timestamp),
+      timestamp: Number(blockSummary.block.header.timestamp / 1000n),
       hash: blockSummary.block.header.id,
     };
   };

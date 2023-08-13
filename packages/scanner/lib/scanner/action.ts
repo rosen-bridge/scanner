@@ -130,7 +130,7 @@ export class BlockDbAction {
         height: block.blockHeight,
         scanner: this.name(),
       });
-      const date = new Date(block.timestamp);
+      const date = new Date(block.timestamp * 1000);
       const blockInfo = {
         height: block.blockHeight,
         hash: block.hash,
@@ -147,15 +147,10 @@ export class BlockDbAction {
       if (!instance) {
         await this.blockRepository.insert(blockInfo);
       } else {
-        await this.blockRepository
-          .createQueryBuilder()
-          .update()
-          .set(blockInfo)
-          .where({
-            height: block.blockHeight,
-            scanner: this.name(),
-          })
-          .execute();
+        await this.blockRepository.update(
+          { height: block.blockHeight, scanner: this.name() },
+          blockInfo
+        );
       }
       const res = await this.blockRepository.findOneBy({
         height: block.blockHeight,
@@ -175,17 +170,16 @@ export class BlockDbAction {
   updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
     this.logger.info(`Updating block status at height ${blockHeight}`);
     return await this.blockRepository
-      .createQueryBuilder()
-      .update()
-      .set({
-        status: PROCEED,
-      })
-      .where({
-        height: blockHeight,
-        status: PROCESSING,
-        scanner: this.name(),
-      })
-      .execute()
+      .update(
+        {
+          height: blockHeight,
+          status: PROCESSING,
+          scanner: this.name(),
+        },
+        {
+          status: PROCEED,
+        }
+      )
       .then(() => true)
       .catch(() => false);
   };
@@ -197,17 +191,16 @@ export class BlockDbAction {
   revertBlockStatus = async (blockHeight: number): Promise<boolean> => {
     this.logger.info(`Reverting block status at height ${blockHeight}`);
     return await this.blockRepository
-      .createQueryBuilder()
-      .update()
-      .set({
-        status: PROCESSING,
-      })
-      .where({
-        height: blockHeight,
-        status: PROCEED,
-        scanner: this.name(),
-      })
-      .execute()
+      .update(
+        {
+          height: blockHeight,
+          status: PROCEED,
+          scanner: this.name(),
+        },
+        {
+          status: PROCESSING,
+        }
+      )
       .then(() => true)
       .catch(() => false);
   };

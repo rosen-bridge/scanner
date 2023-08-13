@@ -25,7 +25,7 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
       hash: block.id,
       blockHeight: block.height,
       parentHash: block.parentId,
-      timestamp: Number(block.timestamp),
+      timestamp: Number(block.timestamp / 1000n),
     };
   };
 

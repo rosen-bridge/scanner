@@ -36,6 +36,9 @@ export class ObservationEntityAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(
+      ObservationEntity
+    );
     try {
       for (const observation of observations) {
         const saved = savedObservations.some((entity) => {
@@ -62,13 +65,12 @@ export class ObservationEntityAction {
           this.logger.info(
             `Storing observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.insert(ObservationEntity, entity);
+          await repository.insert(entity);
         } else {
           this.logger.info(
             `Updating observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.update(
-            ObservationEntity,
+          await repository.update(
             {
               requestId: observation.requestId,
             },
@@ -94,14 +96,9 @@ export class ObservationEntityAction {
     this.logger.info(
       `Deleting observations in block ${block} and extractor ${extractor}`
     );
-    await this.datasource
-      .createQueryBuilder()
-      .delete()
-      .from(ObservationEntity)
-      .where('extractor = :extractor AND block = :block', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
+    await this.observationRepository.delete({
+      block: block,
+      extractor: extractor,
+    });
   };
 }
