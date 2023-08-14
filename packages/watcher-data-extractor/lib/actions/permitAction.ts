@@ -79,6 +79,7 @@ class PermitAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(PermitEntity);
     try {
       for (const permit of permits) {
         const saved = savedPermits.some((entity) => {
@@ -97,18 +98,12 @@ class PermitAction {
           this.logger.debug(
             `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.insert(PermitEntity, entity);
+          await repository.insert(entity);
         } else {
           this.logger.debug(
             `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.update(
-            PermitEntity,
-            {
-              boxId: permit.boxId,
-            },
-            entity
-          );
+          await repository.update({ boxId: permit.boxId }, entity);
         }
         this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
@@ -176,11 +171,14 @@ class PermitAction {
    *  Returns all stored permit box ids
    */
   getAllPermitBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.permitRepository
-      .createQueryBuilder()
-      .where({ extractor: extractor })
-      .select('boxId', 'boxId')
-      .getRawMany();
+    const boxIds = await this.permitRepository.find({
+      where: {
+        extractor: extractor,
+      },
+      select: {
+        boxId: true,
+      },
+    });
     return boxIds.map((item: { boxId: string }) => item.boxId);
   };
 

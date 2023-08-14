@@ -73,6 +73,7 @@ export class BoxEntityAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(BoxEntity);
     try {
       for (const box of boxes) {
         const entity = {
@@ -90,30 +91,18 @@ export class BoxEntityAction {
             `Updating box ${box.boxId} and extractor ${extractor}`
           );
           this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
-          await queryRunner.manager
-            .getRepository(BoxEntity)
-            .createQueryBuilder()
-            .update()
-            .set(entity)
-            .where({ id: dbBox[0].id })
-            .execute();
+          await repository.update({ id: dbBoxes[0].id }, entity);
         } else {
           this.logger.info(`Storing box ${box.boxId}`);
           this.logger.debug(JSON.stringify(entity));
-          await queryRunner.manager.getRepository(BoxEntity).insert(entity);
+          await repository.insert(entity);
         }
       }
       this.logger.debug(`Updating spendBlock for boxes ${spendBoxes}`);
-      await queryRunner.manager
-        .getRepository(BoxEntity)
-        .createQueryBuilder()
-        .update()
-        .set({ spendBlock: block.hash, spendHeight: block.height })
-        .where('boxId IN (:...boxes) AND extractor = :extractor', {
-          boxes: spendBoxes,
-          extractor: extractor,
-        })
-        .execute();
+      await repository.update(
+        { boxId: In(spendBoxes), extractor: extractor },
+        { spendBlock: block.hash, spendHeight: block.height }
+      );
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
@@ -135,36 +124,28 @@ export class BoxEntityAction {
     this.logger.info(
       `Deleting boxes in block ${block} and extractor ${extractor}`
     );
-    await this.datasource
-      .createQueryBuilder()
-      .delete()
-      .from(BoxEntity)
-      .where('extractor = :extractor AND createBlock = :block', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
-    await this.datasource
-      .getRepository(BoxEntity)
-      .createQueryBuilder()
-      .update()
-      .set({ spendBlock: null, spendHeight: 0 })
-      .where('spendBlock = :block AND extractor = :extractor', {
-        block: block,
-        extractor: extractor,
-      })
-      .execute();
+    await this.repository.delete({
+      extractor: extractor,
+      createBlock: block,
+    });
+    await this.repository.update(
+      { spendBlock: block, extractor: extractor },
+      { spendBlock: null, spendHeight: 0 }
+    );
   };
 
   /**
    *  Returns all stored box ids
    */
   getAllBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.repository
-      .createQueryBuilder()
-      .where({ extractor: extractor })
-      .select('boxId', 'boxId')
-      .getRawMany();
+    const boxIds = await this.repository.find({
+      select: {
+        boxId: true,
+      },
+      where: {
+        extractor: extractor,
+      },
+    });
     return boxIds.map((item: { boxId: string }) => item.boxId);
   };
 

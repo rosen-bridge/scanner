@@ -39,6 +39,9 @@ class CommitmentAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(
+      CommitmentEntity
+    );
     try {
       for (const commitment of commitments) {
         const saved = savedCommitments.some((entity) => {
@@ -60,18 +63,12 @@ class CommitmentAction {
           this.logger.info(
             `Saving commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.insert(CommitmentEntity, entity);
+          await repository.insert(entity);
         } else {
           this.logger.info(
             `Updating commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.update(
-            CommitmentEntity,
-            {
-              boxId: commitment.boxId,
-            },
-            entity
-          );
+          await repository.update({ boxId: commitment.boxId }, entity);
         }
         this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }

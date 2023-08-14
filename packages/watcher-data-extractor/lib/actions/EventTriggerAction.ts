@@ -39,6 +39,9 @@ class EventTriggerAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(
+      EventTriggerEntity
+    );
     try {
       for (const trigger of eventTriggers) {
         const saved = savedTriggers.some((entity) => {
@@ -70,18 +73,12 @@ class EventTriggerAction {
           this.logger.info(
             `Storing event trigger [${trigger.boxId}] for event [${trigger.eventId}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.insert(EventTriggerEntity, entity);
+          await repository.insert(entity);
         } else {
           this.logger.info(
             `Updating event trigger ${trigger.boxId} for event [${trigger.eventId}] at height ${block.height} and extractor ${extractor}`
           );
-          await queryRunner.manager.update(
-            EventTriggerEntity,
-            {
-              boxId: trigger.boxId,
-            },
-            entity
-          );
+          await repository.update({ boxId: trigger.boxId }, entity);
         }
         this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
