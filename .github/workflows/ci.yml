@@ -98,7 +98,7 @@ jobs:
     name: Pre-Release Job
     needs: tests
     if: |
-      github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'dev' && (github.event.action == 'opened' || github.event.action =='synchronize')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
@@ -168,14 +168,17 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
+      - name: make chanegset commit true
+        run: |
+          sed -i 's/"commit": false,/"commit": true,/' .changeset/config.json
+
       - name: Changing Version Using changeset
         run: |
           npx changeset version
 
-      - name: Commit & Push
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'automated push'
+      - name: make chanegset commit false
+        run: |
+          sed -i 's/"commit": true,/"commit": false,/' .changeset/config.json
 
       - name: Configure npm Authentication
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > $HOME/.npmrc
@@ -184,3 +187,8 @@ jobs:
 
       - name: Publish changeset
         run: npx changeset publish
+
+      - name: Commit & Push
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'automated push'
