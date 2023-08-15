@@ -1,0 +1,11 @@
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Print actions github builtin variables
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github.event) }}
+        run: echo "$GITHUB_CONTEXT"
