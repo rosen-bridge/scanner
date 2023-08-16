@@ -168,6 +168,11 @@ jobs:
             packages/*/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
+      - name: Config git
+        run: |
+          git config --global user.name "$(git log -1 --format="%cn")"
+          git config --global user.email "$(git log -1 --format="%ce")"
+
       - name: make chanegset commit true
         run: |
           sed -i 's/"commit": false,/"commit": true,/' .changeset/config.json
@@ -188,7 +193,5 @@ jobs:
       - name: Publish changeset
         run: npx changeset publish
 
-      - name: Commit & Push
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: 'automated push'
+      - name: Push to Github
+        run: git push
