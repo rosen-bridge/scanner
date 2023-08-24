@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "UTXO box extractor for any address or token.",
   "author": "Rosen Team",
   "license": "GPL-3.0",

@@ -31,7 +31,7 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor');
+      await action.storeBox([box], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address');
@@ -63,7 +63,7 @@ describe('BoxAction', () => {
         address: 'address-new',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor');
+      await action.storeBox([box], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address-new');
@@ -95,7 +95,7 @@ describe('BoxAction', () => {
         address: 'address-new',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor');
+      await action.storeBox([box], block, 'extractor');
       expect(await repository.count()).toEqual(2);
       const stored = (await repository.findBy({ extractor: 'extractor' }))[0];
       expect(stored.address).toEqual('address-new');
@@ -104,7 +104,9 @@ describe('BoxAction', () => {
       expect(stored.creationHeight).toEqual(100);
       expect(stored.createBlock).toEqual('block1');
     });
+  });
 
+  describe('spendBoxes', () => {
     /**
      * spend box must update its corresponding box entity
      * Dependency: Stored box entity in database
@@ -118,9 +120,9 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor1');
+      await action.storeBox([box], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.storeBox([], ['boxid'], block, 'extractor1');
+      await action.spendBoxes(['boxid'], block, 'extractor1');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
     });
@@ -138,9 +140,9 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor1');
+      await action.storeBox([box], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.storeBox([], ['boxid'], block, 'extractor2');
+      await action.spendBoxes(['boxid'], block, 'extractor2');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
     });
@@ -158,7 +160,8 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], ['boxid'], block, 'extractor');
+      await action.storeBox([box], block, 'extractor');
+      await action.spendBoxes(['boxid'], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.creationHeight).toEqual(100);
@@ -185,7 +188,7 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor1');
+      await action.storeBox([box], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
       await action.deleteBlockBoxes(block.hash, 'extractor1');
       expect(await repository.count()).toEqual(0);
@@ -207,8 +210,8 @@ describe('BoxAction', () => {
       };
       const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBox([box], [], block1, 'extractor1');
-      await action.storeBox([], ['boxid'], block2, 'extractor1');
+      await action.storeBox([box], block1, 'extractor1');
+      await action.spendBoxes(['boxid'], block2, 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
@@ -234,8 +237,8 @@ describe('BoxAction', () => {
       };
       const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBox([box], [], block1, 'extractor1');
-      await action.storeBox([], ['boxid'], block2, 'extractor1');
+      await action.storeBox([box], block1, 'extractor1');
+      await action.spendBoxes(['boxid'], block2, 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
@@ -259,7 +262,8 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], ['boxid'], block, 'extractor1');
+      await action.storeBox([box], block, 'extractor1');
+      await action.spendBoxes(['boxid'], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
@@ -355,7 +359,7 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box, box2], [], block, 'extractor');
+      await action.storeBox([box, box2], block, 'extractor');
       const boxIds = await action.getAllBoxIds('extractor');
       expect(boxIds).toHaveLength(2);
       expect(boxIds).toEqual([box.boxId, box2.boxId]);
@@ -379,7 +383,7 @@ describe('BoxAction', () => {
         address: 'address',
       };
       const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], [], block, 'extractor');
+      await action.storeBox([box], block, 'extractor');
       const result = await action.removeBox(box.boxId, 'extractor');
       expect(result.affected).toEqual(1);
     });

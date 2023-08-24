@@ -1,9 +1,11 @@
 import { DataSource, In, Repository } from 'typeorm';
+import { chunk } from 'lodash-es';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
 import { BlockEntity } from '@rosen-bridge/scanner';
 
 import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';
+import { dbIdChunkSize } from '../constants';
 
 export class BoxEntityAction {
   private readonly datasource: DataSource;
@@ -60,7 +62,6 @@ export class BoxEntityAction {
    */
   storeBox = async (
     boxes: Array<ExtractedBox>,
-    spendBoxes: Array<string>,
     block: BlockEntity,
     extractor: string
   ) => {
@@ -98,11 +99,6 @@ export class BoxEntityAction {
           await repository.insert(entity);
         }
       }
-      this.logger.debug(`Updating spendBlock for boxes ${spendBoxes}`);
-      await repository.update(
-        { boxId: In(spendBoxes), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height }
-      );
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
@@ -112,6 +108,38 @@ export class BoxEntityAction {
       await queryRunner.release();
     }
     return success;
+  };
+
+  /**
+   * Update spendBlock and spendHeight of boxes spent on the block
+   * @param spendIds
+   * @param block
+   * @param extractor
+   */
+  spendBoxes = async (
+    spendIds: Array<string>,
+    block: BlockEntity,
+    extractor: string
+  ): Promise<void> => {
+    const spendIdChunks = chunk(spendIds, dbIdChunkSize);
+    for (const spendIdChunk of spendIdChunks) {
+      const updateResult = await this.repository.update(
+        { boxId: In(spendIdChunk), extractor: extractor },
+        { spendBlock: block.hash, spendHeight: block.height }
+      );
+
+      if (updateResult.affected && updateResult.affected > 0) {
+        const spentRows = await this.repository.findBy({
+          boxId: In(spendIdChunk),
+          spendBlock: block.hash,
+        });
+        for (const row of spentRows) {
+          this.logger.debug(
+            `Spent box with boxId [${row.boxId}] at height ${block.height}`
+          );
+        }
+      }
+    }
   };
 
   /**
