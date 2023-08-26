@@ -105,13 +105,22 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
           }
         });
         this.actions
-          .storeBox(boxes, spendBoxes, block, this.getId())
-          .then((status) => {
+          .storeBox(boxes, block, this.getId())
+          .then(async (status) => {
+            if (status)
+              await this.actions
+                .spendBoxes(spendBoxes, block, this.getId())
+                .catch((e) => {
+                  this.logger.error(
+                    `An error occurred during spending ergo UTXOs for block at height [${block.height}] : ${e}`
+                  );
+                  reject(e);
+                });
             resolve(status);
           })
           .catch((e) => {
             this.logger.error(
-              `An error uncached exception occurred during store ergo observation: ${e}`
+              `An error occurred during storing ergo UTXOs for block at height [${block.height}] : ${e}`
             );
             reject(e);
           });
