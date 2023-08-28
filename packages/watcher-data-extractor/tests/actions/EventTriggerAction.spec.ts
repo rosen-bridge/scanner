@@ -11,7 +11,7 @@ import {
   sampleEventTrigger2,
   sampleEventTrigger3,
   sampleEventTrigger4,
-} from './data/eventTriggerAction.data';
+} from './eventTriggerActionData';
 
 const logger = new DummyLogger();
 let dataSource: DataSource;

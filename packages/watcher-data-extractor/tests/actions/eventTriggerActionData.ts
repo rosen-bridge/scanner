@@ -1,6 +1,4 @@
-import { BlockEntity } from '@rosen-bridge/scanner';
-import { EventTriggerEntity } from '../../../lib';
-import { ExtractedEventTrigger } from '../../../lib/interfaces/extractedEventTrigger';
+import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
 
 export const sampleEventEntity = {
   txId: 'txId',
