@@ -21,7 +21,10 @@ export class FraudEntity {
   triggerBoxId: string;
 
   @Column()
-  WID: string;
+  wid: string;
+
+  @Column()
+  rwtCount: string;
 
   @Column({ nullable: true, type: 'text' })
   spendBlock?: string | null;

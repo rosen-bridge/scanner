@@ -82,6 +82,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
               boxId: output.boxId,
               triggerBoxId: transaction.inputs[0].boxId,
               wid: Buffer.from(r4[0]).toString('hex'),
+              rwtCount: output.assets[0].amount.toString(),
               serialized: Buffer.from(
                 wasm.ErgoBox.from_json(
                   JsonBI.stringify(output)
@@ -290,6 +291,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         boxId: ergoBox.box_id().to_str(),
         triggerBoxId: triggerBoxId,
         wid: Buffer.from(r4[0]).toString('hex'),
+        rwtCount: box.assets![0].amount.toString(),
         serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
           'base64'
         ),

@@ -39,25 +39,27 @@ export class FraudAction {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      for (const box of frauds) {
+      for (const fraud of frauds) {
         const entity = {
-          triggerBoxId: box.triggerBoxId,
-          boxId: box.boxId,
+          triggerBoxId: fraud.triggerBoxId,
+          boxId: fraud.boxId,
+          wid: fraud.wid,
+          rwtCount: fraud.rwtCount,
           createBlock: block.hash,
           creationHeight: block.height,
-          spendBlock: undefined,
-          serialized: box.serialized,
+          serialized: fraud.serialized,
           extractor: extractor,
+          spendBlock: undefined,
         };
-        const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
+        const dbBox = dbBoxes.filter((item) => item.boxId === fraud.boxId);
         if (dbBox.length > 0) {
-          this.logger.info(`Updating fraud with boxId [${box.boxId}]`);
+          this.logger.info(`Updating fraud with boxId [${fraud.boxId}]`);
           this.logger.debug(`Updated fraud: [${JSON.stringify(entity)}]`);
           await queryRunner.manager
             .getRepository(FraudEntity)
             .update({ id: dbBox[0].id }, entity);
         } else {
-          this.logger.info(`Storing fraud with boxId: [${box.boxId}]`);
+          this.logger.info(`Storing fraud with boxId: [${fraud.boxId}]`);
           this.logger.debug(JSON.stringify(entity));
           await queryRunner.manager.getRepository(FraudEntity).insert(entity);
         }
@@ -75,33 +77,37 @@ export class FraudAction {
 
   /**
    * insert new fraud into database
-   * @param box
+   * @param fraud
    * @param extractor
    */
-  insertFraud = async (box: ExtractedFraud, extractor: string) => {
+  insertFraud = async (fraud: ExtractedFraud, extractor: string) => {
     return this.repository.insert({
-      boxId: box.boxId,
-      triggerBoxId: box.triggerBoxId,
-      createBlock: box.blockId,
-      creationHeight: box.height,
-      serialized: box.serialized,
+      boxId: fraud.boxId,
+      triggerBoxId: fraud.triggerBoxId,
+      wid: fraud.wid,
+      rwtCount: fraud.rwtCount,
+      createBlock: fraud.blockId,
+      creationHeight: fraud.height,
+      serialized: fraud.serialized,
       extractor: extractor,
     });
   };
 
   /**
    * Update an unspent fraud information in the database
-   * @param box
+   * @param fraud
    * @param extractor
    */
-  updateFraud = async (box: ExtractedFraud, extractor: string) => {
+  updateFraud = async (fraud: ExtractedFraud, extractor: string) => {
     return this.repository.update(
-      { boxId: box.boxId, extractor: extractor },
+      { boxId: fraud.boxId, extractor: extractor },
       {
-        triggerBoxId: box.triggerBoxId,
-        createBlock: box.blockId,
-        creationHeight: box.height,
-        serialized: box.serialized,
+        triggerBoxId: fraud.triggerBoxId,
+        createBlock: fraud.blockId,
+        creationHeight: fraud.height,
+        serialized: fraud.serialized,
+        wid: fraud.wid,
+        rwtCount: fraud.rwtCount,
         spendBlock: null,
         spendHeight: 0,
       }
@@ -159,11 +165,14 @@ export class FraudAction {
    *  Return all stored fraud box ids
    */
   getAllBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.repository
-      .createQueryBuilder()
-      .where({ extractor: extractor })
-      .select('boxId', 'boxId')
-      .getRawMany();
+    const boxIds = await this.repository.find({
+      select: {
+        boxId: true,
+      },
+      where: {
+        extractor: extractor,
+      },
+    });
     return boxIds.map((item: { boxId: string }) => item.boxId);
   };
 

@@ -3,6 +3,7 @@ interface ExtractedFraud {
   serialized: string;
   triggerBoxId: string;
   wid: string;
+  rwtCount: string;
   blockId?: string;
   height?: number;
   spendBlock?: string;
