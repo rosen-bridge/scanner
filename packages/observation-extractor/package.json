@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/observation-extractor",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Event observation data extractor for different chains",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -22,7 +22,7 @@
     "@cardano-ogmios/schema": "^5.5.7",
     "@rosen-bridge/logger-interface": "^0.1.0",
     "@rosen-bridge/rosen-extractor": "^0.1.11",
-    "@rosen-bridge/scanner": "^2.1.4",
+    "@rosen-bridge/scanner": "^2.1.5",
     "@rosen-bridge/tokens": "^0.2.0",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.0-alpha-1f24f53",
