@@ -1,11 +1,11 @@
 import { DataSource, Repository } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 
-import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';
+import { createDatabase } from '../extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';
 import { FraudEntity } from '../../lib/entities/fraudEntity';
 import { ExtractedFraud } from '../../lib/interfaces/types';
-import { fraud, oldStoredFraud } from './fraudActionTestData';
+import { block, fraud, nextBlock, oldStoredFraud } from './fraudActionTestData';
 
 const logger = new DummyLogger();
 let dataSource: DataSource;
@@ -27,11 +27,10 @@ describe('FraudAction', () => {
      * - store the fraud
      * - check stored fraud and its block information
      * @expected
-     * - database should have 1 updated inserted entity
+     * - database should have 1 inserted entity
      * - fraud information should have been saved correctly
      */
     it('should store a fraud with the block information in the database', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
@@ -40,7 +39,7 @@ describe('FraudAction', () => {
       expect(stored.serialized).toEqual('serialized');
       expect(stored.triggerBoxId).toEqual('triggerId');
       expect(stored.creationHeight).toEqual(100);
-      expect(stored.createBlock).toEqual('block1');
+      expect(stored.creationBlock).toEqual('block1');
     });
 
     /**
@@ -56,7 +55,6 @@ describe('FraudAction', () => {
      */
     it('should update an already stored fraud in the database', async () => {
       await repository.insert(oldStoredFraud);
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
@@ -65,7 +63,7 @@ describe('FraudAction', () => {
       expect(stored.serialized).toEqual('serialized');
       expect(stored.triggerBoxId).toEqual('triggerId');
       expect(stored.creationHeight).toEqual(100);
-      expect(stored.createBlock).toEqual('block1');
+      expect(stored.creationBlock).toEqual('block1');
     });
 
     /**
@@ -88,8 +86,8 @@ describe('FraudAction', () => {
         triggerBoxId: 'triggerId-new',
         wid: 'wid-new',
         rwtCount: '2000',
+        txId: 'txId',
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([newFraud], block, 'extractor-new');
       expect(await repository.count()).toEqual(2);
       const stored = (
@@ -99,7 +97,7 @@ describe('FraudAction', () => {
       expect(stored.boxId).toEqual('boxId');
       expect(stored.serialized).toEqual('serialized-new');
       expect(stored.creationHeight).toEqual(100);
-      expect(stored.createBlock).toEqual('block1');
+      expect(stored.creationBlock).toEqual('block1');
     });
   });
 
@@ -116,10 +114,9 @@ describe('FraudAction', () => {
      * - the fraud spendBlock and spendHeight are updated
      */
     it('should update the spending information of an stored fraud', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
-      await action.spendFrauds(['boxId'], block, 'extractor');
+      await action.spendFrauds(['boxId'], block, 'extractor', 'txId');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
       expect(stored.spendHeight).toEqual(100);
@@ -137,10 +134,9 @@ describe('FraudAction', () => {
      * - the fraud spendBlock and spendHeight are not updated
      */
     it('should NOT update the spending information of an stored fraud with different extractor', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendFrauds(['boxId'], block, 'extractor2');
+      await action.spendFrauds(['boxId'], block, 'extractor2', 'txId');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
       expect(stored.spendHeight).toBeNull();
@@ -160,7 +156,6 @@ describe('FraudAction', () => {
      * - the fraud should not exist after forking the block
      */
     it('should remove frauds in a forked block', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
       await action.deleteBlock(block.hash, 'extractor');
@@ -180,14 +175,12 @@ describe('FraudAction', () => {
      * - to remove fraud spending information after a fork event
      */
     it('should remove spending information when spent on a forked block', async () => {
-      const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBlockFrauds([fraud], block1, 'extractor');
-      await action.spendFrauds(['boxId'], block2, 'extractor');
+      await action.storeBlockFrauds([fraud], block, 'extractor');
+      await action.spendFrauds(['boxId'], nextBlock, 'extractor', 'txId');
       expect(await repository.count()).toEqual(1);
       const FraudEntity1 = (await repository.find())[0];
       expect(FraudEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlock(block2.hash, 'extractor');
+      await action.deleteBlock(nextBlock.hash, 'extractor');
       expect(await repository.count()).toEqual(1);
       const FraudEntity2 = (await repository.find())[0];
       expect(FraudEntity2.spendBlock).toBeNull();
@@ -206,14 +199,12 @@ describe('FraudAction', () => {
      * - to not change the fraud spending information
      */
     it('should NOT remove the spending information when report is from a different extractor', async () => {
-      const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBlockFrauds([fraud], block1, 'extractor1');
-      await action.spendFrauds(['boxId'], block2, 'extractor1');
+      await action.storeBlockFrauds([fraud], block, 'extractor1');
+      await action.spendFrauds(['boxId'], nextBlock, 'extractor1', 'txId');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlock(block2.hash, 'extractor2');
+      await action.deleteBlock(nextBlock.hash, 'extractor2');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).not.toBeNull();
@@ -241,7 +232,7 @@ describe('FraudAction', () => {
       expect(stored.serialized).toEqual('serialized');
       expect(stored.triggerBoxId).toEqual('triggerId');
       expect(stored.creationHeight).toEqual(100);
-      expect(stored.createBlock).toEqual('block1');
+      expect(stored.creationBlock).toEqual('block1');
     });
   });
 
@@ -283,8 +274,8 @@ describe('FraudAction', () => {
         triggerBoxId: 'triggerId2',
         wid: 'wid2',
         rwtCount: '1001',
+        txId: 'txId2',
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud, fraud2], block, 'extractor');
       const boxIds = await action.getAllBoxIds('extractor');
       expect(boxIds).toHaveLength(2);
@@ -303,7 +294,6 @@ describe('FraudAction', () => {
      * - it should remove the fraud in the database
      */
     it('should remove the fraud in the database', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await action.storeBlockFrauds([fraud], block, 'extractor');
       const result = await action.removeFraud(fraud.boxId, 'extractor');
       expect(result.affected).toEqual(1);

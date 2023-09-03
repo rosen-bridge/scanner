@@ -5,12 +5,12 @@ import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { FraudExtractor } from '../../lib';
 import { FraudEntity } from '../../lib';
 import {
-  generateBlockEntity,
   createDatabase,
   generateFraudTx,
   insertFraudEntity,
 } from './utils.mock';
 import { ExtractedFraud } from '../../lib/interfaces/types';
+import { block } from '../actions/fraudActionTestData';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -24,7 +24,6 @@ describe('fraudExtractor', () => {
     extractor = new FraudExtractor(
       dataSource,
       'extractor',
-      ergoLib.NetworkPrefix.Mainnet,
       'https://explorer.ergoplatform.com/',
       '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
       'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
@@ -44,7 +43,6 @@ describe('fraudExtractor', () => {
      * - should store one fraud in the database
      */
     it('should extract and save a fraud from the transaction', async () => {
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
       await extractor.processTransactions(
         [
           generateFraudTx(
@@ -60,7 +58,7 @@ describe('fraudExtractor', () => {
       expect(fraud.wid).toEqual(
         '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542'
       );
-      expect(fraud.createBlock).toEqual(block.hash);
+      expect(fraud.creationBlock).toEqual(block.hash);
       expect(fraud.creationHeight).toEqual(block.height);
     });
   });
@@ -87,7 +85,6 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        ergoLib.NetworkPrefix.Mainnet,
         'https://explorer.ergoplatform.com/',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
@@ -131,7 +128,6 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        ergoLib.NetworkPrefix.Mainnet,
         'https://explorer.ergoplatform.com/',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
@@ -191,7 +187,6 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        ergoLib.NetworkPrefix.Mainnet,
         'https://explorer.ergoplatform.com/',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
@@ -236,7 +231,6 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        ergoLib.NetworkPrefix.Mainnet,
         'https://explorer.ergoplatform.com/',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
@@ -356,6 +350,7 @@ describe('fraudExtractor', () => {
           serialized: 'serialized2',
           blockId: 'blockId',
           height: 99,
+          txId: 'txId',
         },
       ];
       jest
@@ -368,7 +363,7 @@ describe('fraudExtractor', () => {
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
       expect(box?.wid).toEqual('wid2');
-      expect(box?.createBlock).toEqual('blockId');
+      expect(box?.creationBlock).toEqual('blockId');
       expect(box?.serialized).toEqual('serialized2');
       expect(box?.creationHeight).toEqual(99);
       expect(spy).toHaveBeenCalledWith(['boxId1'], 100);
@@ -398,6 +393,7 @@ describe('fraudExtractor', () => {
           serialized: 'newSerialized',
           blockId: 'blockId',
           height: 99,
+          txId: 'txId',
         },
       ];
       jest

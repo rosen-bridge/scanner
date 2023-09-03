@@ -1,3 +1,10 @@
+import { BlockEntity } from '@rosen-bridge/scanner';
+
+export const block: BlockEntity = new BlockEntity();
+block.hash = 'block1';
+block.parentHash = 'block0';
+block.height = 100;
+
 export const last10BlockHeader = [
   {
     extensionId:

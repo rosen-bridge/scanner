@@ -1,3 +1,4 @@
+import { BlockEntity } from '@rosen-bridge/scanner';
 import { ExtractedFraud } from '../../lib/interfaces/types';
 
 const fraud: ExtractedFraud = {
@@ -6,6 +7,7 @@ const fraud: ExtractedFraud = {
   triggerBoxId: 'triggerId',
   wid: 'wid',
   rwtCount: '1000',
+  txId: 'txId',
 };
 
 const oldStoredFraud = {
@@ -15,10 +17,21 @@ const oldStoredFraud = {
   rwtCount: '1000',
   triggerBoxId: 'triggerId-old',
   extractor: 'extractor',
-  createBlock: 'create-block',
+  creationBlock: 'create-block',
   creationHeight: 100,
+  creationTxId: 'txId',
   spendBlock: 'old-spendBlock',
   spendHeight: 109,
 };
 
-export { fraud, oldStoredFraud };
+const block: BlockEntity = new BlockEntity();
+block.hash = 'block1';
+block.parentHash = 'block0';
+block.height = 100;
+
+const nextBlock: BlockEntity = new BlockEntity();
+nextBlock.hash = 'block2';
+nextBlock.parentHash = 'block1';
+nextBlock.height = 101;
+
+export { fraud, oldStoredFraud, block, nextBlock };

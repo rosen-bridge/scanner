@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { FraudEntity } from '../../lib';
 import { migrations } from '../../lib';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import {
   migrations as scannerMigrations,
   Transaction,
@@ -11,33 +10,17 @@ import { JsonBI } from '../../lib/utils';
 import { last10BlockHeader } from './fraduExtractorTestData';
 
 const createDatabase = async (): Promise<DataSource> => {
-  return new DataSource({
+  const dataSource = new DataSource({
     type: 'sqlite',
     database: `:memory:`,
-    entities: [BlockEntity, FraudEntity],
+    entities: [FraudEntity],
     migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],
     synchronize: false,
     logging: false,
-  })
-    .initialize()
-    .then(async (dataSource) => {
-      await dataSource.runMigrations();
-      return dataSource;
-    });
-};
-
-const generateBlockEntity = (
-  dataSource: DataSource,
-  hash: string,
-  parent?: string,
-  height?: number
-) => {
-  const repository = dataSource.getRepository(BlockEntity);
-  return repository.create({
-    height: height ? height : 1,
-    parentHash: parent ? parent : '1',
-    hash: hash,
   });
+  await dataSource.initialize();
+  await dataSource.runMigrations();
+  return dataSource;
 };
 
 /**
@@ -135,7 +118,8 @@ const insertFraudEntity = (
   const repository = dataSource.getRepository(FraudEntity);
   return repository.insert({
     creationHeight: height || 1,
-    createBlock: 'blockId',
+    creationBlock: 'blockId',
+    creationTxId: 'txId',
     boxId: boxId || 'boxId',
     wid: 'wid',
     rwtCount: '100',
@@ -145,9 +129,4 @@ const insertFraudEntity = (
   });
 };
 
-export {
-  createDatabase,
-  generateBlockEntity,
-  generateFraudTx,
-  insertFraudEntity,
-};
+export { createDatabase, generateFraudTx, insertFraudEntity };

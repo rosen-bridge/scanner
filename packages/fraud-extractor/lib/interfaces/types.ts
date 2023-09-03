@@ -6,8 +6,10 @@ interface ExtractedFraud {
   rwtCount: string;
   blockId?: string;
   height?: number;
+  txId?: string;
   spendBlock?: string;
   spendHeight?: number;
+  spendTxId?: string;
 }
 
 export { ExtractedFraud };

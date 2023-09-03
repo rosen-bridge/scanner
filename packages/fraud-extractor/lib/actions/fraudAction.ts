@@ -18,7 +18,7 @@ export class FraudAction {
     this.repository = dataSource.getRepository(FraudEntity);
   }
   /**
-   * It stores a list of frauds in a specific block
+   * Store a list of frauds in a specific block
    * @param frauds
    * @param spendBoxes
    * @param block
@@ -30,7 +30,7 @@ export class FraudAction {
     extractor: string
   ) => {
     const boxIds = frauds.map((item) => item.boxId);
-    const dbBoxes = await this.datasource.getRepository(FraudEntity).findBy({
+    const dbBoxes = await this.repository.findBy({
       boxId: In(boxIds),
       extractor: extractor,
     });
@@ -38,6 +38,7 @@ export class FraudAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    const repository = await queryRunner.manager.getRepository(FraudEntity);
     try {
       for (const fraud of frauds) {
         const entity = {
@@ -45,27 +46,29 @@ export class FraudAction {
           boxId: fraud.boxId,
           wid: fraud.wid,
           rwtCount: fraud.rwtCount,
-          createBlock: block.hash,
+          creationBlock: block.hash,
           creationHeight: block.height,
+          creationTxId: fraud.txId,
           serialized: fraud.serialized,
           extractor: extractor,
           spendBlock: undefined,
+          spendHeight: undefined,
+          spendTxId: undefined,
         };
         const dbBox = dbBoxes.filter((item) => item.boxId === fraud.boxId);
         if (dbBox.length > 0) {
           this.logger.info(`Updating fraud with boxId [${fraud.boxId}]`);
           this.logger.debug(`Updated fraud: [${JSON.stringify(entity)}]`);
-          await queryRunner.manager
-            .getRepository(FraudEntity)
-            .update({ id: dbBox[0].id }, entity);
+          await repository.update({ id: dbBox[0].id }, entity);
         } else {
           this.logger.info(`Storing fraud with boxId: [${fraud.boxId}]`);
-          this.logger.debug(JSON.stringify(entity));
-          await queryRunner.manager.getRepository(FraudEntity).insert(entity);
+          this.logger.debug(`Inserted fraud: [${JSON.stringify(entity)}]`);
+          await repository.insert(entity);
         }
       }
       await queryRunner.commitTransaction();
     } catch (e) {
+      console.log(e);
       this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;
@@ -76,7 +79,7 @@ export class FraudAction {
   };
 
   /**
-   * insert new fraud into database
+   * Insert a new fraud into database
    * @param fraud
    * @param extractor
    */
@@ -86,8 +89,9 @@ export class FraudAction {
       triggerBoxId: fraud.triggerBoxId,
       wid: fraud.wid,
       rwtCount: fraud.rwtCount,
-      createBlock: fraud.blockId,
+      creationBlock: fraud.blockId,
       creationHeight: fraud.height,
+      creationTxId: fraud.txId,
       serialized: fraud.serialized,
       extractor: extractor,
     });
@@ -103,8 +107,9 @@ export class FraudAction {
       { boxId: fraud.boxId, extractor: extractor },
       {
         triggerBoxId: fraud.triggerBoxId,
-        createBlock: fraud.blockId,
+        creationBlock: fraud.blockId,
         creationHeight: fraud.height,
+        creationTxId: fraud.txId,
         serialized: fraud.serialized,
         wid: fraud.wid,
         rwtCount: fraud.rwtCount,
@@ -123,23 +128,25 @@ export class FraudAction {
   spendFrauds = async (
     spendIds: Array<string>,
     block: BlockEntity,
-    extractor: string
+    extractor: string,
+    txId: string
   ): Promise<void> => {
     const spendIdChunks = chunk(spendIds, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.repository.update(
         { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height }
+        { spendBlock: block.hash, spendHeight: block.height, spendTxId: txId }
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.repository.findBy({
           boxId: In(spendIdChunk),
           spendBlock: block.hash,
+          spendTxId: txId,
         });
         for (const row of spentRows) {
           this.logger.debug(
-            `Spent box with boxId [${row.boxId}] at height ${block.height}`
+            `Spent box with boxId [${row.boxId}] at transaction [${txId}] at height ${block.height}`
           );
         }
       }
@@ -147,22 +154,48 @@ export class FraudAction {
   };
 
   /**
-   * update all frauds related to an specific invalid block
-   * if box been spent in this block mark it as unspent, and if its' created within the block remove it from database
+   * Update all frauds related to an specific invalid block
+   * if box had been spent in the block mark it as unspent,
+   * and if it was created within the block remove it from database
    * @param block
    * @param extractor
    */
-  deleteBlock = async (block: string, extractor: string) => {
+  deleteBlock = async (block: string, extractor: string): Promise<void> => {
     this.logger.info(`Deleting frauds in block [${block}]`);
-    await this.repository.delete({ extractor: extractor, createBlock: block });
-    await this.repository.update(
+    const deleteResult = await this.repository.delete({
+      extractor: extractor,
+      creationBlock: block,
+    });
+    if (deleteResult.affected && deleteResult.affected > 0) {
+      const spentRows = await this.repository.findBy({
+        extractor: extractor,
+        creationBlock: block,
+      });
+      for (const row of spentRows) {
+        this.logger.debug(
+          `deleted invalid fraud with boxId [${row.boxId}] at the forked block [${block}]`
+        );
+      }
+    }
+    const updateResult = await this.repository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0 }
+      { spendBlock: null, spendHeight: 0, spendTxId: null }
     );
+    if (updateResult.affected && updateResult.affected > 0) {
+      const spentRows = await this.repository.findBy({
+        extractor: extractor,
+        spendBlock: block,
+      });
+      for (const row of spentRows) {
+        this.logger.debug(
+          `removed spending information of the fraud with boxId [${row.boxId}], spent at the forked block [${block}]`
+        );
+      }
+    }
   };
 
   /**
-   *  Return all stored fraud box ids
+   * Return all stored fraud box ids
    */
   getAllBoxIds = async (extractor: string): Promise<Array<string>> => {
     const boxIds = await this.repository.find({

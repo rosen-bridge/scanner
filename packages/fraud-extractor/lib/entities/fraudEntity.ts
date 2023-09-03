@@ -9,10 +9,13 @@ export class FraudEntity {
   boxId: string;
 
   @Column()
-  createBlock: string;
+  creationBlock: string;
 
   @Column()
   creationHeight: number;
+
+  @Column()
+  creationTxId: string;
 
   @Column()
   serialized: string;
@@ -31,6 +34,9 @@ export class FraudEntity {
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column({ nullable: true, type: 'text' })
+  spendTxId?: string | null;
 
   @Column()
   extractor: string;

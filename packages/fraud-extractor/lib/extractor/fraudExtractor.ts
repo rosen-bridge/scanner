@@ -21,7 +21,6 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   readonly actions: FraudAction;
   private readonly id: string;
-  private readonly networkType: wasm.NetworkPrefix;
   private readonly ergoTree: string;
   private readonly rwt: string;
   readonly api;
@@ -29,14 +28,12 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   constructor(
     dataSource: DataSource,
     id: string,
-    networkType: wasm.NetworkPrefix,
     explorerUrl: string,
     fraudAddress: string,
     rwt: string,
     logger?: AbstractLogger
   ) {
     this.id = id;
-    this.networkType = networkType;
     this.ergoTree = wasm.Address.from_base58(fraudAddress)
       .to_ergo_tree()
       .to_base16_bytes();
@@ -63,7 +60,8 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     return new Promise((resolve, reject) => {
       try {
         const newFrauds: Array<ExtractedFraud> = [];
-        const spentBoxes: Array<string> = [];
+        const txSpendIds: Array<{ txId: string; spendBoxes: Array<string> }> =
+          [];
         txs.forEach((transaction) => {
           for (const output of transaction.outputs) {
             if (
@@ -80,6 +78,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
             if (!r4) continue;
             newFrauds.push({
               boxId: output.boxId,
+              txId: transaction.id,
               triggerBoxId: transaction.inputs[0].boxId,
               wid: Buffer.from(r4[0]).toString('hex'),
               rwtCount: output.assets[0].amount.toString(),
@@ -90,14 +89,23 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
               ).toString('base64'),
             });
           }
-          for (const input of transaction.inputs) {
-            spentBoxes.push(input.boxId);
-          }
+          txSpendIds.push({
+            txId: transaction.id,
+            spendBoxes: transaction.inputs.map((box) => box.boxId),
+          });
         });
         this.actions
           .storeBlockFrauds(newFrauds, block, this.getId())
-          .then((status) => {
-            // TODO: spend frauds
+          .then(async (status) => {
+            if (status) {
+              for (const spendIds of txSpendIds)
+                await this.actions.spendFrauds(
+                  spendIds.spendBoxes,
+                  block,
+                  this.getId(),
+                  spendIds.txId
+                );
+            }
             resolve(status);
           })
           .catch((e) => {
@@ -297,8 +305,10 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         ),
         blockId: box.blockId,
         height: box.settlementHeight,
+        txId: box.transactionId,
         spendBlock: spendBlock,
         spendHeight: spendHeight,
+        spendTxId: box.spentTransactionId,
       });
     }
     return ExtractedFrauds;
