@@ -4,83 +4,16 @@ import { DummyLogger } from '@rosen-bridge/logger-interface';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventTriggerEntity } from '../../lib';
 import EventTriggerAction from '../../lib/actions/EventTriggerAction';
-import { ExtractedEventTrigger } from '../../lib/interfaces/extractedEventTrigger';
 import { block, block2 } from '../extractor/utilsVariable.mock';
-
-const sampleEventTrigger1: ExtractedEventTrigger = {
-  eventId: 'eventId',
-  txId: 'txId2',
-  WIDs: 'wid2',
-  amount: '22',
-  bridgeFee: '11',
-  fromAddress: 'ergoAddress1',
-  fromChain: 'ergo',
-  networkFee: '88',
-  sourceChainTokenId: 'tokenId2',
-  targetChainTokenId: 'asset2',
-  sourceTxId: 'txId2',
-  toAddress: 'addr4',
-  toChain: 'cardano',
-  boxId: '1',
-  boxSerialized: 'serialized1',
-  sourceBlockId: 'blockId',
-  sourceChainHeight: 10,
-};
-const sampleEventTrigger2: ExtractedEventTrigger = {
-  eventId: 'eventId',
-  txId: 'txId',
-  WIDs: '1',
-  amount: '100',
-  bridgeFee: '10',
-  fromAddress: 'address',
-  fromChain: 'ergo',
-  networkFee: '1000',
-  sourceChainTokenId: 'tokenId1',
-  targetChainTokenId: 'asset1',
-  sourceTxId: 'txId1',
-  toAddress: 'addr1',
-  toChain: 'cardano',
-  boxId: '2',
-  boxSerialized: 'serialized2',
-  sourceBlockId: 'blockId',
-  sourceChainHeight: 20,
-};
-
-const sampleEventTrigger3: ExtractedEventTrigger = {
-  ...sampleEventTrigger1,
-  boxId: '3',
-};
-
-const sampleEventTrigger4: ExtractedEventTrigger = {
-  ...sampleEventTrigger2,
-  boxId: '4',
-};
+import {
+  sampleEventEntity,
+  sampleEventTrigger1,
+  sampleEventTrigger2,
+  sampleEventTrigger3,
+  sampleEventTrigger4,
+} from './eventTriggerActionData';
 
 const logger = new DummyLogger();
-
-export const sampleEventEntity = {
-  txId: 'txId',
-  eventId: 'eventId',
-  extractor: 'extractorId',
-  boxId: 'id',
-  boxSerialized: 'boxSerialized',
-  block: 'hash',
-  height: 10,
-  toAddress: 'cardanoAddr2',
-  fromChain: 'ergo',
-  toChain: 'cardano',
-  fromAddress: 'address',
-  amount: '17',
-  bridgeFee: '34',
-  networkFee: '51',
-  sourceChainTokenId: 'sourceToken',
-  targetChainTokenId: 'targetToken',
-  sourceTxId: 'txId',
-  sourceBlockId: 'blockId',
-  WIDs: 'ff',
-  sourceChainHeight: 10,
-};
-
 let dataSource: DataSource;
 
 describe('EventTrigger', () => {
