@@ -11,6 +11,7 @@ import {
 } from './utils.mock';
 import { ExtractedFraud } from '../../lib/interfaces/types';
 import { block } from '../actions/fraudActionTestData';
+import { fraudBox } from './fraduExtractorTestData';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -32,7 +33,7 @@ describe('fraudExtractor', () => {
 
   describe('processTransactions', () => {
     /**
-     * @target fraudExtractor.processTransactions should extract and save a fraud from the transaction
+     * @target fraudExtractor.processTransactions should save a fraud from the transaction
      * @dependencies
      * - Database
      * @scenario
@@ -42,7 +43,7 @@ describe('fraudExtractor', () => {
      * @expected
      * - should store one fraud in the database
      */
-    it('should extract and save a fraud from the transaction', async () => {
+    it('should save a fraud from the transaction', async () => {
       await extractor.processTransactions(
         [
           generateFraudTx(
@@ -242,6 +243,39 @@ describe('fraudExtractor', () => {
       expect(spy).toHaveBeenCalledWith([box]);
       expect(boxData).toEqual(extractedFraud);
     });
+
+    /**
+     * @target fraudExtractor.getFraudInfoWithBoxId should return undefined when box is forked
+     * @dependencies
+     * @scenario
+     * - mock getApiV1BoxesP1 to getApiV1BoxesP1 to throw Error
+     * - mock extractBoxData to return the extracted fraud
+     * - run getFraudInfoWithBoxId
+     * - check the extractBoxData input and function output
+     * @expected
+     * - it should not call extractBoxData
+     * - it should return undefined
+     */
+    it('should return undefined when box is forked', async () => {
+      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+        v1: {
+          getApiV1BoxesP1: async () => {
+            throw new Error('404');
+          },
+        },
+      } as any);
+      const extractor = new FraudExtractor(
+        dataSource,
+        'extractor1',
+        'https://explorer.ergoplatform.com/',
+        '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+      );
+      const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
+      const boxData = await extractor.getFraudInfoWithBoxId('boxId');
+      expect(spy).not.toHaveBeenCalled();
+      expect(boxData).toEqual(undefined);
+    });
   });
 
   describe('validateOldStoredFrauds', () => {
@@ -409,6 +443,38 @@ describe('fraudExtractor', () => {
       expect(box?.serialized).toEqual('newSerialized');
       expect(box?.triggerBoxId).toEqual('newTriggerId');
       expect(spy).toHaveBeenCalledWith([], 100);
+    });
+  });
+
+  describe('extractBoxData', () => {
+    /**
+     * @target fraudExtractor.extractBoxData should extract fraud data from api output
+     * @dependencies
+     * @scenario
+     * - call extractBoxData with api output
+     * - check the extracted info
+     * @expected
+     * - should extract fraud data from api output
+     */
+    it('should extract fraud data from api output', async () => {
+      jest.spyOn(extractor, 'getTriggerBoxId').mockResolvedValue('triggerId');
+      const boxData = await extractor.extractBoxData([fraudBox]);
+      expect(boxData[0]).toEqual({
+        boxId:
+          '19a1aa6e4946425f8925837ef0b1a28b528a46303751c1599bec890bf7f25fa2',
+        wid: 'fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
+        serialized:
+          'wIQ9EAkEAgQABAAEAAQADiAy7l2UfP6NtUgBV/+lZrm32fr0H6FFydAGKMfBWZh49gQEBAAOIOTcpcezXq0U5laZUFvdZa9cALIkkyfg7Zug4rUJEBqC0ZaDAwHvrrW0pXMAsaXZAQFjkbHbYwhyAXMB2QEBY67bYwhyAdkBA00Ok4xyAwGMsttjCKdzAgABk4yy22MIsqRzAwBzBAABcwWTjLLbYwiypHMGAHMHAAFzCJHxQQE4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmpBOARoBIP6Dy4ooQ/pvV1HWXk+Vf8Yixnq5IR8wtEmRofsDFFwBl2LoSEGbF7VpnisZdRfvUQypqT047XyffHySCf4ryDkJ',
+        blockId:
+          '5cc1d227ad4e71325d48a27fc026e76f778964804a757a8e399ead3e26872de3',
+        height: 1079443,
+        triggerBoxId: 'triggerId',
+        rwtCount: '10000',
+        txId: '9762e848419b17b5699e2b197517ef510ca9a93d38ed7c9f7c7c9209fe2bc839',
+        spendBlock: undefined,
+        spendHeight: undefined,
+        spendTxId: undefined,
+      });
     });
   });
 });

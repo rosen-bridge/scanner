@@ -327,3 +327,33 @@ export const last10BlockHeader = [
       '2aeed311b23c92427c16f2262bde3396484e109fcddb4f1a56aa1dd5a7b2113b',
   },
 ];
+
+export const fraudBox = {
+  boxId: '19a1aa6e4946425f8925837ef0b1a28b528a46303751c1599bec890bf7f25fa2',
+  transactionId:
+    '9762e848419b17b5699e2b197517ef510ca9a93d38ed7c9f7c7c9209fe2bc839',
+  blockId: '5cc1d227ad4e71325d48a27fc026e76f778964804a757a8e399ead3e26872de3',
+  value: 1000000n,
+  index: 9,
+  globalIndex: 32168420n,
+  creationHeight: 1079441,
+  settlementHeight: 1079443,
+  ergoTree:
+    '1009040204000400040004000e2032ee5d947cfe8db5480157ffa566b9b7d9faf41fa145c9d00628c7c1599878f6040404000e20e4dca5c7b35ead14e65699505bdd65af5c00b2249327e0ed9ba0e2b509101a82d196830301efaeb5b4a57300b1a5d901016391b1db630872017301d9010163aedb63087201d901034d0e938c7203018cb2db6308a773020001938cb2db6308b2a4730300730400017305938cb2db6308b2a4730600730700017308',
+  address:
+    'LFz5FPkW7nPVq2NA5YcZRNq2HSmY5btR3zSJD7spW8pDBRCmWqZnkC6Wdxzfgwbh5SnT1w4NHi5TNvQeaFiXUtG3Dnhbf9JoJgoby7z4NxcdES1KnR4w4JjeiTF6r6u7ErG6jDSTFkE4MkpxEHeCvX2ijj3Nvuy9h74LkXrPFptUZdzF5Jtvp9v2da6Y9DGNwyUPNQEPFNQi9k42Mj1Lic2dGTM6xxVRjmQN9CaPjLjajEzyvmyMr',
+  assets: [
+    {
+      tokenId:
+        '3825b2b4acaaaba626440113153246c65ddb2e9df406c4a56418b5842c9f839a',
+      index: 0,
+      amount: 10000n,
+      decimals: 0,
+      type: 'EIP-004',
+    },
+  ],
+  additionalRegisters: {
+    R4: '1a0120fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
+  },
+  mainChain: true,
+};

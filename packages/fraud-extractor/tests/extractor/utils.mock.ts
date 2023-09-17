@@ -9,6 +9,10 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { JsonBI } from '../../lib/utils';
 import { last10BlockHeader } from './fraduExtractorTestData';
 
+/**
+ * Create and initialize database with required entities
+ * @returns initialized datasource
+ */
 const createDatabase = async (): Promise<DataSource> => {
   const dataSource = new DataSource({
     type: 'sqlite',
@@ -110,6 +114,13 @@ const generateFraudTx = (
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
 
+/**
+ * Insert a fraud entity in the database
+ * @param dataSource
+ * @param boxId
+ * @param height
+ * @returns
+ */
 const insertFraudEntity = (
   dataSource: DataSource,
   boxId?: string,

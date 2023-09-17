@@ -75,8 +75,13 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
             const r4 = boxOutput
               .register_value(wasm.NonMandatoryRegisterId.R4)
               ?.to_coll_coll_byte();
-            if (!r4) continue;
-            newFrauds.push({
+            if (!r4) {
+              this.logger.debug(
+                `A new fraud box found without correct wid format at height ${block.height}`
+              );
+              continue;
+            }
+            const newFraud = {
               boxId: output.boxId,
               txId: transaction.id,
               triggerBoxId: transaction.inputs[0].boxId,
@@ -87,7 +92,11 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
                   JsonBI.stringify(output)
                 ).sigma_serialize_bytes()
               ).toString('base64'),
-            });
+            };
+            newFrauds.push(newFraud);
+            this.logger.debug(
+              `new fraud found [${newFraud}] at height ${block.height}`
+            );
           }
           txSpendIds.push({
             txId: transaction.id,
@@ -98,6 +107,10 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
           .storeBlockFrauds(newFrauds, block, this.getId())
           .then(async (status) => {
             if (status) {
+              if (newFrauds.length > 0)
+                this.logger.debug(
+                  `successfully stored new frauds at hight ${block.height}`
+                );
               for (const spendIds of txSpendIds)
                 await this.actions.spendFrauds(
                   spendIds.spendBoxes,
@@ -110,7 +123,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
           })
           .catch((e) => {
             this.logger.error(
-              `Uncached error happened in processing frauds in block [${block.hash}]: ${e}`
+              `An error occurred in processing frauds in block [${block.hash}]: ${e}`
             );
             reject(e);
           });
@@ -133,6 +146,9 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    */
   initializeBoxes = async (initialHeight: number) => {
     // Getting unspent boxes
+    this.logger.debug(
+      `Initializing fraud table. storing fraud boxes created bellow height ${initialHeight}.`
+    );
     const unspentFrauds = await this.getUnspentFrauds(initialHeight);
     const unspentBoxIds = unspentFrauds.map((box) => box.boxId);
 
@@ -157,6 +173,9 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     // Remove updated box ids from existing boxes in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained boxes
+    this.logger.debug(
+      `Validating and updating stored fraud boxes with boxIds ${allStoredBoxIds}`
+    );
     await this.validateOldStoredFrauds(allStoredBoxIds, initialHeight);
   };
 
@@ -173,13 +192,17 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     for (const boxId of unchangedStoredBoxIds) {
       const box = await this.getFraudInfoWithBoxId(boxId);
       if (box && box.spendBlock && box.spendHeight) {
-        if (box.spendHeight < initialHeight)
+        if (box.spendHeight < initialHeight) {
+          this.logger.debug(
+            `updating spending information of fraud with boxId [${box.boxId}] spent at height [${box.spendHeight}]`
+          );
           await this.actions.updateSpendBlock(
             boxId,
             this.getId(),
             box.spendBlock,
             box.spendHeight
           );
+        }
       } else {
         await this.actions.removeFraud(boxId, this.getId());
         this.logger.info(
@@ -226,8 +249,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         }
       );
       if (!boxes.items) {
-        this.logger.warn('Explorer api output items should not be undefined.');
-        throw new Error('Incorrect explorer api output');
+        throw new Error('Explorer api output items should not be undefined.');
       }
       allBoxes = [
         ...allBoxes,
@@ -272,8 +294,11 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    * @param boxes
    */
   extractBoxData = async (boxes: Array<OutputInfo>) => {
-    const ExtractedFrauds: Array<ExtractedFraud> = [];
+    const extractedFrauds: Array<ExtractedFraud> = [];
     for (const box of boxes) {
+      this.logger.debug(
+        `Extracting box fraud information from box with boxId [${box.boxId}]`
+      );
       let spendBlock, spendHeight;
       // Extract spending information
       if (box.spentTransactionId) {
@@ -295,7 +320,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         continue;
       }
 
-      ExtractedFrauds.push({
+      const extractedFraud = {
         boxId: ergoBox.box_id().to_str(),
         triggerBoxId: triggerBoxId,
         wid: Buffer.from(r4[0]).toString('hex'),
@@ -309,8 +334,10 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         spendBlock: spendBlock,
         spendHeight: spendHeight,
         spendTxId: box.spentTransactionId,
-      });
+      };
+      extractedFrauds.push(extractedFraud);
+      this.logger.debug(`Extracted fraud: [${extractedFraud}]`);
     }
-    return ExtractedFrauds;
+    return extractedFrauds;
   };
 }

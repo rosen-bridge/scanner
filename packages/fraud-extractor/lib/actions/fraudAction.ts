@@ -69,7 +69,7 @@ export class FraudAction {
       await queryRunner.commitTransaction();
     } catch (e) {
       console.log(e);
-      this.logger.error(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during storing fraud boxes: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;
     } finally {
