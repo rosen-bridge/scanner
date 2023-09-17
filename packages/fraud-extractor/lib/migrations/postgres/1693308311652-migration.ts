@@ -10,7 +10,7 @@ export class migration1693308311652 implements MigrationInterface {
                 "boxId" character varying NOT NULL,
                 "creationBlock" character varying NOT NULL,
                 "creationHeight" integer NOT NULL,
-                "creationHeight" character varying NOT NULL,
+                "creationTxId" character varying NOT NULL,
                 "serialized" character varying NOT NULL,
                 "triggerBoxId" character varying NOT NULL,
                 "wid" character varying NOT NULL,
