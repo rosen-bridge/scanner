@@ -162,31 +162,31 @@ export class FraudAction {
    */
   deleteBlock = async (block: string, extractor: string): Promise<void> => {
     this.logger.info(`Deleting frauds in block [${block}]`);
-    const deleteResult = await this.repository.delete({
+    const invalidRows = await this.repository.findBy({
       extractor: extractor,
       creationBlock: block,
     });
-    if (deleteResult.affected && deleteResult.affected > 0) {
-      const spentRows = await this.repository.findBy({
+    if (invalidRows.length > 0) {
+      await this.repository.delete({
         extractor: extractor,
         creationBlock: block,
       });
-      for (const row of spentRows) {
+      for (const row of invalidRows) {
         this.logger.debug(
           `deleted invalid fraud with boxId [${row.boxId}] at the forked block [${block}]`
         );
       }
     }
-    const updateResult = await this.repository.update(
-      { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0, spendTxId: null }
-    );
-    if (updateResult.affected && updateResult.affected > 0) {
-      const spentRows = await this.repository.findBy({
-        extractor: extractor,
-        spendBlock: block,
-      });
-      for (const row of spentRows) {
+    const updatingRows = await this.repository.findBy({
+      extractor: extractor,
+      spendBlock: block,
+    });
+    if (updatingRows.length > 0) {
+      await this.repository.update(
+        { spendBlock: block, extractor: extractor },
+        { spendBlock: null, spendHeight: 0, spendTxId: null }
+      );
+      for (const row of updatingRows) {
         this.logger.debug(
           `removed spending information of the fraud with boxId [${row.boxId}], spent at the forked block [${block}]`
         );

@@ -151,6 +151,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     );
     const unspentFrauds = await this.getUnspentFrauds(initialHeight);
     const unspentBoxIds = unspentFrauds.map((box) => box.boxId);
+    this.logger.debug(`Unspent fraud boxIds ${unspentBoxIds}`);
 
     // Storing extracted boxes
     let allStoredBoxIds = await this.actions.getAllBoxIds(this.getId());
@@ -201,6 +202,10 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
             this.getId(),
             box.spendBlock,
             box.spendHeight
+          );
+        } else {
+          this.logger.debug(
+            `fraud with boxId [${box.boxId}] has been spent after the initialization height, updating spending information skipped.`
           );
         }
       } else {
@@ -296,47 +301,53 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   extractBoxData = async (boxes: Array<OutputInfo>) => {
     const extractedFrauds: Array<ExtractedFraud> = [];
     for (const box of boxes) {
-      this.logger.debug(
-        `Extracting box fraud information from box with boxId [${box.boxId}]`
-      );
-      let spendBlock, spendHeight;
-      // Extract spending information
-      if (box.spentTransactionId) {
-        const block = await this.getTxBlock(box.spentTransactionId);
-        spendBlock = block.id;
-        spendHeight = block.height;
-      }
-      // Extract WID
-      const ergoBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
-      const r4 = ergoBox
-        .register_value(wasm.NonMandatoryRegisterId.R4)
-        ?.to_coll_coll_byte();
-      // Extract trigger boxId
-      const triggerBoxId = await this.getTriggerBoxId(box.transactionId);
-      if (!r4 || !triggerBoxId) {
-        this.logger.warn(
-          `Skipping storing fraud with boxId [${box.boxId}], wid or trigger box id is undefined`
+      try {
+        this.logger.debug(
+          `Extracting box fraud information from box with boxId [${box.boxId}]`
         );
-        continue;
-      }
+        let spendBlock, spendHeight;
+        // Extract spending information
+        if (box.spentTransactionId) {
+          const block = await this.getTxBlock(box.spentTransactionId);
+          spendBlock = block.id;
+          spendHeight = block.height;
+        }
+        // Extract WID
+        const ergoBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
+        const r4 = ergoBox
+          .register_value(wasm.NonMandatoryRegisterId.R4)
+          ?.to_coll_coll_byte();
+        // Extract trigger boxId
+        const triggerBoxId = await this.getTriggerBoxId(box.transactionId);
+        if (!r4 || !triggerBoxId) {
+          this.logger.warn(
+            `Skipping storing fraud with boxId [${box.boxId}], wid or trigger box id is undefined`
+          );
+          continue;
+        }
 
-      const extractedFraud = {
-        boxId: ergoBox.box_id().to_str(),
-        triggerBoxId: triggerBoxId,
-        wid: Buffer.from(r4[0]).toString('hex'),
-        rwtCount: box.assets![0].amount.toString(),
-        serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
-          'base64'
-        ),
-        blockId: box.blockId,
-        height: box.settlementHeight,
-        txId: box.transactionId,
-        spendBlock: spendBlock,
-        spendHeight: spendHeight,
-        spendTxId: box.spentTransactionId,
-      };
-      extractedFrauds.push(extractedFraud);
-      this.logger.debug(`Extracted fraud: [${extractedFraud}]`);
+        const extractedFraud = {
+          boxId: ergoBox.box_id().to_str(),
+          triggerBoxId: triggerBoxId,
+          wid: Buffer.from(r4[0]).toString('hex'),
+          rwtCount: box.assets![0].amount.toString(),
+          serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
+            'base64'
+          ),
+          blockId: box.blockId,
+          height: box.settlementHeight,
+          txId: box.transactionId,
+          spendBlock: spendBlock,
+          spendHeight: spendHeight,
+          spendTxId: box.spentTransactionId,
+        };
+        extractedFrauds.push(extractedFraud);
+        this.logger.debug(`Extracted fraud: [${extractedFraud}]`);
+      } catch (e) {
+        this.logger.error(
+          `Extracting fraud information failed for box [${box.boxId}] with error: ${e}`
+        );
+      }
     }
     return extractedFrauds;
   };
