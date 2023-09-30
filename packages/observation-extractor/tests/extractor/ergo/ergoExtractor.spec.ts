@@ -126,5 +126,53 @@ describe('extractorErgo', () => {
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     });
+
+    /**
+     * 1 Valid Transaction but invalid creationHeight should not save
+     * Dependency: action.storeObservations
+     * Scenario: one valid observation with invalid creationHeight should not save in the database
+     * Expected: processTransactions should returns true and database row count should be 0
+     */
+    it('checks observation with invalid creationHeight should not save', async () => {
+      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
+      const Tx1 = observationTxGenerator(
+        true,
+        [
+          'cardano',
+          'address',
+          '10000',
+          '1000',
+          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
+        ],
+        bankSK,
+        watcherSK
+      );
+      const Tx2 = observationTxGenerator(
+        true,
+        ['cardano', 'address', '10000', '1000'],
+        bankSK,
+        watcherSK
+      );
+      const Tx3 = observationTxGenerator(
+        false,
+        [
+          'cardano',
+          'address',
+          '10000',
+          '1000',
+          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
+        ],
+        bankSK,
+        watcherSK
+      );
+      const res = await extractor.processTransactions(
+        [Tx1, Tx2, Tx3],
+        generateBlockEntity(dataSource, '1', '1', 500000)
+      );
+      expect(res).toEqual(true);
+      const repository = dataSource.getRepository(ObservationEntity);
+      const [, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(0);
+    });
   });
 });

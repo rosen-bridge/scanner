@@ -11,6 +11,7 @@ import {
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -53,6 +54,18 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
       try {
         const observations: Array<ExtractedObservation> = [];
         txs.forEach((transaction) => {
+          for (let i = 0; i < transaction.outputs.length; i++) {
+            const box = transaction.outputs[i];
+            if (
+              block.height - Number(box.creationHeight) >
+              NUMBER_OF_BLOCKS_PER_YEAR
+            ) {
+              this.logger.debug(
+                `Skip tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
+              );
+              return;
+            }
+          }
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
