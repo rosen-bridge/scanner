@@ -61,7 +61,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               NUMBER_OF_BLOCKS_PER_YEAR
             ) {
               this.logger.debug(
-                `Skip tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
+                `Skipping tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
               );
               return;
             }
