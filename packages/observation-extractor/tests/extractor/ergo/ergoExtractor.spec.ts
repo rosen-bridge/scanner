@@ -128,12 +128,20 @@ describe('extractorErgo', () => {
     });
 
     /**
-     * 1 Valid Transaction but invalid creationHeight should not save
-     * Dependency: action.storeObservations
-     * Scenario: one valid observation with invalid creationHeight should not save in the database
-     * Expected: processTransactions should returns true and database row count should be 0
+     * @target ExtractorErgo.processTransactions should ignore tx containing
+     * output box with invalid creation height
+     * @dependencies
+     * @scenario
+     * - mock test txs
+     * - mock block with high height
+     * - run test
+     * - check returned value
+     * - check stored observations
+     * @expected
+     * - it should return true
+     * - no observation should be stored
      */
-    it('checks observation with invalid creationHeight should not save', async () => {
+    it('should ignore tx containing output box with invalid creation height', async () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
       const Tx1 = observationTxGenerator(
         true,
