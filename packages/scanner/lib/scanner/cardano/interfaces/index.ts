@@ -8,12 +8,13 @@ interface CardanoKoiosConfig {
 }
 
 interface CardanoOgmiosConfig {
-  nodeIp: string;
+  nodeHostOrIp: string;
   nodePort: number;
   initialSlot: number;
   initialHash: string;
   maxTryBlock?: number;
   dataSource: DataSource;
+  useTls?: boolean;
 }
 
 export { CardanoKoiosConfig, CardanoOgmiosConfig };

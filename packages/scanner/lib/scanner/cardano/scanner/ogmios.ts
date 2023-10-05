@@ -36,13 +36,15 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
   initPoint: Point;
   host: string;
   port: number;
+  useTls: boolean;
   name = () => 'cardano-ogmios';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
     super(logger, config.maxTryBlock);
     this.action = new BlockDbAction(config.dataSource, this.name());
-    this.host = config.nodeIp;
+    this.host = config.nodeHostOrIp;
     this.port = config.nodePort;
+    this.useTls = config.useTls ?? false;
 
     this.initPoint = {
       hash: config.initialHash,
@@ -150,7 +152,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     const context: InteractionContext = await createInteractionContext(
       (err) => this.logger.error(`${err}`),
       () => this.logger.debug('Connection closed.'),
-      { connection: { port: 1337, host: this.host } }
+      { connection: { port: this.port, host: this.host, tls: this.useTls } }
     );
     const intersect = await this.findIntersection(context);
     if (intersect) {
