@@ -1,5 +1,5 @@
 import { DataSource, In, Repository } from 'typeorm';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockEntity } from '@rosen-bridge/scanner';
 
 import { FraudEntity } from '../entities/fraudEntity';
@@ -9,7 +9,7 @@ import { chunk } from 'lodash-es';
 
 export class FraudAction {
   private readonly datasource: DataSource;
-  readonly logger: AbstractLogger;
+  private readonly logger: AbstractLogger;
   private readonly repository: Repository<FraudEntity>;
 
   constructor(dataSource: DataSource, logger: AbstractLogger) {
@@ -68,7 +68,6 @@ export class FraudAction {
       }
       await queryRunner.commitTransaction();
     } catch (e) {
-      console.log(e);
       this.logger.error(`An error occurred during storing fraud boxes: ${e}`);
       await queryRunner.rollbackTransaction();
       success = false;

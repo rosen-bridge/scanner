@@ -3,23 +3,19 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
 import { AbstractExtractor } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
-import { BlockEntity } from '@rosen-bridge/scanner';
-import { Transaction } from '@rosen-bridge/scanner';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import {
-  ItemsOutputInfo,
-  OutputInfo,
-} from '@rosen-clients/ergo-explorer/dist/src/v1/types';
+import { V1 } from '@rosen-clients/ergo-explorer';
+import JsonBI from '@rosen-bridge/json-bigint';
 
 import { FraudAction } from '../actions/fraudAction';
-import { JsonBI } from '../utils';
 import { DefaultApiLimit } from '../constants';
 import { ExtractedFraud } from '../interfaces/types';
 
 export class FraudExtractor implements AbstractExtractor<Transaction> {
-  readonly logger: AbstractLogger;
-  readonly actions: FraudAction;
+  private readonly logger: AbstractLogger;
+  private readonly actions: FraudAction;
   private readonly id: string;
   private readonly ergoTree: string;
   private readonly rwt: string;
@@ -244,7 +240,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     let allBoxes: Array<ExtractedFraud> = [];
     let offset = 0,
       total = DefaultApiLimit,
-      boxes: ItemsOutputInfo;
+      boxes: V1.ItemsOutputInfo;
     while (offset < total) {
       boxes = await this.api.v1.getApiV1BoxesUnspentByergotreeP1(
         this.ergoTree,
@@ -298,7 +294,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    * Extract needed information for storing in database from api json outputs
    * @param boxes
    */
-  extractBoxData = async (boxes: Array<OutputInfo>) => {
+  extractBoxData = async (boxes: Array<V1.OutputInfo>) => {
     const extractedFrauds: Array<ExtractedFraud> = [];
     for (const box of boxes) {
       try {

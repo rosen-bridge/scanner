@@ -203,11 +203,11 @@ describe('FraudAction', () => {
       await action.spendFrauds(['boxId'], nextBlock, 'extractor1', 'txId');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
-      expect(boxEntity1.spendBlock).not.toBeNull();
+      expect(boxEntity1.spendBlock).toEqual('block2');
       await action.deleteBlock(nextBlock.hash, 'extractor2');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
-      expect(boxEntity2.spendBlock).not.toBeNull();
+      expect(boxEntity2.spendBlock).toEqual('block2');
     });
   });
 

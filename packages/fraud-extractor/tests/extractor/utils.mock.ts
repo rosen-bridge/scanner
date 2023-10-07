@@ -6,8 +6,8 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { JsonBI } from '../../lib/utils';
-import { last10BlockHeader } from './fraduExtractorTestData';
+import JsonBI from '@rosen-bridge/json-bigint';
+import { last10BlockHeader } from './fraudExtractorTestData';
 
 /**
  * Create and initialize database with required entities

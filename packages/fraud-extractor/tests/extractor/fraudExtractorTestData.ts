@@ -357,3 +357,44 @@ export const fraudBox = {
   },
   mainChain: true,
 };
+
+export const extractedFraud = {
+  boxId: '19a1aa6e4946425f8925837ef0b1a28b528a46303751c1599bec890bf7f25fa2',
+  wid: 'fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
+  serialized:
+    'wIQ9EAkEAgQABAAEAAQADiAy7l2UfP6NtUgBV/+lZrm32fr0H6FFydAGKMfBWZh49gQEBAAOIOTcpcezXq0U5laZUFvdZa9cALIkkyfg7Zug4rUJEBqC0ZaDAwHvrrW0pXMAsaXZAQFjkbHbYwhyAXMB2QEBY67bYwhyAdkBA00Ok4xyAwGMsttjCKdzAgABk4yy22MIsqRzAwBzBAABcwWTjLLbYwiypHMGAHMHAAFzCJHxQQE4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmpBOARoBIP6Dy4ooQ/pvV1HWXk+Vf8Yixnq5IR8wtEmRofsDFFwBl2LoSEGbF7VpnisZdRfvUQypqT047XyffHySCf4ryDkJ',
+  blockId: '5cc1d227ad4e71325d48a27fc026e76f778964804a757a8e399ead3e26872de3',
+  height: 1079443,
+  triggerBoxId: 'triggerId',
+  rwtCount: '10000',
+  txId: '9762e848419b17b5699e2b197517ef510ca9a93d38ed7c9f7c7c9209fe2bc839',
+  spendBlock: undefined,
+  spendHeight: undefined,
+  spendTxId: undefined,
+};
+
+export const fraudApiOutputBoxes = [
+  {
+    assets: [
+      {
+        tokenId:
+          'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
+        amount: 1000n,
+      },
+    ],
+    creationHeight: 100,
+  },
+  {
+    creationHeight: 100,
+  },
+  {
+    assets: [
+      {
+        tokenId:
+          'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
+        amount: 1000n,
+      },
+    ],
+    creationHeight: 120,
+  },
+];

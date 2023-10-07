@@ -1,5 +1,4 @@
 import { DataSource, Repository } from 'typeorm';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 import { FraudExtractor } from '../../lib';
@@ -11,7 +10,11 @@ import {
 } from './utils.mock';
 import { ExtractedFraud } from '../../lib/interfaces/types';
 import { block } from '../actions/fraudActionTestData';
-import { fraudBox } from './fraduExtractorTestData';
+import {
+  fraudBox,
+  extractedFraud,
+  fraudApiOutputBoxes,
+} from './fraudExtractorTestData';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -25,7 +28,7 @@ describe('fraudExtractor', () => {
     extractor = new FraudExtractor(
       dataSource,
       'extractor',
-      'https://explorer.ergoplatform.com/',
+      'explorerUrl',
       '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
       'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
     );
@@ -86,7 +89,7 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        'https://explorer.ergoplatform.com/',
+        'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
       );
@@ -129,7 +132,7 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        'https://explorer.ergoplatform.com/',
+        'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
       );
@@ -152,35 +155,10 @@ describe('fraudExtractor', () => {
      * - should filter one box with proper height and token and extract its data
      */
     it('should filter the boxes with required token and initialHeight', async () => {
-      const boxes = [
-        {
-          assets: [
-            {
-              tokenId:
-                'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
-              amount: 1000n,
-            },
-          ],
-          creationHeight: 100,
-        },
-        {
-          creationHeight: 100,
-        },
-        {
-          assets: [
-            {
-              tokenId:
-                'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
-              amount: 1000n,
-            },
-          ],
-          creationHeight: 120,
-        },
-      ];
       jest.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1BoxesUnspentByergotreeP1: async () => ({
-            items: boxes,
+            items: fraudApiOutputBoxes,
             total: 20,
           }),
         },
@@ -188,13 +166,13 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        'https://explorer.ergoplatform.com/',
+        'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
       );
       const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
       await extractor.getUnspentFrauds(110);
-      expect(spy).toHaveBeenCalledWith([boxes[0]]);
+      expect(spy).toHaveBeenCalledWith([fraudApiOutputBoxes[0]]);
     });
   });
 
@@ -232,7 +210,7 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        'https://explorer.ergoplatform.com/',
+        'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
       );
@@ -267,7 +245,7 @@ describe('fraudExtractor', () => {
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
-        'https://explorer.ergoplatform.com/',
+        'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
       );
@@ -459,22 +437,7 @@ describe('fraudExtractor', () => {
     it('should extract fraud data from api output', async () => {
       jest.spyOn(extractor, 'getTriggerBoxId').mockResolvedValue('triggerId');
       const boxData = await extractor.extractBoxData([fraudBox]);
-      expect(boxData[0]).toEqual({
-        boxId:
-          '19a1aa6e4946425f8925837ef0b1a28b528a46303751c1599bec890bf7f25fa2',
-        wid: 'fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
-        serialized:
-          'wIQ9EAkEAgQABAAEAAQADiAy7l2UfP6NtUgBV/+lZrm32fr0H6FFydAGKMfBWZh49gQEBAAOIOTcpcezXq0U5laZUFvdZa9cALIkkyfg7Zug4rUJEBqC0ZaDAwHvrrW0pXMAsaXZAQFjkbHbYwhyAXMB2QEBY67bYwhyAdkBA00Ok4xyAwGMsttjCKdzAgABk4yy22MIsqRzAwBzBAABcwWTjLLbYwiypHMGAHMHAAFzCJHxQQE4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmpBOARoBIP6Dy4ooQ/pvV1HWXk+Vf8Yixnq5IR8wtEmRofsDFFwBl2LoSEGbF7VpnisZdRfvUQypqT047XyffHySCf4ryDkJ',
-        blockId:
-          '5cc1d227ad4e71325d48a27fc026e76f778964804a757a8e399ead3e26872de3',
-        height: 1079443,
-        triggerBoxId: 'triggerId',
-        rwtCount: '10000',
-        txId: '9762e848419b17b5699e2b197517ef510ca9a93d38ed7c9f7c7c9209fe2bc839',
-        spendBlock: undefined,
-        spendHeight: undefined,
-        spendTxId: undefined,
-      });
+      expect(boxData[0]).toEqual(extractedFraud);
     });
   });
 });
