@@ -15,6 +15,8 @@ export const tokens: RosenTokens = {
     {
       [ErgoObservationExtractor.FROM_CHAIN]: {
         tokenId: ERGO_NATIVE_TOKEN,
+        name: ERGO_NATIVE_TOKEN,
+        decimals: 9,
         metaData: {
           type: 'EIP004',
           residency: 'wrapped',
@@ -24,6 +26,8 @@ export const tokens: RosenTokens = {
         fingerprint: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
         policyId: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
         assetName: '7369676d61',
+        name: 'wrapped erg',
+        decimals: 9,
         metaData: {
           type: 'wrapped',
           residency: 'native',
@@ -36,6 +40,8 @@ export const tokens: RosenTokens = {
           'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
         id: 'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
         idKey: 'tokenId',
+        name: 'wrapped ada',
+        decimals: 6,
         metaData: {
           residency: 'wrapped',
           type: 'EIP-004',
@@ -45,6 +51,8 @@ export const tokens: RosenTokens = {
         fingerprint: CARDANO_NATIVE_TOKEN,
         tokenId: CARDANO_NATIVE_TOKEN,
         id: CARDANO_NATIVE_TOKEN,
+        name: 'ada',
+        decimals: 6,
         metaData: {
           residency: 'native',
           type: 'native',

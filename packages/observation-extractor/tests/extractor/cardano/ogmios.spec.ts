@@ -65,7 +65,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
           '5670b92f077a6abb051e69f125a7337399afca4f062c8ee2edcaaf2796ace470',
         sourceBlockId:
           '340df860ccefa2ee3a65ac85a44116e9c4b49ec0a19367e23e56d30fa9d13f99',
-        sourceChainTokenId: 'lovelace',
+        sourceChainTokenId: 'ada',
         sourceTxId:
           '55ec4f12b1a8656e07bc5e4281af3c12bf7b63bf39811eb5762a2f522be2600f',
         targetChainTokenId:
