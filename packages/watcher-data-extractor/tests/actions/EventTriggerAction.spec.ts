@@ -273,7 +273,9 @@ describe('EventTrigger', () => {
         ['id'],
         block,
         'extractorId',
-        'spendTxId'
+        'spendTxId',
+        'fraud',
+        ''
       );
       expect(
         (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
@@ -327,27 +329,40 @@ describe('EventTrigger', () => {
      * - delete the block which is the trigger is spent on
      * - check trigger spend block status
      * @expected
-     * - it should set the spent correct block id when spent on a block
-     * - it should set the spent block to null when the block is removed
+     * - it should set the spent data when spent on a block
+     * - it should set result and paymentTxId when spent on a block
+     * - it should set the spent data to null when the block is removed
+     * - it should set result and paymentTxId to null when the block is removed
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
+      const spentTxId = 'txId';
+      const result = 'fraud';
+      const paymentTxId = '';
       await eventTriggerAction.spendEventTriggers(
         [sampleEventTrigger1.boxId],
         block2,
         'extractor1',
-        'txId'
+        spentTxId,
+        result,
+        paymentTxId
       );
       const repository = dataSource.getRepository(EventTriggerEntity);
       let storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
       });
       expect(storedEntity!.spendBlock).toEqual(block2.hash);
+      expect(storedEntity!.spendTxId).toEqual(spentTxId);
+      expect(storedEntity!.result).toEqual(result);
+      expect(storedEntity!.paymentTxId).toEqual(paymentTxId);
 
       await eventTriggerAction.deleteBlock(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
       });
       expect(storedEntity!.spendBlock).toBeNull();
+      expect(storedEntity!.spendTxId).toBeNull();
+      expect(storedEntity!.result).toBeNull();
+      expect(storedEntity!.paymentTxId).toBeNull();
     });
   });
 });

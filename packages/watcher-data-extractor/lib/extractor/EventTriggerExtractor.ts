@@ -18,6 +18,8 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   private readonly dataSource: DataSource;
   private readonly actions: EventTriggerAction;
   private readonly eventTriggerErgoTree: string;
+  private readonly bridgeFeeErgoTree: string;
+  private readonly fraudErgoTree: string;
   private readonly RWT: string;
 
   constructor(
@@ -25,12 +27,20 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     dataSource: DataSource,
     address: string,
     RWT: string,
+    bridgeFeeAddress: string,
+    fraudAddress: string,
     logger?: AbstractLogger
   ) {
     super();
     this.id = id;
     this.dataSource = dataSource;
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
+      .to_ergo_tree()
+      .to_base16_bytes();
+    this.bridgeFeeErgoTree = wasm.Address.from_base58(bridgeFeeAddress)
+      .to_ergo_tree()
+      .to_base16_bytes();
+    this.fraudErgoTree = wasm.Address.from_base58(fraudAddress)
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
@@ -53,8 +63,12 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     return new Promise((resolve, reject) => {
       try {
         const boxes: Array<ExtractedEventTrigger> = [];
-        const txSpendIds: Array<{ txId: string; spendBoxes: Array<string> }> =
-          [];
+        const txSpendIds: Array<{
+          txId: string;
+          spendBoxes: Array<string>;
+          result: string;
+          paymentTxId: string;
+        }> = [];
         txs.forEach((transaction) => {
           for (const output of transaction.outputs) {
             try {
@@ -132,10 +146,46 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             } catch {
               continue;
             }
+            // extract event result
+            let result: string;
+            let paymentTxId = '';
+            if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
+              result = 'fraud';
+            else {
+              result = 'successful';
+              const bridgeFeeBox = transaction.outputs.find(
+                (box) => box.ergoTree === this.bridgeFeeErgoTree
+              );
+              if (bridgeFeeBox) {
+                const outputParsed = wasm.ErgoBox.from_json(
+                  JsonBI.stringify(bridgeFeeBox)
+                );
+                const R4Serialized = outputParsed
+                  .register_value(wasm.NonMandatoryRegisterId.R4)
+                  ?.to_coll_coll_byte();
+                if (R4Serialized) {
+                  const txId = Buffer.from(R4Serialized[0]).toString('hex');
+                  if (txId !== '') paymentTxId = txId;
+                  else
+                    this.logger.debug(
+                      `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
+                    );
+                } else
+                  this.logger.debug(
+                    `successful event is spent in tx [${transaction.id}] but failed to extract paymentTxId from R4`
+                  );
+              } else {
+                this.logger.debug(
+                  `found no box with bridge fee ergo tree [${this.bridgeFeeErgoTree}] in tx [${transaction.id}] which spending successful event`
+                );
+              }
+            }
             // process inputs
             txSpendIds.push({
               txId: transaction.id,
               spendBoxes: transaction.inputs.map((box) => box.boxId),
+              result: result,
+              paymentTxId: paymentTxId,
             });
           }
         });
@@ -148,7 +198,9 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                   txSpends.spendBoxes,
                   block,
                   this.id,
-                  txSpends.txId
+                  txSpends.txId,
+                  txSpends.result,
+                  txSpends.paymentTxId
                 )
                 .then(() => {
                   resolve(true);

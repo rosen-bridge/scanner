@@ -23,6 +23,9 @@ const sampleEventData = [
   'b1',
   '12',
 ];
+const bridgeFeeAddress = '9esHWS1CVuXvmsSUXsgGk7aScvxU4eognun9qT5kUEmkP9thaza';
+const fraudAddress =
+  'LFz5FPkW7nPVq2NA5YcZncXBMTAy5KmfaAtw3Xbdkq8Uv8vntZ5gbA8NrCrZvGTXm3A8QG2qeaLQh97w6mFnunMYVN19iXAzC8mhraST6bM2oTqqPP6srsXTwTfNpe4t9p7WXPtrxxe2nbBkjgmbbRyZDwnbhv9KKcD9RgiMjZQ4LEY2eaYv19JKhmbEgXr7QRAniXwvscuFhypNvP3FZtMvUMV7wupeBUEDQV23RciS918eVvBp5';
 
 describe('EventTriggerExtractor', () => {
   beforeEach(async () => {
@@ -41,7 +44,9 @@ describe('EventTriggerExtractor', () => {
         'extractorId',
         dataSource,
         eventTriggerAddress,
-        RWTId
+        RWTId,
+        bridgeFeeAddress,
+        fraudAddress
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -60,7 +65,9 @@ describe('EventTriggerExtractor', () => {
         'extractorId',
         dataSource,
         eventTriggerAddress,
-        RWTId
+        RWTId,
+        bridgeFeeAddress,
+        fraudAddress
       );
       const tx1 = eventTriggerTxGenerator(true, ['ff'], sampleEventData);
       const res = await extractor.processTransactions([tx1], block);
@@ -96,6 +103,8 @@ describe('EventTriggerExtractor', () => {
         spendBlock: null,
         spendHeight: null,
         spendTxId: null,
+        result: null,
+        paymentTxId: null,
       });
       expect(rowsCount).toBe(1);
     });
@@ -114,7 +123,9 @@ describe('EventTriggerExtractor', () => {
         'extractorId',
         dataSource,
         eventTriggerAddress,
-        RWTId
+        RWTId,
+        bridgeFeeAddress,
+        fraudAddress
       );
       const tx1 = eventTriggerTxGenerator(true, ['wid1'], sampleEventData);
       const tx2 = eventTriggerTxGenerator(true, [], sampleEventData);
@@ -145,7 +156,9 @@ describe('EventTriggerExtractor', () => {
         'extractorId',
         dataSource,
         eventTriggerAddress,
-        RWTId
+        RWTId,
+        bridgeFeeAddress,
+        fraudAddress
       );
       const repository = dataSource.getRepository(EventTriggerEntity);
       await repository.insert([

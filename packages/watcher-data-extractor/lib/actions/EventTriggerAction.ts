@@ -98,22 +98,33 @@ class EventTriggerAction {
   /**
    * Update spendBlock and spendHeight of eventTriggers spent on the block
    * also update the spendTxId with the specified txId
+   * and set result and paymentTxId of the event
    * @param spendId
    * @param block
    * @param extractor
    * @param txId
+   * @param result
+   * @param paymentTxId
    */
   spendEventTriggers = async (
     spendId: Array<string>,
     block: BlockEntity,
     extractor: string,
-    txId: string
+    txId: string,
+    result: string,
+    paymentTxId: string
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.triggerEventRepository.update(
         { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height, spendTxId: txId }
+        {
+          spendBlock: block.hash,
+          spendHeight: block.height,
+          spendTxId: txId,
+          result: result,
+          paymentTxId: paymentTxId,
+        }
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
@@ -147,7 +158,13 @@ class EventTriggerAction {
     });
     await this.triggerEventRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0 }
+      {
+        spendBlock: null,
+        spendTxId: null,
+        spendHeight: 0,
+        result: null,
+        paymentTxId: null,
+      }
     );
   };
 }
