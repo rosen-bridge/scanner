@@ -18,7 +18,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   private readonly dataSource: DataSource;
   private readonly actions: EventTriggerAction;
   private readonly eventTriggerErgoTree: string;
-  private readonly bridgeFeeErgoTree: string;
+  private readonly permitErgoTree: string;
   private readonly fraudErgoTree: string;
   private readonly RWT: string;
 
@@ -27,7 +27,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     dataSource: DataSource,
     address: string,
     RWT: string,
-    bridgeFeeAddress: string,
+    permitAddress: string,
     fraudAddress: string,
     logger?: AbstractLogger
   ) {
@@ -37,7 +37,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
       .to_base16_bytes();
-    this.bridgeFeeErgoTree = wasm.Address.from_base58(bridgeFeeAddress)
+    this.permitErgoTree = wasm.Address.from_base58(permitAddress)
       .to_ergo_tree()
       .to_base16_bytes();
     this.fraudErgoTree = wasm.Address.from_base58(fraudAddress)
@@ -70,6 +70,38 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
           paymentTxId: string;
         }> = [];
         txs.forEach((transaction) => {
+          // extract event result
+          let result = 'unknown';
+          let paymentTxId = '';
+          if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
+            result = 'fraud';
+          else if (transaction.outputs[0].ergoTree === this.permitErgoTree) {
+            result = 'successful';
+            // find first non-watcher box with R4 value
+            for (const box of transaction.outputs) {
+              // if it's watcher box, skip it
+              if (box.ergoTree === this.permitErgoTree) continue;
+              const outputParsed = wasm.ErgoBox.from_json(
+                JsonBI.stringify(box)
+              );
+              const R4Serialized = outputParsed
+                .register_value(wasm.NonMandatoryRegisterId.R4)
+                ?.to_coll_coll_byte();
+              if (R4Serialized !== undefined && R4Serialized.length > 0) {
+                const txId = Buffer.from(R4Serialized[0]).toString('hex');
+                paymentTxId = txId;
+                if (txId !== '') paymentTxId = txId;
+                else {
+                  paymentTxId = transaction.id;
+                  this.logger.debug(
+                    `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
+                  );
+                }
+                // paymentTxId is extracted. no need to process next boxes
+                break;
+              }
+            }
+          }
           for (const output of transaction.outputs) {
             try {
               if (
@@ -146,48 +178,14 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             } catch {
               continue;
             }
-            // extract event result
-            let result: string;
-            let paymentTxId = '';
-            if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
-              result = 'fraud';
-            else {
-              result = 'successful';
-              const bridgeFeeBox = transaction.outputs.find(
-                (box) => box.ergoTree === this.bridgeFeeErgoTree
-              );
-              if (bridgeFeeBox) {
-                const outputParsed = wasm.ErgoBox.from_json(
-                  JsonBI.stringify(bridgeFeeBox)
-                );
-                const R4Serialized = outputParsed
-                  .register_value(wasm.NonMandatoryRegisterId.R4)
-                  ?.to_coll_coll_byte();
-                if (R4Serialized) {
-                  const txId = Buffer.from(R4Serialized[0]).toString('hex');
-                  if (txId !== '') paymentTxId = txId;
-                  else
-                    this.logger.debug(
-                      `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
-                    );
-                } else
-                  this.logger.debug(
-                    `successful event is spent in tx [${transaction.id}] but failed to extract paymentTxId from R4`
-                  );
-              } else {
-                this.logger.debug(
-                  `found no box with bridge fee ergo tree [${this.bridgeFeeErgoTree}] in tx [${transaction.id}] which spending successful event`
-                );
-              }
-            }
-            // process inputs
-            txSpendIds.push({
-              txId: transaction.id,
-              spendBoxes: transaction.inputs.map((box) => box.boxId),
-              result: result,
-              paymentTxId: paymentTxId,
-            });
           }
+          // process inputs
+          txSpendIds.push({
+            txId: transaction.id,
+            spendBoxes: transaction.inputs.map((box) => box.boxId),
+            result: result,
+            paymentTxId: paymentTxId,
+          });
         });
         this.actions
           .storeEventTriggers(boxes, block, this.getId())
