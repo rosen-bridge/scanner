@@ -84,21 +84,25 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
               const outputParsed = wasm.ErgoBox.from_json(
                 JsonBI.stringify(box)
               );
-              const R4Serialized = outputParsed
-                .register_value(wasm.NonMandatoryRegisterId.R4)
-                ?.to_coll_coll_byte();
-              if (R4Serialized !== undefined && R4Serialized.length > 0) {
-                const txId = Buffer.from(R4Serialized[0]).toString('hex');
-                paymentTxId = txId;
-                if (txId !== '') paymentTxId = txId;
-                else {
-                  paymentTxId = transaction.id;
-                  this.logger.debug(
-                    `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
-                  );
+              try {
+                const R4Serialized = outputParsed
+                  .register_value(wasm.NonMandatoryRegisterId.R4)
+                  ?.to_coll_coll_byte();
+                if (R4Serialized !== undefined && R4Serialized.length > 0) {
+                  const txId = Buffer.from(R4Serialized[0]).toString('hex');
+                  paymentTxId = txId;
+                  if (txId !== '') paymentTxId = txId;
+                  else {
+                    paymentTxId = transaction.id;
+                    this.logger.debug(
+                      `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
+                    );
+                  }
+                  // paymentTxId is extracted. no need to process next boxes
+                  break;
                 }
-                // paymentTxId is extracted. no need to process next boxes
-                break;
+              } catch (e) {
+                continue;
               }
             }
           }

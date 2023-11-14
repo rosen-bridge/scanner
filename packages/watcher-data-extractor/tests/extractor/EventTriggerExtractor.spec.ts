@@ -4,7 +4,12 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
 import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
-import { block, eventTriggerAddress, RWTId } from './utilsVariable.mock';
+import {
+  block,
+  eventTriggerAddress,
+  RWTId,
+  spendTriggerTx,
+} from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
 
@@ -23,7 +28,8 @@ const sampleEventData = [
   'b1',
   '12',
 ];
-const bridgeFeeAddress = '9esHWS1CVuXvmsSUXsgGk7aScvxU4eognun9qT5kUEmkP9thaza';
+const permitAddress =
+  'EE7687i4URb4YuSGSQXPCb7yjKwPzLkrEB4u6kZdScqCkeY81qy66Mz69ohJQhx9whKit1dh7VuPpzSeuadba8PcuitfKL6xnBhHYHXc7Uf6i6tq8NkqfZi1HToyAbVPz4LgnGE9sDbJqgvtord736pvsVmdfmRmTvaEQ8VTDx7RoK71VhEXuwqZF2UjWdY3G3DpmdWPGKprtLg4kjB4ikRpYG9eG9rF33ucgQ1hHmu1UeAUXqhv9e2U7VfF2X6D9js7zc4FXJb1ct4H56eEgwLbKRDAegkHUmeH1TJSknxRqTP1W97E9b9tSRj8P3CEi58J7GzmoWVJUg1ZXmQGAHfFUvDVC6Kif9tNE9rwuvp43QzoFVHcNdNCXxpUhBs7FkKHaW8mBVxzMoXQnpekVVuFePqgNL5CDQ8CjbmwHCSkvbRyXifVr8bCqmxytfEiyGMVzAZjEu3TcoERSJYRt2QwsaJ4wCneFUbm7kvNJ9rDgJS9wzHGLKtbgVbh1STbRwp5Zo6TtvrnQkUkf2sMcnpeZn6LfQSQwdJXdXr';
 const fraudAddress =
   'LFz5FPkW7nPVq2NA5YcZncXBMTAy5KmfaAtw3Xbdkq8Uv8vntZ5gbA8NrCrZvGTXm3A8QG2qeaLQh97w6mFnunMYVN19iXAzC8mhraST6bM2oTqqPP6srsXTwTfNpe4t9p7WXPtrxxe2nbBkjgmbbRyZDwnbhv9KKcD9RgiMjZQ4LEY2eaYv19JKhmbEgXr7QRAniXwvscuFhypNvP3FZtMvUMV7wupeBUEDQV23RciS918eVvBp5';
 
@@ -45,7 +51,7 @@ describe('EventTriggerExtractor', () => {
         dataSource,
         eventTriggerAddress,
         RWTId,
-        bridgeFeeAddress,
+        permitAddress,
         fraudAddress
       );
       const data = extractor.getId();
@@ -66,7 +72,7 @@ describe('EventTriggerExtractor', () => {
         dataSource,
         eventTriggerAddress,
         RWTId,
-        bridgeFeeAddress,
+        permitAddress,
         fraudAddress
       );
       const tx1 = eventTriggerTxGenerator(true, ['ff'], sampleEventData);
@@ -124,7 +130,7 @@ describe('EventTriggerExtractor', () => {
         dataSource,
         eventTriggerAddress,
         RWTId,
-        bridgeFeeAddress,
+        permitAddress,
         fraudAddress
       );
       const tx1 = eventTriggerTxGenerator(true, ['wid1'], sampleEventData);
@@ -140,6 +146,47 @@ describe('EventTriggerExtractor', () => {
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
+    });
+
+    /**
+     * @target EventTriggerExtractor.processTransactions should extract result and
+     * paymentTxId of the event succesfully and save them into db
+     * @dependencies
+     * - EventTriggerAction
+     * @scenario
+     * - mock `spendEventTriggers` function of action
+     * - run test
+     * - check if function got called with correct argument
+     * @expected
+     * - `spendEventTriggers` should have been called with 'succesful' result
+     *   and expected paymentTxId
+     */
+    it('should extract result and paymentTxId of the event succesfully and save them into db', async () => {
+      // mock `spendEventTriggers` function of action
+      const extractor = new EventTriggerExtractor(
+        'extractorId',
+        dataSource,
+        eventTriggerAddress,
+        RWTId,
+        permitAddress,
+        fraudAddress
+      );
+      const spendTriggerSpy = jest.spyOn(
+        (extractor as any).actions,
+        'spendEventTriggers'
+      );
+      spendTriggerSpy.mockResolvedValue(undefined);
+      const tx1 = spendTriggerTx;
+      const res = await extractor.processTransactions([tx1], block);
+      expect(res).toEqual(true);
+      expect(spendTriggerSpy).toHaveBeenCalledWith(
+        expect.any(Array),
+        block,
+        extractor.id,
+        tx1.id,
+        'successful',
+        '8379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57'
+      );
     });
   });
 
@@ -157,7 +204,7 @@ describe('EventTriggerExtractor', () => {
         dataSource,
         eventTriggerAddress,
         RWTId,
-        bridgeFeeAddress,
+        permitAddress,
         fraudAddress
       );
       const repository = dataSource.getRepository(EventTriggerEntity);
