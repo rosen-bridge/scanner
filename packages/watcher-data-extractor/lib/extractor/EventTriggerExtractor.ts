@@ -11,6 +11,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
+import { EventResult } from '../types';
 
 class EventTriggerExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -71,41 +72,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
         }> = [];
         txs.forEach((transaction) => {
           // extract event result
-          let result = 'unknown';
-          let paymentTxId = '';
-          if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
-            result = 'fraud';
-          else if (transaction.outputs[0].ergoTree === this.permitErgoTree) {
-            result = 'successful';
-            // find first non-watcher box with R4 value
-            for (const box of transaction.outputs) {
-              // if it's watcher box, skip it
-              if (box.ergoTree === this.permitErgoTree) continue;
-              const outputParsed = wasm.ErgoBox.from_json(
-                JsonBI.stringify(box)
-              );
-              try {
-                const R4Serialized = outputParsed
-                  .register_value(wasm.NonMandatoryRegisterId.R4)
-                  ?.to_coll_coll_byte();
-                if (R4Serialized !== undefined && R4Serialized.length > 0) {
-                  const txId = Buffer.from(R4Serialized[0]).toString('hex');
-                  paymentTxId = txId;
-                  if (txId !== '') paymentTxId = txId;
-                  else {
-                    paymentTxId = transaction.id;
-                    this.logger.debug(
-                      `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
-                    );
-                  }
-                  // paymentTxId is extracted. no need to process next boxes
-                  break;
-                }
-              } catch (e) {
-                continue;
-              }
-            }
-          }
+          const { result, paymentTxId } = this.extractEventResult(transaction);
           for (const output of transaction.outputs) {
             try {
               if (
@@ -234,6 +201,52 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
    */
   initializeBoxes = async () => {
     return;
+  };
+
+  /**
+   * extracts result and paymentTxId from a transaction
+   * returns 'unknown' as result when tx is neither fraud or successful
+   * @param transaction
+   * @returns
+   */
+  protected extractEventResult = (transaction: Transaction) => {
+    let result = EventResult.unknown;
+    let paymentTxId = '';
+    if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
+      result = EventResult.fraud;
+    else if (transaction.outputs[0].ergoTree === this.permitErgoTree) {
+      result = EventResult.successful;
+      // find first non-watcher box with R4 value
+      for (const box of transaction.outputs) {
+        // if it's watcher box, skip it
+        if (box.ergoTree === this.permitErgoTree) continue;
+        const outputParsed = wasm.ErgoBox.from_json(JsonBI.stringify(box));
+        try {
+          const R4Serialized = outputParsed
+            .register_value(wasm.NonMandatoryRegisterId.R4)
+            ?.to_coll_coll_byte();
+          if (R4Serialized !== undefined && R4Serialized.length > 0) {
+            const txId = Buffer.from(R4Serialized[0]).toString('hex');
+            paymentTxId = txId;
+            if (txId !== '') paymentTxId = txId;
+            else {
+              paymentTxId = transaction.id;
+              this.logger.debug(
+                `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
+              );
+            }
+            // paymentTxId is extracted. no need to process next boxes
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+    return {
+      result,
+      paymentTxId,
+    };
   };
 }
 

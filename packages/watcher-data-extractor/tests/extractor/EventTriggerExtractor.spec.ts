@@ -12,6 +12,7 @@ import {
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
+import { EventResult } from '../../lib';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -184,7 +185,7 @@ describe('EventTriggerExtractor', () => {
         block,
         extractor.id,
         tx1.id,
-        'successful',
+        EventResult.successful,
         '8379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57'
       );
     });

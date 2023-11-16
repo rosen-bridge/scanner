@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { EventTriggerEntity } from '../../lib';
+import { EventResult, EventTriggerEntity } from '../../lib';
 import EventTriggerAction from '../../lib/actions/EventTriggerAction';
 import { block, block2 } from '../extractor/utilsVariable.mock';
 import {
@@ -274,7 +274,7 @@ describe('EventTrigger', () => {
         block,
         'extractorId',
         'spendTxId',
-        'fraud',
+        EventResult.fraud,
         ''
       );
       expect(
@@ -336,7 +336,7 @@ describe('EventTrigger', () => {
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
       const spentTxId = 'txId';
-      const result = 'fraud';
+      const result = EventResult.fraud;
       const paymentTxId = '';
       await eventTriggerAction.spendEventTriggers(
         [sampleEventTrigger1.boxId],
