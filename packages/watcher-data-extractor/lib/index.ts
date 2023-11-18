@@ -15,3 +15,4 @@ export {
   EventTriggerEntity,
   PermitEntity,
 };
+export * from './types';

@@ -72,8 +72,14 @@ class EventTriggerEntity {
   @Column({ nullable: true })
   spendHeight?: number;
 
-  @Column({ nullable: true })
-  spendTxId?: string;
+  @Column({ nullable: true, type: 'text' })
+  spendTxId?: string | null;
+
+  @Column({ nullable: true, type: 'text' })
+  result?: string | null;
+
+  @Column({ nullable: true, type: 'text' })
+  paymentTxId?: string | null;
 }
 
 export default EventTriggerEntity;
