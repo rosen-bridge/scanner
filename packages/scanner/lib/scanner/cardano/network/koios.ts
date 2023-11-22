@@ -11,7 +11,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly timeout: number;
   private koios: AxiosInstance;
 
-  constructor(url: string, timeout: number) {
+  constructor(url: string, timeout: number, authToken?: string) {
     super();
     this.url = url;
     this.timeout = timeout;
@@ -20,6 +20,11 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       timeout: this.timeout,
       headers: { 'Content-Type': 'application/json' },
     });
+    if (authToken) {
+      this.koios.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${authToken}`;
+    }
   }
 
   getBlockAtHeight = (height: number): Promise<Block> => {
@@ -81,14 +86,14 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
 
   getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
     return this.koios
-      .post<Array<{ tx_hashes: Array<string> }>>('/block_txs', {
+      .post<Array<{ tx_hash: string }>>('/block_txs', {
         _block_hashes: [blockHash],
       })
       .then((res) => {
         if (res.data.length === 0) {
           return [];
         } else {
-          return this.getTxInformations(res.data[0].tx_hashes);
+          return this.getTxInformations(res.data.map((tx) => tx.tx_hash));
         }
       })
       .catch((exp) => {
