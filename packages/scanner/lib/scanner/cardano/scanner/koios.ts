@@ -9,7 +9,11 @@ import { AbstractLogger } from '@rosen-bridge/logger-interface';
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   readonly initialHeight: number;
   network: KoiosNetwork;
-  constructor(config: CardanoKoiosConfig, logger?: AbstractLogger) {
+  constructor(
+    config: CardanoKoiosConfig,
+    logger?: AbstractLogger,
+    authToken?: string
+  ) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name());
     /**
@@ -18,7 +22,7 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
      * works.
      */
     this.initialHeight = config.initialHeight + 1;
-    this.network = new KoiosNetwork(config.koiosUrl, config.timeout);
+    this.network = new KoiosNetwork(config.koiosUrl, config.timeout, authToken);
   }
 
   getFirstBlock = (): Promise<Block> => {
