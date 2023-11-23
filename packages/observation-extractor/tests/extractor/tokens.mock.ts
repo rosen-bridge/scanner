@@ -9,7 +9,7 @@ import {
 export const tokens: RosenTokens = {
   idKeys: {
     ergo: 'tokenId',
-    cardano: 'fingerprint',
+    cardano: 'tokenId',
   },
   tokens: [
     {
@@ -23,7 +23,8 @@ export const tokens: RosenTokens = {
         },
       },
       [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
-        fingerprint: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
+        tokenId:
+          'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
         policyId: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
         assetName: '7369676d61',
         name: 'wrapped erg',
@@ -48,9 +49,9 @@ export const tokens: RosenTokens = {
         },
       },
       [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
-        fingerprint: CARDANO_NATIVE_TOKEN,
         tokenId: CARDANO_NATIVE_TOKEN,
-        id: CARDANO_NATIVE_TOKEN,
+        policyId: '',
+        assetName: '41441',
         name: 'ada',
         decimals: 6,
         metaData: {
