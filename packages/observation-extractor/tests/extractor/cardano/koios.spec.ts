@@ -61,7 +61,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         networkFee: '10000',
         bridgeFee: '10000',
         sourceChainTokenId:
-          'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
+          'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
         targetChainTokenId: ERGO_NATIVE_TOKEN,
         sourceBlockId: '1',
         sourceTxId: txHash,
