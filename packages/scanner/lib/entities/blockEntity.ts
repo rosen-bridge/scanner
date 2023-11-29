@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 const PROCESSING = 'PROCESSING';
 const PROCEED = 'PROCEED';
 
-@Entity()
+@Entity('block_entity')
 @Unique(['height', 'scanner'])
 @Unique(['hash', 'scanner'])
 @Unique(['parentHash', 'scanner'])

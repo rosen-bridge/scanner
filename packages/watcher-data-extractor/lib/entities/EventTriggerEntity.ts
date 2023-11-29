@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('event_trigger_entity')
 @Unique(['boxId', 'extractor'])
 class EventTriggerEntity {
   @PrimaryGeneratedColumn()

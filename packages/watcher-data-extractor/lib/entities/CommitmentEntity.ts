@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('commitment_entity')
 @Unique(['boxId', 'extractor'])
 class CommitmentEntity {
   @PrimaryGeneratedColumn()
