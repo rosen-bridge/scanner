@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('permit_entity')
 @Unique(['boxId', 'extractor'])
 class PermitEntity {
   @PrimaryGeneratedColumn()

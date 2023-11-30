@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('observation_entity')
 @Unique(['requestId', 'extractor'])
 export class ObservationEntity {
   @PrimaryGeneratedColumn()
