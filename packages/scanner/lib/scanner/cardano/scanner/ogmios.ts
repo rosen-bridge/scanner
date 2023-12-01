@@ -1,21 +1,21 @@
 import { WebSocketScanner } from '../../abstract/webSocketScanner';
 import {
-  Babbage,
   Block,
+  BlockPraos,
   Point,
   PointOrOrigin,
   TipOrOrigin,
-  TxBabbage,
+  Transaction,
 } from '@cardano-ogmios/schema';
 import {
   createInteractionContext,
-  createChainSyncClient,
+  createChainSynchronizationClient,
   InteractionContext,
 } from '@cardano-ogmios/client';
 import {
-  ChainSyncClient,
-  findIntersect,
-} from '@cardano-ogmios/client/dist/ChainSync';
+  ChainSynchronizationClient,
+  findIntersection,
+} from '@cardano-ogmios/client/dist/ChainSynchronization';
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
@@ -31,8 +31,8 @@ interface ForwardResponse {
   tip: TipOrOrigin;
 }
 
-class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
-  client: ChainSyncClient;
+class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
+  client: ChainSynchronizationClient;
   initPoint: Point;
   host: string;
   port: number;
@@ -47,7 +47,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     this.useTls = config.useTls ?? false;
 
     this.initPoint = {
-      hash: config.initialHash,
+      id: config.initialHash,
       slot: config.initialSlot,
     };
   }
@@ -61,7 +61,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     response: BackwardResponse,
     requestNext: () => void
   ) => {
-    const hash = (response.point as Point).hash;
+    const hash = (response.point as Point).id;
     const savedBlock = await this.action.getBlockWithHash(hash);
     this.logger.debug(
       `Rolling backward to height ${
@@ -87,22 +87,23 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
    * @param requestNext: tell library that this block proceeds. pass next block when available
    */
   rollForward = async (response: ForwardResponse, requestNext: () => void) => {
-    if (Object.prototype.hasOwnProperty.call(response.block, 'babbage')) {
-      const babbageBlock = (response.block as Babbage).babbage;
+    if (response.block.type === 'praos') {
+      const praosBlock = response.block as BlockPraos;
       this.logger.debug(
         `Queueing new block at height ${
-          babbageBlock.header.blockHeight
+          praosBlock.height
         } in scanner ${this.name()}`
       );
       const block = {
-        hash: babbageBlock.headerHash,
-        blockHeight: babbageBlock.header.blockHeight,
-        parentHash: babbageBlock.header.prevHash,
-        extra: `${babbageBlock.header.slot}`,
+        hash: praosBlock.id,
+        blockHeight: praosBlock.height,
+        parentHash: praosBlock.ancestor,
+        extra: `${praosBlock.slot}`,
         // Caution: In case of a hard fork and change in slot duration, this must change!
-        timestamp: babbageBlock.header.slot + SLOT_SHELLY_NUMBER,
+        timestamp: praosBlock.slot + SLOT_SHELLY_NUMBER,
       };
-      await this.stepForward(block, babbageBlock.body);
+      if (praosBlock.transactions)
+        await this.stepForward(block, praosBlock.transactions);
     }
     requestNext();
   };
@@ -122,21 +123,21 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
           blocks.length > 0
             ? blocks.map((item) => ({
                 slot: item.extra ? parseInt(item.extra) : 0,
-                hash: item.hash,
+                id: item.hash,
               }))
             : [this.initPoint];
-        const intersect = await findIntersect(context, points);
-        const intersectPoint = intersect.point as Point;
+        const intersect = await findIntersection(context, points);
+        const intersectPoint = intersect.intersection as Point;
         let height = 0;
         if (blocks.length) {
           const foundedBlock = blocks.find(
-            (item) => (item.hash = intersectPoint.hash)
+            (item) => (item.hash = intersectPoint.id)
           );
           if (foundedBlock) {
             height = foundedBlock.height;
           }
         }
-        return { point: intersect.point as Point, height: height };
+        return { point: intersect.intersection as Point, height: height };
       } catch {
         skip += count;
         count *= 2;
@@ -157,7 +158,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
     const intersect = await this.findIntersection(context);
     if (intersect) {
       // find intersect then start from that point
-      this.client = await createChainSyncClient(
+      this.client = await createChainSynchronizationClient(
         context,
         {
           rollBackward: this.rollBackward,
@@ -166,7 +167,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<TxBabbage> {
         { sequential: true }
       );
       await this.forkBlock(intersect.height + 1);
-      await this.client.startSync([intersect.point], 2);
+      await this.client.resume([intersect.point], 2);
     } else {
       throw Error('Can not start scanner. initial block is invalid');
     }
