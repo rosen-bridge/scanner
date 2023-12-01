@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import { TxAction } from '../actions/db';
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
-import { TxBabbage } from '@cardano-ogmios/schema';
+import { Transaction } from '@cardano-ogmios/schema';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 
-export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<TxBabbage> {
+export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
@@ -31,7 +31,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<TxBabbage> {
    * @param block
    */
   processTransactions = async (
-    txs: Array<TxBabbage>,
+    txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
     const txIds = txs.map((item) => item.id);
