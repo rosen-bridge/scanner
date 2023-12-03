@@ -9,7 +9,7 @@ import { ObservationEntity } from '../../../lib';
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;
 const bankAddress =
-  'addr1v8xputtxppjx9f255nqgz0xv9cquqm4ndemd659zdz4nznc7guuzv';
+  'addr1v9kmp9flrq8gzh287q4kku8vmad3vkrw0rwqvjas6vyrf9s9at4dn';
 
 describe('CardanoOgmiosObservationExtractor', () => {
   beforeEach(async () => {
@@ -50,27 +50,27 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const observation = observations[0];
       observation.id = 0;
       expect(observations[0]).toEqual({
-        amount: '1344798',
+        amount: '14271656',
         block:
           '340df860ccefa2ee3a65ac85a44116e9c4b49ec0a19367e23e56d30fa9d13f99',
-        bridgeFee: '3000',
+        bridgeFee: '6800501',
         extractor: 'ergo-cardano-ogmios-extractor',
         fromAddress:
-          '7bb715ce7d410747beb98cb6fb322a5865894018433eb115d67625c5befb6f61',
+          'addr1q8hmp5zjzvv7s7pmgemz3mvrkd2nu7609hwgsqa0auf6h7h3r6x6jn2zrt8',
         fromChain: 'cardano',
         height: 7991037,
         id: 0,
-        networkFee: '300',
+        networkFee: '34003',
         requestId:
-          '5670b92f077a6abb051e69f125a7337399afca4f062c8ee2edcaaf2796ace470',
+          '26bceacc7398183932bb22c7fbd2ca148c5006d329c111930d848beed24028a9',
         sourceBlockId:
           '340df860ccefa2ee3a65ac85a44116e9c4b49ec0a19367e23e56d30fa9d13f99',
         sourceChainTokenId: 'ada',
         sourceTxId:
-          '55ec4f12b1a8656e07bc5e4281af3c12bf7b63bf39811eb5762a2f522be2600f',
+          '07c446bd320e3c2cf7cf11de7dcba5407828602f69c7684cf4d1ec1cfaf66557',
         targetChainTokenId:
           'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
-        toAddress: '9hZxV3YNSfbCqS6GEses7DhAVSatvaoNtdsiNvkimPGG2c8fzkG',
+        toAddress: '9iD5jMoLjK9azTdigyT8z1QY6qHrA6gVrJamMF8MJ2qt45pJpDc',
         toChain: 'ergo',
       });
     });

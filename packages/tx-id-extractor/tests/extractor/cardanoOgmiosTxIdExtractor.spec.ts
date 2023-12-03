@@ -36,9 +36,9 @@ describe('CardanoOgmiosTxIdExtractor', () => {
       });
       const elements = await repository.find();
       const txIds = [
-        'b68e461ca9cb160576848140b93d5dd47cc4f7d5dab91375b0e7b23b926cf328',
-        'eb363721b5208e6738d9493c6016bc36121ae32a8165e1e9edd94568604a2b45',
-        '04164b5e1a8465ccb8269b1b162b79e6a6ea6e27843c763325dbff8378f88ff8',
+        '7d1ae0c3fc6748fdb5c12bd6446d68637d14fe720624a8f1dc57395697e6e4ff',
+        '34fe18ea7d446836ee90b8f381273c955046b747decd50d00d4ce27bfdc96b75',
+        '2da1a30e424ee89f35ac6ab1bad1897bba50ee5fae2f3b53cfe953b4cdfb71bf',
       ];
       expect(elements.length).toEqual(3);
       for (const txId of txIds) {
