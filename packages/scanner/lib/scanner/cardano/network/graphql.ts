@@ -42,7 +42,7 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
           hash: blocks[0].hash,
           blockHeight: blocks[0].number,
           parentHash: blocks[0].previousBlock.hash,
-          timestamp: blocks[0].forgedAt,
+          timestamp: Math.floor(new Date(blocks[0].forgedAt).getTime() / 1000),
         };
       })
       .catch((exp) => {
