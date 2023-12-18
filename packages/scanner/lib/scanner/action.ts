@@ -112,7 +112,7 @@ export class BlockDbAction {
    * @return Promise<DeleteResult>
    */
   removeBlocksFromHeight = async (height: number): Promise<DeleteResult> => {
-    this.logger.info(`Removing blocks from height ${height}`);
+    this.logger.debug(`Removing blocks from height ${height}`);
     return await this.blockRepository.delete({
       height: MoreThanOrEqual(height),
       scanner: this.name(),
@@ -124,7 +124,6 @@ export class BlockDbAction {
    * @param block
    */
   saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
-    this.logger.info(`Saving block ${block.blockHeight}`);
     try {
       const instance = await this.blockRepository.findOneBy({
         height: block.blockHeight,
@@ -143,10 +142,15 @@ export class BlockDbAction {
         month: date.getMonth() + 1,
         day: date.getDate(),
       };
-      this.logger.debug(`Block info: ${JSON.stringify(blockInfo)}`);
       if (!instance) {
+        this.logger.debug(
+          `Inserting block with info: ${JSON.stringify(blockInfo)}`
+        );
         await this.blockRepository.insert(blockInfo);
       } else {
+        this.logger.debug(
+          `Updating block with info: ${JSON.stringify(blockInfo)}`
+        );
         await this.blockRepository.update(
           { height: block.blockHeight, scanner: this.name() },
           blockInfo
@@ -168,7 +172,9 @@ export class BlockDbAction {
    * @param blockHeight: height of expected block
    */
   updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
-    this.logger.info(`Updating block status at height ${blockHeight}`);
+    this.logger.debug(
+      `Block at height ${blockHeight} has been proceed in scanner ${this.scannerName}, updating status`
+    );
     return await this.blockRepository
       .update(
         {
@@ -189,7 +195,7 @@ export class BlockDbAction {
    * @param blockHeight: height of expected block
    */
   revertBlockStatus = async (blockHeight: number): Promise<boolean> => {
-    this.logger.info(`Reverting block status at height ${blockHeight}`);
+    this.logger.debug(`Reverting block status at height ${blockHeight}`);
     return await this.blockRepository
       .update(
         {

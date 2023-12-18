@@ -1,10 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
-import {
-  KoiosBlock,
-  KoiosBlockInfo,
-  KoiosTransaction,
-} from '../interfaces/Koios';
+import { KoiosBlock, KoiosTransaction } from '../interfaces/Koios';
 
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly url: string;
@@ -31,26 +27,22 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
     return this.koios
       .get<Array<KoiosBlock>>('/blocks', {
         params: {
-          block_height: `eq.${height}`,
+          block_height: `lte.${height}`,
+          limit: 2,
           select: 'hash,block_height,block_time',
         },
       })
       .then((res) => {
-        const hash = res.data[0].hash;
-        return this.koios
-          .post<Array<KoiosBlockInfo>>('block_info', { _block_hashes: [hash] })
-          .then((info) => {
-            const row = info.data[0];
-            return {
-              hash: row.hash,
-              blockHeight: row.block_height,
-              parentHash: row.parent_hash,
-              timestamp: res.data[0].block_time,
-            };
-          })
-          .catch((exp) => {
-            throw exp;
-          });
+        const block = res.data[0];
+        const parentBlock = res.data[1];
+        if (block.block_height != height)
+          throw Error(`block with height ${height} is not available`);
+        return {
+          hash: block.hash,
+          blockHeight: block.block_height,
+          parentHash: parentBlock.hash,
+          timestamp: block.block_time,
+        };
       })
       .catch((exp) => {
         throw exp;
