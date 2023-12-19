@@ -41,8 +41,8 @@ export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQ
   getId = () => 'cardano-graphql-extractor';
 
   /**
-   * gets block id and transactions corresponding to the block and saves if they are valid rosen
-   *  transactions and in case of success return true and in case of failure returns false
+   * processes block transactions and saves rosen data for any valid rosen lock transactions
+   * returns false in case of failure
    * @param block
    * @param txs
    */

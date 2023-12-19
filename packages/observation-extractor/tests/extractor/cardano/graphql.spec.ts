@@ -6,22 +6,17 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 import { DataSource } from 'typeorm';
-import { validLockTx } from './graphQLTestData';
-
-class CardanoGraphQLExtractor extends CardanoGraphQLObservationExtractor {}
-
-const bankAddress =
-  'addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re';
+import { validLockTx, bankAddress } from './graphQLTestData';
 
 let dataSource: DataSource;
 
-describe('cardanoGraphQLObservationExtractor', () => {
+describe('CardanoGraphQLObservationExtractor', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
   });
-  describe('processTransactionsCardano', () => {
+  describe('processTransactions', () => {
     /**
-     * @target cardanoGraphQLObservationExtractor.processTransactionsCardano
+     * @target CardanoGraphQLObservationExtractor.processTransactions
      * should return true and insert observation into database on valid lock tx
      * @dependencies
      * - cardanoKoiosClientFactory
@@ -39,7 +34,7 @@ describe('cardanoGraphQLObservationExtractor', () => {
       const tx = validLockTx;
 
       // run test
-      const extractor = new CardanoGraphQLExtractor(
+      const extractor = new CardanoGraphQLObservationExtractor(
         dataSource,
         tokens,
         bankAddress
@@ -76,12 +71,12 @@ describe('cardanoGraphQLObservationExtractor', () => {
         sourceTxId: txHash,
         block: '1',
         requestId: Buffer.from(blake2b(txHash, undefined, 32)).toString('hex'),
-        extractor: 'ergo-cardano-graphql-extractor',
+        extractor: 'cardano-graphql-extractor',
       });
     }, 100000);
 
     /**
-     * @target cardanoGraphQLObservationExtractor.processTransactionsCardano
+     * @target CardanoGraphQLObservationExtractor.processTransactions
      * should return true with no observation in database on invalid lock tx
      * @dependencies
      * - cardanoKoiosClientFactory
@@ -99,7 +94,7 @@ describe('cardanoGraphQLObservationExtractor', () => {
       const tx = validLockTx;
 
       // run test
-      const extractor = new CardanoGraphQLExtractor(
+      const extractor = new CardanoGraphQLObservationExtractor(
         dataSource,
         tokens,
         'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'

@@ -18,7 +18,7 @@ class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
      * works.
      */
     this.initialHeight = config.initialHeight + 1;
-    this.network = new GraphQLNetwork(config.graphQLUri, config.timeout);
+    this.network = new GraphQLNetwork(config.graphQLUri);
   }
 
   getFirstBlock = (): Promise<Block> => {

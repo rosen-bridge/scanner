@@ -27,7 +27,6 @@ interface CardanoBlockFrostConfig {
 
 interface CardanoGraphQLConfig {
   graphQLUri: string;
-  timeout: number;
   initialHeight: number;
   dataSource: DataSource;
 }

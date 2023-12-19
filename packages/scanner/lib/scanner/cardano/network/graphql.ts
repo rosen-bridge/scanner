@@ -15,7 +15,7 @@ import * as Variables from '../interfaces/graphql/variables';
 export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction> {
   private client: ApolloClient<NormalizedCacheObject>;
 
-  constructor(graphqlUri: string, timeout: number) {
+  constructor(graphqlUri: string) {
     super();
     this.client = new ApolloClient({
       cache: new InMemoryCache(),
