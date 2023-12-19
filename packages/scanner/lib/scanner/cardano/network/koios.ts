@@ -23,6 +23,11 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
     }
   }
 
+  /**
+   * Returns block at height
+   * @param height
+   * @returns Block
+   */
   getBlockAtHeight = (height: number): Promise<Block> => {
     return this.koios
       .get<Array<KoiosBlock>>('/blocks', {
@@ -49,6 +54,10 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       });
   };
 
+  /**
+   * Returns current network height
+   * @returns current height
+   */
   getCurrentHeight = (): Promise<number> => {
     return this.koios
       .get<Array<KoiosBlock>>('/blocks', {
@@ -61,32 +70,23 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   };
 
   /**
-   * Try getting transactions information.
-   * @param txHashes
+   * Return transactions in a block with specified hash
+   * @param blockHash
+   * @returns array of KoiosTransaction
    */
-  getTxInformations = (
-    txHashes: Array<string>
-  ): Promise<Array<KoiosTransaction>> => {
-    return this.koios
-      .post<Array<KoiosTransaction>>('/tx_info', {
-        _tx_hashes: txHashes,
-      })
-      .then((ret) => {
-        return ret.data;
-      });
-  };
-
   getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
     return this.koios
-      .post<Array<{ tx_hash: string }>>('/block_txs', {
+      .post<Array<KoiosTransaction>>('/block_tx_info', {
         _block_hashes: [blockHash],
+        _inputs: false,
+        _metadata: true,
+        _assets: true,
+        _withdrawals: true,
+        _certs: false,
+        _scripts: false,
       })
       .then((res) => {
-        if (res.data.length === 0) {
-          return [];
-        } else {
-          return this.getTxInformations(res.data.map((tx) => tx.tx_hash));
-        }
+        return res.data;
       })
       .catch((exp) => {
         throw exp;

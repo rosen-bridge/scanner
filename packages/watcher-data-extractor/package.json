@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "@rosen-bridge/logger-interface": "^0.1.0",
-    "@rosen-bridge/scanner": "^3.0.1",
+    "@rosen-bridge/scanner": "^3.0.2",
     "@rosen-clients/ergo-explorer": "^1.0.3",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
