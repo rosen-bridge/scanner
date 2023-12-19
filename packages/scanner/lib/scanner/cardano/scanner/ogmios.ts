@@ -41,7 +41,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
     super(logger, config.maxTryBlock);
-    this.action = new BlockDbAction(config.dataSource, this.name());
+    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     this.host = config.nodeHostOrIp;
     this.port = config.nodePort;
     this.useTls = config.useTls ?? false;
