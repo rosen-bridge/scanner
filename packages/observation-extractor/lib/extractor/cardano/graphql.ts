@@ -38,7 +38,7 @@ export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQ
   /**
    * get Id for current extractor
    */
-  getId = () => 'ergo-cardano-graphql-extractor';
+  getId = () => 'cardano-graphql-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen

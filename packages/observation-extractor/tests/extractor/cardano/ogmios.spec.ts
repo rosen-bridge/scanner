@@ -54,7 +54,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
         block:
           '340df860ccefa2ee3a65ac85a44116e9c4b49ec0a19367e23e56d30fa9d13f99',
         bridgeFee: '6800501',
-        extractor: 'ergo-cardano-ogmios-extractor',
+        extractor: 'cardano-ogmios-extractor',
         fromAddress:
           'addr1q8hmp5zjzvv7s7pmgemz3mvrkd2nu7609hwgsqa0auf6h7h3r6x6jn2zrt8',
         fromChain: 'cardano',
