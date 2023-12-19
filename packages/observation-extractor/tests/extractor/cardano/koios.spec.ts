@@ -67,7 +67,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         sourceTxId: txHash,
         block: '1',
         requestId: Buffer.from(blake2b(txHash, undefined, 32)).toString('hex'),
-        extractor: 'ergo-cardano-koios-extractor',
+        extractor: 'cardano-koios-extractor',
       });
     }, 100000);
 

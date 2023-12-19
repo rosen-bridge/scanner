@@ -38,7 +38,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
   /**
    * get Id for current extractor
    */
-  getId = () => 'ergo-cardano-ogmios-extractor';
+  getId = () => 'cardano-ogmios-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
