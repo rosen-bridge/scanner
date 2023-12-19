@@ -43,7 +43,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<Blo
   /**
    * get Id for current extractor
    */
-  getId = () => 'ergo-cardano-blockfrost-extractor';
+  getId = () => 'cardano-blockfrost-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen

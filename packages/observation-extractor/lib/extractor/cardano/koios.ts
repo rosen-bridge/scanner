@@ -38,7 +38,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
   /**
    * get Id for current extractor
    */
-  getId = () => 'ergo-cardano-koios-extractor';
+  getId = () => 'cardano-koios-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
