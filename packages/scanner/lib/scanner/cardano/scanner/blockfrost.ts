@@ -11,7 +11,7 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   network: BlockFrostNetwork;
   constructor(config: CardanoBlockFrostConfig, logger?: AbstractLogger) {
     super(logger);
-    this.action = new BlockDbAction(config.dataSource, this.name());
+    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
      * `initialHeight` by one so that it matches how Ogmios scanner currently

@@ -72,7 +72,7 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
   };
 
   /**
-   * fetch list if transaction of specific block
+   * fetch list of transaction for a specific block
    * @param blockId
    */
   getBlockTxs = async (
