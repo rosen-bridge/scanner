@@ -1,6 +1,7 @@
 export { ErgoScanner } from './scanner/ergo/ergoScanner';
 export { CardanoKoiosScanner } from './scanner/cardano/scanner/koios';
 export { CardanoOgmiosScanner } from './scanner/cardano/scanner/ogmios';
+export { CardanoBlockFrostScanner } from './scanner/cardano/scanner/blockfrost';
 export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';

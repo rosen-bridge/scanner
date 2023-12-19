@@ -17,4 +17,12 @@ interface CardanoOgmiosConfig {
   useTls?: boolean;
 }
 
-export { CardanoKoiosConfig, CardanoOgmiosConfig };
+interface CardanoBlockFrostConfig {
+  projectId: string;
+  timeout: number;
+  initialHeight: number;
+  dataSource: DataSource;
+  blockFrostUrl?: string;
+}
+
+export { CardanoKoiosConfig, CardanoOgmiosConfig, CardanoBlockFrostConfig };
