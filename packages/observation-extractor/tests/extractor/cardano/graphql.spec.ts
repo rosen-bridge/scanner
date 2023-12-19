@@ -21,7 +21,6 @@ describe('CardanoGraphQLObservationExtractor', () => {
      * @dependencies
      * - cardanoKoiosClientFactory
      * @scenario
-     * - mock lock tx
      * - run test
      * - check returned value
      * - check database
@@ -30,7 +29,6 @@ describe('CardanoGraphQLObservationExtractor', () => {
      * - observation should be inserted into database
      */
     it('should return true and insert observation into database on valid lock tx', async () => {
-      // mock lock tx
       const tx = validLockTx;
 
       // run test
@@ -81,7 +79,6 @@ describe('CardanoGraphQLObservationExtractor', () => {
      * @dependencies
      * - cardanoKoiosClientFactory
      * @scenario
-     * - mock lock tx
      * - run test
      * - check returned value
      * - check database
@@ -90,7 +87,6 @@ describe('CardanoGraphQLObservationExtractor', () => {
      * - no observation should be in database
      */
     it('should return true with no observation in database on invalid lock tx', async () => {
-      // mock lock tx
       const tx = validLockTx;
 
       // run test

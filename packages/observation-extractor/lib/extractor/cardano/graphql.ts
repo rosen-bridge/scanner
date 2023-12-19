@@ -46,50 +46,48 @@ export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQ
    * @param block
    * @param txs
    */
-  processTransactions = (
+  processTransactions = async (
     txs: Array<GraphQLTransaction>,
     block: BlockEntity
   ): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const observations: Array<ExtractedObservation> = [];
-        txs.forEach((transaction) => {
-          const data = this.extractor.get(transaction);
-          if (data) {
-            const requestId = Buffer.from(
-              blake2b(transaction.hash, undefined, 32)
-            ).toString('hex');
-            observations.push({
-              fromChain: CardanoGraphQLObservationExtractor.FROM_CHAIN,
-              toChain: data.toChain,
-              amount: data.amount,
-              sourceChainTokenId: data.sourceChainTokenId,
-              targetChainTokenId: data.targetChainTokenId,
-              sourceTxId: data.sourceTxId,
-              bridgeFee: data.bridgeFee,
-              networkFee: data.networkFee,
-              sourceBlockId: block.hash,
-              requestId: requestId,
-              toAddress: data.toAddress,
-              fromAddress: data.fromAddress,
-            });
-          }
-        });
-        this.actions
-          .storeObservations(observations, block, this.getId())
-          .then((status) => {
-            resolve(status);
-          })
-          .catch((e) => {
-            this.logger.error(
-              `An error occurred during store observations: ${e}`
-            );
-            reject(e);
+    try {
+      const observations: Array<ExtractedObservation> = [];
+      txs.forEach((transaction) => {
+        const data = this.extractor.get(transaction);
+        if (data) {
+          const requestId = Buffer.from(
+            blake2b(transaction.hash, undefined, 32)
+          ).toString('hex');
+          observations.push({
+            fromChain: CardanoGraphQLObservationExtractor.FROM_CHAIN,
+            toChain: data.toChain,
+            amount: data.amount,
+            sourceChainTokenId: data.sourceChainTokenId,
+            targetChainTokenId: data.targetChainTokenId,
+            sourceTxId: data.sourceTxId,
+            bridgeFee: data.bridgeFee,
+            networkFee: data.networkFee,
+            sourceBlockId: block.hash,
+            requestId: requestId,
+            toAddress: data.toAddress,
+            fromAddress: data.fromAddress,
           });
+        }
+      });
+      try {
+        const status = await this.actions.storeObservations(
+          observations,
+          block,
+          this.getId()
+        );
+        return status;
       } catch (e) {
-        reject(e);
+        this.logger.error(`An error occurred during store observations: ${e}`);
+        return false;
       }
-    });
+    } catch (e) {
+      return false;
+    }
   };
 
   /**

@@ -27,7 +27,7 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
    * get block header from height
    * @param height
    */
-  getBlockAtHeight = async (height: number): Promise<Block> => {
+  getBlockAtHeight = (height: number): Promise<Block> => {
     return this.client
       .query<GraphQLTypes.BlockInfoQuery>({
         query: Queries.blockInfo,
@@ -44,16 +44,13 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
           parentHash: blocks[0].previousBlock.hash,
           timestamp: Math.floor(new Date(blocks[0].forgedAt).getTime() / 1000),
         };
-      })
-      .catch((exp) => {
-        throw exp;
       });
   };
 
   /**
    * get current height for blockchain
    */
-  getCurrentHeight = async (): Promise<number> => {
+  getCurrentHeight = (): Promise<number> => {
     return this.client
       .query<GraphQLTypes.CurrentHeightQuery>({
         query: Queries.currentHeight,
@@ -62,9 +59,6 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
         const height = res.data.cardano.tip.number;
         if (height) return height;
         throw new GraphQLNullValueError('Height of last block is invalid');
-      })
-      .catch((exp) => {
-        throw exp;
       });
   };
 
@@ -72,7 +66,7 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
    * fetch list of transaction of specific block
    * @param blockId
    */
-  getBlockTxs = async (blockId: string): Promise<Array<GraphQLTransaction>> => {
+  getBlockTxs = (blockId: string): Promise<Array<GraphQLTransaction>> => {
     return this.client
       .query<GraphQLTypes.BlockTxsQuery>({
         query: Queries.blockTxs,
@@ -88,9 +82,6 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
             throw new GraphQLNullValueError(`Invalid block transaction data`);
           return tx;
         });
-      })
-      .catch((exp) => {
-        throw exp;
       });
   };
 }
