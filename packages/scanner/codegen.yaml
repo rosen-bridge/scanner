@@ -1,0 +1,7 @@
+schema: ./schema.graphql
+documents: ./lib/scanner/cardano/interfaces/graphql/queries.ts
+generates:
+  lib/scanner/cardano/interfaces/graphql/graphQLTypes.ts:
+    plugins:
+      - typescript
+      - typescript-operations

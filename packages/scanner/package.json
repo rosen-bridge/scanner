@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -13,7 +13,8 @@
     "coverage": "jest --detectOpenHandles --coverage",
     "build": "tsc --build",
     "type-check": "tsc --noEmit",
-    "release": "npm run test && npm run build && npm publish --access public"
+    "release": "npm run test && npm run build && npm publish --access public",
+    "graphql:generate": "graphql-codegen"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "dist"
   ],
   "dependencies": {
+    "@apollo/client": "^3.8.7",
     "@blockfrost/blockfrost-js": "^5.4.0",
     "@cardano-ogmios/client": "^6.0.0",
     "@cardano-ogmios/schema": "^6.0.0",
@@ -38,6 +40,9 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",

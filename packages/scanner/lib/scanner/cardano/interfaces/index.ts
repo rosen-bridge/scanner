@@ -25,4 +25,15 @@ interface CardanoBlockFrostConfig {
   blockFrostUrl?: string;
 }
 
-export { CardanoKoiosConfig, CardanoOgmiosConfig, CardanoBlockFrostConfig };
+interface CardanoGraphQLConfig {
+  graphQLUri: string;
+  initialHeight: number;
+  dataSource: DataSource;
+}
+
+export {
+  CardanoKoiosConfig,
+  CardanoOgmiosConfig,
+  CardanoBlockFrostConfig,
+  CardanoGraphQLConfig,
+};
