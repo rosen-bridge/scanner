@@ -25,7 +25,7 @@ class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 
-  name = () => 'cardano-GraphQL';
+  name = () => 'cardano-graphql';
 }
 
 export { CardanoGraphQLScanner };
