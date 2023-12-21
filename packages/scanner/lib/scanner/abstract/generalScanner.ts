@@ -1,6 +1,7 @@
 import { AbstractScanner } from './scanner';
 import { AbstractNetworkConnector, Block } from '../../interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
+import { KoiosBlockNotFoundError, NotExpectedTxCountError } from '../../errors';
 
 abstract class GeneralScanner<
   TransactionType
@@ -35,6 +36,15 @@ abstract class GeneralScanner<
       }] in scanner ${this.name()}`
     );
     const txs = await this.network.getBlockTxs(block.hash);
+    if (block.txCount) {
+      if (txs.length != block.txCount)
+        throw new NotExpectedTxCountError(
+          `block with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`
+        );
+      this.logger.debug(
+        `processing ${block.txCount} transactions of block with hash [${block.hash}]`
+      );
+    }
     return await this.processBlockTransactions(block, txs);
   };
 
@@ -119,7 +129,15 @@ abstract class GeneralScanner<
         await this.stepBackward();
       }
     } catch (e) {
-      this.logger.error(`An error occurred during update process. ${e}`);
+      if (e instanceof KoiosBlockNotFoundError) {
+        this.logger.debug(
+          `An error occurred in updating koios scanner. ${e.message}`
+        );
+      } else if (e instanceof NotExpectedTxCountError) {
+        this.logger.debug(
+          `An error occurred while processing transactions. ${e.message}`
+        );
+      } else this.logger.error(`An error occurred during update process. ${e}`);
     }
   };
 
