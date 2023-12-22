@@ -1,7 +1,7 @@
 import { AbstractScanner } from './scanner';
 import { AbstractNetworkConnector, Block } from '../../interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
-import { KoiosBlockNotFoundError } from '../../errors';
+import JsonBI from '@rosen-bridge/json-bigint';
 
 abstract class GeneralScanner<
   TransactionType
@@ -75,6 +75,11 @@ abstract class GeneralScanner<
             lastSavedBlock = savedBlock;
           }
         } else {
+          this.logger.debug(
+            `Invalid block at height ${height}. Block info is [${JsonBI.stringify(
+              block
+            )} and the expected parent hash is [${lastSavedBlock.hash}]`
+          );
           break;
         }
       }
@@ -131,11 +136,7 @@ abstract class GeneralScanner<
         await this.stepBackward();
       }
     } catch (e) {
-      if (e instanceof KoiosBlockNotFoundError) {
-        this.logger.debug(
-          `An error occurred in updating koios scanner. ${e.message}`
-        );
-      } else this.logger.error(`An error occurred during update process. ${e}`);
+      this.logger.error(`An error occurred during update process. ${e}`);
     }
   };
 
