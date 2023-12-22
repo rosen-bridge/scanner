@@ -1,6 +1,7 @@
 import { AbstractScanner } from './scanner';
 import { AbstractNetworkConnector, Block } from '../../interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
+import JsonBI from '@rosen-bridge/json-bigint';
 
 abstract class GeneralScanner<
   TransactionType
@@ -35,6 +36,17 @@ abstract class GeneralScanner<
       }] in scanner ${this.name()}`
     );
     const txs = await this.network.getBlockTxs(block.hash);
+    if (block.txCount) {
+      if (txs.length != block.txCount) {
+        this.logger.debug(
+          `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`
+        );
+        return false;
+      }
+      this.logger.debug(
+        `processing ${block.txCount} transactions of block with hash [${block.hash}]`
+      );
+    }
     return await this.processBlockTransactions(block, txs);
   };
 
@@ -63,6 +75,11 @@ abstract class GeneralScanner<
             lastSavedBlock = savedBlock;
           }
         } else {
+          this.logger.debug(
+            `Invalid block at height ${height}. Block info is [${JsonBI.stringify(
+              block
+            )} and the expected parent hash is [${lastSavedBlock.hash}]`
+          );
           break;
         }
       }

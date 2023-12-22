@@ -11,9 +11,8 @@ import { BlockDbAction } from '../../../lib/scanner/action';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { WebSocketScanner } from '../../../lib';
 import { AbstractLogger } from '@rosen-bridge/logger-interface';
-import { log } from 'util';
 
-interface TestTransaction {
+export interface TestTransaction {
   height: number;
   blockHash: string;
 }
