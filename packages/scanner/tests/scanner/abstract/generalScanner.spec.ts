@@ -4,6 +4,7 @@ import {
   insertBlocks,
   NetworkConnectorTest,
   createDatabase,
+  TestTransaction,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockEntity } from '../../../lib';
@@ -111,6 +112,71 @@ describe('generalScanner', () => {
         blockHeight: 1,
         timestamp: 50,
       });
+      expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
+    });
+
+    /**
+     * @target processBlock should return false when could not receive the required transactions
+     * @dependencies
+     * - NetworkConnector
+     * @scenario
+     * - Mock getBlockTxs
+     * - Then call processBlock
+     * @expected
+     * - should return false
+     */
+    it('should return false when could not receive the required transactions', async () => {
+      const network = new NetworkConnectorTest();
+      const txs: Array<TestTransaction> = [];
+      jest
+        .spyOn(network, 'getBlockTxs')
+        .mockImplementation()
+        .mockReturnValue(Promise.resolve(txs));
+      const scanner = new firstScanner(dataSource, network);
+      const mockedProcessBlockTransactions = jest.spyOn(
+        scanner,
+        'processBlockTransactions'
+      );
+      const result = await scanner.processBlock({
+        hash: '1',
+        parentHash: '2',
+        blockHeight: 1,
+        timestamp: 50,
+        txCount: 10,
+      });
+      expect(result).toBe(false);
+      expect(mockedProcessBlockTransactions).not.toBeCalled();
+    });
+
+    /**
+     * @target processBlock should call processBlockTransactions when receive the required transactions
+     * @dependencies
+     * - NetworkConnector
+     * @scenario
+     * - Mock getBlockTxs
+     * - Then call processBlock
+     * @expected
+     * - should call processBlockTransactions with the block and the received txs
+     */
+    it('should call processBlockTransactions when receive the required transactions', async () => {
+      const network = new NetworkConnectorTest();
+      const txs = [{ height: 1, blockHash: '1' }];
+      jest
+        .spyOn(network, 'getBlockTxs')
+        .mockImplementation()
+        .mockReturnValue(Promise.resolve(txs));
+      const scanner = new firstScanner(dataSource, network);
+      const mockedProcessBlockTransactions = jest
+        .spyOn(scanner, 'processBlockTransactions')
+        .mockImplementation();
+      const block = {
+        hash: '1',
+        parentHash: '2',
+        blockHeight: 1,
+        timestamp: 50,
+        txCount: 1,
+      };
+      await scanner.processBlock(block);
       expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
     });
   });

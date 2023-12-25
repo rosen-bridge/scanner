@@ -34,19 +34,18 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         params: {
           block_height: `lte.${height}`,
           limit: 2,
-          select: 'hash,block_height,block_time',
+          select: 'hash,block_height,block_time,tx_count',
         },
       })
       .then((res) => {
         const block = res.data[0];
         const parentBlock = res.data[1];
-        if (block.block_height != height)
-          throw Error(`block with height ${height} is not available`);
         return {
           hash: block.hash,
           blockHeight: block.block_height,
           parentHash: parentBlock.hash,
           timestamp: block.block_time,
+          txCount: block.tx_count,
         };
       })
       .catch((exp) => {

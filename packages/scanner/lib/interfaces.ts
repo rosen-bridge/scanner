@@ -6,6 +6,7 @@ interface Block {
   blockHeight: number;
   timestamp: number;
   extra?: string;
+  txCount?: number;
 }
 
 abstract class AbstractDataBase<DataT> {

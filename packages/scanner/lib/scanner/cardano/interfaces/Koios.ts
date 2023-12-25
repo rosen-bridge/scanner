@@ -2,6 +2,7 @@ interface KoiosBlock {
   hash: string;
   block_height: number;
   block_time: number;
+  tx_count: number;
 }
 
 interface KoiosBlockInfo {
