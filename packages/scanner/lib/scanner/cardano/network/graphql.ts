@@ -1,6 +1,7 @@
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
 import {
   ApolloClient,
+  HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
 } from '@apollo/client/core';
@@ -11,6 +12,7 @@ import {
 import * as GraphQLTypes from '../interfaces/graphql/graphQLTypes';
 import * as Queries from '../interfaces/graphql/queries';
 import * as Variables from '../interfaces/graphql/variables';
+import fetch from 'cross-fetch';
 
 export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction> {
   private client: ApolloClient<NormalizedCacheObject>;
@@ -19,7 +21,7 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
     super();
     this.client = new ApolloClient({
       cache: new InMemoryCache(),
-      uri: graphqlUri,
+      link: new HttpLink({ uri: graphqlUri, fetch }),
     });
   }
 
