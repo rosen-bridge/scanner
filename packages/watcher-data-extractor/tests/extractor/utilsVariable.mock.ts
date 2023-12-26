@@ -48,7 +48,8 @@ export const sampleEventEntity: EventTriggerEntity = {
   targetChainTokenId: 'targetToken',
   sourceTxId: 'txId',
   sourceBlockId: 'blockId',
-  WIDs: 'ff',
+  WIDsCount: 0,
+  WIDsHash: '',
   sourceChainHeight: 10,
 };
 

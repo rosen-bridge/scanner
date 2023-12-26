@@ -10,6 +10,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
 import CommitmentAction from '../actions/commitmentAction';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { JsonBI } from '../utils';
+import { SpendInfo } from '../interfaces/types';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -55,7 +56,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     return new Promise((resolve, reject) => {
       try {
         const commitments: Array<extractedCommitment> = [];
-        const spendIds: Array<string> = [];
+        const spendIds: Array<SpendInfo> = [];
         txs.forEach((transaction) => {
           // process outputs
           for (const output of transaction.outputs) {
@@ -104,8 +105,12 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
             }
           }
           // process inputs
-          for (const input of transaction.inputs) {
-            spendIds.push(input.boxId);
+          for (let i = 0; i < transaction.inputs.length; i++) {
+            spendIds.push({
+              boxId: transaction.inputs[i].boxId,
+              txId: transaction.id,
+              index: i,
+            });
           }
         });
         // process save commitments
