@@ -171,20 +171,28 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     unchangedStoredBoxIds: Array<string>,
     initialHeight: number
   ) => {
-    for (const boxId of unchangedStoredBoxIds) {
-      const permit = await this.getPermitWithBoxId(boxId);
-      if (permit && permit.spendBlock && permit.spendHeight) {
-        if (permit.spendHeight < initialHeight)
-          await this.actions.updateSpendBlock(
-            boxId,
-            this.getId(),
-            permit.spendBlock,
-            permit.spendHeight
-          );
-      } else {
-        await this.actions.removePermit(boxId, this.getId());
-        this.logger.info(
-          `Removed invalid box [${boxId}] in initialization validation`
+    for (let trial = 0; trial < 10; trial++) {
+      try {
+        for (const boxId of unchangedStoredBoxIds) {
+          const permit = await this.getPermitWithBoxId(boxId);
+          if (permit && permit.spendBlock && permit.spendHeight) {
+            if (permit.spendHeight < initialHeight)
+              await this.actions.updateSpendBlock(
+                boxId,
+                this.getId(),
+                permit.spendBlock,
+                permit.spendHeight
+              );
+          } else {
+            await this.actions.removePermit(boxId, this.getId());
+            this.logger.info(
+              `Removed invalid box [${boxId}] in initialization validation`
+            );
+          }
+        }
+      } catch (e) {
+        this.logger.warn(
+          `An error occurred in ${trial} trial, validating old permit boxes`
         );
       }
     }
