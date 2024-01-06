@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/tx-id-extractor",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Extract and store all transaction ids in ogmios blocks.",
   "author": "Rosen Team",
   "license": "GPL-3.0",

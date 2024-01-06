@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/fraud-extractor",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "fraud information extractor for watcher faulty reports",
   "author": "Rosen Team",
   "license": "GPL-3.0",
