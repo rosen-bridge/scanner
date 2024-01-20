@@ -84,7 +84,8 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
               ) {
                 const R4 = output.additionalRegisters.R4;
                 const R5 = output.additionalRegisters.R5;
-                if (R4 && R5) {
+                const R7 = output.additionalRegisters.R7;
+                if (R4 && R5 && R7) {
                   const outputParsed = wasm.ErgoBox.from_json(
                     JsonBI.stringify(output)
                   );
@@ -94,14 +95,17 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                   const R5Const = outputParsed.register_value(
                     wasm.NonMandatoryRegisterId.R5
                   );
-                  if (R4Const && R5Const) {
+                  const R7Const = outputParsed.register_value(
+                    wasm.NonMandatoryRegisterId.R7
+                  );
+                  if (R4Const && R5Const && R7Const) {
                     const R4Serialized = R4Const.to_coll_coll_byte();
                     const R5Serialized = R5Const.to_coll_coll_byte();
                     if (R4Serialized.length >= 1 && R5Serialized.length >= 12) {
-                      // -- TODO: fix this!
-                      const WIDsCount = 0;
-                      const WIDsHash = '';
-                      // --
+                      const WIDsCount = R7Const.to_i32();
+                      const WIDsHash = Buffer.from(R4Serialized[0]).toString(
+                        'hex'
+                      );
                       const sourceTxId = Buffer.from(
                         R5Serialized[0]
                       ).toString();

@@ -14,6 +14,7 @@ import {
   RWTId,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
+import { blake2b } from 'blakejs';
 
 /**
  * generates a dataSource with filename passed to the function for database file name
@@ -263,9 +264,11 @@ export const eventTriggerTxGenerator = (
     );
   }
 
-  const R4Value = WID.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
+  const wids = WID.map((val) => new Uint8Array(Buffer.from(val, 'hex'))).reduce(
+    (buf: Buffer, wid: Uint8Array) => Buffer.concat([buf, wid]),
+    Buffer.from('')
+  );
+  const R4Value = wids.length ? [blake2b(wids, undefined, 32)] : [];
   outBoxBuilder.set_register_value(
     4,
     wasm.Constant.from_coll_coll_byte(R4Value)
@@ -282,6 +285,11 @@ export const eventTriggerTxGenerator = (
     5,
     wasm.Constant.from_coll_coll_byte(R5Value)
   );
+  outBoxBuilder.set_register_value(
+    6,
+    wasm.Constant.from_byte_array(Buffer.from(''))
+  );
+  outBoxBuilder.set_register_value(7, wasm.Constant.from_i32(WID.length));
 
   const outBox = outBoxBuilder.build();
   const tokens = new wasm.Tokens();
