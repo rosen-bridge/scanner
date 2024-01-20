@@ -158,7 +158,8 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     // Remove updated permits from existing permits in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained permits
-    await this.validateOldStoredPermits(allStoredBoxIds, initialHeight);
+    // TODO: Fix validation process
+    // await this.validateOldStoredPermits(allStoredBoxIds, initialHeight);
   };
 
   /**
