@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';

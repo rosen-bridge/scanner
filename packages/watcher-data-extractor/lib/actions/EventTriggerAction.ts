@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

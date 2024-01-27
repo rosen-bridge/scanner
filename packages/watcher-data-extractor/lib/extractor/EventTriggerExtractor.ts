@@ -6,7 +6,7 @@ import {
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

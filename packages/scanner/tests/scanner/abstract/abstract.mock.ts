@@ -10,7 +10,7 @@ import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { WebSocketScanner } from '../../../lib';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 export interface TestTransaction {
   height: number;

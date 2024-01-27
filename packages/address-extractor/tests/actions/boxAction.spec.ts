@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { BoxEntityAction } from '../../lib/actions/boxAction';
 import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';

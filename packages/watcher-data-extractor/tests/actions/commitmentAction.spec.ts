@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import CommitmentAction from '../../lib/actions/commitmentAction';
 import { CommitmentEntity } from '../../lib';

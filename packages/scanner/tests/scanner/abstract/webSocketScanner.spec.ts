@@ -5,7 +5,7 @@ import {
 } from './abstract.mock';
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import mock = jest.mock;
 
 let dataSource: DataSource;

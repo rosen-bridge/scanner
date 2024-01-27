@@ -1,4 +1,4 @@
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { createDatabase } from '../utils.mock';
 import { TxAction } from '../../lib/actions/db';
 import { TxIdEntity } from '../../lib';

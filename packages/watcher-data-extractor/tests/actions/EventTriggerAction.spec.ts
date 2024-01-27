@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventResult, EventTriggerEntity } from '../../lib';

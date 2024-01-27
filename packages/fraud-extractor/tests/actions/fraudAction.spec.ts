@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { createDatabase } from '../extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';

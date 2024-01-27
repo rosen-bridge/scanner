@@ -1,7 +1,7 @@
 import { TxIdEntity } from '../entities/TxIdEntity';
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 export class TxAction {
   private readonly repository: Repository<TxIdEntity>;

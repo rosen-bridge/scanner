@@ -4,7 +4,7 @@ import { KoiosTransaction } from '../interfaces/Koios';
 import { Block } from '../../../interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   readonly initialHeight: number;

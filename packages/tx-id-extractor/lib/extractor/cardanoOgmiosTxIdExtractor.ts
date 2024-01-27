@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { TxAction } from '../actions/db';
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { Transaction } from '@cardano-ogmios/schema';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

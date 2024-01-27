@@ -2,7 +2,7 @@ import { ObservationEntityAction } from '../../lib/actions/db';
 import { ObservationEntity } from '../../lib';
 import { createDatabase, generateBlockEntity } from '../extractor/utils.mock';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   firstObservations,
   secondObservations,
