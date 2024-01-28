@@ -114,10 +114,16 @@ class CommitmentAction {
             `Impossible behavior: box [${commitment.boxId}] is not found in spending info list`
           );
 
-        commitment.spendBlock = block.hash;
-        commitment.spendTxId = spendInfo.txId;
-        commitment.spendIndex = spendInfo.index;
-        await this.commitmentRepository.save(commitment);
+        await this.commitmentRepository.update(
+          {
+            id: commitment.id,
+          },
+          {
+            spendBlock: block.hash,
+            spendTxId: spendInfo.txId,
+            spendIndex: spendInfo.index,
+          }
+        );
         this.logger.info(
           `Spent commitment [${commitment.boxId}] for event [${commitment.eventId}] at height ${block.height}`
         );
