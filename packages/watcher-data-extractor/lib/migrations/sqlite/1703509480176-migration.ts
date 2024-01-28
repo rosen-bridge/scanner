@@ -7,9 +7,12 @@ export class migration1703509480176 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // get all events before removing WIDs column
-    const eventRepository =
-      queryRunner.connection.getRepository(EventTriggerEntity);
-    const events = await eventRepository.find();
+    const events = await queryRunner.connection
+      .createQueryBuilder()
+      .select('id')
+      .addSelect('WIDs')
+      .from('event_trigger_entity', 'ete')
+      .getRawMany();
 
     await queryRunner.query(`
             CREATE TABLE "temporary_event_trigger_entity" (
@@ -113,7 +116,9 @@ export class migration1703509480176 implements MigrationInterface {
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
     for (const event of events) {
       const { WIDsHash, WIDsCount } = getWidInfo((event as any).WIDs);
-      await eventRepository.update({ id: event.id }, { WIDsHash, WIDsCount });
+      await queryRunner.connection
+        .getRepository(EventTriggerEntity)
+        .update({ id: event.id }, { WIDsHash, WIDsCount });
     }
 
     await queryRunner.query(`

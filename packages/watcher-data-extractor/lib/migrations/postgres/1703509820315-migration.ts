@@ -32,13 +32,18 @@ export class migration1703509820315 implements MigrationInterface {
         `);
 
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
-    const eventRepository =
-      queryRunner.connection.getRepository(EventTriggerEntity);
-    const events = await eventRepository.find();
+    const events = await queryRunner.connection
+      .createQueryBuilder()
+      .select('id')
+      .addSelect('WIDs')
+      .from('event_trigger_entity', 'ete')
+      .getRawMany();
 
     for (const event of events) {
       const { WIDsHash, WIDsCount } = getWidInfo((event as any).WIDs);
-      await eventRepository.update({ id: event.id }, { WIDsHash, WIDsCount });
+      await queryRunner.connection
+        .getRepository(EventTriggerEntity)
+        .update({ id: event.id }, { WIDsHash, WIDsCount });
     }
 
     await queryRunner.query(`
