@@ -1,10 +1,8 @@
-import { DummyLogger } from '@rosen-bridge/logger-interface';
 import { createDatabase } from '../utils.mock';
 import { TxAction } from '../../lib/actions/db';
 import { TxIdEntity } from '../../lib';
 import { DataSource, Repository } from 'typeorm';
 
-const logger = new DummyLogger();
 let dataSource: DataSource;
 let action: TxAction;
 let repository: Repository<TxIdEntity>;
@@ -12,7 +10,7 @@ let repository: Repository<TxIdEntity>;
 describe('TxAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    action = new TxAction(dataSource, logger);
+    action = new TxAction(dataSource);
     repository = dataSource.getRepository(TxIdEntity);
   });
 

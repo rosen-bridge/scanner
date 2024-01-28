@@ -10,7 +10,7 @@ import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { WebSocketScanner } from '../../../lib';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 export interface TestTransaction {
   height: number;
@@ -133,9 +133,9 @@ export const insertBlocks = async (
 export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   name = () => 'test scanner';
 
-  constructor(logger: AbstractLogger, dataSource: DataSource) {
-    super(logger);
-    this.action = new BlockDbAction(dataSource, this.name(), logger);
+  constructor(dataSource: DataSource) {
+    super();
+    this.action = new BlockDbAction(dataSource, this.name());
   }
 
   mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>

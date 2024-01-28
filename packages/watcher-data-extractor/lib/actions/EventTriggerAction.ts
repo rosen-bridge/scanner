@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
@@ -12,9 +12,9 @@ class EventTriggerAction {
   private readonly datasource: DataSource;
   private readonly triggerEventRepository: Repository<EventTriggerEntity>;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.datasource = dataSource;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
     this.triggerEventRepository = dataSource.getRepository(EventTriggerEntity);
   }
 

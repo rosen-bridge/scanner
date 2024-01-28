@@ -5,7 +5,7 @@ import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
 import { KoiosTransaction } from '../../interfaces/koiosTransaction';
 import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
 

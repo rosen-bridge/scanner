@@ -18,7 +18,7 @@ import {
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { SLOT_SHELLY_NUMBER } from '../../../constants';
 
 interface BackwardResponse {
