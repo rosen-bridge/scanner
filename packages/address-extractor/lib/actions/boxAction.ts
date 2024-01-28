@@ -1,6 +1,6 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { BlockEntity } from '@rosen-bridge/scanner';
 
 import { BoxEntity } from '../entities/boxEntity';
@@ -12,9 +12,9 @@ export class BoxEntityAction {
   readonly logger: AbstractLogger;
   private readonly repository: Repository<BoxEntity>;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.datasource = dataSource;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
     this.repository = dataSource.getRepository(BoxEntity);
   }
 

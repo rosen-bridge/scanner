@@ -133,9 +133,9 @@ export const insertBlocks = async (
 export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   name = () => 'test scanner';
 
-  constructor(logger: AbstractLogger, dataSource: DataSource) {
-    super(logger);
-    this.action = new BlockDbAction(dataSource, this.name(), logger);
+  constructor(dataSource: DataSource) {
+    super();
+    this.action = new BlockDbAction(dataSource, this.name());
   }
 
   mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>

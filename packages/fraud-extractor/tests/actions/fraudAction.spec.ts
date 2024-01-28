@@ -1,5 +1,4 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { createDatabase } from '../extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';
@@ -7,7 +6,6 @@ import { FraudEntity } from '../../lib/entities/fraudEntity';
 import { ExtractedFraud } from '../../lib/interfaces/types';
 import { block, fraud, nextBlock, oldStoredFraud } from './fraudActionTestData';
 
-const logger = new DummyLogger();
 let dataSource: DataSource;
 let action: FraudAction;
 let repository: Repository<FraudEntity>;
@@ -15,7 +13,7 @@ let repository: Repository<FraudEntity>;
 describe('FraudAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    action = new FraudAction(dataSource, logger);
+    action = new FraudAction(dataSource);
     repository = dataSource.getRepository(FraudEntity);
   });
   describe('storeBlockFrauds', () => {

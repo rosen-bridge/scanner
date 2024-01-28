@@ -1,15 +1,15 @@
 import { TxIdEntity } from '../entities/TxIdEntity';
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class TxAction {
   private readonly repository: Repository<TxIdEntity>;
   readonly logger: AbstractLogger;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.repository = dataSource.getRepository(TxIdEntity);
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   /**

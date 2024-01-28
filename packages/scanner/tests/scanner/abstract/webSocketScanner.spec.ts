@@ -5,8 +5,6 @@ import {
 } from './abstract.mock';
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import mock = jest.mock;
 
 let dataSource: DataSource;
 let scanner: TestWebSocketScanner;
@@ -15,7 +13,7 @@ let repository: Repository<BlockEntity>;
 describe('webSocketScanner', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    scanner = new TestWebSocketScanner(new DummyLogger(), dataSource);
+    scanner = new TestWebSocketScanner(dataSource);
     repository = dataSource.getRepository(BlockEntity);
     await repository.insert({
       hash: 'block 1',

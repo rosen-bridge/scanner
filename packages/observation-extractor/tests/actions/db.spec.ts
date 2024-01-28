@@ -2,14 +2,11 @@ import { ObservationEntityAction } from '../../lib/actions/db';
 import { ObservationEntity } from '../../lib';
 import { createDatabase, generateBlockEntity } from '../extractor/utils.mock';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   firstObservations,
   secondObservations,
 } from '../extractor/observations.mock';
 import { DataSource } from 'typeorm';
-
-const logger = new DummyLogger();
 
 let dataSource: DataSource;
 let action: ObservationEntityAction;
@@ -17,7 +14,7 @@ let action: ObservationEntityAction;
 describe('ObservationEntityAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    action = new ObservationEntityAction(dataSource, logger);
+    action = new ObservationEntityAction(dataSource);
   });
 
   describe('storeObservation', () => {
