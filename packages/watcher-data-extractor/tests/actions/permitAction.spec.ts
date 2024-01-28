@@ -1,5 +1,4 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
@@ -35,7 +34,6 @@ const samplePermit4 = {
   boxId: '4',
 };
 
-const logger = new DummyLogger();
 let dataSource: DataSource;
 
 describe('PermitEntityAction', () => {
@@ -43,7 +41,7 @@ describe('PermitEntityAction', () => {
   let repository: Repository<PermitEntity>;
   beforeEach(async () => {
     dataSource = await createDatabase();
-    action = new PermitAction(dataSource, logger);
+    action = new PermitAction(dataSource);
     repository = dataSource.getRepository(PermitEntity);
   });
 
@@ -290,15 +288,9 @@ describe('PermitEntityAction', () => {
   });
 
   describe('deleteBlock', () => {
-    let permitEntityAction: PermitAction;
     beforeEach(async () => {
-      permitEntityAction = new PermitAction(dataSource, logger);
-      await permitEntityAction.storePermits(
-        [samplePermit1],
-        block,
-        'extractor1'
-      );
-      await permitEntityAction.storePermits(
+      await action.storePermits([samplePermit1], block, 'extractor1');
+      await action.storePermits(
         [samplePermit2],
         { ...block, hash: 'hash2' },
         'extractor2'
@@ -318,7 +310,7 @@ describe('PermitEntityAction', () => {
     it('should remove the permit existed on the removed block', async () => {
       let [_, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await permitEntityAction.deleteBlock('hash', 'extractor1');
+      await action.deleteBlock('hash', 'extractor1');
       [_, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
     });
@@ -335,17 +327,13 @@ describe('PermitEntityAction', () => {
      * - it should set the spent block to null when the block is removed
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
-      await permitEntityAction.spendPermits(
-        [samplePermit1.boxId],
-        block2,
-        'extractor1'
-      );
+      await action.spendPermits([samplePermit1.boxId], block2, 'extractor1');
       let storedEntity = await repository.findOne({
         where: { boxId: samplePermit1.boxId, extractor: 'extractor1' },
       });
       expect(storedEntity!.spendBlock).toEqual(block2.hash);
 
-      await permitEntityAction.deleteBlock(block2.hash, 'extractor1');
+      await action.deleteBlock(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: samplePermit1.boxId, extractor: 'extractor1' },
       });

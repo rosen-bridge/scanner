@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
@@ -12,9 +12,9 @@ class CommitmentAction {
   private readonly datasource: DataSource;
   private readonly commitmentRepository: Repository<CommitmentEntity>;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.datasource = dataSource;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
     this.commitmentRepository = dataSource.getRepository(CommitmentEntity);
   }
 
