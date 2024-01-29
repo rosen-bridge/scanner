@@ -2,17 +2,17 @@ import { ObservationEntity } from '../entities/observationEntity';
 import { DataSource, In, Repository } from 'typeorm';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class ObservationEntityAction {
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly observationRepository: Repository<ObservationEntity>;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.datasource = dataSource;
     this.observationRepository = dataSource.getRepository(ObservationEntity);
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
   }
 
   /**

@@ -1,7 +1,7 @@
 import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
 import { DataSource, DeleteResult, MoreThanOrEqual, Repository } from 'typeorm';
 import { Block } from '../interfaces';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class BlockDbAction {
   readonly blockRepository: Repository<BlockEntity>;

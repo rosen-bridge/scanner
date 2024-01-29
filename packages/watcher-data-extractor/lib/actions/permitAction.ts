@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
@@ -12,9 +12,9 @@ class PermitAction {
   private readonly datasource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
 
-  constructor(dataSource: DataSource, logger: AbstractLogger) {
+  constructor(dataSource: DataSource, logger?: AbstractLogger) {
     this.datasource = dataSource;
-    this.logger = logger;
+    this.logger = logger ? logger : new DummyLogger();
     this.permitRepository = dataSource.getRepository(PermitEntity);
   }
 

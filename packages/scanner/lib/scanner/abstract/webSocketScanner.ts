@@ -1,7 +1,7 @@
 import { AbstractScanner } from './scanner';
 import { Block } from '../../interfaces';
 import { Mutex } from 'await-semaphore';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 const DEFAULT_MAX_TRY_BLOCK = 10;
 

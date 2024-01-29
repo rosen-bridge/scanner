@@ -8,7 +8,7 @@ import {
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 

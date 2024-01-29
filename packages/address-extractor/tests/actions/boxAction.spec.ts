@@ -1,12 +1,10 @@
 import { DataSource, Repository } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
 
 import { BoxEntityAction } from '../../lib/actions/boxAction';
 import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';
 import { BoxEntity } from '../../lib';
 import { ExtractedBox } from '../../lib/interfaces/types';
 
-const logger = new DummyLogger();
 let dataSource: DataSource;
 let action: BoxEntityAction;
 let repository: Repository<BoxEntity>;
@@ -14,7 +12,7 @@ let repository: Repository<BoxEntity>;
 describe('BoxAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    action = new BoxEntityAction(dataSource, logger);
+    action = new BoxEntityAction(dataSource);
     repository = dataSource.getRepository(BoxEntity);
   });
   describe('storeBlockBoxes', () => {

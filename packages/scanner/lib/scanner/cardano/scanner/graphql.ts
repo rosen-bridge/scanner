@@ -4,7 +4,7 @@ import { GraphQLTransaction } from '../interfaces/graphql';
 import { Block } from '../../../interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
   readonly initialHeight: number;

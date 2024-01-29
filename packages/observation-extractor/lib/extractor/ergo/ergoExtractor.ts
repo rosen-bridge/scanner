@@ -8,7 +8,7 @@ import {
   BlockEntity,
   Transaction,
 } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';

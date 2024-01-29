@@ -1,5 +1,4 @@
-import { DataSource } from 'typeorm';
-import { DummyLogger } from '@rosen-bridge/logger-interface';
+import { DataSource, Repository } from 'typeorm';
 
 import CommitmentAction from '../../lib/actions/commitmentAction';
 import { CommitmentEntity } from '../../lib';
@@ -33,12 +32,15 @@ const commitment4 = {
   boxId: 'boxId4',
 };
 
-const logger = new DummyLogger();
 let dataSource: DataSource;
 
-describe('commitmentEntityAction', () => {
+describe('commitmentAction', () => {
+  let action: CommitmentAction;
+  let repository: Repository<CommitmentEntity>;
   beforeEach(async () => {
     dataSource = await createDatabase();
+    action = new CommitmentAction(dataSource);
+    repository = dataSource.getRepository(CommitmentEntity);
   });
 
   describe('storeCommitments', () => {
@@ -49,8 +51,7 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and database row count should be 2
      */
     it('gets two commitments and dataBase row should be 2', async () => {
-      const commitmentEntity = new CommitmentAction(dataSource, logger);
-      const res = await commitmentEntity.storeCommitments(
+      const res = await action.storeCommitments(
         [commitment1, commitment2],
         block,
         'extractor1'
@@ -68,8 +69,6 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and each saved commitments should have valid fields
      */
     it('checks that commitments saved successfully with two different extractor', async () => {
-      const action = new CommitmentAction(dataSource, logger);
-      const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
           ...commitment1,
@@ -121,7 +120,6 @@ describe('commitmentEntityAction', () => {
      * Expected: storeCommitments should returns true and last commitment fields should update
      */
     it('checks that duplicated commitment updated with same extractor', async () => {
-      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -168,7 +166,6 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different extractor but same boxId', async () => {
-      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -214,7 +211,6 @@ describe('commitmentEntityAction', () => {
      *  each step and new commitments should insert in the database
      */
     it('two commitment with two different boxId but same extractor', async () => {
-      const action = new CommitmentAction(dataSource, logger);
       const repository = dataSource.getRepository(CommitmentEntity);
       await repository.insert([
         {
@@ -261,8 +257,7 @@ describe('commitmentEntityAction', () => {
    */
   describe('spendCommitments', () => {
     it('sets one spendBlock for one commitment & one row should have spendBlock', async () => {
-      const commitmentEntity = new CommitmentAction(dataSource, logger);
-      const res = await commitmentEntity.storeCommitments(
+      const res = await action.storeCommitments(
         [commitment1, commitment2],
         block,
         'extractor1'
@@ -282,7 +277,7 @@ describe('commitmentEntityAction', () => {
         txId: 'txId',
         index: 10,
       };
-      await commitmentEntity.spendCommitments(
+      await action.spendCommitments(
         [spendInfo2, spendInfo10],
         block,
         'extractor1'
@@ -298,15 +293,9 @@ describe('commitmentEntityAction', () => {
   });
 
   describe('deleteBlockCommitment', () => {
-    let commitmentAction: CommitmentAction;
     beforeEach(async () => {
-      commitmentAction = new CommitmentAction(dataSource, logger);
-      await commitmentAction.storeCommitments(
-        [commitment1],
-        block,
-        'extractor1'
-      );
-      await commitmentAction.storeCommitments(
+      await action.storeCommitments([commitment1], block, 'extractor1');
+      await action.storeCommitments(
         [commitment2],
         { ...block, hash: 'hash2' },
         'extractor1'
@@ -314,7 +303,7 @@ describe('commitmentEntityAction', () => {
     });
 
     /**
-     * @target commitmentEntityAction.deleteBlock should remove the commitment existed on the removed block
+     * @target commitmentAction.deleteBlock should remove the commitment existed on the removed block
      * @dependencies
      * @scenario
      * - delete the block which is the commitment created on
@@ -327,13 +316,13 @@ describe('commitmentEntityAction', () => {
       const repository = dataSource.getRepository(CommitmentEntity);
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await commitmentAction.deleteBlock('hash', 'extractor1');
+      await action.deleteBlock('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
     });
 
     /**
-     * @target commitmentEntityAction.deleteBlock should set the spendBlock to null when spent block is forked
+     * @target commitmentAction.deleteBlock should set the spendBlock to null when spent block is forked
      * @dependencies
      * @scenario
      * - spend the stored commitment in the database
@@ -344,7 +333,7 @@ describe('commitmentEntityAction', () => {
      * - it should set the spent block, txId and index to null when the block is removed
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
-      await commitmentAction.spendCommitments(
+      await action.spendCommitments(
         [
           {
             boxId: commitment1.boxId,
@@ -366,7 +355,7 @@ describe('commitmentEntityAction', () => {
       });
       expect(storedEntity!.spendBlock).toEqual(block2.hash);
 
-      await commitmentAction.deleteBlock(block2.hash, 'extractor1');
+      await action.deleteBlock(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: commitment1.boxId, extractor: 'extractor1' },
       });

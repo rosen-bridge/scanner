@@ -4,7 +4,7 @@ import { BlockFrostTransaction } from '../interfaces/BlockFrost';
 import { Block } from '../../../interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
-import { AbstractLogger } from '@rosen-bridge/logger-interface';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   readonly initialHeight: number;
