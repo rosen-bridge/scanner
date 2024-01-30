@@ -2,8 +2,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import EventTriggerEntity from '../../entities/EventTriggerEntity';
 import { getWidInfo } from '../../utils';
 
-export class migration1703509820315 implements MigrationInterface {
-  name = 'migration1703509820315';
+export class migration1706610773315 implements MigrationInterface {
+  name = 'migration1706610773315';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -31,19 +31,18 @@ export class migration1703509820315 implements MigrationInterface {
             ADD "spendIndex" integer
         `);
 
+    // get all events before removing WIDs column
+    const events = await queryRunner.query(`
+            SELECT "id", "WIDs" from "event_trigger_entity"
+        `);
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
-    const events = await queryRunner.connection
-      .createQueryBuilder()
-      .select('id')
-      .addSelect('WIDs')
-      .from('event_trigger_entity', 'ete')
-      .getRawMany();
-
     for (const event of events) {
       const { WIDsHash, WIDsCount } = getWidInfo((event as any).WIDs);
-      await queryRunner.connection
-        .getRepository(EventTriggerEntity)
-        .update({ id: event.id }, { WIDsHash, WIDsCount });
+      await queryRunner.query(`
+            UPDATE "event_trigger_entity"
+            SET "WIDsHash" = '${WIDsHash}', "WIDsCount" = '${WIDsCount}'
+            WHERE "id" = ${event.id}
+        `);
     }
 
     await queryRunner.query(`
