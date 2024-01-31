@@ -1,4 +1,4 @@
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
 import { RPCTransaction } from '../interfaces/rpc';
 import { JsonRpcProvider } from 'ethers';
 

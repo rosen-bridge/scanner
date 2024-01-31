@@ -1,9 +1,7 @@
 import { EVMRPCConfig } from '../interfaces';
 import { RPCNetwork } from '../network/rpc';
 import { RPCTransaction } from '../interfaces/rpc';
-import { Block } from '../../../interfaces';
-import { GeneralScanner } from '../../abstract/generalScanner';
-import { BlockDbAction } from '../../action';
+import { Block, GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 class EVMRPCScanner extends GeneralScanner<RPCTransaction> {
