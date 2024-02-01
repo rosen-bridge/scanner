@@ -61,7 +61,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {
@@ -160,7 +162,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {
@@ -259,7 +263,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     signatories: [
@@ -331,7 +337,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {
