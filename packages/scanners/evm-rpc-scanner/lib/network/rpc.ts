@@ -3,18 +3,14 @@ import { RPCTransaction } from '../interfaces/rpc';
 import { JsonRpcProvider } from 'ethers';
 
 export class RPCNetwork extends AbstractNetworkConnector<RPCTransaction> {
-  private readonly url: string;
-  private readonly timeout: number;
-  private readonly provider: JsonRpcProvider;
+  protected readonly provider: JsonRpcProvider;
 
   constructor(url: string, timeout: number, authToken?: string) {
     super();
-    this.url = url;
-    this.timeout = timeout;
     this.provider = authToken
       ? new JsonRpcProvider(`${url}/${authToken}`)
       : new JsonRpcProvider(`${url}`);
-    this.provider._getConnection().timeout = 600;
+    this.provider._getConnection().timeout = timeout;
   }
 
   /**
