@@ -7,3 +7,5 @@ export { CardanoGraphQLObservationExtractor } from './extractor/cardano/graphql'
 export { ErgoObservationExtractor } from './extractor/ergo/ergoExtractor';
 export { ObservationEntity } from './entities/observationEntity';
 export { migrations } from './migrations/index';
+export { ExtractedObservation } from './interfaces/extractedObservation';
+export { ObservationEntityAction } from './actions/db';

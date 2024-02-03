@@ -1,3 +1,4 @@
+export { BlockDbAction } from './scanner/action';
 export { ErgoScanner } from './scanner/ergo/ergoScanner';
 export { CardanoKoiosScanner } from './scanner/cardano/scanner/koios';
 export { CardanoOgmiosScanner } from './scanner/cardano/scanner/ogmios';
@@ -6,7 +7,11 @@ export { CardanoGraphQLScanner } from './scanner/cardano/scanner/graphql';
 export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
-export { AbstractExtractor } from './interfaces';
+export {
+  AbstractExtractor,
+  AbstractNetworkConnector,
+  Block,
+} from './interfaces';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';
 export { WebSocketScanner } from './scanner/abstract/webSocketScanner';
