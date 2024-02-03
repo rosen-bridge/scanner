@@ -33,6 +33,8 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "@rosen-bridge/scanner": "^3.2.5"
+    "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/scanner": "^3.2.5",
+    "axios": "^1.6.7"
   }
 }
