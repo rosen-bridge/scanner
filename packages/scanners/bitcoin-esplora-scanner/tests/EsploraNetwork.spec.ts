@@ -1,12 +1,18 @@
-import { vi } from 'vitest';
-import { axiosInstance, mockAxiosGet } from './mocked/axios.mock';
+import {
+  axiosInstance,
+  mockAxiosGet,
+  resetAxiosMock,
+} from './mocked/axios.mock';
 import * as testData from './testData';
 import { EsploraNetwork } from '../lib/EsploraNetwork';
-import axios from 'axios';
 
 describe('EsploraNetwork', () => {
-  vi.spyOn(axios, 'create').mockReturnValue(axiosInstance as any);
-  const network = new EsploraNetwork('', 1);
+  let network: EsploraNetwork;
+
+  beforeEach(() => {
+    resetAxiosMock();
+    network = new EsploraNetwork('', 1);
+  });
 
   describe('getBlockAtHeight', () => {
     /**
@@ -17,8 +23,12 @@ describe('EsploraNetwork', () => {
      * - mock axios to return block header
      * - run test
      * - check returned value
+     * - check if function got called
      * @expected
      * - it should be expected block info
+     * - axios.get should got called 2 times
+     *   - with mocked block height
+     *   - with mocked block hash
      */
     it('should return block info successfully', async () => {
       mockAxiosGet(testData.blockHash);
@@ -27,6 +37,7 @@ describe('EsploraNetwork', () => {
       const result = await network.getBlockAtHeight(testData.blockHeight);
 
       expect(result).toEqual(testData.block);
+      expect(axiosInstance.get).toHaveBeenCalledTimes(2);
       expect(axiosInstance.get).toHaveBeenCalledWith(
         expect.stringContaining(String(testData.blockHeight))
       );
@@ -65,8 +76,12 @@ describe('EsploraNetwork', () => {
      * - mock axios to return block transactions 3 times (3 pages)
      * - run test
      * - check returned value
+     * - check if function got called
      * @expected
      * - it should be expected height
+     * - axios.get should got called 3 times
+     *   - with mocked block hash and starting index 0
+     *   - with mocked block hash and starting index 25
      */
     it('should return block transactions successfully', async () => {
       mockAxiosGet(testData.blockResponse);
@@ -79,6 +94,13 @@ describe('EsploraNetwork', () => {
         ...testData.blockTxsPage0,
         ...testData.blockTxsPage1,
       ]);
+      expect(axiosInstance.get).toHaveBeenCalledTimes(3);
+      expect(axiosInstance.get).toHaveBeenCalledWith(
+        expect.stringContaining(`${testData.blockHash}/txs/0`)
+      );
+      expect(axiosInstance.get).toHaveBeenCalledWith(
+        expect.stringContaining(`${testData.blockHash}/txs/25`)
+      );
     });
   });
 });
