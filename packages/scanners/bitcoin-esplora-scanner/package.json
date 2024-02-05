@@ -1,5 +1,5 @@
 {
-  "name": "bitcoin-esplora-scanner",
+  "name": "@rosen-bridge/bitcoin-esplora-scanner",
   "version": "0.1.0",
   "description": "A Bitcoin blockchain scanner based on Esplora Block Explorer API",
   "repository": "https://github.com/rosen-bridge/scanner",
@@ -13,7 +13,7 @@
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run build && npm publish --access public",
+    "release": "npm run test && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS=--loader=extensionless vitest",
     "type-check": "tsc --noEmit"
   },

@@ -1,4 +1,4 @@
-# bitcoin-esplora-scanner
+# @rosen-bridge/bitcoin-esplora-scanner
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ A Bitcoin blockchain scanner based on Esplora Block Explorer API
 npm:
 
 ```sh
-npm i bitcoin-esplora-scanner
+npm i @rosen-bridge/bitcoin-esplora-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add bitcoin-esplora-scanner
+yarn add @rosen-bridge/bitcoin-esplora-scanner
 ```
