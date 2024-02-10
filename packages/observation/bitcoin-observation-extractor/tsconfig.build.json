@@ -5,7 +5,7 @@
   },
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
-    { "path": "../../scanner" },
+    { "path": "../../observation-extractor" },
     { "path": "../../scanners/bitcoin-esplora-scanner/tsconfig.build.json" }
   ]
 }

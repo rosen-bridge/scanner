@@ -5,7 +5,7 @@
   },
   "include": ["tests", "lib", "vitest.config.ts"],
   "references": [
-    { "path": "../../scanner" },
+    { "path": "../../observation-extractor" },
     { "path": "../../scanners/bitcoin-esplora-scanner" }
   ]
 }
