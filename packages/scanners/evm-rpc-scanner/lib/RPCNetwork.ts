@@ -1,16 +1,17 @@
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
-import { RPCTransaction } from '../interfaces/rpc';
+import { RPCTransaction, BlockNotFound } from './types';
 import { JsonRpcProvider } from 'ethers';
+import { rpcClientFactory } from './api';
 
 export class RPCNetwork extends AbstractNetworkConnector<RPCTransaction> {
   protected readonly provider: JsonRpcProvider;
 
-  constructor(url: string, timeout: number, authToken?: string) {
+  constructor(url: string, timeout?: number, authToken?: string) {
     super();
-    this.provider = authToken
-      ? new JsonRpcProvider(`${url}/${authToken}`)
-      : new JsonRpcProvider(`${url}`);
-    this.provider._getConnection().timeout = timeout;
+    this.provider = rpcClientFactory.generate(url, authToken);
+    if (timeout) {
+      this.provider._getConnection().timeout = timeout;
+    }
   }
 
   /**
@@ -23,7 +24,7 @@ export class RPCNetwork extends AbstractNetworkConnector<RPCTransaction> {
       .getBlock(height)
       .then((block) => {
         if (block == undefined) {
-          throw new Error("Block doesn't exist.");
+          throw new BlockNotFound(`Block with height ${height} is not found.`);
         }
         if (block['hash'] == undefined) {
           throw new Error('no block hash!');
@@ -67,30 +68,9 @@ export class RPCNetwork extends AbstractNetworkConnector<RPCTransaction> {
       .getBlock(blockHash, true)
       .then((block) => {
         if (block == undefined) {
-          throw new Error("Block doesn't exist.");
+          throw new BlockNotFound(`Block with hash ${blockHash} is not found.`);
         }
-        return block.prefetchedTransactions
-          .filter((tx) => tx.isMined()) // Not sure why tx shouldn't be mined already !
-          .map((tx) => {
-            return {
-              tx_hash: tx.hash,
-              block_hash: tx.blockHash,
-              block_height: tx.blockNumber,
-              tx_block_index: tx.index,
-              value: tx.value,
-              fee: {
-                gas_limit: tx.gasLimit,
-                gas_price: tx.gasPrice,
-                maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-                maxFeePerGas: tx.maxFeePerGas,
-              },
-              nonce: tx.nonce,
-              type: tx.type,
-              from: tx.from,
-              to: tx.to,
-              input_data: tx.data,
-            };
-          });
+        return block.prefetchedTransactions.filter((tx) => tx.isMined()); // Not sure why tx shouldn't be mined already !
       })
       .catch((exp) => {
         throw exp;

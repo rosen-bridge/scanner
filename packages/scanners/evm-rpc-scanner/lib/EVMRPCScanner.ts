@@ -1,6 +1,5 @@
-import { EVMRPCConfig } from '../interfaces';
-import { RPCNetwork } from '../network/rpc';
-import { RPCTransaction } from '../interfaces/rpc';
+import { EVMRPCConfig, RPCTransaction } from './types';
+import { RPCNetwork } from './RPCNetwork';
 import { Block, GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 

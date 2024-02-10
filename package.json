@@ -3,8 +3,8 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "packages/scanners/evm-rpc-scanner/*",
-      "packages/*"
+      "packages/*",
+      "packages/scanners/*"
     ]
   },
   "scripts": {

@@ -1,5 +1,5 @@
-import { RPCNetwork } from '../lib/network/rpc';
+import { RPCNetwork } from '../lib/RPCNetwork';
 
-export class TestCardanoBlockFrostNetwork extends RPCNetwork {
+export class TestEVMRPCNetwork extends RPCNetwork {
   getProvider = () => this.provider;
 }

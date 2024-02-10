@@ -1,13 +1,10 @@
 {
-  "name": "@rosen-bridge/evm-rpc-scanner",
+  "name": "bitcoin-esplora-scanner",
   "version": "0.1.0",
-  "description": "An EVM chain scanner based on RPC.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rosen-bridge/scanner.git"
-  },
+  "description": "A Bitcoin blockchain scanner based on Esplora Block Explorer API",
+  "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
-  "author": "",
+  "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,18 +32,9 @@
   "engines": {
     "node": ">=20.11.0"
   },
-  "bugs": {
-    "url": "https://github.com/rosen-bridge/scanner/issues"
-  },
-  "homepage": "https://github.com/rosen-bridge/scanner#readme",
-  "directories": {
-    "lib": "lib",
-    "test": "tests"
-  },
-  "keywords": [],
   "dependencies": {
-    "ethers": "^6.10.0",
-    "vitest-when": "^0.3.1",
-    "ws": "^8.16.0"
+    "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/scanner": "^3.2.5",
+    "axios": "^1.6.7"
   }
 }
