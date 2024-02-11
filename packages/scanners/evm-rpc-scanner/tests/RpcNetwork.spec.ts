@@ -4,7 +4,7 @@ import {
   mockGetBlockNumber,
   mockGetBlock,
   resetRpcMock,
-} from './mocked/JsonRpc.mock';
+} from './mocked/JsonRpcProvider.mock';
 import { BlockNotFound } from '../lib/types';
 
 describe('RPCNetwork', () => {
@@ -41,7 +41,7 @@ describe('RPCNetwork', () => {
   describe('getBlockTxs', () => {
     /**
      * @target `RPCNetwork.getBlockTxs` should return
-     * id of block transactions
+     * transactions of the block
      * @dependencies
      * @scenario
      * - mock `RPC.getBlock` with prefetchTxs `true`
@@ -86,8 +86,7 @@ describe('RPCNetwork', () => {
 
   describe('getBlockAtHeight', () => {
     /**
-     * @target `RPCNetwork.getBlockInfo` should return
-     * block hash, parent hash and height
+     * @target `RPCNetwork.getBlockInfo` should return block info
      * @dependencies
      * @scenario
      * - mock `RPC.getBlock`
