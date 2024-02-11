@@ -3,10 +3,6 @@ export const blockHeight = 9511863;
 export const wrongBlockHeight = 2000000000;
 export const blockHash =
   '0x3fe54add83a1b7122039ddfc4a5e6b2a4116791b2db5d4f6e3a5cd2a36737acc';
-// export const absoluteSlot = 107701834;
-
-// export const address =
-//   'addr1qxxa3kfnnh40yqtepa5frt0tkw4a0rys7v33422lzt8glx43sqtd4vkhjzawajej8aujh27p5a54zx62xf3wvuplynqs3fsqet';
 
 export const transactionsList = [
   {

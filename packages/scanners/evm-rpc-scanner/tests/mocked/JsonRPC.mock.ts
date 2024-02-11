@@ -1,30 +1,39 @@
 import { vi } from 'vitest';
 import { JsonRpcProvider } from 'ethers';
 import * as testData from '../testData';
+import { rpcClientFactory } from '../../lib/api';
 
-// const serverNotFoundError = new BlockfrostServerError({
-//   status_code: 404,
-//   message: 'The requested component has not been found.',
-//   error: 'Not Found',
-//   url: 'requested_url',
-// });
+export const rpcInstance = {
+  getBlock: vi.fn(),
+  getBlockNumber: vi.fn(),
+  _getConnection: () => {
+    return {
+      timeout: 0,
+    };
+  },
+};
+
+/**
+ * resets rpc functions mocks and call counts
+ */
+export const resetRpcMock = () => {
+  rpcInstance.getBlock.mockReset();
+  rpcInstance.getBlockNumber.mockReset();
+  vi.spyOn(rpcClientFactory, 'generate').mockReturnValue(rpcInstance as any);
+};
 
 /**
  * mocks `getBlock` function of the provider to return value
  * @param provider
  */
-export const mockGetBlock = (provider: JsonRpcProvider) => {
-  vi.spyOn(provider, 'getBlock').mockResolvedValue(testData.blockInfo);
+export const mockGetBlock = (provider: JsonRpcProvider, data: any) => {
+  vi.spyOn(provider, 'getBlock').mockResolvedValue(data);
 };
 
 /**
- * mocks `getBlock` function of the provider to throw error
+ * mocks `getBlockNumber` function of the provider to return value
  * @param provider
  */
-export const mockGetBlockThrowError = (provider: JsonRpcProvider) => {
-  vi.spyOn(provider, 'getBlock').mockResolvedValue(null);
-};
-
 export const mockGetBlockNumber = (provider: JsonRpcProvider) => {
   vi.spyOn(provider, 'getBlockNumber').mockResolvedValue(
     testData.blockInfo.number
@@ -35,30 +44,6 @@ export const mockGetBlockNumber = (provider: JsonRpcProvider) => {
  * mocks `txs` function of the provider to return value
  * @param provider
  */
-export const mockTxs = (provider: JsonRpcProvider) => {
-  mockGetBlock(provider);
-};
-
-/**
- * mocks `getBlockTxs` function of the provider to throw error
- * @param provider
- */
-export const mockTxsThrowError = (provider: JsonRpcProvider) => {
-  mockGetBlockThrowError(provider);
-};
-
-/**
- * mocks `txs` function of the provider to throw error
- * @param provider
- */
-export const mockTxsNotFound = (provider: JsonRpcProvider) => {
-  //   vi.spyOn(client, 'txs').mockRejectedValue(serverNotFoundError);
-};
-
-/**
- * mocks `blocks` function of the client to return value
- * @param provider
- */
-export const mockBlocks = (provider: JsonRpcProvider) => {
-  //   vi.spyOn(client, 'blocks').mockResolvedValue(testData.blockInfo);
+export const mockTxs = (provider: JsonRpcProvider, data: any) => {
+  mockGetBlock(provider, data);
 };

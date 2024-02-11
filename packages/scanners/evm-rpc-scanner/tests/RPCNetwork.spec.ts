@@ -1,50 +1,32 @@
 import * as testData from './testData';
-import { TestEVMRPCNetwork } from './TestRPCNetwork';
+import { TestEVMRpcNetwork } from './TestRpcNetwork';
 import {
   mockGetBlockNumber,
   mockTxs,
   mockGetBlock,
-  mockGetBlockThrowError,
-  mockTxsThrowError,
-} from './mocked/JsonRPC.mock';
+  resetRpcMock,
+} from './mocked/JsonRpc.mock';
 import { BlockNotFound } from '../lib/types';
-import { resetRPCMock } from './mocked/RPC.mock';
 
 describe('RPCNetwork', () => {
-  let network: TestEVMRPCNetwork;
+  let network: TestEVMRpcNetwork;
 
   beforeEach(() => {
-    resetRPCMock();
-    network = new TestEVMRPCNetwork('', 1);
+    resetRpcMock();
+    network = new TestEVMRpcNetwork('', 1);
   });
 
-  //   describe('constructor', () => {
-  //     /**
-  //      * @target constructor of `CardanoBlockFrostNetwork` should set extractor
-  //      * @dependencies
-  //      * @scenario
-  //      * - construct an `CardanoBlockFrostNetwork`
-  //      * @expected
-  //      * - extractor of network should be defined
-  //      */
-  //     it('should set extractor', () => {
-  //       const network = mockNetwork();
-
-  //       expect(network.).toBeDefined();
-  //     });
-  //   });
-
   describe('getCurrentHeight', () => {
-    //     /**
-    //      * @target `RPCNetwork.getHeight` should return block height successfully
-    //      * @dependencies
-    //      * @scenario
-    //      * - mock `RPC.getBlockNumber`
-    //      * - run test
-    //      * - check returned value
-    //      * @expected
-    //      * - it should be mocked block height
-    //      */
+    /**
+     * @target `RPCNetwork.getHeight` should return block height successfully
+     * @dependencies
+     * @scenario
+     * - mock `RPC.getBlockNumber`
+     * - run test
+     * - check returned value
+     * @expected
+     * - it should be mocked block height
+     */
     it('should return block height successfully', async () => {
       // mock client response
       mockGetBlockNumber(network.getProvider());
@@ -67,11 +49,11 @@ describe('RPCNetwork', () => {
      * - run test
      * - check returned value
      * @expected
-     * - it should be mocked transactions
+     * - it should return transactions of the block
      */
     it('should return transactions of the block', async () => {
       // mock client response
-      mockTxs(network.getProvider());
+      mockTxs(network.getProvider(), testData.blockInfo);
 
       // run test
       const result = await network.getBlockTxs(testData.blockHash);
@@ -79,6 +61,7 @@ describe('RPCNetwork', () => {
       // check returned value
       expect(result).toEqual(testData.transactionsList);
     });
+
     /**
      * @target `RPCNetwork.getBlockTxs` should throw
      * error if block can not be found.
@@ -90,9 +73,9 @@ describe('RPCNetwork', () => {
      * @expected
      * - getBlockTxs should throw BlockNotFound
      */
-    it('should return transactions of the block', async () => {
+    it('should throw BlockNotFound', async () => {
       // mock client response
-      mockTxsThrowError(network.getProvider());
+      mockTxs(network.getProvider(), null);
 
       // run test
       const result = network.getBlockTxs(testData.blockHash);
@@ -112,11 +95,11 @@ describe('RPCNetwork', () => {
      * - run test
      * - check returned value
      * @expected
-     * - it should be mocked block info
+     * - it should return block info successfully
      */
-    it('should return block hash, parent hash and height', async () => {
+    it('should return block info successfully', async () => {
       // mock client response
-      mockGetBlock(network.getProvider());
+      mockGetBlock(network.getProvider(), testData.blockInfo);
 
       // run test
       const result = await network.getBlockAtHeight(testData.blockHeight);
@@ -133,18 +116,18 @@ describe('RPCNetwork', () => {
 
     /**
      * @target `RPCNetwork.getBlockAtHeight` should throw
-     * error. The block shouldn't be found
+     * error when block height is wrong
      * @dependencies
      * @scenario
      * - mock `RPC.getBlock`
      * - run test
      * - call the function and expect error
      * @expected
-     * - getBlockAtHeight should throw NotEnoughAssetsError
+     * - getBlockAtHeight should throw BlockNotFound
      */
     it('should throw error when block height is wrong', async () => {
       // mock client response
-      mockGetBlockThrowError(network.getProvider());
+      mockGetBlock(network.getProvider(), null);
 
       // run test
       const result = network.getBlockAtHeight(testData.wrongBlockHeight);

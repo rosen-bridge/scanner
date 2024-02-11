@@ -1,2 +1,1 @@
-export { RPCTransaction } from './types';
-export { RPCNetwork } from './RPCNetwork';
+export { RpcNetwork } from './RpcNetwork';
