@@ -4,17 +4,19 @@ import { TransactionResponse } from 'ethers';
 import { Block, GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
-export abstract class EVMRpcScanner extends GeneralScanner<TransactionResponse> {
+export class EVMRpcScanner extends GeneralScanner<TransactionResponse> {
   readonly initialHeight: number;
+  readonly _name: string;
   network: RpcNetwork;
   constructor(
-    name: string,
+    _name: string,
     config: EVMRpcConfig,
     logger?: AbstractLogger,
     authToken?: string
   ) {
     super(logger);
-    this.action = new BlockDbAction(config.dataSource, name, logger);
+    this._name = _name;
+    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
      * `initialHeight` by one so that it matches all other rosen-bridge scanners
@@ -25,5 +27,9 @@ export abstract class EVMRpcScanner extends GeneralScanner<TransactionResponse> 
 
   getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
+  };
+
+  name = (): string => {
+    return this._name;
   };
 }

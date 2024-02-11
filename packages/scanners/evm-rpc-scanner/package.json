@@ -29,21 +29,9 @@
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
   },
-  "engines": {
-    "node": ">=20.11.0"
-  },
-  "bugs": {
-    "url": "https://github.com/rosen-bridge/scanner/issues"
-  },
-  "homepage": "https://github.com/rosen-bridge/scanner#readme",
-  "directories": {
-    "lib": "lib",
-    "test": "tests"
-  },
-  "keywords": [],
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
     "@rosen-bridge/scanner": "^3.2.5",
-    "ethers": "^6.10.0"
+    "ethers": "^6.11.0"
   }
 }

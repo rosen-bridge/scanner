@@ -1,1 +1,1 @@
-export { RpcNetwork } from './RpcNetwork';
+export { EVMRpcScanner } from './EVMRpcScanner';

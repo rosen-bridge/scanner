@@ -24,15 +24,15 @@ export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
       if (block == undefined) {
         throw new BlockNotFound(`Block with height ${height} is not found.`);
       }
-      if (block['hash'] == undefined) {
+      if (block.hash == undefined) {
         throw new Error('no block hash!');
       }
 
       return {
-        hash: block['hash'],
-        blockHeight: block['number'],
-        parentHash: block['parentHash'],
-        timestamp: block['timestamp'],
+        hash: block.hash,
+        blockHeight: block.number,
+        parentHash: block.parentHash,
+        timestamp: block.timestamp,
         txCount: block.length,
       };
     });
