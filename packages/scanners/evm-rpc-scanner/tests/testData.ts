@@ -11,6 +11,7 @@ export const transactionsList = [
     blockHash:
       '0x3fe54add83a1b7122039ddfc4a5e6b2a4116791b2db5d4f6e3a5cd2a36737acc',
     index: 4,
+    maxFeePerBlobGas: null,
     hash: '0x0a661586235004d977583ee5715ae87679d2815381ff62f08e006bbc7e3a9afc',
     type: 2,
     to: '0xC12dC39e799706B3E9bAF3064Ce5011f491A480B',
@@ -30,12 +31,15 @@ export const transactionsList = [
       networkV: null,
     }),
     accessList: [],
+    blobVersionedHashes: null,
   },
   {
     provider: new JsonRpcProvider(),
     blockNumber: 19195927,
     blockHash:
       '0x3fe54add83a1b7122039ddfc4a5e6b2a4116791b2db5d4f6e3a5cd2a36737acc',
+    maxFeePerBlobGas: null,
+    blobVersionedHashes: null,
     index: 3,
     hash: '0x457077e99e7a8bd4a5403a08ab2aa793a6c9c7ceb6df0fa4704471431390bc4e',
     type: 2,
@@ -60,6 +64,8 @@ export const transactionsList = [
   {
     provider: new JsonRpcProvider(),
     blockNumber: 19195927,
+    maxFeePerBlobGas: null,
+    blobVersionedHashes: null,
     blockHash:
       '0x3fe54add83a1b7122039ddfc4a5e6b2a4116791b2db5d4f6e3a5cd2a36737acc',
     hash: '0x3cdcaaba56740b0bcb5e1be7c4eb9a89b9f9444289fcfd766db74b541a158d5e',
@@ -88,6 +94,8 @@ export const transactionsList = [
     blockNumber: 19195927,
     blockHash:
       '0x3fe54add83a1b7122039ddfc4a5e6b2a4116791b2db5d4f6e3a5cd2a36737acc',
+    maxFeePerBlobGas: null,
+    blobVersionedHashes: null,
     index: 0,
     hash: '0xd5c1486c432bdbde219639b50ccd1c6258690413a1c229014761aac7e74b1e0c',
     type: 2,
