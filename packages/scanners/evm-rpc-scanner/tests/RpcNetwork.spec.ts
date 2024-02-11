@@ -2,7 +2,6 @@ import * as testData from './testData';
 import { TestEVMRpcNetwork } from './TestRpcNetwork';
 import {
   mockGetBlockNumber,
-  mockTxs,
   mockGetBlock,
   resetRpcMock,
 } from './mocked/JsonRpc.mock';
@@ -53,7 +52,7 @@ describe('RPCNetwork', () => {
      */
     it('should return transactions of the block', async () => {
       // mock client response
-      mockTxs(network.getProvider(), testData.blockInfo);
+      mockGetBlock(network.getProvider(), testData.blockInfo);
 
       // run test
       const result = await network.getBlockTxs(testData.blockHash);
@@ -75,7 +74,7 @@ describe('RPCNetwork', () => {
      */
     it('should throw BlockNotFound', async () => {
       // mock client response
-      mockTxs(network.getProvider(), null);
+      mockGetBlock(network.getProvider(), null);
 
       // run test
       const result = network.getBlockTxs(testData.blockHash);

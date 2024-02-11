@@ -9,13 +9,13 @@ export class EVMRpcScanner extends GeneralScanner<TransactionResponse> {
   readonly _name: string;
   network: RpcNetwork;
   constructor(
-    _name: string,
+    chain: string,
     config: EVMRpcConfig,
     logger?: AbstractLogger,
     authToken?: string
   ) {
     super(logger);
-    this._name = _name;
+    this._name = `${chain}-evm-rpc`;
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config

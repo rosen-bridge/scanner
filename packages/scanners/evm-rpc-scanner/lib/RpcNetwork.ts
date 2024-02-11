@@ -1,14 +1,15 @@
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
 import { BlockNotFound } from './types';
 import { JsonRpcProvider, TransactionResponse } from 'ethers';
-import { rpcClientFactory } from './api';
 
 export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
   protected readonly provider: JsonRpcProvider;
 
   constructor(url: string, timeout?: number, authToken?: string) {
     super();
-    this.provider = rpcClientFactory.generate(url, authToken);
+    this.provider = authToken
+      ? new JsonRpcProvider(`${url}/${authToken}`)
+      : new JsonRpcProvider(`${url}`);
     if (timeout) {
       this.provider._getConnection().timeout = timeout;
     }
