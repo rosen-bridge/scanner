@@ -52,46 +52,30 @@ export abstract class AbstractObservationExtractor<
     txs: Array<TransactionType>,
     block: BlockEntity
   ): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const observations: Array<ExtractedObservation> = [];
-        txs.forEach((transaction) => {
-          const data = this.extractor.get(transaction);
-          if (data) {
-            const requestId = Buffer.from(
-              blake2b(this.getTxId(transaction), undefined, 32)
-            ).toString('hex');
-            observations.push({
-              fromChain: this.FROM_CHAIN,
-              toChain: data.toChain,
-              amount: data.amount,
-              sourceChainTokenId: data.sourceChainTokenId,
-              targetChainTokenId: data.targetChainTokenId,
-              sourceTxId: data.sourceTxId,
-              bridgeFee: data.bridgeFee,
-              networkFee: data.networkFee,
-              sourceBlockId: block.hash,
-              requestId: requestId,
-              toAddress: data.toAddress,
-              fromAddress: data.fromAddress,
-            });
-          }
+    const observations: Array<ExtractedObservation> = [];
+    txs.forEach((transaction) => {
+      const data = this.extractor.get(transaction);
+      if (data) {
+        const requestId = Buffer.from(
+          blake2b(this.getTxId(transaction), undefined, 32)
+        ).toString('hex');
+        observations.push({
+          fromChain: this.FROM_CHAIN,
+          toChain: data.toChain,
+          amount: data.amount,
+          sourceChainTokenId: data.sourceChainTokenId,
+          targetChainTokenId: data.targetChainTokenId,
+          sourceTxId: data.sourceTxId,
+          bridgeFee: data.bridgeFee,
+          networkFee: data.networkFee,
+          sourceBlockId: block.hash,
+          requestId: requestId,
+          toAddress: data.toAddress,
+          fromAddress: data.fromAddress,
         });
-        this.actions
-          .storeObservations(observations, block, this.getId())
-          .then((status) => {
-            resolve(status);
-          })
-          .catch((e) => {
-            this.logger.error(
-              `An error occurred during store observations: ${e}`
-            );
-            reject(e);
-          });
-      } catch (e) {
-        reject(e);
       }
     });
+    return this.actions.storeObservations(observations, block, this.getId());
   };
 
   /**
