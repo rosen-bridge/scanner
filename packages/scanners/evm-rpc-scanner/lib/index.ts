@@ -1,1 +1,1 @@
-export { EVMRpcScanner } from './EVMRpcScanner';
+export { EvmRpcScanner } from './EvmRpcScanner';

@@ -1,5 +1,5 @@
 import * as testData from './testData';
-import { TestEVMRpcNetwork } from './TestRpcNetwork';
+import { TestEvmRpcNetwork } from './TestRpcNetwork';
 import {
   mockGetBlockNumber,
   mockGetBlock,
@@ -8,11 +8,11 @@ import {
 import { BlockNotFound } from '../lib/types';
 
 describe('RPCNetwork', () => {
-  let network: TestEVMRpcNetwork;
+  let network: TestEvmRpcNetwork;
 
   beforeEach(() => {
     resetRpcMock();
-    network = new TestEVMRpcNetwork('', 1);
+    network = new TestEvmRpcNetwork('', 1);
   });
 
   describe('getCurrentHeight', () => {

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
-export interface EVMRpcConfig {
-  RPCUrl: string;
+export interface EvmRpcConfig {
+  RpcUrl: string;
   timeout: number;
   initialHeight: number;
   dataSource: DataSource;
