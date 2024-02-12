@@ -4,7 +4,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
-      "packages/observation/*",
+      "packages/observation-extractors/*",
       "packages/scanners/*"
     ]
   },
