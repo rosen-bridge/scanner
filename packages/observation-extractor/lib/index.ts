@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+export { AbstractObservationExtractor } from './extractor/abstract/AbstractObservationExtractor';
 export { CardanoKoiosObservationExtractor } from './extractor/cardano/koios';
 export { CardanoOgmiosObservationExtractor } from './extractor/cardano/ogmios';
 export { CardanoBlockFrostObservationExtractor } from './extractor/cardano/blockfrost';
