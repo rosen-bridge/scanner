@@ -78,7 +78,7 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
 
   outBoxBuilder.set_register_value(
     4,
-    wasm.Constant.from_coll_coll_byte([new Uint8Array(Buffer.from(WID, 'hex'))])
+    wasm.Constant.from_byte_array(new Uint8Array(Buffer.from(WID, 'hex')))
   );
 
   const outBox = outBoxBuilder.build();

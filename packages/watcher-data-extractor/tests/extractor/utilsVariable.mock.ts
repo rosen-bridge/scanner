@@ -388,9 +388,9 @@ export const last10BlockHeader = [
 export const addressBoxes = {
   items: [
     {
-      boxId: 'd4e292dbd4df2378f1392044b43922540ae7a0e9e9c3553549aa39557372e671',
+      boxId: '84c19f45cdfc7c35547deefe0e513a7e42919365c17f588536ef61b6885765f1',
       transactionId:
-        '4a61b347bc82b61f56904171423ebdaf9ebe1221f5f930e6910e3e69f6276c23',
+        '0734350dc4760e5596af44de772a1d00ced823a3a02a99bce807c7640e4b72db',
       blockId:
         '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
       value: 1100000n,
@@ -414,8 +414,7 @@ export const addressBoxes = {
         },
       ],
       additionalRegisters: {
-        R4: '1a01203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
-        R5: '0e0100',
+        R4: '0e203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
       },
       mainChain: true,
       spentTransactionId:
