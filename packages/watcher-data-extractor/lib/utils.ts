@@ -5,3 +5,13 @@ const JsonBI = JSONBigInt({
 });
 
 export { JsonBI };
+
+/**
+ * converts hex string to Uint8Array bytes
+ *
+ * @param {Uint8Array} bytes
+ * @return {string}
+ */
+export const uint8ArrayToHex = (bytes: Uint8Array): string => {
+  return Buffer.from(bytes).toString('hex');
+};
