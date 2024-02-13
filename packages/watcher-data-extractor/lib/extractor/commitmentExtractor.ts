@@ -81,11 +81,11 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                   wasm.NonMandatoryRegisterId.R6
                 );
                 if (R4 && R5 && R6) {
-                  const R4Value = R4.to_coll_coll_byte();
-                  const R5Value = R5.to_coll_coll_byte();
+                  const R4Value = R4.to_byte_array();
+                  const R5Value = R5.to_byte_array();
                   const R6Value = R6.to_byte_array();
-                  const WID = Buffer.from(R4Value[0]).toString('hex');
-                  const requestId = Buffer.from(R5Value[0]).toString('hex');
+                  const WID = Buffer.from(R4Value).toString('hex');
+                  const requestId = Buffer.from(R5Value).toString('hex');
                   const eventDigest = Buffer.from(R6Value).toString('hex');
                   commitments.push({
                     txId: transaction.id,

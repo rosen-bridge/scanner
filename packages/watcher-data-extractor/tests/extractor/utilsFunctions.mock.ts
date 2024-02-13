@@ -139,8 +139,8 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
  */
 export const commitmentTxGenerator = (
   hasToken = true,
-  WID: Array<string>,
-  requestId: Array<string>,
+  WID: string,
+  requestId: string,
   eventDigest: string
 ) => {
   const sk = wasm.SecretKey.random_dlog();
@@ -162,21 +162,11 @@ export const commitmentTxGenerator = (
     );
   }
 
-  const R4Value = WID.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
-  outBoxBuilder.set_register_value(
-    4,
-    wasm.Constant.from_coll_coll_byte(R4Value)
-  );
+  const R4Value = new Uint8Array(Buffer.from(WID, 'hex'));
+  outBoxBuilder.set_register_value(4, wasm.Constant.from_byte_array(R4Value));
 
-  const R5Value = requestId.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
-  outBoxBuilder.set_register_value(
-    5,
-    wasm.Constant.from_coll_coll_byte(R5Value)
-  );
+  const R5Value = new Uint8Array(Buffer.from(requestId, 'hex'));
+  outBoxBuilder.set_register_value(5, wasm.Constant.from_byte_array(R5Value));
 
   outBoxBuilder.set_register_value(
     6,
