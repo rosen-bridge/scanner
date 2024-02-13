@@ -99,13 +99,12 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                     wasm.NonMandatoryRegisterId.R7
                   );
                   if (R4Const && R5Const && R7Const) {
-                    const R4Serialized = R4Const.to_coll_coll_byte();
+                    const R4Serialized = R4Const.to_byte_array();
                     const R5Serialized = R5Const.to_coll_coll_byte();
                     if (R4Serialized.length >= 1 && R5Serialized.length >= 12) {
                       const WIDsCount = R7Const.to_i32();
-                      const WIDsHash = Buffer.from(R4Serialized[0]).toString(
-                        'hex'
-                      );
+                      const WIDsHash =
+                        Buffer.from(R4Serialized).toString('hex');
                       const sourceTxId = Buffer.from(
                         R5Serialized[0]
                       ).toString();
@@ -230,9 +229,9 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
         try {
           const R4Serialized = outputParsed
             .register_value(wasm.NonMandatoryRegisterId.R4)
-            ?.to_coll_coll_byte();
+            ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
-            const txId = Buffer.from(R4Serialized[0]).toString('hex');
+            const txId = Buffer.from(R4Serialized).toString('hex');
             paymentTxId = txId;
             if (txId !== '') paymentTxId = txId;
             else {

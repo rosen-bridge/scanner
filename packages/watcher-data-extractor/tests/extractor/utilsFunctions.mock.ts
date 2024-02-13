@@ -258,11 +258,8 @@ export const eventTriggerTxGenerator = (
     (buf: Buffer, wid: Uint8Array) => Buffer.concat([buf, wid]),
     Buffer.from('')
   );
-  const R4Value = wids.length ? [blake2b(wids, undefined, 32)] : [];
-  outBoxBuilder.set_register_value(
-    4,
-    wasm.Constant.from_coll_coll_byte(R4Value)
-  );
+  const R4Value = wids.length ? blake2b(wids, undefined, 32) : Buffer.from('');
+  outBoxBuilder.set_register_value(4, wasm.Constant.from_byte_array(R4Value));
   const R5Value: Array<Uint8Array> = [];
   for (let i = 0; i < eventData.length; i++) {
     if ([5, 6, 7].includes(i)) {
