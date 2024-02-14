@@ -6,6 +6,7 @@ stages:
   - type_check
   - lint
   - test
+  - changeset
 
 installation:
   stage: installation
