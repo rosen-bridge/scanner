@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import EventTriggerEntity from '../../entities/EventTriggerEntity';
 import { getWidInfo } from '../../utils';
 
 export class migration1706610773176 implements MigrationInterface {
@@ -390,7 +389,8 @@ export class migration1706610773176 implements MigrationInterface {
                     "spendHeight",
                     "spendTxId",
                     "result",
-                    "paymentTxId"
+                    "paymentTxId",
+                    "WIDs"
                 )
             SELECT "id",
                 "eventId",
@@ -416,7 +416,8 @@ export class migration1706610773176 implements MigrationInterface {
                 "spendHeight",
                 "spendTxId",
                 "result",
-                "paymentTxId"
+                "paymentTxId",
+                ''
             FROM "temporary_event_trigger_entity"
         `);
     await queryRunner.query(`

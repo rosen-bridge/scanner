@@ -5,7 +5,7 @@ import { migration1706610773315 } from './postgres/1706610773315-migration';
 import { migration1688555766601 } from './sqlite/1688555766601-migration';
 import { migration1689175103163 } from './sqlite/1689175103163-migration';
 import { migration1699872205117 } from './sqlite/1699872205117-migration';
-import { migration1706610773176 } from './sqlite/migration1706610773176-migration';
+import { migration1706610773176 } from './sqlite/1706610773176-migration';
 
 export const migrations = {
   sqlite: [

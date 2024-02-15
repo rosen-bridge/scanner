@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import EventTriggerEntity from '../../entities/EventTriggerEntity';
 import { getWidInfo } from '../../utils';
 
 export class migration1706610773315 implements MigrationInterface {
@@ -65,7 +64,11 @@ export class migration1706610773315 implements MigrationInterface {
         `);
     await queryRunner.query(`
             ALTER TABLE "event_trigger_entity"
-            ADD "WIDs" character varying NOT NULL
+            ADD "WIDs" character varying NOT NULL DEFAULT ''
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "event_trigger_entity"
+            ALTER "WIDs" DROP DEFAULT
         `);
   }
 }
