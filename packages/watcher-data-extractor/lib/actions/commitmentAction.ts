@@ -6,6 +6,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
+import { SpendInfo } from '../interfaces/types';
 
 class CommitmentAction {
   readonly logger: AbstractLogger;
@@ -92,28 +93,41 @@ class CommitmentAction {
    * @param extractor
    */
   spendCommitments = async (
-    spendId: Array<string>,
+    spendId: Array<SpendInfo>,
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
+    // TODO: improve updating (local:ergo/rosen-bridge/scanner#85)
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
-      const updateResult = await this.commitmentRepository.update(
-        { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height }
-      );
+      const commitments = await this.commitmentRepository.findBy({
+        boxId: In(spendIdChunk.map((info) => info.boxId)),
+        extractor: extractor,
+      });
 
-      if (updateResult.affected && updateResult.affected > 0) {
-        const spentRows = await this.commitmentRepository.findBy({
-          boxId: In(spendIdChunk),
-          spendBlock: block.hash,
-        });
-        for (const row of spentRows) {
-          this.logger.info(
-            `Spent commitment [${row.boxId}] for event [${row.eventId}] at height ${block.height}`
+      for (const commitment of commitments) {
+        const spendInfo = spendIdChunk.find(
+          (info) => info.boxId === commitment.boxId
+        );
+        if (!spendInfo)
+          throw new Error(
+            `Impossible behavior: box [${commitment.boxId}] is not found in spending info list`
           );
-          this.logger.debug(`Spent commitment [${JSON.stringify(row)}]`);
-        }
+
+        await this.commitmentRepository.update(
+          {
+            id: commitment.id,
+          },
+          {
+            spendBlock: block.hash,
+            spendTxId: spendInfo.txId,
+            spendIndex: spendInfo.index,
+          }
+        );
+        this.logger.info(
+          `Spent commitment [${commitment.boxId}] for event [${commitment.eventId}] at height ${block.height}`
+        );
+        this.logger.debug(`Spent commitment [${JSON.stringify(commitment)}]`);
       }
     }
   };
@@ -134,7 +148,7 @@ class CommitmentAction {
     });
     await this.commitmentRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0 }
+      { spendBlock: null, spendHeight: 0, spendTxId: null, spendIndex: null }
     );
   };
 }

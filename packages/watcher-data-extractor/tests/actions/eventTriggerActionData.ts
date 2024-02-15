@@ -19,14 +19,16 @@ export const sampleEventEntity = {
   targetChainTokenId: 'targetToken',
   sourceTxId: 'txId',
   sourceBlockId: 'blockId',
-  WIDs: 'ff',
+  WIDsCount: 0,
+  WIDsHash: '',
   sourceChainHeight: 10,
 };
 
 export const sampleEventTrigger1: ExtractedEventTrigger = {
   eventId: 'eventId',
   txId: 'txId2',
-  WIDs: 'wid2',
+  WIDsCount: 1,
+  WIDsHash: 'hash1',
   amount: '22',
   bridgeFee: '11',
   fromAddress: 'ergoAddress1',
@@ -46,7 +48,8 @@ export const sampleEventTrigger1: ExtractedEventTrigger = {
 export const sampleEventTrigger2: ExtractedEventTrigger = {
   eventId: 'eventId',
   txId: 'txId',
-  WIDs: '1',
+  WIDsCount: 1,
+  WIDsHash: 'hash2',
   amount: '100',
   bridgeFee: '10',
   fromAddress: 'address',

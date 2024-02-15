@@ -18,3 +18,9 @@ export interface AddressBoxes {
   items: Array<ErgoBoxJson>;
   total: number;
 }
+
+export interface SpendInfo {
+  boxId: string;
+  txId: string;
+  index: number;
+}

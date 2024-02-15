@@ -48,7 +48,8 @@ export const sampleEventEntity: EventTriggerEntity = {
   targetChainTokenId: 'targetToken',
   sourceTxId: 'txId',
   sourceBlockId: 'blockId',
-  WIDs: 'ff',
+  WIDsCount: 0,
+  WIDsHash: '',
   sourceChainHeight: 10,
 };
 
@@ -387,9 +388,9 @@ export const last10BlockHeader = [
 export const addressBoxes = {
   items: [
     {
-      boxId: 'd4e292dbd4df2378f1392044b43922540ae7a0e9e9c3553549aa39557372e671',
+      boxId: '84c19f45cdfc7c35547deefe0e513a7e42919365c17f588536ef61b6885765f1',
       transactionId:
-        '4a61b347bc82b61f56904171423ebdaf9ebe1221f5f930e6910e3e69f6276c23',
+        '0734350dc4760e5596af44de772a1d00ced823a3a02a99bce807c7640e4b72db',
       blockId:
         '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
       value: 1100000n,
@@ -413,8 +414,7 @@ export const addressBoxes = {
         },
       ],
       additionalRegisters: {
-        R4: '1a01203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
-        R5: '0e0100',
+        R4: '0e203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
       },
       mainChain: true,
       spentTransactionId:
@@ -694,7 +694,7 @@ export const spendTriggerTx: Transaction = {
       index: 9,
     },
     {
-      boxId: '5cc08266df9245bd62db2140613e7805e6975b52ea8c3070c8ac27b5ef02e492',
+      boxId: 'ad8f28d284586190025589a314c20c2b9afb62be023596c115c1eacef2a1fc5b',
       value: 47000000n,
       ergoTree:
         '0008cd02d0b75bc997751195d143671cc10e8a590f25b987f2b2dd0d99cc5f48c6966d3d',
@@ -706,12 +706,12 @@ export const spendTriggerTx: Transaction = {
         },
       ],
       additionalRegisters: {
-        R4: '1a01208379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57',
+        R4: '0e208379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57',
       },
       creationHeight: 987965,
       transactionId:
-        '28e1cbc78b5847d57278169cf685eaef37c10ac7f18d26d07b0c5539c6d539a1',
-      index: 10,
+        '33b89c7ad97eb9cab674518b19e5be856acfffeace863426393e823394d76117',
+      index: 0,
     },
     {
       boxId: 'fcd1ed2f6348055bccc2ec8a99046cbaa667b5bd18ce4b8e1918a905ac103cf1',

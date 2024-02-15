@@ -14,7 +14,8 @@ interface ExtractedEventTrigger {
   targetChainTokenId: string;
   sourceBlockId: string;
   sourceTxId: string;
-  WIDs: string;
+  WIDsCount: number;
+  WIDsHash: string;
   sourceChainHeight: number;
 }
 
