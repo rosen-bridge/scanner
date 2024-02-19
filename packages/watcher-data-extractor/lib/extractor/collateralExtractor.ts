@@ -6,6 +6,7 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { TransactionInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
@@ -102,10 +103,88 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
       initialHeight
     );
+    this.logger.debug(
+      `unspent collateral box info with following IDs gotten form Ergo network: [${unspentCollaterals
+        .map((box) => box.boxId)
+        .join(', ')}]`
+    );
+
+    const storedUnspentCollateralBoxIds =
+      await this.action.getUnspentCollateralBoxIds(this.getId());
+    const unspentCollateralBoxIds = new Set(
+      unspentCollaterals.map((box) => box.boxId)
+    );
+    await this.tidyUpStoredCollaterals(
+      initialHeight,
+      storedUnspentCollateralBoxIds.filter(
+        (boxId) => !unspentCollateralBoxIds.has(boxId)
+      )
+    );
+
     for (const collateral of unspentCollaterals) {
+      this.logger.debug(
+        `saving unspent collateral with boxId=[${collateral.boxId}] to database for initialization`
+      );
       await this.action.saveCollateral(collateral, this.getId());
+      this.logger.debug(
+        `saved unspent collateral with boxId=[${collateral.boxId}] to database for initialization`
+      );
     }
   };
+
+  /**
+   * removes or updates stored collateral boxes before initializing boxes
+   *
+   * @private
+   * @param {number} initialHeight
+   * @param {string[]} collateralBoxIds
+   * @return {Promise<void>}
+   * @memberof CollateralExtractor
+   */
+  private async tidyUpStoredCollaterals(
+    initialHeight: number,
+    collateralBoxIds: string[]
+  ) {
+    for (const boxId of collateralBoxIds) {
+      let boxInfo: OutputInfo;
+      try {
+        boxInfo = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
+      } catch (e: any) {
+        if (e?.response?.status === 404) {
+          this.action.deleteCollateral(boxId, this.getId());
+        } else {
+          throw new Error(
+            `something went wrong when trying to get box=[${boxId}] from Ergo network: ${e?.message}`
+          );
+        }
+        return;
+      }
+
+      if (boxInfo?.spentTransactionId != null) {
+        try {
+          const transactionInfo: TransactionInfo =
+            await this.explorerApi.v1.getApiV1TransactionsP1(
+              boxInfo.spentTransactionId
+            );
+
+          if (transactionInfo.inclusionHeight < initialHeight) {
+            this.action.saveCollateral(
+              {
+                boxId: boxId,
+                spendHeight: transactionInfo.inclusionHeight,
+                spendBlock: transactionInfo.blockId,
+              },
+              this.getId()
+            );
+          }
+        } catch (e: any) {
+          throw new Error(
+            `something went wrong when trying to get transaction=[${boxInfo.spentTransactionId}] from Ergo network: ${e?.message}`
+          );
+        }
+      }
+    }
+  }
 
   /**
    * Return all unspent permits
@@ -165,36 +244,46 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   ): ExtractedCollateral => {
     const ergoOutputBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
 
-    let wId: string;
+    let r4: Uint8Array | undefined;
     try {
-      const r4 = ergoOutputBox
+      r4 = ergoOutputBox
         .register_value(ergoLib.NonMandatoryRegisterId.R4)
         ?.to_byte_array();
-      if (r4 == undefined) {
-        throw new Error(
-          `collateral box with boxId=${box.boxId} skipped, because of an invalid R4 register`
-        );
-      }
-      wId = uint8ArrayToHex(r4);
     } catch (e) {
       throw new Error(`collateral box with boxId=${box.boxId} skipped: ${e}`);
     }
+    if (r4 == undefined) {
+      throw new Error(
+        `collateral box with boxId=${box.boxId} skipped, because of an invalid R4 register`
+      );
+    }
+    const wId = uint8ArrayToHex(r4);
+    this.logger.debug(
+      `Extracted WID=[${wId}] from R4 register of box=${ergoOutputBox
+        .box_id()
+        .to_str()}`
+    );
 
-    let rwtCount: bigint;
+    let r5: string | undefined;
     try {
-      const r5 = ergoOutputBox
+      r5 = ergoOutputBox
         .register_value(ergoLib.NonMandatoryRegisterId.R5)
         ?.to_i64()
         .to_str();
-      if (r5 == undefined) {
-        throw new Error(
-          `collateral box with boxId=${box.boxId} skipped, because of an invalid R5 register`
-        );
-      }
-      rwtCount = BigInt(r5);
     } catch (e) {
       throw new Error(`collateral box with boxId=${box.boxId} skipped: ${e}`);
     }
+    if (r5 == undefined) {
+      throw new Error(
+        `collateral box with boxId=${box.boxId} skipped, because of an invalid R5 register`
+      );
+    }
+    const rwtCount = BigInt(r5);
+    this.logger.debug(
+      `Extracted rwtCount=[${rwtCount}] from R5 register of box=${ergoOutputBox
+        .box_id()
+        .to_str()}`
+    );
 
     return {
       boxId: box.boxId,
