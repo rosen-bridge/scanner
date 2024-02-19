@@ -18,7 +18,7 @@ import { JsonBI, uint8ArrayToHex } from '../utils';
 export class CollateralExtractor extends AbstractExtractor<Transaction> {
   private readonly ergoTree: string;
   readonly action: CollateralAction;
-  readonly explorerApi;
+  private explorerApi;
 
   constructor(
     private readonly id: string,
@@ -44,7 +44,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   getId = (): string => this.id;
 
   /**
-   * process a list of transactions and store any information
+   * process a list of transactions and store collateral box details
    *
    * @param {Transaction[]} txs list of transaction for block
    * @param {BlockEntity} block block id for transactions as hex encoded
@@ -186,11 +186,6 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     }
   }
 
-  /**
-   * Return all unspent permits
-   * @param initialHeight
-   * @returns
-   */
   /**
    * gets all unspent collaterals from Ergo explorer api
    *
