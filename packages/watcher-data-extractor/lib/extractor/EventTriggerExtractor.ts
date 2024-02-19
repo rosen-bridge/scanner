@@ -84,7 +84,8 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
               ) {
                 const R4 = output.additionalRegisters.R4;
                 const R5 = output.additionalRegisters.R5;
-                if (R4 && R5) {
+                const R7 = output.additionalRegisters.R7;
+                if (R4 && R5 && R7) {
                   const outputParsed = wasm.ErgoBox.from_json(
                     JsonBI.stringify(output)
                   );
@@ -94,13 +95,16 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                   const R5Const = outputParsed.register_value(
                     wasm.NonMandatoryRegisterId.R5
                   );
-                  if (R4Const && R5Const) {
-                    const R4Serialized = R4Const.to_coll_coll_byte();
+                  const R7Const = outputParsed.register_value(
+                    wasm.NonMandatoryRegisterId.R7
+                  );
+                  if (R4Const && R5Const && R7Const) {
+                    const R4Serialized = R4Const.to_byte_array();
                     const R5Serialized = R5Const.to_coll_coll_byte();
                     if (R4Serialized.length >= 1 && R5Serialized.length >= 12) {
-                      const WIDs = R4Serialized.map((byteArray) =>
-                        Buffer.from(byteArray).toString('hex')
-                      ).join(',');
+                      const WIDsCount = R7Const.to_i32();
+                      const WIDsHash =
+                        Buffer.from(R4Serialized).toString('hex');
                       const sourceTxId = Buffer.from(
                         R5Serialized[0]
                       ).toString();
@@ -135,7 +139,8 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
                         fromChain: Buffer.from(R5Serialized[1]).toString(),
                         fromAddress: Buffer.from(R5Serialized[3]).toString(),
                         sourceBlockId: Buffer.from(R5Serialized[10]).toString(),
-                        WIDs: WIDs,
+                        WIDsCount: WIDsCount,
+                        WIDsHash: WIDsHash,
                         sourceChainHeight: Number(
                           BigInt(
                             '0x' + Buffer.from(R5Serialized[11]).toString('hex')
@@ -224,9 +229,9 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
         try {
           const R4Serialized = outputParsed
             .register_value(wasm.NonMandatoryRegisterId.R4)
-            ?.to_coll_coll_byte();
+            ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
-            const txId = Buffer.from(R4Serialized[0]).toString('hex');
+            const txId = Buffer.from(R4Serialized).toString('hex');
             paymentTxId = txId;
             if (txId !== '') paymentTxId = txId;
             else {

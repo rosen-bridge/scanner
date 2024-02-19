@@ -15,6 +15,7 @@ import {
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { CollateralEntity } from '../../lib';
+import { blake2b } from 'blakejs';
 
 /**
  * generates a dataSource with filename passed to the function for database file name
@@ -83,7 +84,7 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
 
   outBoxBuilder.set_register_value(
     4,
-    wasm.Constant.from_coll_coll_byte([new Uint8Array(Buffer.from(WID, 'hex'))])
+    wasm.Constant.from_byte_array(new Uint8Array(Buffer.from(WID, 'hex')))
   );
 
   const outBox = outBoxBuilder.build();
@@ -144,8 +145,8 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
  */
 export const commitmentTxGenerator = (
   hasToken = true,
-  WID: Array<string>,
-  requestId: Array<string>,
+  WID: string,
+  requestId: string,
   eventDigest: string
 ) => {
   const sk = wasm.SecretKey.random_dlog();
@@ -167,21 +168,11 @@ export const commitmentTxGenerator = (
     );
   }
 
-  const R4Value = WID.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
-  outBoxBuilder.set_register_value(
-    4,
-    wasm.Constant.from_coll_coll_byte(R4Value)
-  );
+  const R4Value = new Uint8Array(Buffer.from(WID, 'hex'));
+  outBoxBuilder.set_register_value(4, wasm.Constant.from_byte_array(R4Value));
 
-  const R5Value = requestId.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
-  outBoxBuilder.set_register_value(
-    5,
-    wasm.Constant.from_coll_coll_byte(R5Value)
-  );
+  const R5Value = new Uint8Array(Buffer.from(requestId, 'hex'));
+  outBoxBuilder.set_register_value(5, wasm.Constant.from_byte_array(R5Value));
 
   outBoxBuilder.set_register_value(
     6,
@@ -269,13 +260,12 @@ export const eventTriggerTxGenerator = (
     );
   }
 
-  const R4Value = WID.map((val) => {
-    return new Uint8Array(Buffer.from(val, 'hex'));
-  });
-  outBoxBuilder.set_register_value(
-    4,
-    wasm.Constant.from_coll_coll_byte(R4Value)
+  const wids = WID.map((val) => new Uint8Array(Buffer.from(val, 'hex'))).reduce(
+    (buf: Buffer, wid: Uint8Array) => Buffer.concat([buf, wid]),
+    Buffer.from('')
   );
+  const R4Value = wids.length ? blake2b(wids, undefined, 32) : Buffer.from('');
+  outBoxBuilder.set_register_value(4, wasm.Constant.from_byte_array(R4Value));
   const R5Value: Array<Uint8Array> = [];
   for (let i = 0; i < eventData.length; i++) {
     if ([5, 6, 7].includes(i)) {
@@ -288,6 +278,11 @@ export const eventTriggerTxGenerator = (
     5,
     wasm.Constant.from_coll_coll_byte(R5Value)
   );
+  outBoxBuilder.set_register_value(
+    6,
+    wasm.Constant.from_byte_array(Buffer.from(''))
+  );
+  outBoxBuilder.set_register_value(7, wasm.Constant.from_i32(WID.length));
 
   const outBox = outBoxBuilder.build();
   const tokens = new wasm.Tokens();

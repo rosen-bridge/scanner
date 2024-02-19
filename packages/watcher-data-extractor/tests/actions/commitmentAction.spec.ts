@@ -252,7 +252,8 @@ describe('commitmentAction', () => {
    * testing spendBlock row update works correctly
    * Dependency: Nothing
    * Scenario: 1 commitments spendBlock should updated successfully
-   * Expected: one commitment spendBlock should be equal to 'hash'
+   * Expected:
+   * - one commitment with correct spend info should be found
    */
   describe('spendCommitments', () => {
     it('sets one spendBlock for one commitment & one row should have spendBlock', async () => {
@@ -266,11 +267,28 @@ describe('commitmentAction', () => {
       expect((await repository.findBy({ spendBlock: 'hash' })).length).toEqual(
         0
       );
-      await action.spendCommitments(['boxId2', 'boxId10'], block, 'extractor1');
-      expect(
-        (await repository.findBy({ boxId: 'boxId2', spendBlock: 'hash' }))
-          .length
-      ).toEqual(1);
+      const spendInfo2 = {
+        boxId: 'boxId2',
+        txId: 'txId',
+        index: 2,
+      };
+      const spendInfo10 = {
+        boxId: 'boxId10',
+        txId: 'txId',
+        index: 10,
+      };
+      await action.spendCommitments(
+        [spendInfo2, spendInfo10],
+        block,
+        'extractor1'
+      );
+      const commitments = await repository.findBy({
+        boxId: 'boxId2',
+        spendBlock: 'hash',
+      });
+      expect(commitments.length).toEqual(1);
+      expect(commitments[0].spendTxId).toEqual('txId');
+      expect(commitments[0].spendIndex).toEqual(2);
     });
   });
 
@@ -312,13 +330,28 @@ describe('commitmentAction', () => {
      * - check commitment spend block status
      * @expected
      * - it should set the spent correct block id when spent on a block
-     * - it should set the spent block to null when the block is removed
+     * - it should set the spent block, txId and index to null when the block is removed
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
-      await action.spendCommitments([commitment1.boxId], block2, 'extractor1');
+      await action.spendCommitments(
+        [
+          {
+            boxId: commitment1.boxId,
+            txId: 'txId',
+            index: 0,
+          },
+        ],
+        block2,
+        'extractor1'
+      );
       const repository = dataSource.getRepository(CommitmentEntity);
       let storedEntity = await repository.findOne({
-        where: { boxId: commitment1.boxId, extractor: 'extractor1' },
+        where: {
+          boxId: commitment1.boxId,
+          spendTxId: 'txId',
+          spendIndex: 0,
+          extractor: 'extractor1',
+        },
       });
       expect(storedEntity!.spendBlock).toEqual(block2.hash);
 
@@ -327,6 +360,8 @@ describe('commitmentAction', () => {
         where: { boxId: commitment1.boxId, extractor: 'extractor1' },
       });
       expect(storedEntity!.spendBlock).toBeNull();
+      expect(storedEntity!.spendTxId).toBeNull();
+      expect(storedEntity!.spendIndex).toBeNull();
     });
   });
 });

@@ -41,6 +41,12 @@ class CommitmentEntity {
 
   @Column({ nullable: true })
   rwtCount?: string;
+
+  @Column({ nullable: true, type: 'text' })
+  spendTxId?: string | null;
+
+  @Column({ nullable: true, type: 'int' })
+  spendIndex?: number | null;
 }
 
 export default CommitmentEntity;

@@ -6,6 +6,7 @@ stages:
   - type_check
   - lint
   - test
+  - changeset
 
 installation:
   stage: installation
@@ -14,7 +15,7 @@ installation:
     policy: push
     paths:
       - node_modules
-      - packages/*/node_modules
+      - '**/node_modules'
   script:
     - npm ci
 
@@ -25,8 +26,8 @@ build:
       policy: pull-push
       paths:
         - node_modules
-        - packages/*/node_modules
-        - packages/*/dist
+        - '**/node_modules'
+        - '**/dist'
   script:
     - npm run build
 
@@ -37,8 +38,8 @@ type_check:
     policy: pull
     paths:
       - node_modules
-      - packages/*/node_modules
-      - packages/*/dist
+      - '**/node_modules'
+      - '**/dist'
   script:
     - npm run type-check
 
@@ -49,8 +50,8 @@ lint:
     policy: pull
     paths:
       - node_modules
-      - packages/*/node_modules
-      - packages/*/dist
+      - '**/node_modules'
+      - '**/dist'
   script:
     - npm run lint
 
@@ -61,8 +62,8 @@ test:
     policy: pull
     paths:
       - node_modules
-      - packages/*/node_modules
-      - packages/*/dist
+      - '**/node_modules'
+      - '**/dist'
   script:
     - npm run coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
@@ -70,4 +71,18 @@ test:
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: packages/*/coverage/cobertura-coverage.xml
+        path: '**/coverage/cobertura-coverage.xml'
+
+changeset:
+  stage: changeset
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  before_script:
+    - git fetch origin dev
+  script:
+    - npx changeset status --since=origin/dev
