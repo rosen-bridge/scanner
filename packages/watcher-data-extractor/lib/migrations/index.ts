@@ -14,14 +14,14 @@ export const migrations = {
     migration1688555766601,
     migration1689175103163,
     migration1699872205117,
-    Migration1708175020320,
     migration1706610773176,
+    Migration1708175020320,
   ],
   postgres: [
     migration1688554842087,
     migration1689175974257,
     migration1699874447928,
-    Migration1708189757400,
     migration1706610773315,
+    Migration1708189757400,
   ],
 };
