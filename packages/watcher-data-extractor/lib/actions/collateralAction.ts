@@ -72,6 +72,10 @@ class CollateralAction {
     block: BlockEntity,
     extractor: string
   ): Promise<boolean> => {
+    if (collaterals.length == 0) {
+      return true;
+    }
+
     const collateralEntities = collaterals.map((col) => ({
       extractor: extractor,
       boxId: col.boxId,
