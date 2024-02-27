@@ -12,9 +12,9 @@ const JsonBI = JSONBigInt({
  */
 const getWidInfo = (WIDs: string) => {
   const WIDsArray = WIDs.split(',');
-  const hash = Buffer.from(blake2b(WIDsArray.join(''), undefined, 32)).toString(
-    'hex'
-  );
+  const hash = Buffer.from(
+    blake2b(Buffer.from(WIDsArray.join(''), 'hex'), undefined, 32)
+  ).toString('hex');
 
   return {
     WIDsHash: hash,
