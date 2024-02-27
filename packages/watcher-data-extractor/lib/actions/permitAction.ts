@@ -53,7 +53,7 @@ class PermitAction {
         WID: permit.WID,
         txId: permit.txId,
         spendBlock: null,
-        spendHeight: 0,
+        spendHeight: null,
       }
     );
   };
@@ -163,7 +163,7 @@ class PermitAction {
     await this.permitRepository.delete({ block: block, extractor: extractor });
     await this.permitRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0 }
+      { spendBlock: null, spendHeight: null }
     );
   };
 

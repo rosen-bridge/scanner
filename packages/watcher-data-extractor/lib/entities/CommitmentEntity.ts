@@ -34,10 +34,10 @@ class CommitmentEntity {
   boxSerialized: string;
 
   @Column({ nullable: true, type: 'text' })
-  spendBlock!: string | null;
+  spendBlock?: string | null;
 
-  @Column({ nullable: true })
-  spendHeight?: number;
+  @Column({ nullable: true, type: 'int' })
+  spendHeight?: number | null;
 
   @Column({ nullable: true })
   rwtCount?: string;

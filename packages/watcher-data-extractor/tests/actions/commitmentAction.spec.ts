@@ -289,6 +289,8 @@ describe('commitmentAction', () => {
       expect(commitments.length).toEqual(1);
       expect(commitments[0].spendTxId).toEqual('txId');
       expect(commitments[0].spendIndex).toEqual(2);
+      expect(commitments[0].spendBlock).toEqual(block.hash);
+      expect(commitments[0].spendHeight).toEqual(block.height);
     });
   });
 
