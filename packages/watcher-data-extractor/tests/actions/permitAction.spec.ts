@@ -385,7 +385,7 @@ describe('PermitEntityAction', () => {
       await action.updatePermit(permit, 'extractor');
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
-      expect(stored.spendHeight).toEqual(0);
+      expect(stored.spendHeight).toBeNull();
     });
   });
 

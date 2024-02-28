@@ -162,7 +162,7 @@ class EventTriggerAction {
       {
         spendBlock: null,
         spendTxId: null,
-        spendHeight: 0,
+        spendHeight: null,
         result: null,
         paymentTxId: null,
       }
