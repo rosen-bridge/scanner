@@ -5,7 +5,6 @@ import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
 import { dbIdChunkSize } from '../constants';
 import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
-import { JsonBI } from '../utils';
 
 class CollateralAction {
   private readonly collateralRepository: Repository<CollateralEntity>;
@@ -46,16 +45,19 @@ class CollateralAction {
       extractor,
       boxId: collateral.boxId,
       boxSerialized: collateral.boxSerialized,
-      wId: collateral.wId,
+      wid: collateral.wid,
       rwtCount: collateral.rwtCount,
       txId: collateral.txId,
       block: collateral.block,
       height: collateral.height,
       spendBlock: collateral.spendBlock,
       spendHeight: collateral.spendHeight,
+      spendTxId: collateral.spendTxId,
     };
 
-    return await this.collateralRepository.save(collateralEntity);
+    const result = await this.collateralRepository.save(collateralEntity);
+
+    return result;
   };
 
   /**
@@ -80,7 +82,7 @@ class CollateralAction {
       extractor: extractor,
       boxId: col.boxId,
       boxSerialized: col.boxSerialized,
-      wId: col.wId,
+      wid: col.wid,
       rwtCount: col.rwtCount,
       txId: col.txId,
       block: block.hash,
@@ -154,26 +156,35 @@ class CollateralAction {
    * @memberof CollateralAction
    */
   spendCollaterals = async (
-    spentBoxIds: Array<string>,
+    spendInfos: Map<string, string[]>,
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    const spentBoxIdChunks = chunk(spentBoxIds, dbIdChunkSize);
-    for (const spendIdChunk of spentBoxIdChunks) {
-      const updateResult = await this.collateralRepository.update(
-        { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height }
-      );
+    for (const [txId, boxIds] of spendInfos.entries()) {
+      const boxIdsChunks = chunk(boxIds, dbIdChunkSize);
+      for (const boxIdChunk of boxIdsChunks) {
+        const updateResult = await this.collateralRepository.update(
+          {
+            boxId: In(boxIdChunk),
+            extractor: extractor,
+          },
+          {
+            spendBlock: block.hash,
+            spendHeight: block.height,
+            spendTxId: txId,
+          }
+        );
 
-      if (updateResult.affected && updateResult.affected > 0) {
-        const updatedRows = await this.collateralRepository.findBy({
-          boxId: In(spendIdChunk),
-          spendBlock: block.hash,
-        });
-        for (const row of updatedRows) {
-          this.logger.debug(
-            `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wId}] at height ${block.height}`
-          );
+        if (updateResult.affected && updateResult.affected > 0) {
+          const updatedRows = await this.collateralRepository.findBy({
+            boxId: In(boxIdChunk),
+            spendBlock: block.hash,
+          });
+          for (const row of updatedRows) {
+            this.logger.debug(
+              `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wid}] at height ${block.height}`
+            );
+          }
         }
       }
     }
@@ -200,6 +211,39 @@ class CollateralAction {
     });
     return boxIds.map((box) => box.boxId);
   };
+
+  /**
+   * Delete all collaterals corresponding to the passed block and extractor and
+   * update all collaterals spent in the specified block
+   *
+   * @param {string} block
+   * @param {string} extractor
+   * @return {Promise<void>}
+   * @memberof CollateralAction
+   */
+  async deleteBlock(block: string, extractor: string): Promise<void> {
+    this.logger.info(
+      `Deleting collaterals in block=[${block}] and extractor=[${extractor}]`
+    );
+
+    await this.collateralRepository.delete({
+      block: block,
+      extractor: extractor,
+    });
+
+    this.logger.info(
+      `changing spent collaterals in block=[${block}] and extractor=[${extractor}] to unspent status`
+    );
+
+    await this.collateralRepository.update(
+      { spendBlock: block, extractor: extractor },
+      {
+        spendBlock: null as any,
+        spendHeight: null as any,
+        spendTxId: null as any,
+      }
+    );
+  }
 
   /**
    * deletes the specified collateral box from database

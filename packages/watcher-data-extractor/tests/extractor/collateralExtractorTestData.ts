@@ -22,7 +22,7 @@ export const generateCollateralBox = (
   awcNft: string,
   value: bigint,
   height: number,
-  wId: string,
+  wid: string,
   rwtCount: bigint,
   rsn: string,
   rsnCollateral: bigint
@@ -35,7 +35,7 @@ export const generateCollateralBox = (
 
   boxBuilder.set_register_value(
     4,
-    ergoLib.Constant.from_byte_array(hexToUint8Array(wId))
+    ergoLib.Constant.from_byte_array(hexToUint8Array(wid))
   );
 
   boxBuilder.set_register_value(
@@ -84,11 +84,11 @@ export const txId1 =
   '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
 export const height1 = 20;
 export const collateralBoxesTx1 = [
-  { wId: '444a', rwtCount: 200n, rsnCollateral: 333n },
-  { wId: '234f', rwtCount: 300n, rsnCollateral: 45n },
-  { wId: '7da8', rwtCount: 600n, rsnCollateral: 74n },
+  { wid: '444a', rwtCount: 200n, rsnCollateral: 333n },
+  { wid: '234f', rwtCount: 300n, rsnCollateral: 45n },
+  { wid: '7da8', rwtCount: 600n, rsnCollateral: 74n },
   {
-    wId: '9afd',
+    wid: '9afd',
     rwtCount: 700n,
     rsnCollateral: 4000n,
     awcNft: 'e4dca5c7b35ead14e65699505bdd65af5c00b2249327e0ed9ba0e2b509101a82',
@@ -100,7 +100,7 @@ export const collateralBoxesTx1 = [
       data.awcNft || awcNft,
       2_000_000_000n,
       height1,
-      data.wId,
+      data.wid,
       data.rwtCount,
       rsn,
       data.rsnCollateral
@@ -122,10 +122,10 @@ export const txId2 =
   '0a7404b9e376cf39618c904ac797b7b2688ce3b9b2a7236e319781dc8b360a08';
 export const height2 = 30;
 export const collateralBoxesTx2 = [
-  { wId: 'abcd', rwtCount: 200n, rsnCollateral: 333n },
-  { wId: '12cd', rwtCount: 300n, rsnCollateral: 45n },
-  { wId: '30de', rwtCount: 600n, rsnCollateral: 74n },
-  { wId: '18af', rwtCount: 700n, rsnCollateral: 4000n },
+  { wid: 'abcd', rwtCount: 200n, rsnCollateral: 333n },
+  { wid: '12cd', rwtCount: 300n, rsnCollateral: 45n },
+  { wid: '30de', rwtCount: 600n, rsnCollateral: 74n },
+  { wid: '18af', rwtCount: 700n, rsnCollateral: 4000n },
 ]
   .map((data) =>
     generateCollateralBox(
@@ -133,7 +133,7 @@ export const collateralBoxesTx2 = [
       awcNft,
       2_000_000_000n,
       height2,
-      data.wId,
+      data.wid,
       data.rwtCount,
       rsn,
       data.rsnCollateral

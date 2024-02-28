@@ -17,7 +17,7 @@ class CollateralEntity {
   boxSerialized: string;
 
   @Column()
-  wId: string;
+  wid: string;
 
   @Column({ type: 'bigint', transformer: bigintTransformer })
   rwtCount: bigint;
@@ -25,17 +25,20 @@ class CollateralEntity {
   @Column()
   txId: string;
 
-  @Column({ nullable: true })
-  block?: string;
+  @Column()
+  block: string;
 
-  @Column({ nullable: true })
-  height?: number;
+  @Column()
+  height: number;
 
   @Column({ nullable: true, type: 'text' })
   spendBlock?: string;
 
   @Column({ nullable: true })
   spendHeight?: number;
+
+  @Column({ nullable: true, type: 'text' })
+  spendTxId?: string;
 }
 
 export default CollateralEntity;

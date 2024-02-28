@@ -60,7 +60,7 @@ describe('CollateralAction', () => {
         },
       ]);
 
-      const updatedProps = { wId: 'new-wid', rwtCount: 2024n };
+      const updatedProps = { wid: 'new-wid', rwtCount: 2024n };
       const updatedCollateral = testData.sampleCollateralEntities[1];
       await action.saveCollateral(
         {
@@ -126,20 +126,14 @@ describe('CollateralAction', () => {
     });
 
     /**
-     * different permit with different extractor should save successfully
-     * Dependency: permit for the first extractor should be in the database
-     * Scenario: second extractor should save different permit in the database
-     * Expected: storePermits should returns true and each saved permit should have valid fields
-     */
-    /**
      * @target storeCollaterals should correctly save collaterals with different
      * extractors
      * @dependencies
      * @scenario
      * - call storeCollaterals
-     * - check if collaterals have been saved to DB successfully
+     * - check if collaterals have been saved to DB with correct extractors
      * @expected
-     * - collaterals should have been saved to DB successfully
+     * - collaterals should have been saved to DB with correct extractors
      */
     it(`should correctly save collaterals with different extractors`, async () => {
       await repository.insert([
@@ -311,11 +305,13 @@ describe('CollateralAction', () => {
       );
 
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
-      await action.spendCollaterals(
-        [testData.sampleCollateralEntities[0].boxId],
-        spendBlock,
-        'extractor1'
-      );
+      const spendTxId =
+        '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
+      const spendInfos = new Map<string, string[]>([
+        [spendTxId, [testData.sampleCollateralEntities[0].boxId]],
+      ]);
+
+      await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
       const spentCollateral = await repository.findOneBy({
         boxId: testData.sampleCollateralEntities[0].boxId,
@@ -328,6 +324,7 @@ describe('CollateralAction', () => {
         extractor: 'extractor1',
         spendBlock: spendBlock.hash,
         spendHeight: spendBlock.height,
+        spendTxId: spendTxId,
       });
     });
   });
@@ -353,11 +350,12 @@ describe('CollateralAction', () => {
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
       const collateralsToSpend = testData.sampleCollateralEntities.slice(0, 2);
       const unspentCollaterals = testData.sampleCollateralEntities.slice(2);
-      await action.spendCollaterals(
-        collateralsToSpend.map((col) => col.boxId),
-        spendBlock,
-        'extractor1'
-      );
+      const spendTxId =
+        '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
+      const spendInfos = new Map<string, string[]>([
+        [spendTxId, collateralsToSpend.map((col) => col.boxId)],
+      ]);
+      await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
       const unspentCollateralBoxIds = await action.getUnspentCollateralBoxIds(
         'extractor1'
@@ -371,8 +369,8 @@ describe('CollateralAction', () => {
 
   describe('deleteCollateral', () => {
     /**
-     * @target deleteCollateral should delete a the collateral with the
-     * specified boxId and extractor from DB
+     * @target deleteCollateral should delete the collateral with the specified
+     * boxId and extractor from DB
      * @dependencies
      * @scenario
      * - call deleteCollateral

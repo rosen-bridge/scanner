@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1708175020320 implements MigrationInterface {
-  name = 'Migration1708175020320';
+export class Migration1709058785649 implements MigrationInterface {
+  name = 'Migration1709058785649';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -10,13 +10,14 @@ export class Migration1708175020320 implements MigrationInterface {
                 "extractor" varchar NOT NULL,
                 "boxId" varchar NOT NULL,
                 "boxSerialized" varchar NOT NULL,
-                "wId" varchar NOT NULL,
+                "wid" varchar NOT NULL,
                 "rwtCount" bigint NOT NULL,
                 "txId" varchar NOT NULL,
-                "block" varchar,
-                "height" integer,
+                "block" varchar NOT NULL,
+                "height" integer NOT NULL,
                 "spendBlock" text,
                 "spendHeight" integer,
+                "spendTxId" text,
                 CONSTRAINT "UQ_2d4abc2071df9a2300a5e1b4616" UNIQUE ("boxId", "extractor")
             )
         `);

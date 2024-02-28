@@ -56,21 +56,27 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     block: BlockEntity
   ): Promise<boolean> => {
     const boxes: Array<ExtractedCollateral> = [];
-    const spendBoxIds: Array<string> = [];
+    const spentInfos = new Map<string, string[]>();
     for (const tx of txs) {
-      for (const outputBox of tx.outputs) {
-        if (!this.isCollateralBox(outputBox)) {
-          continue;
-        }
-        boxes.push(this.toExtractedCollateral(outputBox));
+      const outputBox = tx.outputs.at(1);
+      if (outputBox == undefined) {
+        continue;
       }
 
-      spendBoxIds.push(...tx.inputs.map((box) => box.boxId));
+      if (!this.isCollateralBox(outputBox)) {
+        continue;
+      }
+      boxes.push(this.toExtractedCollateral(outputBox, block.hash));
+
+      spentInfos.set(
+        tx.id,
+        tx.inputs.map((box) => box.boxId)
+      );
     }
 
     try {
       await this.action.storeCollaterals(boxes, block, this.getId());
-      await this.action.spendCollaterals(spendBoxIds, block, this.getId());
+      await this.action.spendCollaterals(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
         `Error in storing collaterals of the block ${block}: ${e}`
@@ -90,7 +96,17 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     );
   }
 
-  forkBlock: (hash: string) => Promise<void>;
+  /**
+   * Delete all collaterals corresponding to the passed block and extractor and
+   * update all collaterals spent in the specified block
+   *
+   * @param {string} hash
+   * @return {Promise<void>}
+   * @memberof CollateralExtractor
+   */
+  forkBlock = async (hash: string): Promise<void> => {
+    await this.action.deleteBlock(hash, this.getId());
+  };
 
   /**
    * Initializes the database with older collaterals
@@ -151,13 +167,13 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
         boxInfo = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
       } catch (e: any) {
         if (e?.response?.status === 404) {
-          this.action.deleteCollateral(boxId, this.getId());
+          await this.action.deleteCollateral(boxId, this.getId());
+          continue;
         } else {
           throw new Error(
             `something went wrong when trying to get box=[${boxId}] from Ergo network: ${e?.message}`
           );
         }
-        return;
       }
 
       if (boxInfo?.spentTransactionId != null) {
@@ -168,11 +184,16 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
             );
 
           if (transactionInfo.inclusionHeight < initialHeight) {
-            this.action.saveCollateral(
+            this.logger.debug(
+              `collateral with boxId=[${boxId}] is spent and is being updated with spendHeight=[${transactionInfo.inclusionHeight}] and spendBlock=[${transactionInfo.blockId}]`
+            );
+
+            await this.action.saveCollateral(
               {
                 boxId: boxId,
                 spendHeight: transactionInfo.inclusionHeight,
                 spendBlock: transactionInfo.blockId,
+                spendTxId: transactionInfo.id,
               },
               this.getId()
             );
@@ -218,7 +239,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
               box.creationHeight < initialHeight &&
               this.isCollateralBox(box)
           )
-          .map((box) => this.toExtractedCollateral(box))
+          .map((box) => this.toExtractedCollateral(box, box.blockId))
       );
       total = boxes.total;
       offset += DefaultApiLimit;
@@ -235,7 +256,8 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @memberof CollateralExtractor
    */
   private toExtractedCollateral = (
-    box: OutputInfo | OutputBox
+    box: OutputInfo | OutputBox,
+    blockId: string
   ): ExtractedCollateral => {
     const ergoOutputBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
 
@@ -252,9 +274,9 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
         `collateral box with boxId=${box.boxId} skipped, because of an invalid R4 register`
       );
     }
-    const wId = uint8ArrayToHex(r4);
+    const wid = uint8ArrayToHex(r4);
     this.logger.debug(
-      `Extracted WID=[${wId}] from R4 register of box=${ergoOutputBox
+      `Extracted WID=[${wid}] from R4 register of box=${ergoOutputBox
         .box_id()
         .to_str()}`
     );
@@ -285,9 +307,10 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       boxSerialized: Buffer.from(
         ergoOutputBox.sigma_serialize_bytes()
       ).toString('base64'),
-      wId: wId,
+      wid: wid,
       rwtCount: rwtCount,
       txId: box.transactionId,
+      block: blockId,
       height: Number(box.creationHeight),
     };
   };
