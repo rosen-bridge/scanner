@@ -6,7 +6,7 @@ export interface ExtractedCollateral {
   txId: string;
   block: string;
   height: number;
-  spendBlock?: string;
-  spendHeight?: number;
-  spendTxId?: string;
+  spendBlock?: string | null;
+  spendHeight?: number | null;
+  spendTxId?: string | null;
 }

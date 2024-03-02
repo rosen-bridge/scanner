@@ -32,13 +32,13 @@ class CollateralEntity {
   height: number;
 
   @Column({ nullable: true, type: 'text' })
-  spendBlock?: string;
+  spendBlock?: string | null;
 
-  @Column({ nullable: true })
-  spendHeight?: number;
+  @Column({ nullable: true, type: 'integer' })
+  spendHeight?: number | null;
 
   @Column({ nullable: true, type: 'text' })
-  spendTxId?: string;
+  spendTxId?: string | null;
 }
 
 export default CollateralEntity;

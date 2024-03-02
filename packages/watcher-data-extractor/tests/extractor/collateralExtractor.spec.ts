@@ -235,18 +235,22 @@ describe('CollateralExtractor', () => {
      *   have been updated
      */
     it(`should update stored collaterals considering the passed initial height`, async () => {
+      // boxes with creation height lower than initialHeight
       const beforeHeightBoxes = testData.collateralBoxesTx2
         .slice(0, 1)
         .map((box) => box.to_js_eip12());
 
+      // boxes with creation height greater than initialHeight
       const afterHeightBoxes = testData.collateralBoxesTx2
         .slice(1, 3)
         .map((box) => box.to_js_eip12());
 
+      // boxes missing in the explorer api
       const missingBoxes = testData.collateralBoxesTx2
         .slice(3, 4)
         .map((box) => box.to_js_eip12());
 
+      // insert collection of initial collateral boxes into the DB
       const collateralBoxes = [
         ...missingBoxes,
         ...afterHeightBoxes,
@@ -267,18 +271,21 @@ describe('CollateralExtractor', () => {
 
       const initialHeight = 300;
 
+      // transaction with output collateral boxes created before initialHeight
       const beforeHeightSpendTx = {
         inclusionHeight: initialHeight - 10,
         blockId: testData.block1.hash,
         id: '683adbb880a54f66ef43b2d79d85ac7a486dbd58bde5804da0f33f430f9e330e',
       };
 
+      // transaction with output collateral boxes created after initialHeight
       const afterHeightSpendTx = {
         inclusionHeight: initialHeight + 10,
         blockId: testData.block2.hash,
         id: '84bb7783f64d30b8e41c62b935fb5d7f608d869558c20b852a773e04ed0041f9',
       };
 
+      // mock explorer api
       collateralExtractor['explorerApi'] = {
         v1: {
           getApiV1BoxesP1: async (boxId: string) => {
@@ -313,6 +320,7 @@ describe('CollateralExtractor', () => {
         },
       } as any;
 
+      // call tidyUpStoredCollaterals
       await collateralExtractor['tidyUpStoredCollaterals'](
         initialHeight,
         collateralBoxes.map((box) => box.boxId)
@@ -320,8 +328,11 @@ describe('CollateralExtractor', () => {
 
       const [rows, rowsCount] = await repository.findAndCount();
 
+      // check missing boxes form explorer api to have been deleted from DB
       expect(rowsCount).toBe(collateralBoxes.length - missingBoxes.length);
 
+      // check boxes with creation height lower than initialHeight have their
+      // spend data updated
       for (const row of rows) {
         const collateral = collateralBoxes.find(
           (box) => box.boxId === row.boxId
@@ -369,6 +380,7 @@ describe('CollateralExtractor', () => {
             items: testData.tx1.outputs.map((output) => ({
               ...output,
               blockId: block.hash,
+              settlementHeight: testData.height1,
             })),
             total: testData.tx1.outputs.length,
           }),

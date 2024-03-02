@@ -232,9 +232,9 @@ class CollateralAction {
     await this.collateralRepository.update(
       { spendBlock: block, extractor: extractor },
       {
-        spendBlock: null as any,
-        spendHeight: null as any,
-        spendTxId: null as any,
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
       }
     );
   }
