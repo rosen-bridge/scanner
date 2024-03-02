@@ -16,20 +16,20 @@ describe('CollateralAction', () => {
     repository = dataSource.getRepository(CollateralEntity);
   });
 
-  describe('saveCollateral', () => {
+  describe('insertCollateral', () => {
     /**
-     * @target saveCollateral should insert a nonexistent collateral box entity
+     * @target insertCollateral should insert a nonexistent collateral box entity
      * into DB
      * @dependencies
      * @scenario
-     * - call saveCollateral
+     * - call insertCollateral
      * - check if the collateral have been saved to DB successfully
      * @expected
      * - collateral should have been saved to DB successfully
      */
     it(`should insert a nonexistent collateral box entity into DB`, async () => {
       const collateral = testData.sampleCollateralEntities[0];
-      await action.saveCollateral(collateral, 'extractor1');
+      await action.insertCollateral(collateral, 'extractor1');
 
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
@@ -40,12 +40,14 @@ describe('CollateralAction', () => {
         spendHeight: null,
       });
     });
+  });
 
+  describe('updateCollateral', () => {
     /**
-     * @target saveCollateral should update an existing collateral correctly
+     * @target updateCollateral should update an existing collateral correctly
      * @dependencies
      * @scenario
-     * - call saveCollateral
+     * - call updateCollateral
      * - check if the collateral have been updated in DB correctly
      * @expected
      * - collateral should have been updated in DB correctly
@@ -62,7 +64,7 @@ describe('CollateralAction', () => {
 
       const updatedProps = { wid: 'new-wid', rwtCount: 2024n };
       const updatedCollateral = testData.sampleCollateralEntities[1];
-      await action.saveCollateral(
+      await action.updateCollateral(
         {
           boxId: updatedCollateral.boxId,
           ...updatedProps,

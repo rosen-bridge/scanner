@@ -69,7 +69,8 @@ describe('CollateralExtractor', () => {
         expect(row).toMatchObject({
           ...collateralExtractor['toExtractedCollateral'](
             box,
-            testData.block1.hash
+            testData.block1.hash,
+            testData.block1.height
           ),
           extractor: testData.extractor,
           block: testData.block1.hash,
@@ -189,7 +190,8 @@ describe('CollateralExtractor', () => {
           collateralBoxes.map((box) =>
             collateralExtractor['toExtractedCollateral'](
               box,
-              testData.block1.hash
+              testData.block1.hash,
+              testData.block1.height
             )
           )
         );
@@ -208,7 +210,8 @@ describe('CollateralExtractor', () => {
         expect(row).toMatchObject({
           ...collateralExtractor['toExtractedCollateral'](
             box,
-            testData.block1.hash
+            testData.block1.hash,
+            testData.block1.height
           ),
           extractor: testData.extractor,
         });
@@ -252,8 +255,12 @@ describe('CollateralExtractor', () => {
       const extractor = testData.extractor;
       const block = testData.block1;
       for (const box of collateralBoxes) {
-        await collateralExtractor.action.saveCollateral(
-          collateralExtractor['toExtractedCollateral'](box, block.hash),
+        await collateralExtractor.action.insertCollateral(
+          collateralExtractor['toExtractedCollateral'](
+            box,
+            block.hash,
+            block.height
+          )!,
           extractor
         );
       }
@@ -324,7 +331,8 @@ describe('CollateralExtractor', () => {
         expect(row).toMatchObject({
           ...collateralExtractor['toExtractedCollateral'](
             collateral,
-            testData.block1.hash
+            testData.block1.hash,
+            testData.block1.height
           ),
           extractor: testData.extractor,
           block: testData.block1.hash,
@@ -380,7 +388,8 @@ describe('CollateralExtractor', () => {
         expect(box).toEqual(
           collateralExtractor['toExtractedCollateral'](
             collateralBoxes.find((col) => col.boxId === box.boxId)!,
-            block.hash
+            block.hash,
+            20
           )
         )
       );
@@ -403,7 +412,8 @@ describe('CollateralExtractor', () => {
       const block = testData.block1;
       const extractedCollateral = collateralExtractor['toExtractedCollateral'](
         collaterlBoxData,
-        block.hash
+        block.hash,
+        20
       );
 
       expect(extractedCollateral).toEqual({

@@ -17,47 +17,41 @@ class CollateralAction {
   }
 
   /**
-   * saves (upserts) a collateral into the database
+   * inserts a collateral into the database
    *
    * @param {ExtractedCollateral} collateral
    * @param {string} extractor
    * @memberof CollateralAction
    */
-  saveCollateral = async (
+  insertCollateral = async (
+    collateral: ExtractedCollateral,
+    extractor: string
+  ) => {
+    return await this.collateralRepository.insert({
+      ...collateral,
+      extractor,
+    });
+  };
+
+  /**
+   * updates a collateral into the database
+   *
+   * @param {ExtractedCollateral} collateral
+   * @param {string} extractor
+   * @memberof CollateralAction
+   */
+  updateCollateral = async (
     collateral: Partial<ExtractedCollateral> &
       Pick<ExtractedCollateral, 'boxId'>,
     extractor: string
   ) => {
-    const id = (
-      await this.collateralRepository.findOne({
-        where: {
-          boxId: collateral.boxId,
-          extractor,
-        },
-        select: {
-          id: true,
-        },
-      })
-    )?.id;
-
-    const collateralEntity = {
-      ...(id != undefined && { id }),
-      extractor,
-      boxId: collateral.boxId,
-      boxSerialized: collateral.boxSerialized,
-      wid: collateral.wid,
-      rwtCount: collateral.rwtCount,
-      txId: collateral.txId,
-      block: collateral.block,
-      height: collateral.height,
-      spendBlock: collateral.spendBlock,
-      spendHeight: collateral.spendHeight,
-      spendTxId: collateral.spendTxId,
-    };
-
-    const result = await this.collateralRepository.save(collateralEntity);
-
-    return result;
+    return await this.collateralRepository.update(
+      {
+        extractor,
+        boxId: collateral.boxId,
+      },
+      collateral
+    );
   };
 
   /**
