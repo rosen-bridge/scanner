@@ -442,7 +442,6 @@ describe('CollateralExtractor', () => {
         block.hash,
         20
       );
-      //'gKjWuQcQBwQABAAEAQQEBAAEAA4gMu5dlHz+jbVIAVf/pWa5t9n69B+hRcnQBijHwVmYePbYBdYB5ManBA7WArKkcwAA1gOypXMBANYE5cZyAwcEcwLWBeTGcgMEGtGWgwQBk4yy22MIsqRzAwBzBAABcgGTsuTGcgIEGnIEAHIB7JOxcgVyBJSycgVyBAByAZOMsttjCHICcwUAAXMGFAI4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmgH4/mTT2U1OsZPqnWMEZG22e9kU7ULOvTpPYU2dnedc8M0CAg4CREoFkAOMSU2gJC/QTstO/T2d4RgThIx5s4WS8p1XmDbfvEWflgA=',
 
       expect(extractedCollateral).toEqual({
         boxId: collaterlBoxData.boxId,
