@@ -154,3 +154,29 @@ export const block2: BlockEntity = {
   scanner: '1',
   timestamp: 11,
 };
+
+export const txId3 =
+  '86653a4b967b1042e9215be68674c0b75f6843ee95d48a78d13a35e90fefd307';
+export const height3 = 40;
+export const collateralBoxesTx3 = [
+  {
+    wid: '9afd44',
+    rwtCount: 700n,
+    rsnCollateral: 4000n,
+    awcNft: 'e4dca5c7b35ead14e65699505bdd65af5c00b2249327e0ed9ba0e2b509101a82',
+  },
+]
+  .map((data) =>
+    generateCollateralBox(
+      collateralAddress,
+      data.awcNft || awcNft,
+      2_000_000_000n,
+      height3,
+      data.wid,
+      data.rwtCount,
+      rsn,
+      data.rsnCollateral
+    )
+  )
+  .map((box, i) => toErgoBox(box, txId3, i));
+export const tx3 = generateTx(txId3, [], collateralBoxesTx3);

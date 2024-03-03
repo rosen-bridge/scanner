@@ -5,9 +5,7 @@ import {
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { TransactionInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
-import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
+import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
 import CollateralAction from '../actions/collateralAction';
@@ -171,7 +169,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     collateralBoxIds: string[]
   ) {
     for (const boxId of collateralBoxIds) {
-      let boxInfo: OutputInfo;
+      let boxInfo: V1.OutputInfo;
       try {
         boxInfo = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
       } catch (e: any) {
@@ -187,7 +185,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
 
       if (boxInfo?.spentTransactionId != null) {
         try {
-          const transactionInfo: TransactionInfo =
+          const transactionInfo: V1.TransactionInfo =
             await this.explorerApi.v1.getApiV1TransactionsP1(
               boxInfo.spentTransactionId
             );
@@ -268,7 +266,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @memberof CollateralExtractor
    */
   private toExtractedCollateral = (
-    box: OutputInfo | OutputBox,
+    box: V1.OutputInfo | OutputBox,
     blockId: string,
     blockHeight: number
   ): ExtractedCollateral | undefined => {
@@ -279,15 +277,13 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       ?.to_byte_array();
     if (r4 == undefined) {
       this.logger.warn(
-        `collateral box with boxId=${box.boxId} has an invalid R4 register`
+        `collateral box with boxId=[${box.boxId}] has an invalid R4 register`
       );
       return undefined;
     }
     const wid = uint8ArrayToHex(r4);
     this.logger.debug(
-      `Extracted WID=[${wid}] from R4 register of box=${ergoOutputBox
-        .box_id()
-        .to_str()}`
+      `Extracted WID=[${wid}] from R4 register of box=[${box.boxId}]`
     );
 
     const r5 = ergoOutputBox
@@ -297,15 +293,13 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
 
     if (r5 == undefined) {
       this.logger.warn(
-        `collateral box with boxId=${box.boxId} has an invalid R5 register`
+        `collateral box with boxId=[${box.boxId}] has an invalid R5 register`
       );
       return undefined;
     }
     const rwtCount = BigInt(r5);
     this.logger.debug(
-      `Extracted rwtCount=[${rwtCount}] from R5 register of box=${ergoOutputBox
-        .box_id()
-        .to_str()}`
+      `Extracted rwtCount=[${rwtCount}] from R5 register of box=[${box.boxId}]`
     );
 
     return {

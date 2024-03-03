@@ -14,6 +14,7 @@ const JsonBI = JSONBigInt({
 export const uint8ArrayToHex = (bytes: Uint8Array): string => {
   return Buffer.from(bytes).toString('hex');
 };
+
 /**
  * calculates hash of WIDs
  * @param WIDs

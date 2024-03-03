@@ -2,6 +2,8 @@ import { DataSource, Repository } from 'typeorm';
 import { CollateralEntity, CollateralExtractor } from '../../lib';
 import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { uint8ArrayToHex } from '../../lib/utils';
 
 describe('CollateralExtractor', () => {
   let dataSource: DataSource;
@@ -51,7 +53,7 @@ describe('CollateralExtractor', () => {
     it(`should correctly store unspent collateral boxes and update spent
     collateral boxes`, async () => {
       const success = await collateralExtractor.processTransactions(
-        [testData.tx1, testData.tx2],
+        [testData.tx1, testData.tx2, testData.tx3],
         testData.block1
       );
       const collateralBoxes = [
@@ -420,23 +422,37 @@ describe('CollateralExtractor', () => {
      * - correct value should have been returned
      */
     it(`should convert the passed box info to an ExtractedCollateral object`, async () => {
-      const collaterlBoxData = testData.collateralBoxesTx1[0].to_js_eip12();
+      const collateralBox = testData.collateralBoxesTx1[0];
+      const collaterlBoxData = collateralBox.to_js_eip12();
       const block = testData.block1;
+      const rwtCount = BigInt(
+        collateralBox
+          .register_value(ergoLib.NonMandatoryRegisterId.R5)!
+          .to_i64()
+          .to_str()
+      );
+      const wid = uint8ArrayToHex(
+        collateralBox
+          .register_value(ergoLib.NonMandatoryRegisterId.R4)!
+          .to_byte_array()
+      );
+
       const extractedCollateral = collateralExtractor['toExtractedCollateral'](
         collaterlBoxData,
         block.hash,
         20
       );
+      //'gKjWuQcQBwQABAAEAQQEBAAEAA4gMu5dlHz+jbVIAVf/pWa5t9n69B+hRcnQBijHwVmYePbYBdYB5ManBA7WArKkcwAA1gOypXMBANYE5cZyAwcEcwLWBeTGcgMEGtGWgwQBk4yy22MIsqRzAwBzBAABcgGTsuTGcgIEGnIEAHIB7JOxcgVyBJSycgVyBAByAZOMsttjCHICcwUAAXMGFAI4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmgH4/mTT2U1OsZPqnWMEZG22e9kU7ULOvTpPYU2dnedc8M0CAg4CREoFkAOMSU2gJC/QTstO/T2d4RgThIx5s4WS8p1XmDbfvEWflgA=',
 
       expect(extractedCollateral).toEqual({
-        boxId:
-          '5e1214fb8b60e53e20559f455c7fbae4f6684aaac23baa72de8d1d5f063ba889',
-        boxSerialized:
-          'gKjWuQcQBwQABAAEAQQEBAAEAA4gMu5dlHz+jbVIAVf/pWa5t9n69B+hRcnQBijHwVmYePbYBdYB5ManBA7WArKkcwAA1gOypXMBANYE5cZyAwcEcwLWBeTGcgMEGtGWgwQBk4yy22MIsqRzAwBzBAABcgGTsuTGcgIEGnIEAHIB7JOxcgVyBJSycgVyBAByAZOMsttjCHICcwUAAXMGFAI4JbK0rKqrpiZEARMVMkbGXdsunfQGxKVkGLWELJ+DmgH4/mTT2U1OsZPqnWMEZG22e9kU7ULOvTpPYU2dnedc8M0CAg4CREoFkAOMSU2gJC/QTstO/T2d4RgThIx5s4WS8p1XmDbfvEWflgA=',
-        wid: '444a',
-        rwtCount: 200n,
-        txId: '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96',
-        height: 20,
+        boxId: collaterlBoxData.boxId,
+        boxSerialized: Buffer.from(
+          collateralBox.sigma_serialize_bytes()
+        ).toString('base64'),
+        wid: wid,
+        rwtCount: rwtCount,
+        txId: collaterlBoxData.transactionId,
+        height: collaterlBoxData.creationHeight,
         block: block.hash,
       });
     });
