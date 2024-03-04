@@ -55,7 +55,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];
-      const spentInfos = new Map<string, string[]>();
+      const spentInfos: Array<[string, string]> = [];
       for (const tx of txs) {
         const outputBox = tx.outputs.at(1);
         if (outputBox == undefined) {
@@ -72,10 +72,10 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
         );
         if (extractedCollateral) boxes.push(extractedCollateral);
 
-        spentInfos.set(
-          tx.id,
-          tx.inputs.map((box) => box.boxId)
-        );
+        const inputCollateral = tx.inputs.at(1);
+        if (inputCollateral != undefined) {
+          spentInfos.push([tx.id, inputCollateral.boxId]);
+        }
       }
       if (boxes.length > 0)
         await this.action.storeCollaterals(boxes, block, this.getId());
@@ -90,14 +90,22 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     return true;
   };
 
-  private isCollateralBox(outputBox: OutputBox): boolean {
+  /**
+   * checks if the passed box is a collateral box
+   *
+   * @private
+   * @param {OutputBox} outputBox
+   * @return {boolean}
+   * @memberof CollateralExtractor
+   */
+  private isCollateralBox = (outputBox: OutputBox): boolean => {
     const awcNft = outputBox.assets?.at(0)?.tokenId;
     return (
       awcNft != undefined &&
       awcNft === this.awcNft &&
       outputBox.ergoTree === this.ergoTree
     );
-  }
+  };
 
   /**
    * Delete all collaterals corresponding to the passed block and extractor and

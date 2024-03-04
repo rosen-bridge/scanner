@@ -150,35 +150,32 @@ class CollateralAction {
    * @memberof CollateralAction
    */
   spendCollaterals = async (
-    spendInfos: Map<string, string[]>,
+    spendInfos: Array<[string, string]>,
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    for (const [txId, boxIds] of spendInfos.entries()) {
-      const boxIdsChunks = chunk(boxIds, dbIdChunkSize);
-      for (const boxIdChunk of boxIdsChunks) {
-        const updateResult = await this.collateralRepository.update(
-          {
-            boxId: In(boxIdChunk),
-            extractor: extractor,
-          },
-          {
-            spendBlock: block.hash,
-            spendHeight: block.height,
-            spendTxId: txId,
-          }
-        );
+    for (const [txId, boxId] of spendInfos) {
+      const updateResult = await this.collateralRepository.update(
+        {
+          boxId: boxId,
+          extractor: extractor,
+        },
+        {
+          spendBlock: block.hash,
+          spendHeight: block.height,
+          spendTxId: txId,
+        }
+      );
 
-        if (updateResult.affected && updateResult.affected > 0) {
-          const updatedRows = await this.collateralRepository.findBy({
-            boxId: In(boxIdChunk),
-            spendBlock: block.hash,
-          });
-          for (const row of updatedRows) {
-            this.logger.debug(
-              `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wid}] at height ${block.height}`
-            );
-          }
+      if (updateResult.affected && updateResult.affected > 0) {
+        const updatedRows = await this.collateralRepository.findBy({
+          boxId: boxId,
+          spendBlock: block.hash,
+        });
+        for (const row of updatedRows) {
+          this.logger.debug(
+            `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wid}] at height ${block.height}`
+          );
         }
       }
     }

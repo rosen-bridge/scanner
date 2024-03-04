@@ -1,5 +1,5 @@
+import { BigIntValueTransformer } from '@rosen-bridge/extended-typeorm';
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { bigintTransformer } from '../transformers';
 
 @Entity('collateral_entity')
 @Unique(['boxId', 'extractor'])
@@ -19,7 +19,7 @@ class CollateralEntity {
   @Column()
   wid: string;
 
-  @Column({ type: 'bigint', transformer: bigintTransformer })
+  @Column({ type: 'bigint', transformer: new BigIntValueTransformer() })
   rwtCount: bigint;
 
   @Column()

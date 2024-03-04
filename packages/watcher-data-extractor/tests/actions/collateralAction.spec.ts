@@ -309,9 +309,9 @@ describe('CollateralAction', () => {
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
       const spendTxId =
         '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
-      const spendInfos = new Map<string, string[]>([
-        [spendTxId, [testData.sampleCollateralEntities[0].boxId]],
-      ]);
+      const spendInfos: Array<[string, string]> = [
+        [spendTxId, testData.sampleCollateralEntities[0].boxId],
+      ];
 
       await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
@@ -350,13 +350,13 @@ describe('CollateralAction', () => {
       );
 
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
-      const collateralsToSpend = testData.sampleCollateralEntities.slice(0, 2);
-      const unspentCollaterals = testData.sampleCollateralEntities.slice(2);
+      const collateralsToSpend = testData.sampleCollateralEntities.slice(0, 1);
+      const unspentCollaterals = testData.sampleCollateralEntities.slice(1);
       const spendTxId =
         '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
-      const spendInfos = new Map<string, string[]>([
-        [spendTxId, collateralsToSpend.map((col) => col.boxId)],
-      ]);
+      const spendInfos: Array<[string, string]> = collateralsToSpend.map(
+        (box) => [spendTxId, box.boxId]
+      );
       await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
       const unspentCollateralBoxIds = await action.getUnspentCollateralBoxIds(
