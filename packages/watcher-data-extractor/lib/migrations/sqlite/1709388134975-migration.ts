@@ -15,9 +15,9 @@ export class Migration1709388134975 implements MigrationInterface {
                 "txId" varchar NOT NULL,
                 "block" varchar NOT NULL,
                 "height" integer NOT NULL,
-                "spendBlock" text,
+                "spendBlock" varchar,
                 "spendHeight" integer,
-                "spendTxId" text,
+                "spendTxId" varchar,
                 CONSTRAINT "UQ_2d4abc2071df9a2300a5e1b4616" UNIQUE ("boxId", "extractor")
             )
         `);

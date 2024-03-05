@@ -12,6 +12,7 @@ import CollateralAction from '../actions/collateralAction';
 import { DefaultApiLimit } from '../constants';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
 import { JsonBI, uint8ArrayToHex } from '../utils';
+import { SpendInfo } from '../interfaces/types';
 
 export class CollateralExtractor extends AbstractExtractor<Transaction> {
   private readonly ergoTree: string;
@@ -55,7 +56,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];
-      const spentInfos: Array<[string, string]> = [];
+      const spentInfos: Array<SpendInfo> = [];
       for (const tx of txs) {
         const outputBox = tx.outputs.at(1);
         if (outputBox == undefined) {
@@ -74,7 +75,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
 
         const inputCollateral = tx.inputs.at(1);
         if (inputCollateral != undefined) {
-          spentInfos.push([tx.id, inputCollateral.boxId]);
+          spentInfos.push({ txId: tx.id, boxId: inputCollateral.boxId });
         }
       }
       if (boxes.length > 0)

@@ -5,6 +5,7 @@ import CollateralAction from '../../lib/actions/collateralAction';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { block } from '../extractor/utilsVariable.mock';
 import * as testData from './collateralActionTestData';
+import { SpendInfo } from '../../lib/interfaces/types';
 
 describe('CollateralAction', () => {
   let dataSource: DataSource;
@@ -309,8 +310,8 @@ describe('CollateralAction', () => {
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
       const spendTxId =
         '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
-      const spendInfos: Array<[string, string]> = [
-        [spendTxId, testData.sampleCollateralEntities[0].boxId],
+      const spendInfos: Array<SpendInfo> = [
+        { txId: spendTxId, boxId: testData.sampleCollateralEntities[0].boxId },
       ];
 
       await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
@@ -354,9 +355,10 @@ describe('CollateralAction', () => {
       const unspentCollaterals = testData.sampleCollateralEntities.slice(1);
       const spendTxId =
         '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
-      const spendInfos: Array<[string, string]> = collateralsToSpend.map(
-        (box) => [spendTxId, box.boxId]
-      );
+      const spendInfos: Array<SpendInfo> = collateralsToSpend.map((box) => ({
+        txId: spendTxId,
+        boxId: box.boxId,
+      }));
       await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
       const unspentCollateralBoxIds = await action.getUnspentCollateralBoxIds(

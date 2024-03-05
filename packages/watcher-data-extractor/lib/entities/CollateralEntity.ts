@@ -31,13 +31,13 @@ class CollateralEntity {
   @Column()
   height: number;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendBlock?: string | null;
 
   @Column({ nullable: true, type: 'integer' })
   spendHeight?: number | null;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendTxId?: string | null;
 }
 

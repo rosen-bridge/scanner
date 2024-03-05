@@ -1,10 +1,11 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { BlockEntity } from '@rosen-bridge/scanner';
-import { chunk } from 'lodash-es';
+import JsonBigInt from '@rosen-bridge/json-bigint';
+import { difference } from 'lodash-es';
 import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
-import { dbIdChunkSize } from '../constants';
 import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
+import { SpendInfo } from '../interfaces/types';
 
 class CollateralAction {
   private readonly collateralRepository: Repository<CollateralEntity>;
@@ -90,43 +91,60 @@ class CollateralAction {
       const repository = await queryRunner.manager.getRepository(
         CollateralEntity
       );
-      const boxIdToId = new Map<string, number>();
-      (
+      const existingBoxIds = (
         await repository.find({
           where: {
             boxId: In(collateralEntities.map((box) => box.boxId)),
             extractor: extractor,
           },
           select: {
-            id: true,
             boxId: true,
           },
         })
-      ).forEach((col) => boxIdToId.set(col.boxId, col.id));
+      ).map((col) => col.boxId);
 
-      const collateralsToUpdate = collateralEntities
-        .filter((col) => boxIdToId.has(col.boxId))
-        .map((col) => ({ ...col, id: boxIdToId.get(col.boxId) }));
-
-      const collateralsToInsert = collateralEntities.filter(
-        (col) => !boxIdToId.has(col.boxId)
+      const collateralsToUpdate = collateralEntities.filter((col) =>
+        existingBoxIds.includes(col.boxId)
       );
 
-      this.logger.info(
-        `Saving boxes with following IDs into the database: [${collateralEntities
-          .map((col) => col.boxId)
-          .join(', ')}]`
+      const collateralsToInsert = difference(
+        collateralEntities,
+        collateralsToUpdate
       );
-      const savedCollaterals = await repository.save([
-        ...collateralsToInsert,
-        ...collateralsToUpdate,
-      ]);
+
+      if (collateralsToUpdate.length > 0) {
+        this.logger.info(
+          `Inserting boxes with following IDs into the database: [${collateralsToInsert
+            .map((col) => col.boxId)
+            .join(', ')}]`
+        );
+        this.logger.debug(
+          `Inserting collateral boxes [${JsonBigInt.stringify(
+            collateralsToInsert
+          )}]`
+        );
+      }
+      await repository.insert(collateralsToInsert);
+
+      if (collateralsToUpdate.length > 0)
+        this.logger.info(
+          `Updating boxes with following IDs in the database: [${collateralsToUpdate
+            .map((col) => col.boxId)
+            .join(', ')}]`
+        );
+      collateralsToUpdate.forEach(async (collateral) => {
+        this.logger.debug(
+          `Updating collateral box in database [${JsonBigInt.stringify(
+            collateral
+          )}]`
+        );
+        await repository.update(
+          { boxId: collateral.boxId, extractor: extractor },
+          collateral
+        );
+      });
+
       await queryRunner.commitTransaction();
-      this.logger.debug(
-        `Saved boxes with following IDs into the database: [${savedCollaterals
-          .map((col) => col.boxId)
-          .join(', ')}]`
-      );
     } catch (e) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
@@ -143,33 +161,33 @@ class CollateralAction {
   /**
    * Update spendBlock and spendHeight of collaterals spent in the block
    *
-   * @param {Array<string>} spentBoxIds
+   * @param {Array<SpendInfo>} spendInfos
    * @param {BlockEntity} block
    * @param {string} extractor
    * @return {Promise<void>}
    * @memberof CollateralAction
    */
   spendCollaterals = async (
-    spendInfos: Array<[string, string]>,
+    spendInfos: Array<SpendInfo>,
     block: BlockEntity,
     extractor: string
   ): Promise<void> => {
-    for (const [txId, boxId] of spendInfos) {
+    for (const spendInfo of spendInfos) {
       const updateResult = await this.collateralRepository.update(
         {
-          boxId: boxId,
+          boxId: spendInfo.boxId,
           extractor: extractor,
         },
         {
           spendBlock: block.hash,
           spendHeight: block.height,
-          spendTxId: txId,
+          spendTxId: spendInfo.txId,
         }
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const updatedRows = await this.collateralRepository.findBy({
-          boxId: boxId,
+          boxId: spendInfo.boxId,
           spendBlock: block.hash,
         });
         for (const row of updatedRows) {

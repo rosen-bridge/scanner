@@ -22,5 +22,5 @@ export interface AddressBoxes {
 export interface SpendInfo {
   boxId: string;
   txId: string;
-  index: number;
+  index?: number;
 }
