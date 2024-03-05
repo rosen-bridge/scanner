@@ -14,6 +14,7 @@ import {
   RWTId,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
+import { CollateralEntity } from '../../lib';
 import { blake2b } from 'blakejs';
 
 /**
@@ -25,7 +26,12 @@ export const createDatabase = async (): Promise<DataSource> => {
   const dataSource = new DataSource({
     type: 'sqlite',
     database: `:memory:`,
-    entities: [PermitEntity, CommitmentEntity, EventTriggerEntity],
+    entities: [
+      PermitEntity,
+      CommitmentEntity,
+      EventTriggerEntity,
+      CollateralEntity,
+    ],
     migrations: migrations.sqlite,
     synchronize: false,
     logging: false,

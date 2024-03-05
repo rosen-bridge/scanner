@@ -6,6 +6,16 @@ const JsonBI = JSONBigInt({
 });
 
 /**
+ * converts hex string to Uint8Array bytes
+ *
+ * @param {Uint8Array} bytes
+ * @return {string}
+ */
+export const uint8ArrayToHex = (bytes: Uint8Array): string => {
+  return Buffer.from(bytes).toString('hex');
+};
+
+/**
  * calculates hash of WIDs
  * @param WIDs
  * @returns returns WIDsHash with it's count
