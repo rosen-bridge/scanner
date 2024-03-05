@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Rosen Team",
   "license": "GPL-3.0",
