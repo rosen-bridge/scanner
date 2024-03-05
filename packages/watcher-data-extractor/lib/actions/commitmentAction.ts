@@ -120,6 +120,7 @@ class CommitmentAction {
           },
           {
             spendBlock: block.hash,
+            spendHeight: block.height,
             spendTxId: spendInfo.txId,
             spendIndex: spendInfo.index,
           }
@@ -148,7 +149,7 @@ class CommitmentAction {
     });
     await this.commitmentRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: 0, spendTxId: null, spendIndex: null }
+      { spendBlock: null, spendHeight: null, spendTxId: null, spendIndex: null }
     );
   };
 }
