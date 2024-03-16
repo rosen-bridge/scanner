@@ -148,26 +148,25 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
 
     // Storing extracted boxes
     let allStoredBoxIds = await this.actions.getAllBoxIds(this.getId());
-    for (const permit of unspentBoxes) {
-      if (allStoredBoxIds.includes(permit.boxId)) {
-        await this.actions.updateBox(permit, this.getId());
+    for (const box of unspentBoxes) {
+      if (allStoredBoxIds.includes(box.boxId)) {
+        await this.actions.updateBox(box, this.getId());
         this.logger.info(
-          `Updated the existing unspent box with boxId, [${permit.boxId}]`
+          `Updated the existing unspent box with boxId, [${box.boxId}]`
         );
-        this.logger.debug(`Updated box [${JSON.stringify(permit)}]`);
+        this.logger.debug(`Updated box [${JSON.stringify(box)}]`);
       } else {
-        await this.actions.insertBox(permit, this.getId());
-        this.logger.info(
-          `Inserted new unspent box with boxId, [${permit.boxId}]`
-        );
-        this.logger.debug(`Inserted permit [${JSON.stringify(permit)}]`);
+        await this.actions.insertBox(box, this.getId());
+        this.logger.info(`Inserted new unspent box with boxId, [${box.boxId}]`);
+        this.logger.debug(`Inserted box [${JSON.stringify(box)}]`);
       }
     }
 
     // Remove updated box ids from existing boxes in database
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained boxes
-    await this.validateOldStoredBoxes(allStoredBoxIds, initialHeight);
+    // TODO: Fix extractor initialization local:ergo/rosen-bridge/scanner#102
+    // await this.validateOldStoredBoxes(allStoredBoxIds, initialHeight);
   };
 
   /**
