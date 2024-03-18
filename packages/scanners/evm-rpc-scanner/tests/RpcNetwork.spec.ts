@@ -58,7 +58,10 @@ describe('RPCNetwork', () => {
       const result = await network.getBlockTxs(testData.blockHash);
 
       // check returned value
-      expect(result).toEqual(testData.transactionsList);
+      for (let i = 0; i < result.length; i++) {
+        const trx = result[i];
+        expect(trx.toJSON()).toEqual(testData.convertedTxList[i]);
+      }
     });
 
     /**

@@ -1,11 +1,11 @@
-import { TransactionResponse } from 'ethers';
+import { Transaction } from 'ethers';
 import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
 import { EvmRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { RosenTokens } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from 'typeorm';
 
-export class EthereumRpcObservationExtractor extends AbstractObservationExtractor<TransactionResponse> {
+export class EthereumRpcObservationExtractor extends AbstractObservationExtractor<Transaction> {
   readonly FROM_CHAIN = 'ethereum';
 
   constructor(
@@ -30,5 +30,12 @@ export class EthereumRpcObservationExtractor extends AbstractObservationExtracto
   /**
    * gets transaction id from TransactionType
    */
-  getTxId = (tx: TransactionResponse) => tx.hash;
+  getTxId = (tx: Transaction) => {
+    if (tx.hash == null) {
+      throw Error(
+        'ImpossibleBehaviour: Transactions comming from RPC have to be signed.'
+      );
+    }
+    return tx.hash;
+  };
 }

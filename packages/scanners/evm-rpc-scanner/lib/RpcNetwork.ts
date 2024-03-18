@@ -1,8 +1,13 @@
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
 import { BlockNotFound } from './types';
-import { JsonRpcProvider, TransactionResponse } from 'ethers';
+import {
+  JsonRpcProvider,
+  Transaction,
+  TransactionResponse,
+  Signature,
+} from 'ethers';
 
-export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
+export class RpcNetwork extends AbstractNetworkConnector<Transaction> {
   protected readonly provider: JsonRpcProvider;
 
   constructor(url: string, timeout?: number, authToken?: string) {
@@ -52,12 +57,14 @@ export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
    * @param blockHash
    * @returns array of RpcTransaction
    */
-  getBlockTxs = (blockHash: string): Promise<Array<TransactionResponse>> => {
+  getBlockTxs = (blockHash: string): Promise<Array<Transaction>> => {
     return this.provider.getBlock(blockHash, true).then((block) => {
       if (block == undefined) {
         throw new BlockNotFound(`Block with hash ${blockHash} is not found.`);
       }
-      return block.prefetchedTransactions;
+      return block.prefetchedTransactions.map((trxRes: TransactionResponse) => {
+        return Transaction.from(trxRes);
+      });
     });
   };
 }
