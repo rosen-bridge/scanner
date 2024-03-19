@@ -1,10 +1,10 @@
 import { EvmRpcConfig } from './types';
 import { RpcNetwork } from './RpcNetwork';
-import { TransactionResponse } from 'ethers';
+import { Transaction } from 'ethers';
 import { Block, GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
-export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
+export class EvmRpcScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
   readonly chain: string;
   network: RpcNetwork;
