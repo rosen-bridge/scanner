@@ -8,7 +8,7 @@
 
 ### Minor Changes
 
-- updated @rosen-bridge/rosen-extractor version dependency to ^4.0.0
+- updated @rosen-bridge/rosen-extractor version dependency to ^4.0.1
 
 ### Patch Changes
 

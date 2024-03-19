@@ -6,6 +6,10 @@
 
 - changed to Transaction from TransactionResponse
 
+### Minor Changes
+
+- updated @rosen-bridge/rosen-extractor version dependency to ^4.0.1
+
 ### Patch Changes
 
 - Updated dependencies
