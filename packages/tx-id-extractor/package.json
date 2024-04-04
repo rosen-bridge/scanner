@@ -23,7 +23,7 @@
     "@rosen-bridge/scanner": "^3.2.6",
     "@cardano-ogmios/schema": "^6.0.3",
     "sqlite3": "^5.0.9",
-    "typeorm": "^0.3.7"
+    "typeorm": "^0.3.20"
   },
   "type": "module",
   "devDependencies": {
