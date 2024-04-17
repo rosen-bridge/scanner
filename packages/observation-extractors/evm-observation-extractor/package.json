@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@rosen-bridge/observation-extractor": "^4.4.0",
-    "@rosen-bridge/rosen-extractor": "^4.0.1"
+    "@rosen-bridge/rosen-extractor": "^4.1.1"
   }
 }
