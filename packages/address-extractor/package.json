@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "UTXO box extractor for any address or token.",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
-    "@rosen-bridge/scanner": "^3.2.6",
+    "@rosen-bridge/scanner": "^3.2.7",
     "@rosen-clients/ergo-explorer": "^1.0.3",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.1",
