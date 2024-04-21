@@ -4,5 +4,5 @@ import { Migration1713678251901 } from './sqlite/1713678251901-migration';
 
 export const migrations = {
   sqlite: [migration1688555497475, Migration1713678251901],
-  postgres: [migration1688545690867],
+  postgres: [migration1688545690867, Migration1713678251901],
 };
