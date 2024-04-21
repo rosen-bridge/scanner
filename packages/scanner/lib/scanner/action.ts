@@ -1,10 +1,19 @@
 import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
-import { DataSource, DeleteResult, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeleteResult,
+  MoreThanOrEqual,
+  Repository,
+  In,
+} from 'typeorm';
 import { Block } from '../interfaces';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { ExtractorStatusEntity } from '../entities/extractorStatusEntity';
 
 export class BlockDbAction {
   readonly blockRepository: Repository<BlockEntity>;
+  readonly extractorStatusRepository: Repository<ExtractorStatusEntity>;
+  readonly dataSource: DataSource;
   readonly scannerName: string;
   readonly logger: AbstractLogger;
 
@@ -14,6 +23,10 @@ export class BlockDbAction {
     logger?: AbstractLogger
   ) {
     this.blockRepository = dataSource.getRepository(BlockEntity);
+    this.extractorStatusRepository = dataSource.getRepository(
+      ExtractorStatusEntity
+    );
+    this.dataSource = dataSource;
     this.scannerName = scannerName;
     this.logger = logger ? logger : new DummyLogger();
   }
@@ -171,12 +184,19 @@ export class BlockDbAction {
    * Update status of a block to proceed
    * @param blockHeight: height of expected block
    */
-  updateBlockStatus = async (blockHeight: number): Promise<boolean> => {
+  updateBlockStatus = async (
+    blockHeight: number,
+    extractorIds: string[]
+  ): Promise<boolean> => {
+    let success = true;
     this.logger.debug(
       `Block at height ${blockHeight} has been proceed in scanner ${this.scannerName}, updating status`
     );
-    return await this.blockRepository
-      .update(
+    const runner = this.dataSource.createQueryRunner();
+    runner.connect();
+    runner.startTransaction();
+    try {
+      await runner.manager.getRepository(BlockEntity).update(
         {
           height: blockHeight,
           status: PROCESSING,
@@ -185,19 +205,41 @@ export class BlockDbAction {
         {
           status: PROCEED,
         }
-      )
-      .then(() => true)
-      .catch(() => false);
+      );
+
+      this.logger.debug('Updating extractors status', {
+        extractorIds,
+      });
+      await runner.manager
+        .getRepository(ExtractorStatusEntity)
+        .update(
+          { extractorId: In(extractorIds) },
+          { updateHeight: blockHeight }
+        );
+      await runner.commitTransaction();
+    } catch (e) {
+      runner.rollbackTransaction();
+      success = false;
+    } finally {
+      runner.release();
+    }
+    return success;
   };
 
   /**
    * Update status of a block to processing in case of fork
    * @param blockHeight: height of expected block
    */
-  revertBlockStatus = async (blockHeight: number): Promise<boolean> => {
-    this.logger.debug(`Reverting block status at height ${blockHeight}`);
-    return await this.blockRepository
-      .update(
+  revertBlockStatus = async (
+    blockHeight: number,
+    extractorIds: string[]
+  ): Promise<boolean> => {
+    const runner = this.dataSource.createQueryRunner();
+    runner.connect();
+    runner.startTransaction();
+    try {
+      this.logger.debug(`Reverting block status at height ${blockHeight}`);
+      await runner.manager.getRepository(BlockEntity).update(
         {
           height: blockHeight,
           status: PROCEED,
@@ -206,8 +248,62 @@ export class BlockDbAction {
         {
           status: PROCESSING,
         }
-      )
-      .then(() => true)
-      .catch(() => false);
+      );
+
+      this.logger.debug(
+        `Reverting extractors update height to previous block at height ${
+          blockHeight - 1
+        }`
+      );
+      await runner.manager
+        .getRepository(ExtractorStatusEntity)
+        .update(
+          { extractorId: In(extractorIds) },
+          { updateHeight: blockHeight - 1 }
+        );
+      await runner.commitTransaction();
+    } catch (e) {
+      this.logger.warn(`An Error occurred while reverting block status: ${e}`);
+      return false;
+    } finally {
+      runner.release();
+    }
+    return true;
+  };
+
+  /**
+   * Insert a newly initialized extractor or update an existing extractor status
+   * @param extractorId
+   * @param height
+   * @returns
+   */
+  updateOrInsertExtractorStatus = async (
+    extractorId: string,
+    height: number
+  ) => {
+    this.logger.debug(
+      'Inserting new extractor status or Updating existing resynced extractor status',
+      {
+        extractorId,
+        height,
+      }
+    );
+    return await this.extractorStatusRepository.save({
+      extractorId,
+      updateHeight: height,
+    });
+  };
+
+  /**
+   * Return extractors` status specified by id
+   * @param extractorIds
+   * @returns extractors` status
+   */
+  getExtractorsStatus = async (
+    extractorIds: string[]
+  ): Promise<ExtractorStatusEntity[]> => {
+    return await this.extractorStatusRepository.findBy({
+      extractorId: In(extractorIds),
+    });
   };
 }
