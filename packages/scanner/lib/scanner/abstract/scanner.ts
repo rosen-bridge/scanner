@@ -5,12 +5,10 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
   extractors: Array<AbstractExtractor<TransactionType>>;
-  extractorInitialization: Array<number>; // Stores the initialization height of each extractor (-1 if it's not initialized yet)
   logger: AbstractLogger;
 
   constructor(logger?: AbstractLogger) {
     this.extractors = [];
-    this.extractorInitialization = [];
     this.logger = logger ? logger : new DummyLogger();
   }
 
@@ -26,7 +24,10 @@ export abstract class AbstractScanner<TransactionType> {
       this.logger.debug(
         `Reverting block ${lastBlock.hash} at height ${lastBlock.height}`
       );
-      await this.action.revertBlockStatus(lastBlock.height);
+      await this.action.revertBlockStatus(
+        lastBlock.height,
+        this.extractors.map((e) => e.getId())
+      );
       for (const extractor of this.extractors) {
         try {
           await extractor.forkBlock(lastBlock.hash);
@@ -61,7 +62,13 @@ export abstract class AbstractScanner<TransactionType> {
         break;
       }
     }
-    if (success && (await this.action.updateBlockStatus(block.blockHeight))) {
+    if (
+      success &&
+      (await this.action.updateBlockStatus(
+        block.blockHeight,
+        this.extractors.map((e) => e.getId())
+      ))
+    ) {
       return savedBlock;
     }
     return false;
@@ -78,7 +85,6 @@ export abstract class AbstractScanner<TransactionType> {
       ).length === 0
     ) {
       this.extractors.push(extractor);
-      this.extractorInitialization.push(-1);
     }
   };
 
@@ -91,6 +97,25 @@ export abstract class AbstractScanner<TransactionType> {
       return extractorItem.getId() === extractor.getId();
     });
     this.extractors.splice(extractorIndex, 1);
-    this.extractorInitialization.splice(extractorIndex, 1);
+  };
+
+  /**
+   * Initialize all specified extractors and store the updated status
+   * @param extractorIds
+   * @param height
+   */
+  initializeExtractorBoxes = async (extractorIds: string[], height: number) => {
+    const extractors = this.extractors.filter((extractor) =>
+      extractorIds.includes(extractor.getId())
+    );
+    for (const extractor of extractors) {
+      this.logger.info(`Initializing [${extractor.getId()}] boxes`);
+      await extractor.initializeBoxes(height);
+      await this.action.updateOrInsertExtractorStatus(
+        extractor.getId(),
+        height
+      );
+      this.logger.debug(`Initialization finished for [${extractor.getId()}]`);
+    }
   };
 }
