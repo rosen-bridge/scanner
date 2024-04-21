@@ -3,5 +3,4 @@ export interface ExtractedTx {
   signedHash: string;
   nonce: number;
   address: string;
-  // blockId: string;
 }

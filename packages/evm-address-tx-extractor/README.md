@@ -1,4 +1,4 @@
-# evm-address-tx-extractor
+# @rosen-bridge/evm-address-tx-extractor
 
 ## Table of contents
 
@@ -7,18 +7,18 @@
 
 ## Introduction
 
-Extract and store evm chains&#39; important transactions&#39; data
+Extract and store EVM chain notable data of transactions for an address
 
 ## Installation
 
 npm:
 
 ```sh
-npm i evm-address-tx-extractor
+npm i @rosen-bridge/evm-address-tx-extractor
 ```
 
 yarn:
 
 ```sh
-yarn add evm-address-tx-extractor
+yarn add @rosen-bridge/evm-address-tx-extractor
 ```

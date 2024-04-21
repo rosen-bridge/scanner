@@ -37,14 +37,10 @@ export class EvmTxExtractor extends AbstractExtractor<Transaction> {
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = txs.map((tx) => {
       if (tx.from === null) {
-        throw Error(
-          'ImpossibleBehaviour: Transactions comming from RPC must have `from`.'
-        );
+        throw Error('ImpossibleBehaviour: RPC Transactions must have `from`.');
       }
       if (tx.hash === null) {
-        throw Error(
-          'ImpossibleBehaviour: Transactions comming from RPC must have `hash`.'
-        );
+        throw Error('ImpossibleBehaviour: RPC Transactions must have `hash`.');
       }
       return {
         unsignedHash: tx.unsignedHash,
