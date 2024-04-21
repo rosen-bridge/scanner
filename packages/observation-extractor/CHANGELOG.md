@@ -1,10 +1,13 @@
 # @rosen-bridge/observation-extractor
 
-## 4.5.0
+## 4.4.1
 
-### Minor Changes
+### Patch Changes
 
-- changed @rosen-bridge/rosen-extractor dependency version to 4.0.1
+- Update typeorm version
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.7
+  - @rosen-bridge/rosen-extractor@4.1.1
 
 ## 4.4.0
 

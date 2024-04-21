@@ -1,15 +1,13 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
-## 1.1.0
-
-### Minor Changes
-
-- changed @rosen-bridge/rosen-extractor dependency to version 4.0.1
+## 1.0.1
 
 ### Patch Changes
 
+- Update typeorm version
 - Updated dependencies
-  - @rosen-bridge/observation-extractor@4.5.0
+  - @rosen-bridge/observation-extractor@4.4.1
+  - @rosen-bridge/rosen-extractor@4.1.1
 
 ## 1.0.0
 
@@ -19,7 +17,7 @@
 
 ### Minor Changes
 
-- updated @rosen-bridge/rosen-extractor version dependency to ^4.0.0
+- updated @rosen-bridge/rosen-extractor version dependency to ^4.0.1
 
 ### Patch Changes
 

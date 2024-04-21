@@ -1,5 +1,13 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 5.1.1
+
+### Patch Changes
+
+- Update typeorm version
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.7
+
 ## 5.1.0
 
 ### Minor Changes
