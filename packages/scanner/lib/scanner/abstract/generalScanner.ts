@@ -2,7 +2,6 @@ import { AbstractScanner } from './scanner';
 import { AbstractNetworkConnector, Block } from '../../interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
 import JsonBI from '@rosen-bridge/json-bigint';
-import { difference } from 'lodash-es';
 
 abstract class GeneralScanner<
   TransactionType
@@ -129,7 +128,7 @@ abstract class GeneralScanner<
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       }
-      await this.initializeExtractors(lastSavedBlock);
+      await this.initializeExtractors(lastSavedBlock.height);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {
@@ -137,44 +136,6 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
-    }
-  };
-
-  /**
-   * Initializes the extractors if they're not initialized yet,
-   * or they have been initialized on a forked block
-   * @param block
-   */
-  initializeExtractors = async (block: BlockEntity) => {
-    this.logger.debug(`Initializing extractors for block [${block.height}]`);
-    const extractorIds = this.extractors.map((extractor) => extractor.getId());
-    const extractorsStatus = await this.action.getExtractorsStatus(
-      extractorIds
-    );
-    // Find new extractors
-    const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
-    const newExtractorIds = difference(extractorIds, storedExtractorIds);
-    if (newExtractorIds.length > 0)
-      this.logger.debug(`New registered extractors are ${newExtractorIds}`);
-    // Find extractors not synced with the latest height
-    const notSyncedExtractorIds = extractorsStatus
-      .filter((es) => es.updateHeight != block.height)
-      .map((es) => es.extractorId);
-    if (notSyncedExtractorIds.length > 0)
-      this.logger.debug(
-        `Old not synced extractors are ${notSyncedExtractorIds}`
-      );
-    // Initialize required extractors
-    const initRequiredExtractors = [
-      ...newExtractorIds,
-      ...notSyncedExtractorIds,
-    ];
-    if (initRequiredExtractors.length > 0) {
-      this.logger.info(
-        `Initializing ${initRequiredExtractors.length} extractors`,
-        { initRequiredExtractors }
-      );
-      await this.initializeExtractorBoxes(initRequiredExtractors, block.height);
     }
   };
 }

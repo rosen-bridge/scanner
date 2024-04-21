@@ -1,6 +1,7 @@
 import { AbstractExtractor, Block } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { difference } from 'lodash-es';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -116,6 +117,44 @@ export abstract class AbstractScanner<TransactionType> {
         height
       );
       this.logger.debug(`Initialization finished for [${extractor.getId()}]`);
+    }
+  };
+
+  /**
+   * Initializes the extractors if they're not initialized yet,
+   * or they have been initialized on a forked block
+   * @param block
+   */
+  initializeExtractors = async (initHeight: number) => {
+    this.logger.debug(`Initializing extractors for block [${initHeight}]`);
+    const extractorIds = this.extractors.map((extractor) => extractor.getId());
+    const extractorsStatus = await this.action.getExtractorsStatus(
+      extractorIds
+    );
+    // Find new extractors
+    const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
+    const newExtractorIds = difference(extractorIds, storedExtractorIds);
+    if (newExtractorIds.length > 0)
+      this.logger.debug(`New registered extractors are ${newExtractorIds}`);
+    // Find extractors not synced with the latest height
+    const notSyncedExtractorIds = extractorsStatus
+      .filter((es) => es.updateHeight != initHeight)
+      .map((es) => es.extractorId);
+    if (notSyncedExtractorIds.length > 0)
+      this.logger.debug(
+        `Old not synced extractors are ${notSyncedExtractorIds}`
+      );
+    // Initialize required extractors
+    const initRequiredExtractors = [
+      ...newExtractorIds,
+      ...notSyncedExtractorIds,
+    ];
+    if (initRequiredExtractors.length > 0) {
+      this.logger.info(
+        `Initializing ${initRequiredExtractors.length} extractors`,
+        { initRequiredExtractors }
+      );
+      await this.initializeExtractorBoxes(initRequiredExtractors, initHeight);
     }
   };
 }
