@@ -6,6 +6,7 @@ import {
   PROCEED,
   PROCESSING,
 } from '../../lib/entities/blockEntity';
+import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -482,6 +483,7 @@ describe('action', () => {
      */
     it('should change status for block when calling updateBlockStatus', async () => {
       const repository = dataSource.getRepository(BlockEntity);
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
       await repository.insert({
         height: 12,
         hash: 'blockhashOld',
@@ -490,10 +492,17 @@ describe('action', () => {
         status: PROCESSING,
         timestamp: 10,
       });
-      await action.updateBlockStatus(12);
+      await esRepository.insert({
+        extractorId: 'extractorId',
+        updateHeight: 11,
+      });
+      await action.updateBlockStatus(12, ['extractorId']);
       const instances = await repository.find();
+      const esInstances = await esRepository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCEED);
+      expect(esInstances.length).toEqual(1);
+      expect(esInstances[0].updateHeight).toEqual(12);
     });
   });
 
@@ -507,6 +516,7 @@ describe('action', () => {
      */
     it('should change status for block when calling revertBlockStatus', async () => {
       const repository = dataSource.getRepository(BlockEntity);
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
       await repository.insert({
         height: 12,
         hash: 'blockhashOld',
@@ -515,10 +525,46 @@ describe('action', () => {
         status: PROCEED,
         timestamp: 10,
       });
-      await action.revertBlockStatus(12);
+      await esRepository.insert({
+        extractorId: 'extractorId',
+        updateHeight: 12,
+      });
+      await action.revertBlockStatus(12, ['extractorId']);
       const instances = await repository.find();
+      const esInstances = await esRepository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCESSING);
+      expect(esInstances.length).toEqual(1);
+      expect(esInstances[0].updateHeight).toEqual(11);
+    });
+  });
+
+  describe('getExtractorsStatus', () => {
+    /**
+     * @target getExtractorsStatus should return specified extractor status
+     * @dependencies
+     * @scenario
+     * - insert mocked extractors status to db
+     * - run test
+     * @expected
+     * - return 1 element out of 2 with correct details
+     */
+    it('should return specified extractor status', async () => {
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
+      await esRepository.insert([
+        {
+          extractorId: 'extractorId',
+          updateHeight: 12,
+        },
+        {
+          extractorId: 'extractorId2',
+          updateHeight: 10,
+        },
+      ]);
+      const extractorStatus = await action.getExtractorsStatus(['extractorId']);
+      expect(extractorStatus.length).toBe(1);
+      expect(extractorStatus[0].extractorId).toBe('extractorId');
+      expect(extractorStatus[0].updateHeight).toBe(12);
     });
   });
 });
