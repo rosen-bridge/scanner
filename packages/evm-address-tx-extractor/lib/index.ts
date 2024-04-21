@@ -1,4 +1,4 @@
 export * from './interfaces/types';
 export * from './extractors/EvmTxExtractor';
-export * from './entities/TxEntity';
+export * from './entities/AddressTxsEntity';
 export * from './actions/db';

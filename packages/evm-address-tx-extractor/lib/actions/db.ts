@@ -1,15 +1,15 @@
-import { TxEntity } from '../entities/TxEntity';
+import { AddressTxsEntity } from '../entities/AddressTxsEntity';
 import { ExtractedTx } from '../interfaces/types';
 import { DataSource, Repository } from 'typeorm';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class TxAction {
-  private readonly repository: Repository<TxEntity>;
+  private readonly repository: Repository<AddressTxsEntity>;
   readonly logger: AbstractLogger;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.repository = dataSource.getRepository(TxEntity);
+    this.repository = dataSource.getRepository(AddressTxsEntity);
     this.logger = logger ? logger : new DummyLogger();
   }
 
