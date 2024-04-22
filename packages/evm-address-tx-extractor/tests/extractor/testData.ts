@@ -1,6 +1,6 @@
 import { Transaction } from 'ethers';
 
-export const address = '0xedee4752e5a2f595151c94762fb38e5730357785';
+export const address = '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa';
 export const txs: Array<Transaction> = [
   Transaction.from({
     type: 2,
@@ -23,22 +23,21 @@ export const txs: Array<Transaction> = [
   }),
   Transaction.from({
     type: 2,
-    to: '0xedEe4752e5a2F595151831762fb38e5730357785',
-    data: '0xa9059cbb0000000000000000000000004f0d2dde80b45e24ad4019a5bbad6c23aff2842b00000000000000000000000000000000000000000000000000000000e319aa30bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-    nonce: 53,
+    to: '0xb416c8a6d7ec94706a9ae2c26c11d320519482b1',
+    data: '0xa9059cbb000000000000000000000000edee4752e5a2f595151c94762fb38e573035778500000000000000000000000000000000000000000000000000000000c502fc7000000000007554fc820000000000962f582103f999da8e6e42660e4464d17d29e63bc006734a6710a24eb489b466323d3a9339',
+    nonce: 10,
     gasLimit: '21000',
     gasPrice: null,
     maxPriorityFeePerGas: '500000000',
     maxFeePerGas: '48978500000',
-    value: '0',
+    value: '92850988521632054',
     chainId: '1',
     accessList: [],
     signature: {
-      r: '0x81bb1bdf7b84554435406f5e070646a3e4e69cf201ace23ba271a3a901b7ea79',
-      s: '0x51ac98ec928a6a8cc18ed3660ecf8e70c4aedeac46630ce3662f7b3e96f94505',
+      r: '0x7af681001bf23365afc66fbdb18e33bbd69779d3436c3ad2d27797bd133b2235',
+      s: '0x79b8f448c88ba863f450ebe916d386d696efe49ed33932c20951ed53fe50f915',
       yParity: 0,
     },
-    hash: '0x977b555b3f2ff270239a664093b7a20a704dd9cae2a0a133315d429d86b9a085',
   }),
   Transaction.from({
     type: 2,
@@ -59,4 +58,29 @@ export const txs: Array<Transaction> = [
     },
     hash: '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
   }),
+];
+
+export const expectedExtractedTxs = [
+  {
+    id: 1,
+    unsignedHash:
+      '0x47098cb4de103a91ce4c73543ec5658b2ca530050ebf77d9dfa22611e9781c54',
+    signedHash:
+      '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
+    nonce: 53,
+    address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
+    blockId: 'block 1',
+    extractor: 'extractor1',
+  },
+  {
+    id: 2,
+    unsignedHash:
+      '0xc042ca344198b72db99e55b44ceb51cdc719e32bd1ed4881c11e14915654da90',
+    signedHash:
+      '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
+    nonce: 53,
+    address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
+    blockId: 'block 1',
+    extractor: 'extractor1',
+  },
 ];
