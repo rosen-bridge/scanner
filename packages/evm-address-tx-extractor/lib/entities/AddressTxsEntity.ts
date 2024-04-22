@@ -2,24 +2,24 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('address_txs_entity')
 export class AddressTxsEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'integer' })
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   unsignedHash: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   signedHash: string;
 
-  @Column()
+  @Column({ type: 'integer' })
   nonce: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   address: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   blockId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 }
