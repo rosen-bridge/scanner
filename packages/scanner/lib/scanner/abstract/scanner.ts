@@ -1,15 +1,17 @@
 import { AbstractExtractor, Block } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { difference } from 'lodash-es';
+import { difference, remove } from 'lodash-es';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
   extractors: Array<AbstractExtractor<TransactionType>>;
+  newExtractors: Array<AbstractExtractor<TransactionType>>;
   logger: AbstractLogger;
 
   constructor(logger?: AbstractLogger) {
     this.extractors = [];
+    this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
   }
 
@@ -80,12 +82,17 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   registerExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
-    if (
-      this.extractors.filter(
+    const notRegisteredIn = (
+      extractors: Array<AbstractExtractor<TransactionType>>
+    ) =>
+      extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId()
-      ).length === 0
+      ).length === 0;
+    if (
+      notRegisteredIn(this.extractors) &&
+      notRegisteredIn(this.newExtractors)
     ) {
-      this.extractors.push(extractor);
+      this.newExtractors.push(extractor);
     }
   };
 
@@ -94,10 +101,11 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   removeExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
-    const extractorIndex = this.extractors.findIndex((extractorItem) => {
-      return extractorItem.getId() === extractor.getId();
-    });
-    this.extractors.splice(extractorIndex, 1);
+    const removeFn = (ex: AbstractExtractor<TransactionType>) =>
+      ex.getId() === extractor.getId();
+
+    remove(this.extractors, removeFn);
+    remove(this.newExtractors, removeFn);
   };
 
   /**
@@ -105,11 +113,15 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractorIds
    * @param height
    */
-  initializeExtractorBoxes = async (extractorIds: string[], height: number) => {
-    const extractors = this.extractors.filter((extractor) =>
+  private initializeExtractorBoxes = async (
+    extractorIds: string[],
+    height: number
+  ) => {
+    const allExtractors = [...this.extractors, ...this.newExtractors];
+    const initRequiredExtractors = allExtractors.filter((extractor) =>
       extractorIds.includes(extractor.getId())
     );
-    for (const extractor of extractors) {
+    for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
       await extractor.initializeBoxes(height);
       await this.action.updateOrInsertExtractorStatus(
@@ -121,21 +133,22 @@ export abstract class AbstractScanner<TransactionType> {
   };
 
   /**
-   * Initializes the extractors if they're not initialized yet,
-   * or they have been initialized on a forked block
+   * Initializes the extractors if they're not synced or not initialized yet,
+   * and update the active extractors list
    * @param block
    */
   initializeExtractors = async (initHeight: number) => {
+    const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
+      return extractors.map((extractor) => extractor.getId());
+    };
     this.logger.debug(`Initializing extractors for block [${initHeight}]`);
-    const extractorIds = this.extractors.map((extractor) => extractor.getId());
-    const extractorsStatus = await this.action.getExtractorsStatus(
-      extractorIds
+    const extractorsStatus = await this.action.getExtractorsStatus([
+      ...getIds(this.extractors),
+      ...getIds(this.newExtractors),
+    ]);
+    this.logger.debug(
+      `Stored extractors status are [${JSON.stringify(extractorsStatus)}]`
     );
-    // Find new extractors
-    const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
-    const newExtractorIds = difference(extractorIds, storedExtractorIds);
-    if (newExtractorIds.length > 0)
-      this.logger.debug(`New registered extractors are ${newExtractorIds}`);
     // Find extractors not synced with the latest height
     const notSyncedExtractorIds = extractorsStatus
       .filter((es) => es.updateHeight != initHeight)
@@ -144,17 +157,31 @@ export abstract class AbstractScanner<TransactionType> {
       this.logger.debug(
         `Old not synced extractors are ${notSyncedExtractorIds}`
       );
+    // Find new extractors not available in database
+    const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
+    const newRegisteredExtractorIds = difference(
+      getIds(this.newExtractors),
+      storedExtractorIds
+    );
+    if (newRegisteredExtractorIds.length > 0)
+      this.logger.debug(
+        `New registered extractors are ${newRegisteredExtractorIds}`
+      );
     // Initialize required extractors
     const initRequiredExtractors = [
-      ...newExtractorIds,
+      ...newRegisteredExtractorIds,
       ...notSyncedExtractorIds,
     ];
     if (initRequiredExtractors.length > 0) {
       this.logger.info(
-        `Initializing ${initRequiredExtractors.length} extractors`,
+        `Initializing ${
+          initRequiredExtractors.length
+        } extractor(s) for [${this.name()}]`,
         { initRequiredExtractors }
       );
       await this.initializeExtractorBoxes(initRequiredExtractors, initHeight);
+      this.extractors.push(...this.newExtractors);
+      this.newExtractors = [];
     }
   };
 }

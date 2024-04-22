@@ -193,8 +193,8 @@ export class BlockDbAction {
       `Block at height ${blockHeight} has been proceed in scanner ${this.scannerName}, updating status`
     );
     const runner = this.dataSource.createQueryRunner();
-    runner.connect();
-    runner.startTransaction();
+    await runner.connect();
+    await runner.startTransaction();
     try {
       await runner.manager.getRepository(BlockEntity).update(
         {
@@ -218,10 +218,10 @@ export class BlockDbAction {
         );
       await runner.commitTransaction();
     } catch (e) {
-      runner.rollbackTransaction();
+      await runner.rollbackTransaction();
       success = false;
     } finally {
-      runner.release();
+      await runner.release();
     }
     return success;
   };
@@ -234,9 +234,10 @@ export class BlockDbAction {
     blockHeight: number,
     extractorIds: string[]
   ): Promise<boolean> => {
+    let success = true;
     const runner = this.dataSource.createQueryRunner();
-    runner.connect();
-    runner.startTransaction();
+    await runner.connect();
+    await runner.startTransaction();
     try {
       this.logger.debug(`Reverting block status at height ${blockHeight}`);
       await runner.manager.getRepository(BlockEntity).update(
@@ -264,11 +265,12 @@ export class BlockDbAction {
       await runner.commitTransaction();
     } catch (e) {
       this.logger.warn(`An Error occurred while reverting block status: ${e}`);
-      return false;
+      await runner.rollbackTransaction();
+      success = false;
     } finally {
-      runner.release();
+      await runner.release();
     }
-    return true;
+    return success;
   };
 
   /**
