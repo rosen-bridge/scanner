@@ -128,7 +128,7 @@ abstract class GeneralScanner<
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       }
-      await this.initializeExtractors(lastSavedBlock.height);
+      await this.initializeExtractors(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {

@@ -92,7 +92,7 @@ abstract class AbstractExtractor<TransactionType> {
    * Extractor box initialization
    * No action needed in cardano extractors
    */
-  abstract initializeBoxes: (initialHeight: number) => Promise<void>;
+  abstract initializeBoxes: (initialBlock: BlockEntity) => Promise<void>;
 }
 
 export { AbstractDataBase, AbstractExtractor, AbstractNetworkConnector, Block };

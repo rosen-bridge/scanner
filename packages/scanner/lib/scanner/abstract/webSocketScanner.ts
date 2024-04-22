@@ -56,7 +56,7 @@ abstract class WebSocketScanner<
           this.logger.error('It seems saved block is not valid in scanner.');
           return false;
         } else {
-          await this.initializeExtractors(block.blockHeight - 1);
+          if (lastSavedBlock) await this.initializeExtractors(lastSavedBlock);
           const res = await this.processBlockTransactions(block, transactions);
           if (res === false) {
             this.logger.error(

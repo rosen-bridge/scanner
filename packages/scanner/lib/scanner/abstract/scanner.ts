@@ -1,3 +1,4 @@
+import { BlockEntity } from '../../entities/blockEntity';
 import { AbstractExtractor, Block } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -29,6 +30,7 @@ export abstract class AbstractScanner<TransactionType> {
       );
       await this.action.revertBlockStatus(
         lastBlock.height,
+        lastBlock.parentHash,
         this.extractors.map((e) => e.getId())
       );
       for (const extractor of this.extractors) {
@@ -69,6 +71,7 @@ export abstract class AbstractScanner<TransactionType> {
       success &&
       (await this.action.updateBlockStatus(
         block.blockHeight,
+        block.hash,
         this.extractors.map((e) => e.getId())
       ))
     ) {
@@ -115,7 +118,7 @@ export abstract class AbstractScanner<TransactionType> {
    */
   private initializeExtractorBoxes = async (
     extractorIds: string[],
-    height: number
+    block: BlockEntity
   ) => {
     const allExtractors = [...this.extractors, ...this.newExtractors];
     const initRequiredExtractors = allExtractors.filter((extractor) =>
@@ -123,10 +126,11 @@ export abstract class AbstractScanner<TransactionType> {
     );
     for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
-      await extractor.initializeBoxes(height);
+      await extractor.initializeBoxes(block);
       await this.action.updateOrInsertExtractorStatus(
         extractor.getId(),
-        height
+        block.height,
+        block.hash
       );
       this.logger.debug(`Initialization finished for [${extractor.getId()}]`);
     }
@@ -137,11 +141,11 @@ export abstract class AbstractScanner<TransactionType> {
    * and update the active extractors list
    * @param block
    */
-  initializeExtractors = async (initHeight: number) => {
+  initializeExtractors = async (block: BlockEntity) => {
     const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
       return extractors.map((extractor) => extractor.getId());
     };
-    this.logger.debug(`Initializing extractors for block [${initHeight}]`);
+    this.logger.debug(`Initializing extractors for block [${block.height}]`);
     const extractorsStatus = await this.action.getExtractorsStatus([
       ...getIds(this.extractors),
       ...getIds(this.newExtractors),
@@ -151,7 +155,7 @@ export abstract class AbstractScanner<TransactionType> {
     );
     // Find extractors not synced with the latest height
     const notSyncedExtractorIds = extractorsStatus
-      .filter((es) => es.updateHeight != initHeight)
+      .filter((es) => es.updateBlockHash != block.hash)
       .map((es) => es.extractorId);
     if (notSyncedExtractorIds.length > 0)
       this.logger.debug(
@@ -179,9 +183,9 @@ export abstract class AbstractScanner<TransactionType> {
         } extractor(s) for [${this.name()}]`,
         { initRequiredExtractors }
       );
-      await this.initializeExtractorBoxes(initRequiredExtractors, initHeight);
-      this.extractors.push(...this.newExtractors);
-      this.newExtractors = [];
+      await this.initializeExtractorBoxes(initRequiredExtractors, block);
     }
+    this.extractors.push(...this.newExtractors);
+    this.newExtractors = [];
   };
 }

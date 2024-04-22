@@ -493,16 +493,19 @@ describe('action', () => {
         timestamp: 10,
       });
       await esRepository.insert({
+        scannerId: action.name(),
         extractorId: 'extractorId',
         updateHeight: 11,
+        updateBlockHash: 'blockHash',
       });
-      await action.updateBlockStatus(12, ['extractorId']);
+      await action.updateBlockStatus(12, 'blockhashOld', ['extractorId']);
       const instances = await repository.find();
       const esInstances = await esRepository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCEED);
       expect(esInstances.length).toEqual(1);
       expect(esInstances[0].updateHeight).toEqual(12);
+      expect(esInstances[0].updateBlockHash).toEqual('blockhashOld');
     });
   });
 
@@ -526,16 +529,19 @@ describe('action', () => {
         timestamp: 10,
       });
       await esRepository.insert({
+        scannerId: action.name(),
         extractorId: 'extractorId',
         updateHeight: 12,
+        updateBlockHash: 'blockHash',
       });
-      await action.revertBlockStatus(12, ['extractorId']);
+      await action.revertBlockStatus(12, 'parentHashOld', ['extractorId']);
       const instances = await repository.find();
       const esInstances = await esRepository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCESSING);
       expect(esInstances.length).toEqual(1);
       expect(esInstances[0].updateHeight).toEqual(11);
+      expect(esInstances[0].updateBlockHash).toEqual('parentHashOld');
     });
   });
 
@@ -553,12 +559,16 @@ describe('action', () => {
       const esRepository = dataSource.getRepository(ExtractorStatusEntity);
       await esRepository.insert([
         {
+          scannerId: action.name(),
           extractorId: 'extractorId',
           updateHeight: 12,
+          updateBlockHash: 'blockHash2',
         },
         {
+          scannerId: action.name(),
           extractorId: 'extractorId2',
           updateHeight: 10,
+          updateBlockHash: 'blockHash1',
         },
       ]);
       const extractorStatus = await action.getExtractorsStatus(['extractorId']);

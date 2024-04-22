@@ -126,7 +126,7 @@ export const insertBlocks = async (
       blockHeight: index,
       timestamp: 10 * index,
     });
-    await scanner.action.updateBlockStatus(index, []);
+    await scanner.action.updateBlockStatus(index, 'hash', []);
   }
 };
 
@@ -153,7 +153,7 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   getId = () => 'fail extractor';
 
-  initializeBoxes = (initialHeight: number) => Promise.resolve();
+  initializeBoxes = (initialBlock: BlockEntity) => Promise.resolve();
 
   processTransactions = async (
     txs: Array<{ id: string }>,

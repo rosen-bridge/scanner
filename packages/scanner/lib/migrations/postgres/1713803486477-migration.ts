@@ -1,14 +1,16 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1713681832833 implements MigrationInterface {
-  name = 'Migration1713681832833';
+export class Migration1713803486477 implements MigrationInterface {
+  name = 'Migration1713803486477';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             CREATE TABLE "extractor_status_entity" (
+                "scannerId" character varying NOT NULL,
                 "extractorId" character varying NOT NULL,
                 "updateHeight" integer NOT NULL,
-                CONSTRAINT "PK_2dc3cb25b6890abfdfe8437c209" PRIMARY KEY ("extractorId")
+                "updateBlockHash" character varying NOT NULL,
+                CONSTRAINT "PK_74b8d00f8f0bbfc3814ef77e07e" PRIMARY KEY ("scannerId", "extractorId")
             )
         `);
   }

@@ -225,7 +225,10 @@ describe('AbstractScanner', () => {
       const mockedInit = jest
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
-      await scanner.initializeExtractors(100);
+      await scanner.initializeExtractors({
+        height: 100,
+        hash: 'hash',
+      } as BlockEntity);
       expect(mockedInit).toHaveBeenCalled();
       expect(scanner.extractors[0]).toBe(extractor);
       expect(scanner.newExtractors.length).toBe(0);
@@ -246,14 +249,20 @@ describe('AbstractScanner', () => {
     it('should not initialize new registered extractors with updated db information', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
-      await dataSource
-        .getRepository(ExtractorStatusEntity)
-        .insert({ extractorId: 'test', updateHeight: 100 });
+      await dataSource.getRepository(ExtractorStatusEntity).insert({
+        scannerId: scanner.name(),
+        extractorId: 'test',
+        updateHeight: 100,
+        updateBlockHash: 'hash',
+      });
       scanner.registerExtractor(extractor);
       const mockedInit = jest
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
-      await scanner.initializeExtractors(100);
+      await scanner.initializeExtractors({
+        height: 100,
+        hash: 'hash',
+      } as BlockEntity);
       expect(mockedInit).not.toHaveBeenCalled();
     });
 
@@ -272,14 +281,20 @@ describe('AbstractScanner', () => {
     it('should initialize new registered extractors with old db information', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
-      await dataSource
-        .getRepository(ExtractorStatusEntity)
-        .insert({ extractorId: 'test', updateHeight: 100 });
+      await dataSource.getRepository(ExtractorStatusEntity).insert({
+        scannerId: scanner.name(),
+        extractorId: 'test',
+        updateHeight: 100,
+        updateBlockHash: 'hash',
+      });
       scanner.registerExtractor(extractor);
       const mockedInit = jest
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
-      await scanner.initializeExtractors(200);
+      await scanner.initializeExtractors({
+        height: 100,
+        hash: 'hash2',
+      } as BlockEntity);
       expect(mockedInit).toHaveBeenCalled();
     });
   });
