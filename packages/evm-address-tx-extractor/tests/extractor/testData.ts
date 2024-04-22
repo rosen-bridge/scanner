@@ -1,0 +1,62 @@
+import { Transaction } from 'ethers';
+
+export const address = '0xedee4752e5a2f595151c94762fb38e5730357785';
+export const txs: Array<Transaction> = [
+  Transaction.from({
+    type: 2,
+    to: '0xeDee4752e5a2F595151c94762fB38e5730357785',
+    data: '0xa9059cbb0000000000000000000000004f0d2dde80b45e24ad4019a5aabd6c23aff2842b00000000000000000000000000000000000000000000000000000000e319aa30bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    nonce: 53,
+    gasLimit: '21000',
+    gasPrice: null,
+    maxPriorityFeePerGas: '500000000',
+    maxFeePerGas: '48978500000',
+    value: '0',
+    chainId: '1',
+    accessList: [],
+    signature: {
+      r: '0xc15a4d9e300114ed005a2821f01f4aa74dcfd3daf10749f26d8cc1bd8507673c',
+      s: '0x090492307ff4c7d2d514f373fa8fb01212c6af83391b6aed7039a3c9d6ecad11',
+      yParity: 0,
+    },
+    hash: '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
+  }),
+  Transaction.from({
+    type: 2,
+    to: '0xedEe4752e5a2F595151831762fb38e5730357785',
+    data: '0xa9059cbb0000000000000000000000004f0d2dde80b45e24ad4019a5bbad6c23aff2842b00000000000000000000000000000000000000000000000000000000e319aa30bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    nonce: 53,
+    gasLimit: '21000',
+    gasPrice: null,
+    maxPriorityFeePerGas: '500000000',
+    maxFeePerGas: '48978500000',
+    value: '0',
+    chainId: '1',
+    accessList: [],
+    signature: {
+      r: '0x81bb1bdf7b84554435406f5e070646a3e4e69cf201ace23ba271a3a901b7ea79',
+      s: '0x51ac98ec928a6a8cc18ed3660ecf8e70c4aedeac46630ce3662f7b3e96f94505',
+      yParity: 0,
+    },
+    hash: '0x977b555b3f2ff270239a664093b7a20a704dd9cae2a0a133315d429d86b9a085',
+  }),
+  Transaction.from({
+    type: 2,
+    to: '0xEDee4752e5a2F595151c94762fb38e5730437785',
+    data: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    nonce: 53,
+    gasLimit: '21000',
+    gasPrice: null,
+    maxPriorityFeePerGas: '500000000',
+    maxFeePerGas: '48978500000',
+    value: '0',
+    chainId: '1',
+    accessList: [],
+    signature: {
+      r: '0xbd9f0cae0d3e31b026cc828b7e5778ab79cf09b86f32ef07ad364f3e8fc1c31d',
+      s: '0x1d8db0fd3bc212ccff7661ecc9b95f9d985b4e75dfd211545f78ab0cef169ee1',
+      yParity: 0,
+    },
+    hash: '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
+  }),
+];

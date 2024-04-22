@@ -9,14 +9,17 @@ export class EvmTxExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
+  private readonly address: string;
 
   constructor(
     dataSource: DataSource,
     id: string,
+    address: string,
     logger: AbstractLogger = new DummyLogger()
   ) {
     super();
     this.id = id;
+    this.address = address;
     this.logger = logger;
     this.action = new TxAction(dataSource, this.logger);
   }
@@ -35,20 +38,29 @@ export class EvmTxExtractor extends AbstractExtractor<Transaction> {
     txs: Array<Transaction>,
     block: BlockEntity
   ): Promise<boolean> => {
-    const extractedTxs: Array<ExtractedTx> = txs.map((tx) => {
-      if (tx.from === null) {
-        throw Error('ImpossibleBehaviour: RPC transactions must have `from`.');
-      }
-      if (tx.hash === null) {
-        throw Error('ImpossibleBehaviour: RPC transactions must have `hash`.');
-      }
-      return {
-        unsignedHash: tx.unsignedHash,
-        signedHash: tx.hash,
-        nonce: tx.nonce,
-        address: tx.from,
-      };
-    });
+    const extractedTxs: Array<ExtractedTx> = txs.reduce(
+      (addressTxs: Array<ExtractedTx>, tx: Transaction) => {
+        if (tx.from === null) {
+          throw Error(
+            'ImpossibleBehaviour: RPC transactions must have `from`.'
+          );
+        }
+        if (tx.hash === null) {
+          throw Error(
+            'ImpossibleBehaviour: RPC transactions must have `hash`.'
+          );
+        }
+        if (tx.from === this.address)
+          addressTxs.push({
+            unsignedHash: tx.unsignedHash,
+            signedHash: tx.hash,
+            nonce: tx.nonce,
+            address: tx.from,
+          });
+        return addressTxs;
+      },
+      []
+    );
     await this.action.storeTxs(extractedTxs, block, this.getId());
     return true;
   };
