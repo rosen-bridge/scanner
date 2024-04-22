@@ -388,6 +388,9 @@ describe('generalScanner', () => {
         .mockImplementation();
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
+      expect(scanner.newExtractors.length).toBe(0);
+      expect(scanner.extractors.length).toBe(1);
+      expect(scanner.extractors[0]).toBe(extractor);
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
     });

@@ -4,7 +4,7 @@ import {
   insertBlocks,
   createDatabase,
 } from './abstract.mock';
-import { BlockEntity } from '../../../lib';
+import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
@@ -27,7 +27,8 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('1');
       scanner.registerExtractor(extractor);
-      expect(scanner.extractors.length).toEqual(1);
+      expect(scanner.newExtractors.length).toEqual(1);
+      expect(scanner.extractors.length).toEqual(0);
     });
 
     /**
@@ -41,7 +42,8 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('1');
       scanner.registerExtractor(extractor);
       scanner.registerExtractor(extractor);
-      expect(scanner.extractors.length).toEqual(1);
+      expect(scanner.newExtractors.length).toEqual(1);
+      expect(scanner.extractors.length).toEqual(0);
     });
 
     /**
@@ -56,7 +58,7 @@ describe('AbstractScanner', () => {
       const extractor2 = new ExtractorTest('2');
       scanner.registerExtractor(extractor1);
       scanner.registerExtractor(extractor2);
-      expect(scanner.extractors.length).toEqual(2);
+      expect(scanner.newExtractors.length).toEqual(2);
     });
   });
 
@@ -75,7 +77,7 @@ describe('AbstractScanner', () => {
       scanner.registerExtractor(extractor1);
       scanner.registerExtractor(extractor2);
       scanner.removeExtractor(extractor1);
-      expect(scanner.extractors.length).toEqual(1);
+      expect(scanner.newExtractors.length).toEqual(1);
     });
   });
 
@@ -131,7 +133,7 @@ describe('AbstractScanner', () => {
     it('should call extractor fork function for forking block', async () => {
       const scanner1 = new firstScanner(dataSource);
       const extractor = new ExtractorTest('extractor');
-      scanner1.registerExtractor(extractor);
+      scanner1.extractors.push(extractor);
       await insertBlocks(scanner1, 10);
       await scanner1.forkBlock(10);
       expect(extractor.forked.length).toEqual(1);
@@ -172,7 +174,7 @@ describe('AbstractScanner', () => {
     it('should call extractor processTransactionFunction', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
-      scanner.registerExtractor(extractor);
+      scanner.extractors.push(extractor);
       await scanner.processBlockTransactions(
         { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [{ height: 1, blockHash: '1' }]
@@ -192,13 +194,93 @@ describe('AbstractScanner', () => {
       jest
         .spyOn(extractor, 'processTransactions')
         .mockImplementation(() => Promise.reject('this is my error on save'));
-      scanner.registerExtractor(extractor);
+      scanner.extractors.push(extractor);
       await expect(() => {
         return scanner.processBlockTransactions(
           { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
           [{ height: 1, blockHash: '1' }]
         );
       }).rejects.toBeTruthy();
+    });
+  });
+
+  describe('initializeExtractors', () => {
+    /**
+     * @target initializeExtractors should initialize new registered extractors with no status in database
+     * @dependencies
+     * - database
+     * @scenario
+     * - mock scanner and a new extractor
+     * - register new extractor in scanner
+     * - run test (call `initializeExtractors`)
+     * @expected
+     * - initialize new extractor
+     * - add new extractor to extractors list
+     * - empty the new extractors list
+     */
+    it('should initialize new registered extractors with no status in database', async () => {
+      const scanner = new firstScanner(dataSource);
+      const extractor = new ExtractorTest('test');
+      scanner.registerExtractor(extractor);
+      const mockedInit = jest
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation();
+      await scanner.initializeExtractors(100);
+      expect(mockedInit).toHaveBeenCalled();
+      expect(scanner.extractors[0]).toBe(extractor);
+      expect(scanner.newExtractors.length).toBe(0);
+    });
+
+    /**
+     * @target initializeExtractors should not initialize new registered extractors with updated db information
+     * @dependencies
+     * - database
+     * @scenario
+     * - mock scanner and a new extractor
+     * - insert extractor information to database (with updated updateHeight)
+     * - register new extractor in scanner
+     * - run test (call `initializeExtractors`)
+     * @expected
+     * - not to initialize the new extractor
+     */
+    it('should not initialize new registered extractors with updated db information', async () => {
+      const scanner = new firstScanner(dataSource);
+      const extractor = new ExtractorTest('test');
+      await dataSource
+        .getRepository(ExtractorStatusEntity)
+        .insert({ extractorId: 'test', updateHeight: 100 });
+      scanner.registerExtractor(extractor);
+      const mockedInit = jest
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation();
+      await scanner.initializeExtractors(100);
+      expect(mockedInit).not.toHaveBeenCalled();
+    });
+
+    /**
+     * @target initializeExtractors should not initialize new registered extractors with updated db information
+     * @dependencies
+     * - database
+     * @scenario
+     * - mock scanner and a new extractor
+     * - insert extractor information to database (with older updateHeight)
+     * - register new extractor in scanner
+     * - run test (call `initializeExtractors`)
+     * @expected
+     * - initialize the new extractor
+     */
+    it('should initialize new registered extractors with old db information', async () => {
+      const scanner = new firstScanner(dataSource);
+      const extractor = new ExtractorTest('test');
+      await dataSource
+        .getRepository(ExtractorStatusEntity)
+        .insert({ extractorId: 'test', updateHeight: 100 });
+      scanner.registerExtractor(extractor);
+      const mockedInit = jest
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation();
+      await scanner.initializeExtractors(200);
+      expect(mockedInit).toHaveBeenCalled();
     });
   });
 });
