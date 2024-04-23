@@ -1,5 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { BlockEntity } from '@rosen-bridge/scanner';
 
 import { FraudExtractor } from '../../lib';
 import { FraudEntity } from '../../lib';
@@ -371,7 +372,7 @@ describe('fraudExtractor', () => {
       const spy = jest
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation();
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as BlockEntity);
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
       expect(box?.wid).toEqual('wid2');
@@ -415,7 +416,7 @@ describe('fraudExtractor', () => {
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation();
       insertFraudEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as BlockEntity);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(box).not.toBeNull();
       expect(box?.serialized).toEqual('newSerialized');

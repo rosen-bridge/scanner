@@ -1,8 +1,10 @@
 import { DataSource, Repository } from 'typeorm';
+import { BlockEntity } from '@rosen-bridge/scanner';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
 import { CollateralEntity, CollateralExtractor } from '../../lib';
 import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { uint8ArrayToHex } from '../../lib/utils';
 
 describe('CollateralExtractor', () => {
@@ -202,7 +204,9 @@ describe('CollateralExtractor', () => {
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
         .mockImplementation();
 
-      await collateralExtractor.initializeBoxes(testData.height1 + 10);
+      await collateralExtractor.initializeBoxes({
+        height: testData.height1 + 10,
+      } as BlockEntity);
       const [rows, rowsCount] = await repository.findAndCount();
 
       expect(tidyUpStoredCollateralsSpy).toHaveBeenCalledTimes(1);

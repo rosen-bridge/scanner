@@ -140,12 +140,12 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older frauds
    */
-  initializeBoxes = async (initialHeight: number) => {
+  initializeBoxes = async (initialBlock: BlockEntity) => {
     // Getting unspent boxes
     this.logger.debug(
-      `Initializing fraud table. storing fraud boxes created bellow height ${initialHeight}.`
+      `Initializing fraud table. storing fraud boxes created bellow height ${initialBlock.height}.`
     );
-    const unspentFrauds = await this.getUnspentFrauds(initialHeight);
+    const unspentFrauds = await this.getUnspentFrauds(initialBlock.height);
     const unspentBoxIds = unspentFrauds.map((box) => box.boxId);
     this.logger.debug(`Unspent fraud boxIds ${unspentBoxIds}`);
 
@@ -173,7 +173,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     this.logger.debug(
       `Validating and updating stored fraud boxes with boxIds ${allStoredBoxIds}`
     );
-    await this.validateOldStoredFrauds(allStoredBoxIds, initialHeight);
+    await this.validateOldStoredFrauds(allStoredBoxIds, initialBlock.height);
   };
 
   /**

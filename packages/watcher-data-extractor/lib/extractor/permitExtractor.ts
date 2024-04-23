@@ -134,10 +134,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older permits related to the address
    */
-  initializeBoxes = async (initialHeight: number) => {
+  initializeBoxes = async (initialBlock: BlockEntity) => {
     let allStoredBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
     // Extract unspent permits
-    const unspentPermits = await this.getAllUnspentPermits(initialHeight);
+    const unspentPermits = await this.getAllUnspentPermits(initialBlock.height);
     const unspentBoxIds = unspentPermits.map((box) => box.boxId);
     // Storing extracted permits
     for (const permit of unspentPermits) {

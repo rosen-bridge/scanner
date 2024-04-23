@@ -141,9 +141,9 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older boxes related to the address
    */
-  initializeBoxes = async (initialHeight: number) => {
+  initializeBoxes = async (initialBlock: BlockEntity) => {
     // Getting unspent boxes
-    const unspentBoxes = await this.getUnspentBoxes(initialHeight);
+    const unspentBoxes = await this.getUnspentBoxes(initialBlock.height);
     const unspentBoxIds = unspentBoxes.map((box) => box.boxId);
 
     // Storing extracted boxes
