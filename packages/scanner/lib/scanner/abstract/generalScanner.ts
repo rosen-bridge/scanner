@@ -97,13 +97,12 @@ abstract class GeneralScanner<
         block.height
       );
       if (
-        blockFromNetwork.hash !== block.hash ||
-        block.parentHash !== blockFromNetwork.parentHash
+        blockFromNetwork.hash === block.hash &&
+        block.parentHash === blockFromNetwork.parentHash
       ) {
-        await this.forkBlock(block.height);
-      } else {
         return;
       }
+      await this.forkBlock(block.height);
       block = await this.action.getLastSavedBlock();
     }
   };
