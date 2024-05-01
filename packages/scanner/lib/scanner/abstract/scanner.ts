@@ -1,5 +1,5 @@
 import { BlockEntity } from '../../entities/blockEntity';
-import { AbstractExtractor, Block } from '../../interfaces';
+import { AbstractExtractor, Block, InitialInfo } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
@@ -118,7 +118,7 @@ export abstract class AbstractScanner<TransactionType> {
    */
   private initializeExtractorBoxes = async (
     extractorIds: string[],
-    block: BlockEntity
+    block: InitialInfo
   ) => {
     const allExtractors = [...this.extractors, ...this.newExtractors];
     const initRequiredExtractors = allExtractors.filter((extractor) =>
@@ -141,7 +141,7 @@ export abstract class AbstractScanner<TransactionType> {
    * and update the active extractors list
    * @param block
    */
-  initializeExtractors = async (block: BlockEntity) => {
+  initializeExtractors = async (block: InitialInfo) => {
     const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
       return extractors.map((extractor) => extractor.getId());
     };

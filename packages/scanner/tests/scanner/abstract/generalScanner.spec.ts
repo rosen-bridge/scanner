@@ -386,6 +386,7 @@ describe('generalScanner', () => {
       const mockedInit = jest
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
+      jest.spyOn(scanner, 'isForkHappen').mockResolvedValue(false);
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
       expect(scanner.newExtractors.length).toBe(0);

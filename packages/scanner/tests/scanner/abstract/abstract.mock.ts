@@ -153,7 +153,7 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   getId = () => 'fail extractor';
 
-  initializeBoxes = (initialBlock: BlockEntity) => Promise.resolve();
+  initializeBoxes = () => Promise.resolve();
 
   processTransactions = async (
     txs: Array<{ id: string }>,

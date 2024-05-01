@@ -2,6 +2,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractExtractor,
   BlockEntity,
+  InitialInfo,
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner';
@@ -127,7 +128,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @return {Promise<void>}
    * @memberof CollateralExtractor
    */
-  initializeBoxes = async (initialBlock: BlockEntity): Promise<void> => {
+  initializeBoxes = async (initialBlock: InitialInfo): Promise<void> => {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
       initialBlock.height
     );

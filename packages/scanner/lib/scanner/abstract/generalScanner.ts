@@ -109,6 +109,10 @@ abstract class GeneralScanner<
 
   initialize = async () => {
     const block = await this.getFirstBlock();
+    await this.initializeExtractors({
+      height: block.blockHeight,
+      hash: block.hash,
+    });
     await this.processBlock(block);
     const entity = await this.action.getFirstSavedBlock();
     if (entity === undefined) {
@@ -126,8 +130,7 @@ abstract class GeneralScanner<
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
-      }
-      await this.initializeExtractors(lastSavedBlock);
+      } else await this.initializeExtractors(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {

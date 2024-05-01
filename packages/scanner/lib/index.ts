@@ -12,6 +12,7 @@ export {
   AbstractExtractor,
   AbstractNetworkConnector,
   Block,
+  InitialInfo,
 } from './interfaces';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';
