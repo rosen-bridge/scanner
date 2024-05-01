@@ -1,19 +1,21 @@
-import { BlockEntity } from '../../entities/blockEntity';
 import { AbstractExtractor, Block, InitialInfo } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
+import { Mutex } from 'async-mutex';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
   extractors: Array<AbstractExtractor<TransactionType>>;
   newExtractors: Array<AbstractExtractor<TransactionType>>;
   logger: AbstractLogger;
+  extractorMutex: Mutex;
 
   constructor(logger?: AbstractLogger) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
+    this.extractorMutex = new Mutex();
   }
 
   abstract name: () => string;
@@ -84,31 +86,43 @@ export abstract class AbstractScanner<TransactionType> {
    * register a nre extractor to scanner.
    * @param extractor
    */
-  registerExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
+  registerExtractor = async (
+    extractor: AbstractExtractor<TransactionType>
+  ): Promise<void> => {
     const notRegisteredIn = (
       extractors: Array<AbstractExtractor<TransactionType>>
     ) =>
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId()
       ).length === 0;
+    await this.extractorMutex.acquire();
     if (
       notRegisteredIn(this.extractors) &&
       notRegisteredIn(this.newExtractors)
     ) {
       this.newExtractors.push(extractor);
+    } else {
+      this.logger.warn(
+        `Extractor with id ${extractor.getId()} is already registered`
+      );
     }
+    this.extractorMutex.release();
   };
 
   /**
    * remove an extractor from scanner
    * @param extractor
    */
-  removeExtractor = (extractor: AbstractExtractor<TransactionType>): void => {
+  removeExtractor = async (
+    extractor: AbstractExtractor<TransactionType>
+  ): Promise<void> => {
     const removeFn = (ex: AbstractExtractor<TransactionType>) =>
       ex.getId() === extractor.getId();
 
+    await this.extractorMutex.acquire();
     remove(this.extractors, removeFn);
     remove(this.newExtractors, removeFn);
+    this.extractorMutex.release();
   };
 
   /**
@@ -146,46 +160,59 @@ export abstract class AbstractScanner<TransactionType> {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
-    const extractorsStatus = await this.action.getExtractorsStatus([
-      ...getIds(this.extractors),
-      ...getIds(this.newExtractors),
-    ]);
-    this.logger.debug(
-      `Stored extractors status are [${JSON.stringify(extractorsStatus)}]`
-    );
-    // Find extractors not synced with the latest height
-    const notSyncedExtractorIds = extractorsStatus
-      .filter((es) => es.updateBlockHash != block.hash)
-      .map((es) => es.extractorId);
-    if (notSyncedExtractorIds.length > 0)
+    let success = true;
+    await this.extractorMutex.acquire();
+    try {
+      const extractorsStatus = await this.action.getExtractorsStatus([
+        ...getIds(this.extractors),
+        ...getIds(this.newExtractors),
+      ]);
       this.logger.debug(
-        `Old not synced extractors are ${notSyncedExtractorIds}`
+        `Stored extractors status are [${JSON.stringify(extractorsStatus)}]`
       );
-    // Find new extractors not available in database
-    const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
-    const newRegisteredExtractorIds = difference(
-      getIds(this.newExtractors),
-      storedExtractorIds
-    );
-    if (newRegisteredExtractorIds.length > 0)
-      this.logger.debug(
-        `New registered extractors are ${newRegisteredExtractorIds}`
+      // Find extractors not synced with the latest height
+      const notSyncedExtractorIds = extractorsStatus
+        .filter((es) => es.updateBlockHash != block.hash)
+        .map((es) => es.extractorId);
+      if (notSyncedExtractorIds.length > 0)
+        this.logger.debug(
+          `Old not synced extractors are ${notSyncedExtractorIds}`
+        );
+      // Find new extractors not available in database
+      const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
+      const newRegisteredExtractorIds = difference(
+        getIds(this.newExtractors),
+        storedExtractorIds
       );
-    // Initialize required extractors
-    const initRequiredExtractors = [
-      ...newRegisteredExtractorIds,
-      ...notSyncedExtractorIds,
-    ];
-    if (initRequiredExtractors.length > 0) {
-      this.logger.info(
-        `Initializing ${
-          initRequiredExtractors.length
-        } extractor(s) for [${this.name()}]`,
-        { initRequiredExtractors }
-      );
-      await this.initializeExtractorBoxes(initRequiredExtractors, block);
+      if (newRegisteredExtractorIds.length > 0)
+        this.logger.debug(
+          `New registered extractors are ${newRegisteredExtractorIds}`
+        );
+      // Initialize required extractors
+      const initRequiredExtractors = [
+        ...newRegisteredExtractorIds,
+        ...notSyncedExtractorIds,
+      ];
+      if (initRequiredExtractors.length > 0) {
+        this.logger.info(
+          `Initializing ${
+            initRequiredExtractors.length
+          } extractor(s) for [${this.name()}]`,
+          { initRequiredExtractors }
+        );
+        await this.initializeExtractorBoxes(initRequiredExtractors, block);
+      }
+      this.extractors.push(...this.newExtractors);
+      this.newExtractors = [];
+    } catch (e) {
+      this.logger.warn(`Initialization for extractors failed with error ${e}`);
+      success = false;
+    } finally {
+      this.extractorMutex.release();
     }
-    this.extractors.push(...this.newExtractors);
-    this.newExtractors = [];
+    if (!success)
+      throw new Error(
+        `Initialization failed for new extractors ${getIds(this.newExtractors)}`
+      );
   };
 }

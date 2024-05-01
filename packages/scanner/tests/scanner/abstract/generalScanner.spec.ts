@@ -377,6 +377,8 @@ describe('generalScanner', () => {
      *           and call update twice
      * Expected: first update must call extractor initialize
      *          second must not.
+     *          `extractors` should update with appending `newExtractors` after initialization
+     *          `newExtractors` should emptied after initialization
      */
     it('should call extractor initialize', async () => {
       const network = new NetworkConnectorTest();

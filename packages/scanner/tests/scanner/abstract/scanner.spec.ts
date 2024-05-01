@@ -4,7 +4,7 @@ import {
   insertBlocks,
   createDatabase,
 } from './abstract.mock';
-import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
+import { BlockEntity, ExtractorStatusEntity, InitialInfo } from '../../../lib';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
@@ -26,7 +26,7 @@ describe('AbstractScanner', () => {
     it('should register extractor', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('1');
-      scanner.registerExtractor(extractor);
+      await scanner.registerExtractor(extractor);
       expect(scanner.newExtractors.length).toEqual(1);
       expect(scanner.extractors.length).toEqual(0);
     });
@@ -40,8 +40,8 @@ describe('AbstractScanner', () => {
     it('should register extractor', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('1');
-      scanner.registerExtractor(extractor);
-      scanner.registerExtractor(extractor);
+      await scanner.registerExtractor(extractor);
+      await scanner.registerExtractor(extractor);
       expect(scanner.newExtractors.length).toEqual(1);
       expect(scanner.extractors.length).toEqual(0);
     });
@@ -56,8 +56,8 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor1 = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
-      scanner.registerExtractor(extractor1);
-      scanner.registerExtractor(extractor2);
+      await scanner.registerExtractor(extractor1);
+      await scanner.registerExtractor(extractor2);
       expect(scanner.newExtractors.length).toEqual(2);
     });
   });
@@ -74,9 +74,9 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor1 = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
-      scanner.registerExtractor(extractor1);
-      scanner.registerExtractor(extractor2);
-      scanner.removeExtractor(extractor1);
+      await scanner.registerExtractor(extractor1);
+      await scanner.registerExtractor(extractor2);
+      await scanner.removeExtractor(extractor1);
       expect(scanner.newExtractors.length).toEqual(1);
     });
   });
@@ -228,7 +228,7 @@ describe('AbstractScanner', () => {
       await scanner.initializeExtractors({
         height: 100,
         hash: 'hash',
-      } as BlockEntity);
+      } as InitialInfo);
       expect(mockedInit).toHaveBeenCalled();
       expect(scanner.extractors[0]).toBe(extractor);
       expect(scanner.newExtractors.length).toBe(0);
@@ -262,7 +262,7 @@ describe('AbstractScanner', () => {
       await scanner.initializeExtractors({
         height: 100,
         hash: 'hash',
-      } as BlockEntity);
+      } as InitialInfo);
       expect(mockedInit).not.toHaveBeenCalled();
     });
 
@@ -294,7 +294,7 @@ describe('AbstractScanner', () => {
       await scanner.initializeExtractors({
         height: 100,
         hash: 'hash2',
-      } as BlockEntity);
+      } as InitialInfo);
       expect(mockedInit).toHaveBeenCalled();
     });
   });

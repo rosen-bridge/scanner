@@ -483,6 +483,31 @@ describe('action', () => {
      */
     it('should change status for block when calling updateBlockStatus', async () => {
       const repository = dataSource.getRepository(BlockEntity);
+      await repository.insert({
+        height: 12,
+        hash: 'blockhashOld',
+        parentHash: 'parentHashOld',
+        scanner: action.name(),
+        status: PROCESSING,
+        timestamp: 10,
+      });
+      await action.updateBlockStatus(12, 'blockhashOld', ['extractorId']);
+      const instances = await repository.find();
+      expect(instances.length).toEqual(1);
+      expect(instances[0].status).toEqual(PROCEED);
+    });
+
+    /**
+     * @target updateBlockStatus should increase the initialization height in registered extractors
+     * @dependencies
+     * @scenario
+     * - insert mocked block and extractor status to db
+     * - run test
+     * @expected
+     * - update the extractor status to the latest processed block
+     */
+    it('should increase the initialization height in registered extractors', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
       const esRepository = dataSource.getRepository(ExtractorStatusEntity);
       await repository.insert({
         height: 12,
@@ -499,10 +524,7 @@ describe('action', () => {
         updateBlockHash: 'blockHash',
       });
       await action.updateBlockStatus(12, 'blockhashOld', ['extractorId']);
-      const instances = await repository.find();
       const esInstances = await esRepository.find();
-      expect(instances.length).toEqual(1);
-      expect(instances[0].status).toEqual(PROCEED);
       expect(esInstances.length).toEqual(1);
       expect(esInstances[0].updateHeight).toEqual(12);
       expect(esInstances[0].updateBlockHash).toEqual('blockhashOld');
@@ -518,6 +540,31 @@ describe('action', () => {
      * Expected: must update db instance status to proceed
      */
     it('should change status for block when calling revertBlockStatus', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
+      await repository.insert({
+        height: 12,
+        hash: 'blockhashOld',
+        parentHash: 'parentHashOld',
+        scanner: action.name(),
+        status: PROCEED,
+        timestamp: 10,
+      });
+      await action.revertBlockStatus(12, 'parentHashOld', ['extractorId']);
+      const instances = await repository.find();
+      expect(instances.length).toEqual(1);
+      expect(instances[0].status).toEqual(PROCESSING);
+    });
+
+    /**
+     * @target revertBlockStatus should decrease the initialization height in registered extractors
+     * @dependencies
+     * @scenario
+     * - insert mocked block and extractor status to db
+     * - run test
+     * @expected
+     * - revert the extractor status to the previous block
+     */
+    it('should decrease the initialization height in registered extractors', async () => {
       const repository = dataSource.getRepository(BlockEntity);
       const esRepository = dataSource.getRepository(ExtractorStatusEntity);
       await repository.insert({
@@ -535,10 +582,7 @@ describe('action', () => {
         updateBlockHash: 'blockHash',
       });
       await action.revertBlockStatus(12, 'parentHashOld', ['extractorId']);
-      const instances = await repository.find();
       const esInstances = await esRepository.find();
-      expect(instances.length).toEqual(1);
-      expect(instances[0].status).toEqual(PROCESSING);
       expect(esInstances.length).toEqual(1);
       expect(esInstances[0].updateHeight).toEqual(11);
       expect(esInstances[0].updateBlockHash).toEqual('parentHashOld');

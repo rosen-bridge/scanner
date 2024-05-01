@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { InitialInfo } from '@rosen-bridge/scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 import { CollateralEntity, CollateralExtractor } from '../../lib';
@@ -206,7 +206,7 @@ describe('CollateralExtractor', () => {
 
       await collateralExtractor.initializeBoxes({
         height: testData.height1 + 10,
-      } as BlockEntity);
+      } as InitialInfo);
       const [rows, rowsCount] = await repository.findAndCount();
 
       expect(tidyUpStoredCollateralsSpy).toHaveBeenCalledTimes(1);

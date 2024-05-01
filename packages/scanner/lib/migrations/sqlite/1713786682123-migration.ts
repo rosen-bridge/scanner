@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1713786682123 implements MigrationInterface {
-  name = 'Migration1713786682123';
+export class migration1713786682123 implements MigrationInterface {
+  name = 'migration1713786682123';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
