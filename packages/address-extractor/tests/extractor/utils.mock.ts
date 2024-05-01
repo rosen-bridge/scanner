@@ -194,6 +194,8 @@ const addressBoxes = {
       globalIndex: 636254n,
       creationHeight: 297228,
       settlementHeight: 297230,
+      ergoTreeConstants: '',
+      ergoTreeScript: '',
       ergoTree:
         '0008cd028bcc85fa22006fa13767ab00af28ae0b2389d576fb59cfd0e46865e0449eeb8a',
       address: '9fadVRGYyiSBCgD7QtZU13BfGoDyTQ1oX918P8py22MJuMEwSuo',
@@ -224,6 +226,8 @@ const addressBoxes = {
       globalIndex: 539461n,
       creationHeight: 249172,
       settlementHeight: 249174,
+      ergoTreeConstants: '',
+      ergoTreeScript: '',
       ergoTree:
         '0008cd028bcc85fa22006fa13767ab00af28ae0b2389d576fb59cfd0e46865e0449eeb8a',
       address: '9fadVRGYyiSBCgD7QtZU13BfGoDyTQ1oX918P8py22MJuMEwSuo',
