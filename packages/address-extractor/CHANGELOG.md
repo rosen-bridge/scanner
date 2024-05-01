@@ -1,5 +1,12 @@
 # @rosen-bridge/address-extractor
 
+## 3.3.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.8
+
 ## 3.3.1
 
 ### Patch Changes
