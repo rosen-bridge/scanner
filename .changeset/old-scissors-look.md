@@ -5,4 +5,4 @@
 '@rosen-bridge/scanner': major
 ---
 
-Update initializeBoxes interface to use the whole block information
+Update initializeBoxes interface to use both block height and hash
