@@ -7,7 +7,7 @@ import {
   TestTransaction,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
-import { BlockEntity } from '../../../lib';
+import { BlockEntity, InitialInfo } from '../../../lib';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 let dataSource: DataSource;
@@ -370,17 +370,17 @@ describe('generalScanner', () => {
     });
 
     /**
-     * Test initialize extractor once
-     * Dependency: Nothing
-     * Scenario: create scanner and extractor and mock initialize method for extractor.
-     *           then register a scanner on it.
-     *           and call update twice
-     * Expected: first update must call extractor initialize
-     *          second must not.
-     *          `extractors` should update with appending `newExtractors` after initialization
-     *          `newExtractors` should emptied after initialization
+     * @target update should initialize new extractor and update the extractors list
+     * @dependencies
+     * @scenario
+     * - mock scanner and a new extractor
+     * - register the new extractor
+     * - spy on extractors initialization
+     * - run test (call `update`)
+     * @expected
+     * - to call new extractor initialization and insert the new extractor id in registered list
      */
-    it('should call extractor initialize', async () => {
+    it('should initialize new extractor and update the extractors list', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
       const extractor = new ExtractorTest('test');
@@ -388,14 +388,36 @@ describe('generalScanner', () => {
       const mockedInit = jest
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
-      jest.spyOn(scanner, 'isForkHappen').mockResolvedValue(false);
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
       expect(scanner.newExtractors.length).toBe(0);
       expect(scanner.extractors.length).toBe(1);
       expect(scanner.extractors[0]).toBe(extractor);
+    });
+
+    /**
+     * @target update should stop processing blocks when extractor initialization fails
+     * @dependencies
+     * @scenario
+     * - mock scanner
+     * - spy `processBlock` to check the processing status
+     * - mock `verifyExtractorsInitialization` to throw Error
+     * - run test (call `update`)
+     * @expected
+     * - not calling `processBlock` after failed initialization
+     */
+    it('should stop processing blocks when extractor initialization fails', async () => {
+      const network = new NetworkConnectorTest();
+      const scanner = new firstScanner(dataSource, network);
+      const processSpy = jest.spyOn(scanner, 'processBlock');
+      jest.spyOn(scanner, 'isForkHappen').mockResolvedValue(false);
+      jest
+        .spyOn(scanner, 'verifyExtractorsInitialization')
+        .mockImplementation((block: InitialInfo) => {
+          throw Error();
+        });
       await scanner.update();
-      expect(mockedInit).toHaveBeenCalledTimes(1);
+      expect(processSpy).not.toBeCalled();
     });
 
     /**

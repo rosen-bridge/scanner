@@ -9,13 +9,13 @@ export abstract class AbstractScanner<TransactionType> {
   extractors: Array<AbstractExtractor<TransactionType>>;
   newExtractors: Array<AbstractExtractor<TransactionType>>;
   logger: AbstractLogger;
-  extractorMutex: Mutex;
+  initializeMutex: Mutex;
 
   constructor(logger?: AbstractLogger) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
-    this.extractorMutex = new Mutex();
+    this.initializeMutex = new Mutex();
   }
 
   abstract name: () => string;
@@ -95,7 +95,7 @@ export abstract class AbstractScanner<TransactionType> {
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId()
       ).length === 0;
-    await this.extractorMutex.acquire();
+    await this.initializeMutex.acquire();
     if (
       notRegisteredIn(this.extractors) &&
       notRegisteredIn(this.newExtractors)
@@ -106,7 +106,7 @@ export abstract class AbstractScanner<TransactionType> {
         `Extractor with id ${extractor.getId()} is already registered`
       );
     }
-    this.extractorMutex.release();
+    this.initializeMutex.release();
   };
 
   /**
@@ -119,10 +119,10 @@ export abstract class AbstractScanner<TransactionType> {
     const removeFn = (ex: AbstractExtractor<TransactionType>) =>
       ex.getId() === extractor.getId();
 
-    await this.extractorMutex.acquire();
+    await this.initializeMutex.acquire();
     remove(this.extractors, removeFn);
     remove(this.newExtractors, removeFn);
-    this.extractorMutex.release();
+    this.initializeMutex.release();
   };
 
   /**
@@ -130,7 +130,7 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractorIds
    * @param height
    */
-  private initializeExtractorBoxes = async (
+  private initializeExtractors = async (
     extractorIds: string[],
     block: InitialInfo
   ) => {
@@ -155,13 +155,13 @@ export abstract class AbstractScanner<TransactionType> {
    * and update the active extractors list
    * @param block
    */
-  initializeExtractors = async (block: InitialInfo) => {
+  verifyExtractorsInitialization = async (block: InitialInfo) => {
     const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
     let success = true;
-    await this.extractorMutex.acquire();
+    await this.initializeMutex.acquire();
     try {
       const extractorsStatus = await this.action.getExtractorsStatus([
         ...getIds(this.extractors),
@@ -200,7 +200,7 @@ export abstract class AbstractScanner<TransactionType> {
           } extractor(s) for [${this.name()}]`,
           { initRequiredExtractors }
         );
-        await this.initializeExtractorBoxes(initRequiredExtractors, block);
+        await this.initializeExtractors(initRequiredExtractors, block);
       }
       this.extractors.push(...this.newExtractors);
       this.newExtractors = [];
@@ -208,7 +208,7 @@ export abstract class AbstractScanner<TransactionType> {
       this.logger.warn(`Initialization for extractors failed with error ${e}`);
       success = false;
     } finally {
-      this.extractorMutex.release();
+      this.initializeMutex.release();
     }
     if (!success)
       throw new Error(

@@ -107,9 +107,14 @@ abstract class GeneralScanner<
     }
   };
 
+  /**
+   * Initialize the extractors with the first block
+   * Process and store the first block in database
+   * @returns
+   */
   initialize = async () => {
     const block = await this.getFirstBlock();
-    await this.initializeExtractors({
+    await this.verifyExtractorsInitialization({
       height: block.blockHeight,
       hash: block.hash,
     });
@@ -130,7 +135,7 @@ abstract class GeneralScanner<
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
-      } else await this.initializeExtractors(lastSavedBlock);
+      } else await this.verifyExtractorsInitialization(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {
