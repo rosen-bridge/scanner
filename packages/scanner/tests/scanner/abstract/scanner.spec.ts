@@ -380,5 +380,30 @@ describe('AbstractScanner', () => {
       expect(extractorStatus?.updateHeight).toBe(100);
       expect(extractorStatus?.updateBlockHash).toBe('hash');
     });
+
+    /**
+     * @target initializeExtractors should not initialize other not specified extractors
+     * @dependencies
+     * - database
+     * @scenario
+     * - mock scanner and extractor
+     * - register extractor
+     * - run test (call `initializeExtractors`)
+     * @expected
+     * - not to initialize extractors
+     */
+    it('should not initialize other not specified extractors', async () => {
+      const scanner = new firstScanner(dataSource);
+      const extractor = new ExtractorTest('test');
+      await scanner.registerExtractor(extractor);
+      const mockedInit = jest
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation();
+      await scanner['initializeExtractors'](['test2'], {
+        height: 100,
+        hash: 'hash',
+      });
+      expect(mockedInit).not.toHaveBeenCalled();
+    });
   });
 });
