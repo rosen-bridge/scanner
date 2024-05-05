@@ -6,6 +6,7 @@ import {
   PROCEED,
   PROCESSING,
 } from '../../lib/entities/blockEntity';
+import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -490,10 +491,43 @@ describe('action', () => {
         status: PROCESSING,
         timestamp: 10,
       });
-      await action.updateBlockStatus(12);
+      await action.updateBlockStatus(12, 'blockhashOld', ['extractorId']);
       const instances = await repository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCEED);
+    });
+
+    /**
+     * @target updateBlockStatus should increase the initialization height in registered extractors
+     * @dependencies
+     * @scenario
+     * - insert mocked block and extractor status to db
+     * - run test
+     * @expected
+     * - update the extractor status to the latest processed block
+     */
+    it('should increase the initialization height in registered extractors', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
+      await repository.insert({
+        height: 12,
+        hash: 'blockhashOld',
+        parentHash: 'parentHashOld',
+        scanner: action.name(),
+        status: PROCESSING,
+        timestamp: 10,
+      });
+      await esRepository.insert({
+        scannerId: action.name(),
+        extractorId: 'extractorId',
+        updateHeight: 11,
+        updateBlockHash: 'blockHash',
+      });
+      await action.updateBlockStatus(12, 'blockhashOld', ['extractorId']);
+      const esInstances = await esRepository.find();
+      expect(esInstances.length).toEqual(1);
+      expect(esInstances[0].updateHeight).toEqual(12);
+      expect(esInstances[0].updateBlockHash).toEqual('blockhashOld');
     });
   });
 
@@ -515,10 +549,76 @@ describe('action', () => {
         status: PROCEED,
         timestamp: 10,
       });
-      await action.revertBlockStatus(12);
+      await action.revertBlockStatus(12, 'parentHashOld', ['extractorId']);
       const instances = await repository.find();
       expect(instances.length).toEqual(1);
       expect(instances[0].status).toEqual(PROCESSING);
+    });
+
+    /**
+     * @target revertBlockStatus should decrease the initialization height in registered extractors
+     * @dependencies
+     * @scenario
+     * - insert mocked block and extractor status to db
+     * - run test
+     * @expected
+     * - revert the extractor status to the previous block
+     */
+    it('should decrease the initialization height in registered extractors', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
+      await repository.insert({
+        height: 12,
+        hash: 'blockhashOld',
+        parentHash: 'parentHashOld',
+        scanner: action.name(),
+        status: PROCEED,
+        timestamp: 10,
+      });
+      await esRepository.insert({
+        scannerId: action.name(),
+        extractorId: 'extractorId',
+        updateHeight: 12,
+        updateBlockHash: 'blockHash',
+      });
+      await action.revertBlockStatus(12, 'parentHashOld', ['extractorId']);
+      const esInstances = await esRepository.find();
+      expect(esInstances.length).toEqual(1);
+      expect(esInstances[0].updateHeight).toEqual(11);
+      expect(esInstances[0].updateBlockHash).toEqual('parentHashOld');
+    });
+  });
+
+  describe('getExtractorsStatus', () => {
+    /**
+     * @target getExtractorsStatus should return specified extractor status
+     * @dependencies
+     * @scenario
+     * - insert mocked extractors status to db
+     * - run test
+     * @expected
+     * - return 1 element out of 2 with correct details
+     */
+    it('should return specified extractor status', async () => {
+      const esRepository = dataSource.getRepository(ExtractorStatusEntity);
+      await esRepository.insert([
+        {
+          scannerId: action.name(),
+          extractorId: 'extractorId',
+          updateHeight: 12,
+          updateBlockHash: 'blockHash2',
+        },
+        {
+          scannerId: action.name(),
+          extractorId: 'extractorId2',
+          updateHeight: 10,
+          updateBlockHash: 'blockHash1',
+        },
+      ]);
+      const extractorStatus = await action.getExtractorsStatus(['extractorId']);
+      expect(extractorStatus.length).toBe(1);
+      expect(extractorStatus[0].extractorId).toBe('extractorId');
+      expect(extractorStatus[0].updateHeight).toBe(12);
     });
   });
 });

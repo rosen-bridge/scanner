@@ -2,6 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { InitialInfo } from '@rosen-bridge/scanner';
 
 import {
   permitTxGenerator,
@@ -503,7 +504,7 @@ describe('permitExtractor', () => {
       const spy = jest
         .spyOn(extractor, 'validateOldStoredPermits')
         .mockImplementation();
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxId).toEqual('boxId2');
@@ -544,7 +545,7 @@ describe('permitExtractor', () => {
         .spyOn(extractor, 'validateOldStoredPermits')
         .mockImplementation();
       await insertPermitEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxSerialized).toEqual('newSerialized');

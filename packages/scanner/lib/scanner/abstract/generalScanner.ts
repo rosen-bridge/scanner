@@ -97,20 +97,27 @@ abstract class GeneralScanner<
         block.height
       );
       if (
-        blockFromNetwork.hash !== block.hash ||
-        block.parentHash !== blockFromNetwork.parentHash
+        blockFromNetwork.hash === block.hash &&
+        block.parentHash === blockFromNetwork.parentHash
       ) {
-        await this.forkBlock(block.height);
-      } else {
-        await this.initializeExtractors(block);
         return;
       }
+      await this.forkBlock(block.height);
       block = await this.action.getLastSavedBlock();
     }
   };
 
+  /**
+   * Initialize the extractors with the first block
+   * Process and store the first block in database
+   * @returns
+   */
   initialize = async () => {
     const block = await this.getFirstBlock();
+    await this.verifyExtractorsInitialization({
+      height: block.blockHeight,
+      hash: block.hash,
+    });
     await this.processBlock(block);
     const entity = await this.action.getFirstSavedBlock();
     if (entity === undefined) {
@@ -128,8 +135,7 @@ abstract class GeneralScanner<
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
-      }
-      await this.initializeExtractors(lastSavedBlock);
+      } else await this.verifyExtractorsInitialization(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {
@@ -137,26 +143,6 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
-    }
-  };
-
-  /**
-   * Initializes the extractors if they're not initialized yet,
-   * or they have been initialized on a forked block
-   * @param block
-   */
-  initializeExtractors = async (block: BlockEntity) => {
-    for (const [
-      index,
-      extractorInitializedHeight,
-    ] of this.extractorInitialization.entries()) {
-      if (
-        extractorInitializedHeight === -1 ||
-        extractorInitializedHeight > block.height
-      ) {
-        await this.extractors[index].initializeBoxes(block.height);
-        this.extractorInitialization[index] = block.height;
-      }
     }
   };
 }

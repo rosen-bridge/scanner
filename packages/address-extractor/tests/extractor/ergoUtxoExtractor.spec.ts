@@ -2,6 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { InitialInfo } from '@rosen-bridge/scanner';
 
 import { ErgoUTXOExtractor } from '../../lib';
 import { BoxEntity } from '../../lib';
@@ -550,7 +551,7 @@ describe('extractorErgo', () => {
       const spy = jest
         .spyOn(extractor, 'validateOldStoredBoxes')
         .mockImplementation();
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
       expect(box?.address).toEqual('address2');
@@ -592,7 +593,7 @@ describe('extractorErgo', () => {
         .spyOn(extractor, 'validateOldStoredBoxes')
         .mockImplementation();
       insertBoxEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(box).not.toBeNull();
       expect(box?.serialized).toEqual('newSerialized');

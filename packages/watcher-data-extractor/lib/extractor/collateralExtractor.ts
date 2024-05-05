@@ -2,6 +2,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractExtractor,
   BlockEntity,
+  InitialInfo,
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner';
@@ -127,9 +128,9 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @return {Promise<void>}
    * @memberof CollateralExtractor
    */
-  initializeBoxes = async (initialHeight: number): Promise<void> => {
+  initializeBoxes = async (initialBlock: InitialInfo): Promise<void> => {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
-      initialHeight
+      initialBlock.height
     );
     this.logger.debug(
       `unspent collateral box info with following IDs gotten form Ergo network: [${unspentCollaterals
@@ -143,7 +144,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       unspentCollaterals.map((box) => box.boxId)
     );
     await this.tidyUpStoredCollaterals(
-      initialHeight,
+      initialBlock.height,
       storedUnspentCollateralBoxIds.filter(
         (boxId) => !unspentCollateralBoxIds.has(boxId)
       )
