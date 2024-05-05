@@ -1,8 +1,8 @@
+import { Mutex } from 'await-semaphore';
 import { AbstractExtractor, Block, InitialInfo } from '../../interfaces';
 import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
-import { Mutex } from 'async-mutex';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -95,7 +95,7 @@ export abstract class AbstractScanner<TransactionType> {
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId()
       ).length === 0;
-    await this.initializeMutex.acquire();
+    const release = await this.initializeMutex.acquire();
     if (
       notRegisteredIn(this.extractors) &&
       notRegisteredIn(this.newExtractors)
@@ -106,7 +106,7 @@ export abstract class AbstractScanner<TransactionType> {
         `Extractor with id ${extractor.getId()} is already registered`
       );
     }
-    this.initializeMutex.release();
+    release();
   };
 
   /**
@@ -119,10 +119,10 @@ export abstract class AbstractScanner<TransactionType> {
     const removeFn = (ex: AbstractExtractor<TransactionType>) =>
       ex.getId() === extractor.getId();
 
-    await this.initializeMutex.acquire();
+    const release = await this.initializeMutex.acquire();
     remove(this.extractors, removeFn);
     remove(this.newExtractors, removeFn);
-    this.initializeMutex.release();
+    release();
   };
 
   /**
@@ -161,7 +161,7 @@ export abstract class AbstractScanner<TransactionType> {
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
     let success = true;
-    await this.initializeMutex.acquire();
+    const release = await this.initializeMutex.acquire();
     try {
       const extractorsStatus = await this.action.getExtractorsStatus([
         ...getIds(this.extractors),
@@ -208,7 +208,7 @@ export abstract class AbstractScanner<TransactionType> {
       this.logger.warn(`Initialization for extractors failed with error ${e}`);
       success = false;
     } finally {
-      this.initializeMutex.release();
+      release();
     }
     if (!success)
       throw new Error(
