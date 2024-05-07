@@ -1,6 +1,6 @@
 {
-  "name": "extractor",
-  "version": "0.0.0",
+  "name": "@rosen-bridge/extractor",
+  "version": "0.1.0",
   "description": "Rosen Bridge extractor interfaces to work with scanner",
   "repository": "",
   "license": "GPL-3.0",
