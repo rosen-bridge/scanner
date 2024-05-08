@@ -1,3 +1,4 @@
 export * from './abstract';
 export * from './abstractAction';
-export * from './intializable/abstract';
+export * from './initializable/abstract';
+export * from './initializable/abstractAction';

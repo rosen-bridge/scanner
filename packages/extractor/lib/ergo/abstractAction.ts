@@ -2,7 +2,7 @@ import { Block, SpendInfo } from '../interfaces';
 
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**
-   * Insert all extracted box data in an atomic transaction
+   * insert all extracted box data in an atomic transaction
    */
   abstract insertBoxes: (
     data: ExtractedData[],
@@ -10,20 +10,22 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   ) => Promise<void>;
 
   /**
-   * Update spending information of stored boxes
+   * update spending information of stored boxes
    */
   abstract spendBoxes: (
     spendInfos: SpendInfo[],
     block: Block,
     extractorId: string
   ) => Promise<void>;
-}
 
-export abstract class AbstractInitializableErgoExtractorAction<
-  ExtractedData
-> extends AbstractErgoExtractorAction<ExtractedData> {
   /**
-   * Remove all existing data
+   * delete boxes in specific block from database. if box spend in this block marked as unspent
+   * and if created in this block remove it from database
+   * @param block
+   * @param extractor
    */
-  abstract removeAllData: (extractorId: string) => Promise<void>;
+  abstract deleteBlockBoxes: (
+    block: string,
+    extractorId: string
+  ) => Promise<void>;
 }

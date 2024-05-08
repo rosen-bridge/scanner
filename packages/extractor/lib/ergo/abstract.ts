@@ -1,6 +1,4 @@
 import { DataSource } from 'typeorm';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { V1 } from '@rosen-clients/ergo-explorer';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
@@ -18,7 +16,7 @@ export abstract class AbstractErgoExtractor<
   ExtractedData extends ErgoExtractedData
 > extends AbstractExtractor<Transaction> {
   protected readonly dataSource: DataSource;
-  protected actions: AbstractErgoExtractorAction<ExtractedData>;
+  protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
   protected logger: AbstractLogger;
 
   constructor(logger = new DummyLogger()) {
@@ -30,7 +28,7 @@ export abstract class AbstractErgoExtractor<
    * @return extracted data in proper format
    */
   abstract extractBoxData: (
-    box: V1.OutputInfo | OutputBox,
+    box: OutputBox,
     blockId: string,
     height: number
   ) => Omit<ExtractedData, 'spendBlock' | 'spendHeight'> | undefined;
@@ -38,7 +36,7 @@ export abstract class AbstractErgoExtractor<
   /**
    * @return true if the box has the required data and false otherwise
    */
-  abstract hasData: (box: V1.OutputInfo | OutputBox) => boolean;
+  abstract hasData: (box: OutputBox) => boolean;
 
   /**
    * process a list of transactions and store Data box details
@@ -93,5 +91,13 @@ export abstract class AbstractErgoExtractor<
     }
 
     return true;
+  };
+
+  /**
+   * fork one block and remove all stored information for this block
+   * @param hash: block hash
+   */
+  forkBlock = async (hash: string): Promise<void> => {
+    await this.actions.deleteBlockBoxes(hash, this.getId());
   };
 }

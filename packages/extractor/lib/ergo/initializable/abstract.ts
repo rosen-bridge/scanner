@@ -10,7 +10,7 @@ import {
 } from '../../interfaces';
 import { API_LIMIT } from '../../constants';
 import { AbstractErgoExtractor } from '../abstract';
-import { AbstractInitializableErgoExtractorAction } from '../abstractAction';
+import { AbstractInitializableErgoExtractorAction } from './abstractAction';
 
 export abstract class AbstractInitializableErgoExtractor<
   ExtractedData extends ErgoExtractedData
