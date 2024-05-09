@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Block } from '@rosen-bridge/extractor';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
@@ -26,7 +26,7 @@ class EventTriggerAction {
    */
   storeEventTriggers = async (
     eventTriggers: Array<ExtractedEventTrigger>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ) => {
     if (eventTriggers.length === 0) return true;
@@ -109,7 +109,7 @@ class EventTriggerAction {
    */
   spendEventTriggers = async (
     spendId: Array<string>,
-    block: BlockEntity,
+    block: Block,
     extractor: string,
     txId: string,
     result: string,

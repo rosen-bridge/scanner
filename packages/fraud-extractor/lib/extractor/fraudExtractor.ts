@@ -2,12 +2,13 @@ import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
-import { AbstractExtractor, InitialInfo } from '@rosen-bridge/scanner';
+import { InitialInfo } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
+import { Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 import JsonBI from '@rosen-bridge/json-bigint';
+import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
 
 import { FraudAction } from '../actions/fraudAction';
 import { DefaultApiLimit } from '../constants';
@@ -51,7 +52,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

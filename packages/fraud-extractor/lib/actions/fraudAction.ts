@@ -1,11 +1,12 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { BlockEntity } from '@rosen-bridge/scanner';
+import { chunk } from 'lodash-es';
+import { Block } from '@rosen-bridge/extractor';
 
 import { FraudEntity } from '../entities/fraudEntity';
 import { ExtractedFraud } from '../interfaces/types';
 import { dbIdChunkSize } from '../constants';
-import { chunk } from 'lodash-es';
 
 export class FraudAction {
   private readonly datasource: DataSource;
@@ -26,7 +27,7 @@ export class FraudAction {
    */
   storeBlockFrauds = async (
     frauds: Array<ExtractedFraud>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ) => {
     const boxIds = frauds.map((item) => item.boxId);
@@ -126,7 +127,7 @@ export class FraudAction {
    */
   spendFrauds = async (
     spendIds: Array<string>,
-    block: BlockEntity,
+    block: Block,
     extractor: string,
     txId: string
   ): Promise<void> => {

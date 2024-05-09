@@ -3,11 +3,11 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoGraphQLRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { GraphQLTransaction } from '../../interfaces/graphql';
+import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
 
 export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQLTransaction> {
   readonly logger: AbstractLogger;
@@ -48,7 +48,7 @@ export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQ
    */
   processTransactions = async (
     txs: Array<GraphQLTransaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     try {
       const observations: Array<ExtractedObservation> = [];

@@ -4,10 +4,10 @@ import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
 import { KoiosTransaction } from '../../interfaces/koiosTransaction';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
 
 export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTransaction> {
   readonly logger: AbstractLogger;
@@ -48,7 +48,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
    */
   processTransactions = (
     txs: Array<KoiosTransaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

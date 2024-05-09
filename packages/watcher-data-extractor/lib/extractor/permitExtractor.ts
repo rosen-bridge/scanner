@@ -3,15 +3,11 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  InitialInfo,
-  Transaction,
-} from '@rosen-bridge/scanner';
+import { InitialInfo, Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
 
 import { DefaultApiLimit } from '../constants';
 import { JsonBI } from '../utils';
@@ -57,7 +53,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

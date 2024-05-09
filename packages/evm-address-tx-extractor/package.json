@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/extractor": "^0.1.0",
     "@rosen-bridge/scanner": "^3.2.8",
     "ethers": "^6.11.0",
     "typeorm": "^0.3.20"

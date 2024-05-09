@@ -3,6 +3,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Block } from '@rosen-bridge/extractor';
 
 export class ObservationEntityAction {
   readonly logger: AbstractLogger;
@@ -23,7 +24,7 @@ export class ObservationEntityAction {
    */
   storeObservations = async (
     observations: Array<ExtractedObservation>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ) => {
     if (observations.length === 0) return true;

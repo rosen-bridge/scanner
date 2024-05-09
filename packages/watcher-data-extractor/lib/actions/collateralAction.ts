@@ -1,8 +1,9 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
 import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
+import { Block } from '@rosen-bridge/extractor';
+
 import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
 import { SpendInfo } from '../interfaces/types';
@@ -66,7 +67,7 @@ class CollateralAction {
    */
   storeCollaterals = async (
     collaterals: Array<ExtractedCollateral>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<boolean> => {
     if (collaterals.length == 0) {
@@ -169,7 +170,7 @@ class CollateralAction {
    */
   spendCollaterals = async (
     spendInfos: Array<SpendInfo>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<void> => {
     for (const spendInfo of spendInfos) {

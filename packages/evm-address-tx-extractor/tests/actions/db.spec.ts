@@ -96,11 +96,8 @@ describe('TxAction', () => {
         txs,
         {
           height: 0,
-          scanner: '',
           hash: 'block 1',
-          status: '',
           parentHash: '',
-          id: 0,
           timestamp: 10,
         },
         'extractor 1'

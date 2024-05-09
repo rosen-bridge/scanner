@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/extractor": "^0.1.0",
     "@rosen-bridge/scanner": "^3.2.8",
     "@rosen-clients/ergo-explorer": "^1.1.1",
     "blakejs": "^1.2.1",
