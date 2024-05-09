@@ -1,5 +1,13 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 5.1.3
+
+### Patch Changes
+
+- Update Ergo explorer client
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.9
+
 ## 5.1.2
 
 ### Patch Changes
