@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner
 
+## 3.2.9
+
+### Patch Changes
+
+- Update ogmios client and schema
+
 ## 3.2.8
 
 ### Patch Changes

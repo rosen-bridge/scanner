@@ -1,5 +1,12 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.2.9
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.9
+
 ## 2.2.8
 
 ### Patch Changes
