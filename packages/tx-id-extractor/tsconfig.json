@@ -5,5 +5,5 @@
     "rootDir": "./lib"
   },
   "include": ["lib/**/*"],
-  "references": [{ "path": "../scanner" }]
+  "references": [{ "path": "../scanner" }, { "path": "../extractor" }]
 }
