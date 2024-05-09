@@ -233,5 +233,29 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(removeSpy).toBeCalledTimes(1);
       expect(insertSpy).toBeCalledTimes(2);
     });
+
+    /**
+     * @target initializeBoxes should not run initialization when initialize flag is false
+     * @dependencies
+     * @scenario
+     * - mock extractor
+     * - spy database functions
+     * - run test (call `initializeBoxes`)
+     * @expected
+     * - not to call any functions
+     */
+    it('should not run initialization when initialize flag is false', async () => {
+      const extractor = new MockedInitializableErgoExtractor(false);
+      const removeSpy = vitest.fn();
+      const insertSpy = vitest.fn();
+      extractor['actions'] = {
+        removeAllData: removeSpy,
+        insertBoxes: insertSpy,
+      } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
+
+      await extractor.initializeBoxes({ height: 100, hash: 'hash' });
+      expect(removeSpy).not.toBeCalled();
+      expect(insertSpy).not.toBeCalled();
+    });
   });
 });

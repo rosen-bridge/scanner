@@ -1,4 +1,5 @@
-import { Block, SpendInfo } from '../interfaces';
+import { Block } from '../interfaces';
+import { SpendInfo } from './interfaces';
 
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**

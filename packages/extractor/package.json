@@ -31,5 +31,10 @@
   },
   "engines": {
     "node": ">=20.11.0"
+  },
+  "dependencies": {
+    "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-clients/ergo-explorer": "^1.1.1",
+    "@rosen-clients/ergo-node": "^1.1.1"
   }
 }

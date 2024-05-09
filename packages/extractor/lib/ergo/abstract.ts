@@ -4,13 +4,13 @@ import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { AbstractExtractor } from '../abstract';
 import { AbstractErgoExtractorAction } from './abstractAction';
+import { Block } from '../interfaces';
 import {
-  Block,
-  ErgoExtractedData,
-  OutputBox,
-  SpendInfo,
   Transaction,
-} from '../interfaces';
+  OutputBox,
+  ErgoExtractedData,
+  SpendInfo,
+} from './interfaces';
 
 export abstract class AbstractErgoExtractor<
   ExtractedData extends ErgoExtractedData

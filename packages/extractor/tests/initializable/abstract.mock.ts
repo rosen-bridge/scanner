@@ -4,7 +4,6 @@ import {
   OutputBox,
   ErgoExtractedData,
   BlockInfo,
-  ErgoBox,
   AbstractInitializableErgoExtractorAction,
 } from '../../lib';
 import { ergoBoxes } from './testData';
@@ -20,18 +19,15 @@ export class MockedInitializableErgoExtractor extends AbstractInitializableErgoE
     return { hash: 'hash', height: 100 };
   };
 
-  getBoxesWithOffsetLimit = (
-    offset: number,
-    limit: number
-  ): Promise<ErgoBox[]> => {
-    return Promise.resolve(ergoBoxes);
+  getBoxesWithOffsetLimit = (offset: number, limit: number) => {
+    return Promise.resolve({ boxes: ergoBoxes, hasNextBatch: true });
   };
 
   extractBoxData = (
     box: V1.OutputInfo | OutputBox,
     blockId: string,
     height: number
-  ): Omit<ErgoExtractedData, 'spendBlock' | 'spendHeight'> | undefined => {
+  ) => {
     return undefined;
   };
 }

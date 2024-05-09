@@ -1,28 +1,22 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
-import {
-  OutputBox,
-  ErgoBox,
-  BlockInfo,
-  ErgoExtractedData,
-} from '../../interfaces';
+import { OutputBox, ErgoBox, ErgoExtractedData } from '../interfaces';
 import { API_LIMIT } from '../../constants';
 import { AbstractErgoExtractor } from '../abstract';
 import { AbstractInitializableErgoExtractorAction } from './abstractAction';
+import { BlockInfo } from '../../interfaces';
 
 export abstract class AbstractInitializableErgoExtractor<
   ExtractedData extends ErgoExtractedData
 > extends AbstractErgoExtractor<ExtractedData> {
-  protected logger: AbstractLogger;
   protected initialize: boolean;
   protected abstract actions: AbstractInitializableErgoExtractorAction<ExtractedData>;
 
-  constructor(initialize = true, logger = new DummyLogger()) {
+  constructor(initialize = true, logger?: AbstractLogger) {
     super(logger);
     this.initialize = initialize;
-    this.logger = logger;
   }
 
   /**
@@ -36,7 +30,7 @@ export abstract class AbstractInitializableErgoExtractor<
   abstract getBoxesWithOffsetLimit: (
     offset: number,
     limit: number
-  ) => Promise<ErgoBox[]>;
+  ) => Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }>;
 
   /**
    * Return block information of specified tx
@@ -58,9 +52,9 @@ export abstract class AbstractInitializableErgoExtractor<
     hasNextBatch: boolean;
   }> => {
     const extractedBoxes: Array<ExtractedData> = [];
-    const boxes = await this.getBoxesWithOffsetLimit(offset, limit);
+    const apiOutput = await this.getBoxesWithOffsetLimit(offset, limit);
 
-    const filteredBoxes = boxes.filter(
+    const filteredBoxes = apiOutput.boxes.filter(
       (box: ErgoBox) => box.creationHeight <= initialHeight && this.hasData(box)
     );
     for (const box of filteredBoxes) {
@@ -89,35 +83,39 @@ export abstract class AbstractInitializableErgoExtractor<
         spendHeight,
       } as ExtractedData);
     }
-    return { extractedBoxes, hasNextBatch: boxes.length > 0 };
+    return { extractedBoxes, hasNextBatch: apiOutput.hasNextBatch };
   };
 
   /**insertBoxes
    * Initializes the database with older boxes related to the address
    */
   initializeBoxes = async (initialBlock: BlockInfo) => {
-    this.logger.debug(
-      `Initializing ${this.getId()} started, removing all existing data`
-    );
-    await this.actions.removeAllData(this.getId());
-
-    let hasNextBatch = true;
-    let offset = 0;
-    while (hasNextBatch) {
-      const data = await this.fetchDataWithOffsetLimit(
-        initialBlock.height,
-        offset,
-        API_LIMIT
+    if (this.initialize) {
+      this.logger.debug(
+        `Initializing ${this.getId()} started, removing all existing data`
       );
-      this.logger.info(
-        `Inserting ${
-          data.extractedBoxes.length
-        } new extracted data in ${this.getId()} initialization`
-      );
-      await this.actions.insertBoxes(data.extractedBoxes, this.getId());
+      await this.actions.removeAllData(this.getId());
 
-      hasNextBatch = data.hasNextBatch;
-      offset += API_LIMIT;
+      let hasNextBatch = true;
+      let offset = 0;
+      while (hasNextBatch) {
+        const data = await this.fetchDataWithOffsetLimit(
+          initialBlock.height,
+          offset,
+          API_LIMIT
+        );
+        this.logger.info(
+          `Inserting ${
+            data.extractedBoxes.length
+          } new extracted data in ${this.getId()} initialization`
+        );
+        await this.actions.insertBoxes(data.extractedBoxes, this.getId());
+
+        hasNextBatch = data.hasNextBatch;
+        offset += API_LIMIT;
+      }
+    } else {
+      this.logger.info(`Initialization for ${this.getId()} is turned off`);
     }
   };
 }
