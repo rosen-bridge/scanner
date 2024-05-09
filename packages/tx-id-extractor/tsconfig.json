@@ -5,5 +5,8 @@
     "rootDir": "./lib"
   },
   "include": ["lib/**/*"],
-  "references": [{ "path": "../scanner" }, { "path": "../extractor" }]
+  "references": [
+    { "path": "../scanner" },
+    { "path": "../extractor/tsconfig.build.json" }
+  ]
 }
