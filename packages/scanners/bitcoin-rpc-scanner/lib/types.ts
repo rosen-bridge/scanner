@@ -35,7 +35,7 @@ export interface BlockInfo {
   time: number;
   nTx: number;
   previousblockhash: string;
-  tx: Array<string>;
+  tx: Array<BitcoinRpcTransaction>;
 }
 
 export interface BlockChainInfo {
@@ -74,8 +74,4 @@ export interface BitcoinRpcTransaction {
   vin: Array<BitcoinRpcTxInput>;
   vout: Array<BitcoinRpcTxOutput>;
   hex: string;
-  blockhash: string;
-  confirmations: number;
-  time: number;
-  blocktime: number;
 }
