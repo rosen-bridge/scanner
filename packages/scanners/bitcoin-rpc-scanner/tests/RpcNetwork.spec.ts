@@ -87,26 +87,15 @@ describe('RpcNetwork', () => {
      */
     it('should return block transactions successfully', async () => {
       mockAxiosPost(testData.getBlockResponse);
-      testData.getRawTransactionResponses.forEach((response) =>
-        mockAxiosPost(response)
-      );
 
       const result = await network.getBlockTxs(testData.blockHash);
 
-      expect(result).toEqual(
-        testData.getRawTransactionResponses.map((response) => response.result)
-      );
-      expect(axiosInstance.post).toHaveBeenCalledTimes(4);
+      expect(result).toEqual(testData.getBlockResponse.result.tx);
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblock',
-        params: [testData.blockHash],
+        params: [testData.blockHash, 2],
       });
-      testData.blockTxIds.forEach((txId) =>
-        expect(axiosInstance.post).toHaveBeenCalledWith('', {
-          method: 'getrawtransaction',
-          params: [txId, true, testData.blockHash],
-        })
-      );
     });
   });
 });

@@ -76,20 +76,11 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
   getBlockTxs = async (
     blockHash: string
   ): Promise<Array<BitcoinRpcTransaction>> => {
-    const blockTxs: Array<BitcoinRpcTransaction> = [];
-
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
-      params: [blockHash],
+      params: [blockHash, 2],
     });
-    const blockTxIds = blockHashResponse.data.result.tx;
-    for (const txId of blockTxIds) {
-      const txResponse = await this.client.post<JsonRpcResult>('', {
-        method: 'getrawtransaction',
-        params: [txId, true, blockHash],
-      });
-      blockTxs.push(txResponse.data.result);
-    }
+    const blockTxs = blockHashResponse.data.result.tx;
 
     return blockTxs;
   };
