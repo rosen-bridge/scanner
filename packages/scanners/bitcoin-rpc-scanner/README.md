@@ -1,4 +1,4 @@
-# bitcoin-rpc-scanner
+# @rosen-bridge/bitcoin-rpc-scanner
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ A Bitcoin blockchain scanner based on bitcoin core JSON RPC API
 npm:
 
 ```sh
-npm i bitcoin-rpc-scanner
+npm i @rosen-bridge/bitcoin-rpc-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add bitcoin-rpc-scanner
+yarn add @rosen-bridge/bitcoin-rpc-scanner
 ```
