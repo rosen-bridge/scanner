@@ -86,7 +86,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     for (const txId of blockTxIds) {
       const txResponse = await this.client.post<JsonRpcResult>('', {
         method: 'getrawtransaction',
-        params: [txId, true, blockHash],
+        params: [txId, true],
       });
       blockTxs.push(txResponse.data.result);
     }

@@ -104,7 +104,7 @@ describe('RpcNetwork', () => {
       testData.blockTxIds.forEach((txId) =>
         expect(axiosInstance.post).toHaveBeenCalledWith('', {
           method: 'getrawtransaction',
-          params: [txId, true, testData.blockHash],
+          params: [txId, true],
         })
       );
     });
