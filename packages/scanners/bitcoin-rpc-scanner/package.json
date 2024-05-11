@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
-    "@rosen-bridge/scanner": "^3.2.5",
-    "axios": "^1.6.7"
+    "@rosen-bridge/scanner": "^3.2.8",
+    "axios": "^1.6.8"
   }
 }
