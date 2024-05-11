@@ -43,7 +43,7 @@ export interface BlockChainInfo {
   bestblockhash: string;
 }
 
-export interface BitcoinRPCTxInput {
+export interface BitcoinRpcTxInput {
   txid: string;
   vout: number;
   scriptSig: {
@@ -54,7 +54,7 @@ export interface BitcoinRPCTxInput {
   sequence: number;
 }
 
-export interface BitcoinRPCTxOutput {
+export interface BitcoinRpcTxOutput {
   value: number;
   n: number;
   scriptPubKey: {
@@ -63,7 +63,7 @@ export interface BitcoinRPCTxOutput {
   };
 }
 
-export interface BitcoinRPCTransaction {
+export interface BitcoinRpcTransaction {
   txid: string;
   hash: string;
   version: number;
@@ -71,8 +71,8 @@ export interface BitcoinRPCTransaction {
   vsize: number;
   weight: number;
   locktime: number;
-  vin: Array<BitcoinRPCTxInput>;
-  vout: Array<BitcoinRPCTxOutput>;
+  vin: Array<BitcoinRpcTxInput>;
+  vout: Array<BitcoinRpcTxOutput>;
   hex: string;
   blockhash: string;
   confirmations: number;

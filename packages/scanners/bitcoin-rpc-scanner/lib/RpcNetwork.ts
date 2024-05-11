@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
 import {
-  BitcoinRPCTransaction,
+  BitcoinRpcTransaction,
   BlockChainInfo,
   BlockHeader,
   JsonRpcResult,
 } from './types';
 
-export class RPCNetwork extends AbstractNetworkConnector<BitcoinRPCTransaction> {
+export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> {
   private readonly url: string;
   private readonly timeout: number;
   private client: AxiosInstance;
@@ -31,14 +31,14 @@ export class RPCNetwork extends AbstractNetworkConnector<BitcoinRPCTransaction> 
    */
   getBlockAtHeight = async (height: number): Promise<Block> => {
     // get block hash using block height
-    const blockHashResponse = await this.client.get<JsonRpcResult>('', {
+    const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockhash',
       params: [height],
     });
     const blockHash = blockHashResponse.data.result;
 
     // get block headers using block hash
-    const blockHeaderResponse = await this.client.get<JsonRpcResult>('', {
+    const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockeader',
       params: [blockHash, true],
     });
@@ -58,7 +58,7 @@ export class RPCNetwork extends AbstractNetworkConnector<BitcoinRPCTransaction> 
    */
   getCurrentHeight = (): Promise<number> => {
     return this.client
-      .get<JsonRpcResult>('', {
+      .post<JsonRpcResult>('', {
         method: 'getblockchaininfo',
         params: [],
       })
@@ -75,16 +75,16 @@ export class RPCNetwork extends AbstractNetworkConnector<BitcoinRPCTransaction> 
    */
   getBlockTxs = async (
     blockHash: string
-  ): Promise<Array<BitcoinRPCTransaction>> => {
-    const blockTxs: Array<BitcoinRPCTransaction> = [];
+  ): Promise<Array<BitcoinRpcTransaction>> => {
+    const blockTxs: Array<BitcoinRpcTransaction> = [];
 
-    const blockHashResponse = await this.client.get<JsonRpcResult>('', {
+    const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
       params: [blockHash],
     });
     const blockTxIds = blockHashResponse.data.result.tx;
     for (const txId of blockTxIds) {
-      const txResponse = await this.client.get<JsonRpcResult>('', {
+      const txResponse = await this.client.post<JsonRpcResult>('', {
         method: 'getrawtransaction',
         params: [txId, true, blockHash],
       });

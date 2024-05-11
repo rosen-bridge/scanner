@@ -1,11 +1,11 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { Block, BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
-import { BitcoinRPCConfig, BitcoinRPCTransaction } from './types';
-import { RPCNetwork } from './RPCNetwork';
+import { BitcoinRPCConfig, BitcoinRpcTransaction } from './types';
+import { RpcNetwork } from './RpcNetwork';
 
-export class BitcoinRPCScanner extends GeneralScanner<BitcoinRPCTransaction> {
+export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
   readonly initialHeight: number;
-  network: RPCNetwork;
+  network: RpcNetwork;
   constructor(config: BitcoinRPCConfig, logger?: AbstractLogger) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
@@ -14,7 +14,7 @@ export class BitcoinRPCScanner extends GeneralScanner<BitcoinRPCTransaction> {
      * `initialHeight` by one so that it matches all other rosen-bridge scanners
      */
     this.initialHeight = config.initialHeight + 1;
-    this.network = new RPCNetwork(config.rpcUrl, config.timeout);
+    this.network = new RpcNetwork(config.rpcUrl, config.timeout);
   }
 
   getFirstBlock = (): Promise<Block> => {
