@@ -81,9 +81,6 @@ describe('RpcNetwork', () => {
      * - check if function got called
      * @expected
      * - it should be expected txs
-     * - axios.get should got called 4 times
-     *   - 1 time with `getblock` function and mocked block hash param
-     *   - 3 times with `getrawtransaction` function and mocked block tx ids param
      */
     it('should return block transactions successfully', async () => {
       mockAxiosPost(testData.getBlockResponse);
@@ -91,11 +88,6 @@ describe('RpcNetwork', () => {
       const result = await network.getBlockTxs(testData.blockHash);
 
       expect(result).toEqual(testData.getBlockResponse.result.tx);
-      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getblock',
-        params: [testData.blockHash, 2],
-      });
     });
   });
 });

@@ -78,7 +78,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
   ): Promise<Array<BitcoinRpcTransaction>> => {
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
-      params: [blockHash, 2],
+      params: [blockHash, 2], // verbosity should be 2 in order to retrieve full transaction info
     });
     const blockTxs = blockHashResponse.data.result.tx;
 
