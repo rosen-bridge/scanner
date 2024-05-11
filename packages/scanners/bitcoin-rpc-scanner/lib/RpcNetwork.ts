@@ -39,7 +39,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
 
     // get block headers using block hash
     const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblockeader',
+      method: 'getblockheader',
       params: [blockHash, true],
     });
     const blockHeader: BlockHeader = blockHeaderResponse.data.result;

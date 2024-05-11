@@ -43,7 +43,7 @@ describe('RpcNetwork', () => {
         params: [testData.blockHeight],
       });
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getblockeader',
+        method: 'getblockheader',
         params: [testData.blockHash, true],
       });
     });
