@@ -4,6 +4,8 @@ import { SpendInfo } from './interfaces';
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**
    * insert all extracted box data in an atomic transaction
+   * @param data
+   * @param extractorId
    */
   abstract insertBoxes: (
     data: ExtractedData[],
@@ -12,6 +14,9 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
 
   /**
    * update spending information of stored boxes
+   * @param spendInfos
+   * @param block
+   * @param extractorId
    */
   abstract spendBoxes: (
     spendInfos: SpendInfo[],
@@ -20,10 +25,11 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   ) => Promise<void>;
 
   /**
-   * delete boxes in specific block from database. if box spend in this block marked as unspent
-   * and if created in this block remove it from database
+   * delete extracted data from a specific block
+   * if a box is spend in this block mark it as unspent
+   * if a box is created in this block remove it from database
    * @param block
-   * @param extractor
+   * @param extractorId
    */
   abstract deleteBlockBoxes: (
     block: string,

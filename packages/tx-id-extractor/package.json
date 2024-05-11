@@ -21,7 +21,7 @@
   "dependencies": {
     "@cardano-ogmios/schema": "^6.0.3",
     "@rosen-bridge/abstract-logger": "^1.0.0",
-    "@rosen-bridge/extractor": "^0.1.0",
+    "@rosen-bridge/abstract-extractor": "^0.1.0",
     "@rosen-bridge/scanner": "^3.2.8",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.20"

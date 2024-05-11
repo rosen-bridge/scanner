@@ -4,7 +4,7 @@ import { RosenTokens } from '@rosen-bridge/tokens';
 import {
   CARDANO_NATIVE_TOKEN,
   ERGO_NATIVE_TOKEN,
-} from '../../lib/extractor/const';
+} from '../../lib/abstract-extractor/const';
 
 export const tokens: RosenTokens = {
   idKeys: {

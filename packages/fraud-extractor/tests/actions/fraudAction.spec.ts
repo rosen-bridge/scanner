@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 
-import { createDatabase } from '../extractor/utils.mock';
+import { createDatabase } from '../abstract-extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';
 import { FraudEntity } from '../../lib/entities/fraudEntity';
 import { ExtractedFraud } from '../../lib/interfaces/types';

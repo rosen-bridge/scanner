@@ -8,7 +8,7 @@ import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

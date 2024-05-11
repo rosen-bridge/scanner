@@ -4,7 +4,7 @@ import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import { ObservationEntityAction } from '../../actions/db';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';

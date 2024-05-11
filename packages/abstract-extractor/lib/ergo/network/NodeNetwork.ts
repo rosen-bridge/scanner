@@ -1,15 +1,24 @@
-import { BlockInfo } from '../../interfaces';
-import { ErgoBox } from '../interfaces';
 import ergoNodeClientFactory, {
   IndexedErgoBox,
 } from '@rosen-clients/ergo-node';
-export class NodeNetwork {
+
+import { BlockInfo } from '../../interfaces';
+import { ErgoBox } from '../interfaces';
+import { AbstractNetwork } from './AbstractNetwork';
+
+export class NodeNetwork extends AbstractNetwork {
   private api;
 
   constructor(url: string) {
+    super();
     this.api = ergoNodeClientFactory(url);
   }
 
+  /**
+   * covert node api boxes to ErgoBox interface
+   * @param box
+   * @returns ErgoBox
+   */
   convertToErgoBox = async (box: IndexedErgoBox): Promise<ErgoBox> => ({
     transactionId: box.transactionId || '',
     index: box.index || 0,
@@ -23,7 +32,7 @@ export class NodeNetwork {
   });
 
   /**
-   * Return block information of specified tx
+   * return block information of specified tx
    * @param txId
    */
   getTxBlock = async (txId: string): Promise<BlockInfo> => {
@@ -35,7 +44,8 @@ export class NodeNetwork {
   };
 
   /**
-   * Use explorer api to return related boxes by specified address
+   * use node api to return related boxes by specified address
+   * @param address
    * @param offset
    * @param limit
    * @returns related boxes
@@ -58,7 +68,8 @@ export class NodeNetwork {
   };
 
   /**
-   * Use explorer api to return related boxes by specified address
+   * use node api to return related boxes by specified token id
+   * @param tokenId
    * @param offset
    * @param limit
    * @returns related boxes

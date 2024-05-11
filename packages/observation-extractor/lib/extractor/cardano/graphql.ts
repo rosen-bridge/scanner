@@ -7,7 +7,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoGraphQLRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { GraphQLTransaction } from '../../interfaces/graphql';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQLTransaction> {
   readonly logger: AbstractLogger;

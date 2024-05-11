@@ -1,8 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity } from '@rosen-bridge/scanner';
-import { Block } from '@rosen-bridge/extractor';
+import { Block } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';

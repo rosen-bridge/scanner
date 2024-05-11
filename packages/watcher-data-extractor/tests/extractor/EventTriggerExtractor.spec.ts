@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
-import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
+import EventTriggerExtractor from '../../lib/abstract-extractor/EventTriggerExtractor';
 import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
 import {
   block,

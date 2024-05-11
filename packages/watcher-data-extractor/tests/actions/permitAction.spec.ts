@@ -2,8 +2,8 @@ import { DataSource, Repository } from 'typeorm';
 
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
-import { block, block2 } from '../extractor/utilsVariable.mock';
-import { createDatabase } from '../extractor/utilsFunctions.mock';
+import { block, block2 } from '../abstract-extractor/utilsVariable.mock';
+import { createDatabase } from '../abstract-extractor/utilsFunctions.mock';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
 
 const samplePermit1 = {

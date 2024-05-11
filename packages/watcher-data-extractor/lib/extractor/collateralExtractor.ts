@@ -3,7 +3,7 @@ import { InitialInfo, OutputBox, Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import CollateralAction from '../actions/collateralAction';
 import { DefaultApiLimit } from '../constants';

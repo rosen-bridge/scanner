@@ -1,15 +1,19 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+
 import { BlockInfo } from '../../interfaces';
 import { ErgoBox } from '../interfaces';
-export class ExplorerNetwork {
+import { AbstractNetwork } from './AbstractNetwork';
+
+export class ExplorerNetwork extends AbstractNetwork {
   private api;
 
   constructor(url: string) {
+    super();
     this.api = ergoExplorerClientFactory(url);
   }
 
   /**
-   * Return block information of specified tx
+   * return block information of specified tx
    * @param txId
    */
   getTxBlock = async (txId: string): Promise<BlockInfo> => {
@@ -21,7 +25,8 @@ export class ExplorerNetwork {
   };
 
   /**
-   * Use explorer api to return related boxes by specified address
+   * use explorer api to return related boxes by specified address
+   * @param address
    * @param offset
    * @param limit
    * @returns related boxes
@@ -41,7 +46,8 @@ export class ExplorerNetwork {
   };
 
   /**
-   * Use explorer api to return related boxes by specified address
+   * use explorer api to return related boxes by specified token id
+   * @param tokenId
    * @param offset
    * @param limit
    * @returns related boxes

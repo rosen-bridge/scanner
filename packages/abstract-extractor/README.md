@@ -14,11 +14,11 @@ Rosen Bridge extractor interfaces to work with scanner
 npm:
 
 ```sh
-npm i extractor
+npm i @rosen-bridge/abstract-extractor
 ```
 
 yarn:
 
 ```sh
-yarn add extractor
+yarn add @rosen-bridge/abstract-extractor
 ```

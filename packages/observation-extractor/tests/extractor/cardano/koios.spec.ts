@@ -9,7 +9,7 @@ import { ObservationEntity } from '../../../lib';
 import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
+import { ERGO_NATIVE_TOKEN } from '../../../lib/abstract-extractor/const';
 import { DataSource } from 'typeorm';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}

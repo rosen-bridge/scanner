@@ -8,7 +8,7 @@ import { Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 import JsonBI from '@rosen-bridge/json-bigint';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import { FraudAction } from '../actions/fraudAction';
 import { DefaultApiLimit } from '../constants';

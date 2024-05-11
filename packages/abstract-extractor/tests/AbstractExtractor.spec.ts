@@ -7,7 +7,7 @@ import {
   AbstractErgoExtractorAction,
 } from '../lib';
 import { block, extractedData, tx } from './testData';
-import { MockedErgoExtractor } from './abstract.mock';
+import { MockedErgoExtractor } from './AbstractExtractor.mock';
 
 describe('AbstractErgoExtractor', () => {
   describe('processTransactions', () => {

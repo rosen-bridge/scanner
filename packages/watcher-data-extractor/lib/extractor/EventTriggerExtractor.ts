@@ -3,7 +3,7 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { blake2b } from 'blakejs';
 import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

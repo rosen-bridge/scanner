@@ -1,9 +1,9 @@
 import { DataSource, Repository } from 'typeorm';
 
-import { createDatabase } from '../extractor/utilsFunctions.mock';
+import { createDatabase } from '../abstract-extractor/utilsFunctions.mock';
 import { EventResult, EventTriggerEntity } from '../../lib';
 import EventTriggerAction from '../../lib/actions/EventTriggerAction';
-import { block, block2 } from '../extractor/utilsVariable.mock';
+import { block, block2 } from '../abstract-extractor/utilsVariable.mock';
 import {
   sampleEventEntity,
   sampleEventTrigger1,

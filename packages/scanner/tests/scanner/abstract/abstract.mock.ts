@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import {
   AbstractExtractor,
   Block as ExtractorBlock,
-} from '@rosen-bridge/extractor';
+} from '@rosen-bridge/abstract-extractor';
 
 import { BlockEntity } from '../../../lib/entities/blockEntity';
 import { Block, AbstractNetworkConnector } from '../../../lib/interfaces';

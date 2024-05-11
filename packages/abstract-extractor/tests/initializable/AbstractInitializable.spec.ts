@@ -1,12 +1,9 @@
 import { describe, it, expect, vitest } from 'vitest';
 
-import { MockedInitializableErgoExtractor } from './abstract.mock';
+import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { ergoBoxes, extractedData } from './testData';
-import {
-  OutputBox,
-  ErgoExtractedData,
-  AbstractInitializableErgoExtractorAction,
-} from '../../lib';
+import { OutputBox, ErgoExtractedData } from '../../lib';
+import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializable';
 
 describe('AbstractInitializableErgoExtractorAction', () => {
   describe('fetchDataWithOffsetLimit', () => {

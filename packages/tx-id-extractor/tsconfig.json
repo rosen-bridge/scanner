@@ -7,6 +7,6 @@
   "include": ["lib/**/*"],
   "references": [
     { "path": "../scanner" },
-    { "path": "../extractor/tsconfig.build.json" }
+    { "path": "../abstract-extractor/tsconfig.build.json" }
   ]
 }

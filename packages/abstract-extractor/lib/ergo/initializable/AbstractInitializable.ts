@@ -1,11 +1,10 @@
-import { V1 } from '@rosen-clients/ergo-explorer';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
-import { OutputBox, ErgoBox, ErgoExtractedData } from '../interfaces';
+import { ErgoBox, ErgoExtractedData } from '../interfaces';
 import { API_LIMIT, RETRIAL_COUNT } from '../../constants';
-import { AbstractErgoExtractor } from '../abstract';
-import { AbstractInitializableErgoExtractorAction } from './abstractAction';
+import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
+import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
 import { BlockInfo } from '../../interfaces';
 
 export abstract class AbstractInitializableErgoExtractor<
@@ -14,18 +13,20 @@ export abstract class AbstractInitializableErgoExtractor<
   protected initialize: boolean;
   protected abstract actions: AbstractInitializableErgoExtractorAction<ExtractedData>;
 
+  /**
+   * Create an initializable ergo extractor
+   * @param initialize ignore the initialization step if its false
+   * @param logger
+   */
   constructor(initialize = true, logger?: AbstractLogger) {
     super(logger);
     this.initialize = initialize;
   }
 
   /**
-   * @return true if the box has the required data and false otherwise
-   */
-  abstract hasData: (box: V1.OutputInfo | OutputBox) => boolean;
-
-  /**
-   * @returns explorer client data with specified limit and offset
+   * return init required boxes with offset limit
+   * @param offset
+   * @param limit
    */
   abstract getBoxesWithOffsetLimit: (
     offset: number,
@@ -33,13 +34,13 @@ export abstract class AbstractInitializableErgoExtractor<
   ) => Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }>;
 
   /**
-   * Return block information of specified tx
+   * return block information of specified tx
    * @param txId
    */
   abstract getTxBlock: (txId: string) => Promise<BlockInfo>;
 
   /**
-   * Return all related data below the initial height (including the init height)
+   * return all related data below the initial height (including the init height)
    * @param initialHeight
    * @returns
    */
@@ -58,7 +59,6 @@ export abstract class AbstractInitializableErgoExtractor<
       (box: ErgoBox) => box.creationHeight <= initialHeight && this.hasData(box)
     );
     for (const box of filteredBoxes) {
-      // const block = await this.getTxBlock(box.transactionId);
       const data = this.extractBoxData(box, box.blockId, box.creationHeight);
       if (!data) continue;
       this.logger.debug(
@@ -86,8 +86,11 @@ export abstract class AbstractInitializableErgoExtractor<
     return { extractedBoxes, hasNextBatch: apiOutput.hasNextBatch };
   };
 
-  /**insertBoxes
-   * Initializes the database with older boxes related to the address
+  /**
+   * initialize extractor database with data created below the initial height
+   * ignore initialization if this feature is off
+   * try to get data multiple times to pass accidental network problems
+   * @param initialBlock
    */
   initializeBoxes = async (initialBlock: BlockInfo) => {
     let trial = 1;

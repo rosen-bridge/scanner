@@ -10,7 +10,7 @@ import {
   ItemsOutputInfo,
   OutputInfo,
 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';

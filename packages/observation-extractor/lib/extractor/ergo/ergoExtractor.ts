@@ -8,7 +8,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

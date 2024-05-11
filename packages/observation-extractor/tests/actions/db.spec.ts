@@ -1,11 +1,14 @@
 import { ObservationEntityAction } from '../../lib/actions/db';
 import { ObservationEntity } from '../../lib';
-import { createDatabase, generateBlockEntity } from '../extractor/utils.mock';
+import {
+  createDatabase,
+  generateBlockEntity,
+} from '../abstract-extractor/utils.mock';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import {
   firstObservations,
   secondObservations,
-} from '../extractor/observations.mock';
+} from '../abstract-extractor/observations.mock';
 import { DataSource } from 'typeorm';
 
 let dataSource: DataSource;

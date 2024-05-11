@@ -1,10 +1,11 @@
-import { AbstractErgoExtractorAction } from '../abstractAction';
+import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';
 
 export abstract class AbstractInitializableErgoExtractorAction<
   ExtractedData
 > extends AbstractErgoExtractorAction<ExtractedData> {
   /**
-   * Remove all existing data
+   * remove all existing data for the extractor
+   * @param extractorId
    */
   abstract removeAllData: (extractorId: string) => Promise<void>;
 }

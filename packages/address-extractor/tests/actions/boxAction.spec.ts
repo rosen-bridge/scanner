@@ -1,7 +1,10 @@
 import { DataSource, Repository } from 'typeorm';
 
 import { BoxEntityAction } from '../../lib/actions/boxAction';
-import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';
+import {
+  generateBlockEntity,
+  createDatabase,
+} from '../abstract-extractor/utils.mock';
 import { BoxEntity } from '../../lib';
 import { ExtractedBox } from '../../lib/interfaces/types';
 

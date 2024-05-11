@@ -1,11 +1,9 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
 import {
   AbstractInitializableErgoExtractor,
-  OutputBox,
-  ErgoExtractedData,
-  BlockInfo,
   AbstractInitializableErgoExtractorAction,
-} from '../../lib';
+} from '../../lib/ergo/initializable';
+import { OutputBox, ErgoExtractedData, BlockInfo } from '../../lib';
 import { ergoBoxes } from './testData';
 
 export class MockedInitializableErgoExtractor extends AbstractInitializableErgoExtractor<ErgoExtractedData> {

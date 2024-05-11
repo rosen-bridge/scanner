@@ -3,7 +3,7 @@ import { TxAction } from '../actions/db';
 import { Transaction } from 'ethers';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ExtractedTx } from '../interfaces/types';
-import { AbstractExtractor, Block } from '@rosen-bridge/extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class EvmTxExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

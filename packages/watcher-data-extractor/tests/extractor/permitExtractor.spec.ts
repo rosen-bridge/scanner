@@ -9,7 +9,7 @@ import {
   createDatabase,
   insertPermitEntity,
 } from './utilsFunctions.mock';
-import PermitExtractor from '../../lib/extractor/permitExtractor';
+import PermitExtractor from '../../lib/abstract-extractor/permitExtractor';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import {
   addressBoxes,
