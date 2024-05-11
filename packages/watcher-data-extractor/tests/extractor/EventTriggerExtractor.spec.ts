@@ -106,7 +106,9 @@ describe('EventTriggerExtractor', () => {
         targetChainTokenId: sampleEventData[9],
         sourceTxId: sampleEventData[0],
         sourceBlockId: sampleEventData[10],
-        WIDs: 'ff',
+        WIDsCount: 1,
+        WIDsHash:
+          'ac4e4076a883937282f1377ef5cacb8edd00e3c79629e43532464eb3be277367',
         spendBlock: null,
         spendHeight: null,
         spendTxId: null,
@@ -134,11 +136,11 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress
       );
-      const tx1 = eventTriggerTxGenerator(true, ['wid1'], sampleEventData);
+      const tx1 = eventTriggerTxGenerator(true, ['aa'], sampleEventData);
       const tx2 = eventTriggerTxGenerator(true, [], sampleEventData);
-      const tx3 = eventTriggerTxGenerator(false, ['wid3'], sampleEventData);
-      const tx4 = eventTriggerTxGenerator(true, ['wid4'], sampleEventData);
-      const tx5 = eventTriggerTxGenerator(true, ['wid5'], []);
+      const tx3 = eventTriggerTxGenerator(false, ['bb'], sampleEventData);
+      const tx4 = eventTriggerTxGenerator(true, ['cc'], sampleEventData);
+      const tx5 = eventTriggerTxGenerator(true, ['dd'], []);
       const res = await extractor.processTransactions(
         [tx1, tx2, tx3, tx4, tx5],
         block

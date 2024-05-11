@@ -9,6 +9,11 @@ interface Block {
   txCount?: number;
 }
 
+interface InitialInfo {
+  height: number;
+  hash: string;
+}
+
 abstract class AbstractDataBase<DataT> {
   /**
    * get last saved block
@@ -92,7 +97,13 @@ abstract class AbstractExtractor<TransactionType> {
    * Extractor box initialization
    * No action needed in cardano extractors
    */
-  abstract initializeBoxes: (initialHeight: number) => Promise<void>;
+  abstract initializeBoxes: (initialBlock: InitialInfo) => Promise<void>;
 }
 
-export { AbstractDataBase, AbstractExtractor, AbstractNetworkConnector, Block };
+export {
+  AbstractDataBase,
+  AbstractExtractor,
+  AbstractNetworkConnector,
+  Block,
+  InitialInfo,
+};

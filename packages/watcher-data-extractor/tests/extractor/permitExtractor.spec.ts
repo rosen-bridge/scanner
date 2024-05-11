@@ -2,6 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { InitialInfo } from '@rosen-bridge/scanner';
 
 import {
   permitTxGenerator,
@@ -135,10 +136,10 @@ describe('permitExtractor', () => {
         RWTId,
         'explorer'
       );
-      const tx1 = permitTxGenerator(true, 'wid1');
-      const tx2 = permitTxGenerator(false, 'wid2');
-      const tx3 = permitTxGenerator(true, 'wid3');
-      const tx4 = permitTxGenerator(false, 'wid3');
+      const tx1 = permitTxGenerator(true, 'ff11');
+      const tx2 = permitTxGenerator(false, 'ff22');
+      const tx3 = permitTxGenerator(true, 'ff33');
+      const tx4 = permitTxGenerator(false, 'ff33');
       const res = await extractor.processTransactions(
         [tx1, tx2, tx3, tx4],
         block
@@ -200,15 +201,15 @@ describe('permitExtractor', () => {
         'url'
       );
       const boxData = await extractor.extractPermitData([
-        addressBoxes.items[0],
+        addressBoxes.items[0] as any,
       ]);
       expect(boxData[0]).toEqual({
         boxId:
-          'd4e292dbd4df2378f1392044b43922540ae7a0e9e9c3553549aa39557372e671',
+          '84c19f45cdfc7c35547deefe0e513a7e42919365c17f588536ef61b6885765f1',
         boxSerialized:
-          '4JFDEBMEAAQABAQEAAQCBAAOIKKdm7DWIuuLT4OjTEqxt9Pxiqqrw6podpEqPrrw2hAYBAQEAAQABAABAQQCBAAEAAQADiBkzHLzKfXbe2lmehCvPhcmFhubfOkYp5TqgLnDLEzjiAUCAQHYB9YBsqVzAADWAoyy22MIp3MBAAHWA661tKVzArGl2QEDY5Gx22MIcgNzA9kBA2Ou22MIcgPZAQVNDpOMcgUBcgLWBOTGpwQa1gWypXMEANYG22MIcgXWB65yBtkBB00Ok4xyBwFyApWTjLLbYwhyAXMFAAFzBtGWgwMB73IDk4yy22MIsqRzBwBzCAABsnIEcwkAlXIHloMCAZOMsnIGcwoAAXICk8JyBcKncwvYAdYIwqfRloMFAe9yA5PCcgFyCJPkxnIBBBpyBJOMsttjCLKkcwwAcw0AAbJyBHMOAJVyB9gB1gmycgZzDwCWgwcBk4xyCQFyApPLwnIFcxDmxnIFBRrmxnIFBg6T5MZyBQcOy3IIk+TGcgUEGnIEk4xyCQJzEXMS54ESAUlyh7mh7/ZDeRJ3dEp0t9WYuDTcYT8uvJcuM3Z8YawrCQIaASA1grEqtEE8mod4Rej68Y1UbRrhHd17s2XAEYx6vv3RVw4BAEphs0e8grYfVpBBcUI+va+evhIh9fkw5pEOPmn2J2wjAA==',
+          '4JFDEBMEAAQABAQEAAQCBAAOIKKdm7DWIuuLT4OjTEqxt9Pxiqqrw6podpEqPrrw2hAYBAQEAAQABAABAQQCBAAEAAQADiBkzHLzKfXbe2lmehCvPhcmFhubfOkYp5TqgLnDLEzjiAUCAQHYB9YBsqVzAADWAoyy22MIp3MBAAHWA661tKVzArGl2QEDY5Gx22MIcgNzA9kBA2Ou22MIcgPZAQVNDpOMcgUBcgLWBOTGpwQa1gWypXMEANYG22MIcgXWB65yBtkBB00Ok4xyBwFyApWTjLLbYwhyAXMFAAFzBtGWgwMB73IDk4yy22MIsqRzBwBzCAABsnIEcwkAlXIHloMCAZOMsnIGcwoAAXICk8JyBcKncwvYAdYIwqfRloMFAe9yA5PCcgFyCJPkxnIBBBpyBJOMsttjCLKkcwwAcw0AAbJyBHMOAJVyB9gB1gmycgZzDwCWgwcBk4xyCQFyApPLwnIFcxDmxnIFBRrmxnIFBg6T5MZyBQcOy3IIk+TGcgUEGnIEk4xyCQJzEXMS54ESAUlyh7mh7/ZDeRJ3dEp0t9WYuDTcYT8uvJcuM3Z8YawrCQEOIDWCsSq0QTyah3hF6PrxjVRtGuEd3XuzZcARjHq+/dFXBzQ1DcR2DlWWr0TedyodAM7YI6OgKpm86AfHZA5LctsA',
         WID: '3582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
-        txId: '4a61b347bc82b61f56904171423ebdaf9ebe1221f5f930e6910e3e69f6276c23',
+        txId: '0734350dc4760e5596af44de772a1d00ced823a3a02a99bce807c7640e4b72db',
         block:
           '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
         height: 295145,
@@ -503,7 +504,7 @@ describe('permitExtractor', () => {
       const spy = jest
         .spyOn(extractor, 'validateOldStoredPermits')
         .mockImplementation();
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxId).toEqual('boxId2');
@@ -544,7 +545,7 @@ describe('permitExtractor', () => {
         .spyOn(extractor, 'validateOldStoredPermits')
         .mockImplementation();
       await insertPermitEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes(100);
+      await extractor.initializeBoxes({ height: 100 } as InitialInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxSerialized).toEqual('newSerialized');

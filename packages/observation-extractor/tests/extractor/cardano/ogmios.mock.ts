@@ -61,33 +61,25 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {
       hash: 'bb02d896eb2c7dd12a9b385239b62a4b3bf06bf6b368314aba0a2ee1300563fe',
       labels: {
         '0': {
-          json: [
-            {
-              to: 'ergo',
-            },
-            {
-              bridgeFee: '6800501',
-            },
-            {
-              networkFee: '34003',
-            },
-            {
-              toAddress: '9iD5jMoLjK9azTdigyT8z1QY6qHrA6gVrJamMF8MJ2qt45pJpDc',
-            },
-            {
-              fromAddress: [
-                'addr1q8hmp5zjzvv7s7pmgemz3mvrkd2nu7609hwgsqa0auf6h7h3r6x6jn2zrt8',
-                '',
-              ],
-            },
-          ],
+          json: {
+            to: 'ergo',
+            bridgeFee: '6800501',
+            networkFee: '34003',
+            toAddress: '9iD5jMoLjK9azTdigyT8z1QY6qHrA6gVrJamMF8MJ2qt45pJpDc',
+            fromAddress: [
+              'addr1q8hmp5zjzvv7s7pmgemz3mvrkd2nu7609hwgsqa0auf6h7h3r6x6jn2zrt8',
+              '',
+            ],
+          },
         },
       },
     },
@@ -160,7 +152,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {
@@ -259,7 +253,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     signatories: [
@@ -331,7 +327,9 @@ export class Transactions {
       },
     ],
     fee: {
-      lovelace: 186533n,
+      ada: {
+        lovelace: 186533n,
+      },
     },
     validityInterval: {},
     metadata: {

@@ -46,7 +46,9 @@ const txs: Array<Transaction> = [
     scriptIntegrityHash:
       '7825ecbe1c90962bf880d1d3fe53e63875c75f7b6d5a969222a9147c52dd875d',
     fee: {
-      lovelace: 186753n,
+      ada: {
+        lovelace: 186753n,
+      },
     },
     validityInterval: {
       invalidAfter: 108390715,
@@ -98,7 +100,9 @@ const txs: Array<Transaction> = [
       },
     ],
     fee: {
-      lovelace: 170627n,
+      ada: {
+        lovelace: 170627n,
+      },
     },
     validityInterval: {
       invalidAfter: 108546959,
@@ -167,7 +171,9 @@ const txs: Array<Transaction> = [
       },
     ],
     fee: {
-      lovelace: 185389n,
+      ada: {
+        lovelace: 185389n,
+      },
     },
     validityInterval: {
       invalidBefore: 0,

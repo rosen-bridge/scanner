@@ -64,13 +64,16 @@ class EventTriggerEntity {
   sourceBlockId: string;
 
   @Column()
-  WIDs: string;
+  WIDsCount: number;
+
+  @Column()
+  WIDsHash: string;
 
   @Column({ nullable: true, type: 'text' })
   spendBlock?: string | null;
 
-  @Column({ nullable: true })
-  spendHeight?: number;
+  @Column({ nullable: true, type: 'int' })
+  spendHeight?: number | null;
 
   @Column({ nullable: true, type: 'text' })
   spendTxId?: string | null;

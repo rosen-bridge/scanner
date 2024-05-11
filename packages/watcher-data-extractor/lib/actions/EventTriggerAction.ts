@@ -55,7 +55,8 @@ class EventTriggerAction {
           block: block.hash,
           height: block.height,
           extractor: extractor,
-          WIDs: trigger.WIDs,
+          WIDsCount: trigger.WIDsCount,
+          WIDsHash: trigger.WIDsHash,
           amount: trigger.amount,
           bridgeFee: trigger.bridgeFee,
           fromAddress: trigger.fromAddress,
@@ -161,7 +162,7 @@ class EventTriggerAction {
       {
         spendBlock: null,
         spendTxId: null,
-        spendHeight: 0,
+        spendHeight: null,
         result: null,
         paymentTxId: null,
       }

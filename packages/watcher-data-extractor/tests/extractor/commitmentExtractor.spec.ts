@@ -47,9 +47,9 @@ describe('CommitmentExtractor', () => {
         RWTId,
         dataSource
       );
-      const tx1 = commitmentTxGenerator(true, ['f1'], ['11'], 'd1');
-      const tx2 = commitmentTxGenerator(true, ['f2'], ['22'], 'd2');
-      const tx3 = commitmentTxGenerator(false, ['f3'], ['33'], 'd3');
+      const tx1 = commitmentTxGenerator(true, 'f1', '11', 'd1');
+      const tx2 = commitmentTxGenerator(true, 'f2', '22', 'd2');
+      const tx3 = commitmentTxGenerator(false, 'f3', '33', 'd3');
       const res = await extractor.processTransactions([tx1, tx3, tx2], block);
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(CommitmentEntity);
@@ -74,6 +74,8 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
         rwtCount: '10',
       });
       expect(commitment2).toEqual({
@@ -91,6 +93,8 @@ describe('CommitmentExtractor', () => {
         height: 10,
         spendBlock: null,
         spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
         rwtCount: '10',
       });
     });
@@ -110,9 +114,9 @@ describe('CommitmentExtractor', () => {
         RWTId,
         dataSource
       );
-      const tx1 = commitmentTxGenerator(true, ['wid1'], ['1'], 'digest1');
-      const tx2 = commitmentTxGenerator(true, ['wid2'], ['2'], 'digest2');
-      const tx3 = commitmentTxGenerator(false, ['wid2'], ['2'], 'digest2');
+      const tx1 = commitmentTxGenerator(true, 'wid1', '1', 'digest1');
+      const tx2 = commitmentTxGenerator(true, 'wid2', '2', 'digest2');
+      const tx3 = commitmentTxGenerator(false, 'wid2', '2', 'digest2');
       await extractor.processTransactions([tx1, tx2, tx3], block);
       await extractor.forkBlock('hash');
       const repository = dataSource.getRepository(CommitmentEntity);

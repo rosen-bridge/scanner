@@ -6,6 +6,7 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import {
   AbstractExtractor,
   BlockEntity,
+  InitialInfo,
   Transaction,
 } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -80,14 +81,14 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                   wasm.NonMandatoryRegisterId.R4
                 );
                 if (r4) {
-                  const R4Serialized = r4.to_coll_coll_byte();
+                  const R4Serialized = r4.to_byte_array();
                   if (R4Serialized.length >= 1) {
                     boxes.push({
                       boxId: output.boxId,
                       boxSerialized: Buffer.from(
                         boxOutput.sigma_serialize_bytes()
                       ).toString('base64'),
-                      WID: Buffer.from(R4Serialized[0]).toString('hex'),
+                      WID: Buffer.from(R4Serialized).toString('hex'),
                       txId: output.transactionId,
                     });
                   }
@@ -134,10 +135,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older permits related to the address
    */
-  initializeBoxes = async (initialHeight: number) => {
+  initializeBoxes = async (initialBlock: InitialInfo) => {
     let allStoredBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
     // Extract unspent permits
-    const unspentPermits = await this.getAllUnspentPermits(initialHeight);
+    const unspentPermits = await this.getAllUnspentPermits(initialBlock.height);
     const unspentBoxIds = unspentPermits.map((box) => box.boxId);
     // Storing extracted permits
     for (const permit of unspentPermits) {
@@ -265,7 +266,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));
       const r4 = box.register_value(4);
       if (r4) {
-        const R4Serialized = r4.to_coll_coll_byte();
+        const R4Serialized = r4.to_byte_array();
         let spendBlock, spendHeight;
         if (boxJson.spentTransactionId) {
           const block = await this.getTxBlock(boxJson.spentTransactionId);
@@ -279,7 +280,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
           ),
           block: boxJson.blockId,
           height: boxJson.settlementHeight,
-          WID: Buffer.from(R4Serialized[0]).toString('hex'),
+          WID: Buffer.from(R4Serialized).toString('hex'),
           txId: box.tx_id().to_str(),
           spendBlock: spendBlock,
           spendHeight: spendHeight,

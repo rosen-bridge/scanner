@@ -10,7 +10,7 @@ import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { WebSocketScanner } from '../../../lib';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { ExtractorStatusEntity } from '../../../lib/entities/extractorStatusEntity';
 
 export interface TestTransaction {
   height: number;
@@ -104,7 +104,7 @@ export const createDatabase = async () => {
   const dataSource = new DataSource({
     type: 'sqlite',
     database: `:memory:`,
-    entities: [BlockEntity],
+    entities: [BlockEntity, ExtractorStatusEntity],
     synchronize: false,
     migrations: migrations.sqlite,
     logging: false,
@@ -126,7 +126,7 @@ export const insertBlocks = async (
       blockHeight: index,
       timestamp: 10 * index,
     });
-    await scanner.action.updateBlockStatus(index);
+    await scanner.action.updateBlockStatus(index, 'hash', []);
   }
 };
 
@@ -153,7 +153,7 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   getId = () => 'fail extractor';
 
-  initializeBoxes = (initialHeight: number) => Promise.resolve();
+  initializeBoxes = () => Promise.resolve();
 
   processTransactions = async (
     txs: Array<{ id: string }>,
