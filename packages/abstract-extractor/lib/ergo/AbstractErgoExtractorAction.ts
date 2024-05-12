@@ -10,7 +10,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   abstract insertBoxes: (
     data: ExtractedData[],
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 
   /**
    * update spending information of stored boxes

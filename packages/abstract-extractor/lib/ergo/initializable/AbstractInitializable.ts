@@ -14,7 +14,7 @@ export abstract class AbstractInitializableErgoExtractor<
   protected abstract actions: AbstractInitializableErgoExtractorAction<ExtractedData>;
 
   /**
-   * Create an initializable ergo extractor
+   * create an initializable ergo extractor
    * @param initialize ignore the initialization step if its false
    * @param logger
    */
@@ -61,27 +61,30 @@ export abstract class AbstractInitializableErgoExtractor<
     for (const box of filteredBoxes) {
       const data = this.extractBoxData(box, box.blockId, box.creationHeight);
       if (!data) continue;
-      this.logger.debug(
-        `Extracted data ${JsonBigInt.stringify(extractedBoxes)} from box ${
-          box.boxId
-        }`
-      );
       let spendBlock, spendHeight;
       if (box.spentTransactionId) {
         const block = await this.getTxBlock(box.spentTransactionId);
         if (block.height <= initialHeight) {
           this.logger.debug(
-            `Box with id ${box.boxId} spent at block ${block} bellow the initial height`
+            `Box with id ${box.boxId} spent at block ${JsonBigInt.stringify(
+              block
+            )} bellow the initial height`
           );
           spendBlock = block.hash;
           spendHeight = block.height;
         }
       }
-      extractedBoxes.push({
+      const extractedData = {
         ...data,
         spendBlock,
         spendHeight,
-      } as ExtractedData);
+      } as ExtractedData;
+      this.logger.debug(
+        `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${
+          box.boxId
+        } in initialization phase`
+      );
+      extractedBoxes.push(extractedData);
     }
     return { extractedBoxes, hasNextBatch: apiOutput.hasNextBatch };
   };
@@ -114,7 +117,11 @@ export abstract class AbstractInitializableErgoExtractor<
               data.extractedBoxes.length
             } new extracted data in ${this.getId()} initialization`
           );
-          await this.actions.insertBoxes(data.extractedBoxes, this.getId());
+          const insertSuccess = await this.actions.insertBoxes(
+            data.extractedBoxes,
+            this.getId()
+          );
+          if (!insertSuccess) throw new Error('Could not store extracted data');
 
           hasNextBatch = data.hasNextBatch;
           offset += API_LIMIT;
@@ -127,7 +134,7 @@ export abstract class AbstractInitializableErgoExtractor<
               `Initialization for ${this.getId()} failed after ${RETRIAL_COUNT} retrial`
             );
           trial += 1;
-          this.logger.debug(
+          this.logger.info(
             `Trying again to initialize ${this.getId()} with trial step ${trial}`
           );
         }

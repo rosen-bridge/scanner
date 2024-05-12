@@ -183,7 +183,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
     it('should remove all data and reinsert the newly extracted data', async () => {
       const extractor = new MockedInitializableErgoExtractor();
       const removeSpy = vitest.fn();
-      const insertSpy = vitest.fn();
+      const insertSpy = vitest.fn().mockResolvedValue(true);
       extractor['actions'] = {
         removeAllData: removeSpy,
         insertBoxes: insertSpy,
@@ -213,7 +213,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
     it('should iterate on api when data count is more than api limit', async () => {
       const extractor = new MockedInitializableErgoExtractor();
       const removeSpy = vitest.fn();
-      const insertSpy = vitest.fn();
+      const insertSpy = vitest.fn().mockResolvedValue(true);
       extractor['actions'] = {
         removeAllData: removeSpy,
         insertBoxes: insertSpy,
