@@ -26,9 +26,9 @@ describe('RpcNetwork', () => {
      * - check if function got called
      * @expected
      * - it should be expected block info
-     * - axios.get should got called 2 times
-     *   - with mocked block height
-     *   - with mocked block hash
+     * - axios.post should got called 2 times
+     *   - to get block hash with mocked block height
+     *   - to get block header with mocked block hash
      */
     it('should return block info successfully', async () => {
       mockAxiosPost(testData.getBlockHashResponse);
@@ -57,8 +57,10 @@ describe('RpcNetwork', () => {
      * - mock axios to return blockchain info
      * - run test
      * - check returned value
+     * - check if function got called
      * @expected
      * - it should be expected height
+     * - axios.post should got called once to get chain info with no param
      */
     it('should return current height successfully', async () => {
       mockAxiosPost(testData.getBlockchainInfoResponse);
@@ -66,6 +68,11 @@ describe('RpcNetwork', () => {
       const result = await network.getCurrentHeight();
 
       expect(result).toEqual(testData.currentBlockHeight);
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).toHaveBeenCalledWith('', {
+        method: 'getblockchaininfo',
+        params: [],
+      });
     });
   });
 
@@ -81,6 +88,7 @@ describe('RpcNetwork', () => {
      * - check if function got called
      * @expected
      * - it should be expected txs
+     * - axios.post should got called once to get block with mocked block hash and verbosity 2
      */
     it('should return block transactions successfully', async () => {
       mockAxiosPost(testData.getBlockResponse);
@@ -88,6 +96,11 @@ describe('RpcNetwork', () => {
       const result = await network.getBlockTxs(testData.blockHash);
 
       expect(result).toEqual(testData.getBlockResponse.result.tx);
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(axiosInstance.post).toHaveBeenCalledWith('', {
+        method: 'getblock',
+        params: [testData.blockHash, 2],
+      });
     });
   });
 });
