@@ -30,6 +30,6 @@
   "dependencies": {
     "@rosen-bridge/evm-rpc-scanner": "^0.2.2",
     "@rosen-bridge/observation-extractor": "^4.4.2",
-    "@rosen-bridge/rosen-extractor": "^4.1.1"
+    "@rosen-bridge/rosen-extractor": "^5.0.0"
   }
 }
