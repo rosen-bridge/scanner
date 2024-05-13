@@ -27,6 +27,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * return init required boxes with offset limit
    * @param offset
    * @param limit
+   * @return boxes in batch
    */
   abstract getBoxesWithOffsetLimit: (
     offset: number,
@@ -36,13 +37,14 @@ export abstract class AbstractInitializableErgoExtractor<
   /**
    * return block information of specified tx
    * @param txId
+   * @return block info
    */
   abstract getTxBlock: (txId: string) => Promise<BlockInfo>;
 
   /**
    * return all related data below the initial height (including the init height)
    * @param initialHeight
-   * @returns
+   * @return extracted data in batch
    */
   fetchDataWithOffsetLimit = async (
     initialHeight: number,

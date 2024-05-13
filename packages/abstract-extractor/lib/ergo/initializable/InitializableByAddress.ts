@@ -33,6 +33,7 @@ export abstract class AbstractInitializableByAddressErgoExtractor<
    * return boxes by token id from the specified network source
    * @param offset
    * @param limit
+   * @return boxes in batch
    */
   getBoxesWithOffsetLimit = (
     offset: number,
@@ -44,6 +45,7 @@ export abstract class AbstractInitializableByAddressErgoExtractor<
   /**
    * return block information from the specified network source
    * @param txId
+   * @return block info
    */
   getTxBlock = (txId: string): Promise<BlockInfo> => {
     return this.network.getTxBlock(txId);

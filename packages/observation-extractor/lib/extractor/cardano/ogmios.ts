@@ -1,4 +1,3 @@
-import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Transaction } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';

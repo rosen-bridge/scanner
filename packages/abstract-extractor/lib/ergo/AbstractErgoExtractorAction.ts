@@ -6,6 +6,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    * insert all extracted box data in an atomic transaction
    * @param data
    * @param extractorId
+   * @return process success
    */
   abstract insertBoxes: (
     data: ExtractedData[],
