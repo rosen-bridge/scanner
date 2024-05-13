@@ -2,8 +2,8 @@ import { DataSource, Repository } from 'typeorm';
 
 import CommitmentAction from '../../lib/actions/commitmentAction';
 import { CommitmentEntity } from '../../lib';
-import { block, block2 } from '../abstract-extractor/utilsVariable.mock';
-import { createDatabase } from '../abstract-extractor/utilsFunctions.mock';
+import { block, block2 } from '../extractor/utilsVariable.mock';
+import { createDatabase } from '../extractor/utilsFunctions.mock';
 
 const commitment1 = {
   txId: 'txId1',

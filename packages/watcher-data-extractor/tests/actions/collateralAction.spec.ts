@@ -2,8 +2,8 @@ import { DataSource, Repository } from 'typeorm';
 
 import { CollateralEntity } from '../../lib';
 import CollateralAction from '../../lib/actions/collateralAction';
-import { createDatabase } from '../abstract-extractor/utilsFunctions.mock';
-import { block } from '../abstract-extractor/utilsVariable.mock';
+import { createDatabase } from '../extractor/utilsFunctions.mock';
+import { block } from '../extractor/utilsVariable.mock';
 import * as testData from './collateralActionTestData';
 import { SpendInfo } from '../../lib/interfaces/types';
 
