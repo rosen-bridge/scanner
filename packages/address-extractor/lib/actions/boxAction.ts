@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { Block } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';
@@ -62,7 +62,7 @@ export class BoxEntityAction {
    */
   storeBox = async (
     boxes: Array<ExtractedBox>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ) => {
     const boxIds = boxes.map((item) => item.boxId);
@@ -118,7 +118,7 @@ export class BoxEntityAction {
    */
   spendBoxes = async (
     spendIds: Array<string>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<void> => {
     const spendIdChunks = chunk(spendIds, dbIdChunkSize);

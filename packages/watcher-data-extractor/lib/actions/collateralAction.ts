@@ -1,8 +1,9 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
 import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
+import { Block } from '@rosen-bridge/abstract-extractor';
+
 import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
 import { SpendInfo } from '../interfaces/types';
@@ -59,14 +60,14 @@ class CollateralAction {
    * stores list of collaterals
    *
    * @param {Array<ExtractedCollateral>} collaterals
-   * @param {BlockEntity} block
+   * @param {Block} block
    * @param {string} extractor
    * @return {Promise<boolean>}
    * @memberof CollateralAction
    */
   storeCollaterals = async (
     collaterals: Array<ExtractedCollateral>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<boolean> => {
     if (collaterals.length == 0) {
@@ -162,14 +163,14 @@ class CollateralAction {
    * Update spendBlock and spendHeight of collaterals spent in the block
    *
    * @param {Array<SpendInfo>} spendInfos
-   * @param {BlockEntity} block
+   * @param {Block} block
    * @param {string} extractor
    * @return {Promise<void>}
    * @memberof CollateralAction
    */
   spendCollaterals = async (
     spendInfos: Array<SpendInfo>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<void> => {
     for (const spendInfo of spendInfos) {

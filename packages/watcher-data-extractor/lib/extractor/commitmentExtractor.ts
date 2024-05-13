@@ -1,11 +1,8 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  Transaction,
-} from '@rosen-bridge/scanner';
+import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import CommitmentAction from '../actions/commitmentAction';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
@@ -51,7 +48,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

@@ -1,10 +1,11 @@
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+
 import { ObservationEntityAction } from '../../actions/db';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 
@@ -50,7 +51,7 @@ export abstract class AbstractObservationExtractor<
    */
   processTransactions = (
     txs: Array<TransactionType>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     txs.forEach((transaction) => {

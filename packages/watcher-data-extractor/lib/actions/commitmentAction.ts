@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Block } from '@rosen-bridge/abstract-extractor';
 
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
@@ -27,7 +27,7 @@ class CommitmentAction {
    */
   storeCommitments = async (
     commitments: Array<extractedCommitment>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<boolean> => {
     if (commitments.length === 0) return true;
@@ -94,7 +94,7 @@ class CommitmentAction {
    */
   spendCommitments = async (
     spendId: Array<SpendInfo>,
-    block: BlockEntity,
+    block: Block,
     extractor: string
   ): Promise<void> => {
     // TODO: improve updating (local:ergo/rosen-bridge/scanner#85)

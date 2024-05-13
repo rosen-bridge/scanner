@@ -2,15 +2,15 @@ import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { intersection, difference } from 'lodash-es';
-import { AbstractExtractor, InitialInfo } from '@rosen-bridge/scanner';
+import { InitialInfo } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import { Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import {
   ItemsOutputInfo,
   OutputInfo,
 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';
@@ -61,7 +61,7 @@ export class ErgoUTXOExtractor implements AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

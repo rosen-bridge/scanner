@@ -1,14 +1,10 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import {
-  AbstractExtractor,
-  BlockEntity,
-  InitialInfo,
-  OutputBox,
-  Transaction,
-} from '@rosen-bridge/scanner';
+import { InitialInfo, OutputBox, Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+
 import CollateralAction from '../actions/collateralAction';
 import { DefaultApiLimit } from '../constants';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
@@ -47,13 +43,13 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * process a list of transactions and store collateral box details
    *
    * @param {Transaction[]} txs list of transaction for block
-   * @param {BlockEntity} block block id for transactions as hex encoded
+   * @param {Block} block block id for transactions as hex encoded
    * @return {Promise<boolean>} Promise<boolean> if no error occurred return
    * true. otherwise, return false
    */
   processTransactions = async (
     txs: Transaction[],
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];

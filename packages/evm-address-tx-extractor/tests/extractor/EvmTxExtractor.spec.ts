@@ -25,11 +25,8 @@ describe('EvmTxExtractor', () => {
       await repository.createQueryBuilder().delete().execute();
       await extractor.processTransactions(txs, {
         height: 0,
-        scanner: '',
         hash: 'block 1',
-        status: '',
         parentHash: '',
-        id: 0,
         timestamp: 10,
       });
       const elements = await repository.find();

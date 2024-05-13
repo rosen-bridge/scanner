@@ -1,7 +1,7 @@
 import { TxIdEntity } from '../entities/TxIdEntity';
 import { DataSource, Repository } from 'typeorm';
-import { BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Block } from '@rosen-bridge/abstract-extractor';
 
 export class TxAction {
   private readonly repository: Repository<TxIdEntity>;
@@ -38,11 +38,7 @@ export class TxAction {
    * @param block
    * @param extractor
    */
-  storeTxs = async (
-    txIds: Array<string>,
-    block: BlockEntity,
-    extractor: string
-  ) => {
+  storeTxs = async (txIds: Array<string>, block: Block, extractor: string) => {
     await this.deleteBlockTxs(block.hash, extractor);
     this.logger.info(
       `Inserting new transactions in block ${block} and extractor ${extractor}`

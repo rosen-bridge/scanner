@@ -1,4 +1,3 @@
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Transaction } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
@@ -8,6 +7,7 @@ import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -48,7 +48,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {

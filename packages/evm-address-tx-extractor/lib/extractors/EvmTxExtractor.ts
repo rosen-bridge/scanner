@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
 import { TxAction } from '../actions/db';
-import { AbstractExtractor, BlockEntity } from '@rosen-bridge/scanner';
 import { Transaction } from 'ethers';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ExtractedTx } from '../interfaces/types';
+import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class EvmTxExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -36,7 +36,7 @@ export class EvmTxExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Array<Transaction>,
-    block: BlockEntity
+    block: Block
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = txs.reduce(
       (addressTxs: Array<ExtractedTx>, tx: Transaction) => {
