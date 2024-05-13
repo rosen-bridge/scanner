@@ -43,7 +43,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * process a list of transactions and store collateral box details
    *
    * @param {Transaction[]} txs list of transaction for block
-   * @param {BlockEntity} block block id for transactions as hex encoded
+   * @param {Block} block block id for transactions as hex encoded
    * @return {Promise<boolean>} Promise<boolean> if no error occurred return
    * true. otherwise, return false
    */

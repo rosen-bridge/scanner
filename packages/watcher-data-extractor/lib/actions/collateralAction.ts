@@ -60,7 +60,7 @@ class CollateralAction {
    * stores list of collaterals
    *
    * @param {Array<ExtractedCollateral>} collaterals
-   * @param {BlockEntity} block
+   * @param {Block} block
    * @param {string} extractor
    * @return {Promise<boolean>}
    * @memberof CollateralAction
@@ -163,7 +163,7 @@ class CollateralAction {
    * Update spendBlock and spendHeight of collaterals spent in the block
    *
    * @param {Array<SpendInfo>} spendInfos
-   * @param {BlockEntity} block
+   * @param {Block} block
    * @param {string} extractor
    * @return {Promise<void>}
    * @memberof CollateralAction
