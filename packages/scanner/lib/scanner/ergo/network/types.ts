@@ -29,7 +29,7 @@ export type OutputBox = {
   boxId: string;
   value: bigint;
   ergoTree: string;
-  creationHeight: bigint | number;
+  creationHeight: number;
   assets?: Array<Asset>;
   additionalRegisters?: AdditionalRegisters;
   transactionId: string;
