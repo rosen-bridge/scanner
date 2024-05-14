@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-observation-extractor",
-  "version": "1.0.2",
+  "version": "1.0.2-40a0c605",
   "description": "Event observation data extractor for Bitcoin chain",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
@@ -35,7 +35,7 @@
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
     "@rosen-bridge/bitcoin-esplora-scanner": "^0.1.3",
-    "@rosen-bridge/bitcoin-rpc-scanner": "^0.1.0",
+    "@rosen-bridge/bitcoin-rpc-scanner": "^0.1.0-40a0c605",
     "@rosen-bridge/observation-extractor": "^4.4.2",
     "@rosen-bridge/rosen-extractor": "^5.0.0",
     "@rosen-bridge/tokens": "^1.0.0",
