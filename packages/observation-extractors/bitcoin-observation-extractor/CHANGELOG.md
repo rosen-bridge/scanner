@@ -1,5 +1,20 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 3.0.0
+
+### Major Changes
+
+- update rosen-extractor version (change fromAddress to first input box ID)
+
+### Patch Changes
+
+- Update rosen extractor version
+- Updated dependencies
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@4.4.4
+  - @rosen-bridge/bitcoin-esplora-scanner@0.1.5
+  - @rosen-bridge/bitcoin-rpc-scanner@0.1.1
+
 ## 1.0.3
 
 ### Patch Changes

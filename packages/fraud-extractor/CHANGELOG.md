@@ -1,5 +1,17 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.0.0
+
+### Major Changes
+
+- Update initializeBoxes interface to use both block height and hash
+
+### Patch Changes
+
+- Update abstract extractor interface
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.0
+
 ## 1.2.9
 
 ### Patch Changes
