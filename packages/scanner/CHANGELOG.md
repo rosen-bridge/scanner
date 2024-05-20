@@ -4,7 +4,8 @@
 
 ### Major Changes
 
-- Update initializeBoxes interface to use both block height and hash
+- Updated the InitializeBoxes interface to include the block hash. Previously, only block height was used as initialization point.
+
 - Move abstract extractor interface to the extractor package
 
 ### Minor Changes
