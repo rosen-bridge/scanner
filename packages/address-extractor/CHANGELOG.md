@@ -1,5 +1,24 @@
 # @rosen-bridge/address-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- Updated the InitializeBoxes interface to include the block hash. Previously, only block height was used as initialization point.
+
+### Patch Changes
+
+- Update abstract extractor interface
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.0
+
+## 3.3.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.9
+
 ## 3.3.2
 
 ### Patch Changes

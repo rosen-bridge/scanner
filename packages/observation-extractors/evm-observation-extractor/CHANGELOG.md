@@ -1,5 +1,22 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 1.0.4
+
+### Patch Changes
+
+- update rosen-extractor version
+- Updated dependencies
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@4.4.4
+  - @rosen-bridge/evm-rpc-scanner@0.2.4
+
+## 1.0.3
+
+### Patch Changes
+
+- @rosen-bridge/observation-extractor@4.4.3
+- @rosen-bridge/evm-rpc-scanner@0.2.3
+
 ## 1.0.2
 
 ### Patch Changes

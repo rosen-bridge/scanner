@@ -1,5 +1,25 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 6.0.0
+
+### Major Changes
+
+- Updated the InitializeBoxes interface to include the block hash. Previously, only block height was used as initialization point.
+
+### Patch Changes
+
+- Update abstract extractor interface
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.0
+
+## 5.1.3
+
+### Patch Changes
+
+- Update Ergo explorer client
+- Updated dependencies
+  - @rosen-bridge/scanner@3.2.9
+
 ## 5.1.2
 
 ### Patch Changes
