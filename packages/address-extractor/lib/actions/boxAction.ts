@@ -1,57 +1,28 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import {
+  Block,
+  AbstractInitializableErgoExtractorAction,
+  SpendInfo,
+  DB_CHUNK_SIZE,
+} from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';
-import { dbIdChunkSize } from '../constants';
+import { JsonBI } from '../utils';
 
-export class BoxEntityAction {
+export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<ExtractedBox> {
   private readonly datasource: DataSource;
   readonly logger: AbstractLogger;
   private readonly repository: Repository<BoxEntity>;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
+    super();
     this.datasource = dataSource;
     this.logger = logger ? logger : new DummyLogger();
     this.repository = dataSource.getRepository(BoxEntity);
   }
-
-  /**
-   * insert new box into database
-   * @param box
-   * @param extractor
-   */
-  insertBox = async (box: ExtractedBox, extractor: string) => {
-    return this.repository.insert({
-      address: box.address,
-      boxId: box.boxId,
-      createBlock: box.blockId,
-      creationHeight: box.height,
-      serialized: box.serialized,
-      extractor: extractor,
-    });
-  };
-
-  /**
-   * Update an unspent box information in the database
-   * @param box
-   * @param extractor
-   */
-  updateBox = async (box: ExtractedBox, extractor: string) => {
-    return this.repository.update(
-      { boxId: box.boxId, extractor: extractor },
-      {
-        address: box.address,
-        createBlock: box.blockId,
-        creationHeight: box.height,
-        serialized: box.serialized,
-        spendBlock: null,
-        spendHeight: 0,
-      }
-    );
-  };
 
   /**
    * It stores list of blocks in the dataSource with block id
@@ -60,16 +31,14 @@ export class BoxEntityAction {
    * @param block
    * @param extractor
    */
-  storeBox = async (
-    boxes: Array<ExtractedBox>,
-    block: Block,
-    extractor: string
-  ) => {
+  insertBoxes = async (boxes: Array<ExtractedBox>, extractor: string) => {
     const boxIds = boxes.map((item) => item.boxId);
     const dbBoxes = await this.datasource.getRepository(BoxEntity).findBy({
       boxId: In(boxIds),
       extractor: extractor,
     });
+    if (dbBoxes.length > 0)
+      this.logger.debug(`Found stored boxes with same boxId`, dbBoxes);
     let success = true;
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
@@ -80,9 +49,10 @@ export class BoxEntityAction {
         const entity = {
           address: box.address,
           boxId: box.boxId,
-          createBlock: block.hash,
-          creationHeight: block.height,
-          spendBlock: undefined,
+          createBlock: box.blockId,
+          creationHeight: box.height,
+          spendBlock: box.spendBlock,
+          spendHeight: box.spendHeight,
           serialized: box.serialized,
           extractor: extractor,
         };
@@ -91,12 +61,16 @@ export class BoxEntityAction {
           this.logger.info(
             `Updating box ${box.boxId} and extractor ${extractor}`
           );
-          this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
           await repository.update({ id: dbBoxes[0].id }, entity);
+          this.logger.debug(
+            `Updated entity is [${JsonBI.stringify(
+              box
+            )}], and stored similar box is [${JsonBI.stringify(dbBox)}]`
+          );
         } else {
           this.logger.info(`Storing box ${box.boxId}`);
-          this.logger.debug(JSON.stringify(entity));
           await repository.insert(entity);
+          this.logger.debug(`Stored ${JsonBI.stringify(entity)}`);
         }
       }
       await queryRunner.commitTransaction();
@@ -117,20 +91,21 @@ export class BoxEntityAction {
    * @param extractor
    */
   spendBoxes = async (
-    spendIds: Array<string>,
+    spendInfos: Array<SpendInfo>,
     block: Block,
     extractor: string
   ): Promise<void> => {
-    const spendIdChunks = chunk(spendIds, dbIdChunkSize);
-    for (const spendIdChunk of spendIdChunks) {
+    const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
+    for (const spendInfoChunk of spendInfoChunks) {
+      const boxIds = spendInfoChunk.map((info) => info.boxId);
       const updateResult = await this.repository.update(
-        { boxId: In(spendIdChunk), extractor: extractor },
+        { boxId: In(boxIds), extractor: extractor },
         { spendBlock: block.hash, spendHeight: block.height }
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.repository.findBy({
-          boxId: In(spendIdChunk),
+          boxId: In(boxIds),
           spendBlock: block.hash,
         });
         for (const row of spentRows) {
@@ -140,6 +115,10 @@ export class BoxEntityAction {
         }
       }
     }
+  };
+
+  removeAllData = async (extractorId: string) => {
+    await this.repository.delete({ extractor: extractorId });
   };
 
   /**
@@ -159,49 +138,6 @@ export class BoxEntityAction {
     await this.repository.update(
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: 0 }
-    );
-  };
-
-  /**
-   *  Returns all stored box ids
-   */
-  getAllBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.repository.find({
-      select: {
-        boxId: true,
-      },
-      where: {
-        extractor: extractor,
-      },
-    });
-    return boxIds.map((item: { boxId: string }) => item.boxId);
-  };
-
-  /**
-   * Removes specified box
-   * @param boxId
-   * @param extractor
-   */
-  removeBox = async (boxId: string, extractor: string) => {
-    return await this.repository.delete({ boxId: boxId, extractor: extractor });
-  };
-
-  /**
-   * Update the box spending information
-   * @param boxId
-   * @param extractor
-   * @param blockId
-   * @param blockHeight
-   */
-  updateSpendBlock = async (
-    boxId: string,
-    extractor: string,
-    blockId: string,
-    blockHeight: number
-  ) => {
-    return await this.repository.update(
-      { boxId: boxId, extractor: extractor },
-      { spendBlock: blockId, spendHeight: blockHeight }
     );
   };
 }

@@ -1,7 +1,8 @@
 import { DataSource, Repository } from 'typeorm';
+import { Block } from '@rosen-bridge/abstract-extractor/lib/interfaces';
 
 import { BoxEntityAction } from '../../lib/actions/boxAction';
-import { generateBlockEntity, createDatabase } from '../extractor/utils.mock';
+import { createDatabase } from '../extractor/utils.mock';
 import { BoxEntity } from '../../lib';
 import { ExtractedBox } from '../../lib/interfaces/types';
 
@@ -24,12 +25,13 @@ describe('BoxAction', () => {
      */
     it('should checks boxes saved successfully', async () => {
       const box: ExtractedBox = {
+        height: 100,
+        blockId: 'block1',
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor');
+      await action.insertBoxes([box], 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address');
@@ -59,9 +61,10 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized-new',
         address: 'address-new',
+        blockId: 'block1',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor');
+      await action.insertBoxes([box], 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address-new');
@@ -91,9 +94,10 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized-new',
         address: 'address-new',
+        blockId: 'block1',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor');
+      await action.insertBoxes([box], 'extractor');
       expect(await repository.count()).toEqual(2);
       const stored = (await repository.findBy({ extractor: 'extractor' }))[0];
       expect(stored.address).toEqual('address-new');
@@ -116,11 +120,16 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(['boxid'], block, 'extractor1');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        { height: 100, hash: 'block1' } as Block,
+        'extractor1'
+      );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
     });
@@ -136,11 +145,16 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(['boxid'], block, 'extractor2');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        { height: 100, hash: 'hash' } as Block,
+        'extractor2'
+      );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
     });
@@ -156,10 +170,15 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'block1',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor');
-      await action.spendBoxes(['boxid'], block, 'extractor');
+      await action.insertBoxes([box], 'extractor');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        { height: 100, hash: 'block1' } as Block,
+        'extractor'
+      );
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.creationHeight).toEqual(100);
@@ -184,19 +203,19 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.deleteBlockBoxes(block.hash, 'extractor1');
+      await action.deleteBlockBoxes('create-block', 'extractor1');
       expect(await repository.count()).toEqual(0);
     });
 
     /**
      * delete block boxes must set spendBlock to null on fork
      * Dependency: A spent box with different created block and spend block
-     * Scenario: create a box for specific block
-     *           then spent it in other block
+     * Scenario: insert an unspent box for specific block
      *           then call deleteBlockBoxes
      * Expected: must set spendBlock to null
      */
@@ -205,15 +224,16 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
+        spendBlock: 'spend-block',
+        spendHeight: 200,
       };
-      const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBox([box], block1, 'extractor1');
-      await action.spendBoxes(['boxid'], block2, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      await action.deleteBlockBoxes('spend-block', 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).toBeNull();
@@ -222,8 +242,7 @@ describe('BoxAction', () => {
     /**
      * delete block boxes must not change other extractor boxes
      * Dependency: A spent box with different created block and spend block
-     * Scenario: create a box for specific block
-     *           then spent it in other block
+     * Scenario: insert a spent box for specific block
      *           then call deleteBlockBoxes for other extractor
      * Expected: must not set spendBlock to null
      */
@@ -232,15 +251,16 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
+        spendBlock: 'spend-block',
+        spendHeight: 200,
       };
-      const block1 = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      const block2 = generateBlockEntity(dataSource, 'block2', 'block1', 101);
-      await action.storeBox([box], block1, 'extractor1');
-      await action.spendBoxes(['boxid'], block2, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block2.hash, 'extractor2');
+      await action.deleteBlockBoxes('spend-block', 'extractor2');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).not.toBeNull();
@@ -258,113 +278,21 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
+        spendBlock: 'create-block',
+        spendHeight: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor1');
-      await action.spendBoxes(['boxid'], block, 'extractor1');
+      await action.insertBoxes([box], 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block.hash, 'extractor1');
+      await action.deleteBlockBoxes('create-block', 'extractor1');
       expect(await repository.count()).toEqual(0);
     });
   });
 
-  describe('insertBox', () => {
-    /**
-     * @target boxAction.insertBox should insert the new box at initialization
-     * @dependencies
-     * @scenario
-     * - insert an initial box
-     * - fetch and check the box information
-     * @expected
-     * - it should insert the new box
-     */
-    it('should insert the new box at initialization', async () => {
-      const box: ExtractedBox = {
-        boxId: 'boxId',
-        serialized: 'serialized',
-        address: 'address',
-        blockId: 'blockId',
-        height: 100,
-      };
-      await action.insertBox(box, 'extractor');
-      const stored = (await repository.find())[0];
-      expect(stored.address).toEqual('address');
-      expect(stored.boxId).toEqual('boxId');
-      expect(stored.serialized).toEqual('serialized');
-      expect(stored.creationHeight).toEqual(100);
-      expect(stored.createBlock).toEqual('blockId');
-    });
-  });
-
-  describe('updateBox', () => {
-    /**
-     * @target boxAction.updateBox should update the unspent box information
-     * @dependencies
-     * @scenario
-     * - insert a mocked box
-     * - update the box with new spend block information
-     * - fetch that box and check the result
-     * @expected
-     * - it should remove the spend block and spend height from existing entity
-     */
-    it('should update the unspent box information', async () => {
-      await dataSource.getRepository(BoxEntity).insert({
-        boxId: 'boxId',
-        serialized: 'serialized',
-        address: 'address',
-        extractor: 'extractor',
-        createBlock: 'createBlock',
-        creationHeight: 100,
-        spendBlock: 'spendBlock',
-        spendHeight: 109,
-      });
-      const box: ExtractedBox = {
-        boxId: 'boxId',
-        serialized: 'serialized',
-        address: 'address',
-        blockId: 'createBlock',
-        height: 100,
-      };
-      await action.updateBox(box, 'extractor');
-      const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toBeNull();
-      expect(stored.spendHeight).toEqual(0);
-    });
-  });
-
-  describe('getAllBoxIds', () => {
-    /**
-     * @target boxAction.getAllBoxIds should return all boxIds in the database
-     * @dependencies
-     * @scenario
-     * - insert two mocked boxes
-     * - call getAllBoxIds
-     * - check to have both boxIds
-     * @expected
-     * - it should return two boxIds stored in the database
-     */
-    it('should return all boxIds in the database', async () => {
-      const box: ExtractedBox = {
-        boxId: 'boxid',
-        serialized: 'serialized',
-        address: 'address',
-      };
-      const box2: ExtractedBox = {
-        boxId: 'boxid2',
-        serialized: 'serialized2',
-        address: 'address',
-      };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box, box2], block, 'extractor');
-      const boxIds = await action.getAllBoxIds('extractor');
-      expect(boxIds).toHaveLength(2);
-      expect(boxIds).toEqual([box.boxId, box2.boxId]);
-    });
-  });
-
-  describe('removeBox', () => {
+  describe('removeAllData', () => {
     /**
      * @target boxAction.removeBox should remove the box in the database
      * @dependencies
@@ -379,45 +307,12 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
+        blockId: 'create-block',
+        height: 100,
       };
-      const block = generateBlockEntity(dataSource, 'block1', 'block0', 100);
-      await action.storeBox([box], block, 'extractor');
-      const result = await action.removeBox(box.boxId, 'extractor');
-      expect(result.affected).toEqual(1);
-    });
-  });
-
-  describe('updateSpendBlock', () => {
-    /**
-     * @target boxAction.updateSpendBlock should update the spend block information
-     * @dependencies
-     * @scenario
-     * - insert a mocked box
-     * - update the box with new spend block information
-     * - fetch that box and check the result
-     * @expected
-     * - it should update the box spend block id and height
-     */
-    it('should update the spend block information', async () => {
-      await dataSource.getRepository(BoxEntity).insert({
-        boxId: 'boxId',
-        serialized: 'serialized',
-        address: 'address',
-        extractor: 'extractor',
-        createBlock: 'createBlock',
-        creationHeight: 100,
-        spendBlock: 'spendBlock',
-        spendHeight: 109,
-      });
-      await action.updateSpendBlock(
-        'boxId',
-        'extractor',
-        'spendBlock-new',
-        110
-      );
-      const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toEqual('spendBlock-new');
-      expect(stored.spendHeight).toEqual(110);
+      await action.insertBoxes([box], 'extractor');
+      const result = await action.removeAllData('extractor');
+      expect(await repository.find()).toHaveLength(0);
     });
   });
 });
