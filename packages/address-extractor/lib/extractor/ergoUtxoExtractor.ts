@@ -34,9 +34,10 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
     type: ErgoNetworkType,
     address?: string,
     tokens?: Array<string>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    initialize = true
   ) {
-    super(true, logger);
+    super(initialize, logger);
     this.id = id;
     this.networkType = networkType;
     this.address = address;
