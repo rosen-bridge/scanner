@@ -25,11 +25,10 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
   }
 
   /**
-   * It stores list of blocks in the dataSource with block id
+   * insert all extracted box data in an atomic transaction
    * @param boxes
-   * @param spendBoxes
-   * @param block
    * @param extractor
+   * @return success
    */
   insertBoxes = async (boxes: Array<ExtractedBox>, extractor: string) => {
     const boxIds = boxes.map((item) => item.boxId);
@@ -85,8 +84,9 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
   };
 
   /**
-   * Update spendBlock and spendHeight of boxes spent on the block
-   * @param spendIds
+   * update spending information of stored boxes
+   * chunk spendInfos to prevent large database queries
+   * @param spendInfos
    * @param block
    * @param extractor
    */
@@ -117,15 +117,20 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     }
   };
 
+  /**
+   * remove all existing data for the extractor
+   * @param extractorId
+   */
   removeAllData = async (extractorId: string) => {
     await this.repository.delete({ extractor: extractorId });
   };
 
   /**
-   * delete boxes in specific block from database. if box spend in this block marked as unspent
-   * and if created in this block remove it from database
+   * delete extracted data from a specific block
+   * if a box is spend in this block mark it as unspent
+   * if a box is created in this block remove it from database
    * @param block
-   * @param extractor
+   * @param extractorId
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(

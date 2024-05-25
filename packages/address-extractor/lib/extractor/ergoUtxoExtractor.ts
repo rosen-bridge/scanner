@@ -56,6 +56,11 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
    */
   getId = () => `${this.id}`;
 
+  /**
+   * check proper data format in the box
+   * @param box
+   * @return true if the box has the required data and false otherwise
+   */
   hasData = (box: OutputBox): boolean => {
     return (
       (!this.ergoTree || box.ergoTree == this.ergoTree) &&
@@ -71,6 +76,13 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
     return this.network.getTxBlock(txId);
   };
 
+  /**
+   * extract box data to proper format (not including spending information)
+   * @param box
+   * @param blockId box inclusion block hash
+   * @param height box inclusion block height
+   * @return extracted data in proper format
+   */
   extractBoxData = (
     box: OutputBox,
     blockId: string,
@@ -92,6 +104,12 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
     };
   };
 
+  /**
+   * return init required boxes with offset limit
+   * @param offset
+   * @param limit
+   * @return boxes in batch
+   */
   getBoxesWithOffsetLimit = async (
     offset: number,
     limit: number
