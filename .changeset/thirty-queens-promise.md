@@ -2,4 +2,4 @@
 '@rosen-bridge/abstract-extractor': patch
 ---
 
-Export required interfaces
+Export constants and AbstractNetwork interface
