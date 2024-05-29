@@ -113,6 +113,29 @@ describe('AddressExtractor', () => {
     });
 
     /**
+     * @target hasData should return false when box doesn't have required token
+     * @dependencies
+     * @scenario
+     * - mock extractor with required token
+     * - run test (call `hasData`)
+     * @expected
+     * - to return false
+     */
+    it("should return false when box doesn't have required token", () => {
+      extractor = new ErgoUTXOExtractor(
+        dataSource,
+        'extractor1',
+        ergoLib.NetworkPrefix.Mainnet,
+        'https://explorer.ergoplatform.com/',
+        ErgoNetworkType.Explorer,
+        '',
+        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367']
+      );
+      const data = extractor.hasData(tx1.outputs[1]);
+      expect(data).toEqual(false);
+    });
+
+    /**
      * @target hasData should return true when the box has required token but the address is different
      * @dependencies
      * @scenario
