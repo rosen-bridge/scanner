@@ -7,6 +7,8 @@ import {
   JsonRpcResult,
 } from './types';
 
+import { randomBytes } from 'crypto';
+
 export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> {
   private readonly url: string;
   private readonly timeout: number;
@@ -24,6 +26,8 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     });
   }
 
+  private generateRandomId = () => randomBytes(32).toString('hex');
+
   /**
    * Returns block at height
    * @param height
@@ -33,6 +37,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     // get block hash using block height
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockhash',
+      id: this.generateRandomId(),
       params: [height],
     });
     const blockHash = blockHashResponse.data.result;
@@ -40,6 +45,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     // get block headers using block hash
     const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockheader',
+      id: this.generateRandomId(),
       params: [blockHash, true],
     });
     const blockHeader: BlockHeader = blockHeaderResponse.data.result;
@@ -60,6 +66,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     return this.client
       .post<JsonRpcResult>('', {
         method: 'getblockchaininfo',
+        id: this.generateRandomId(),
         params: [],
       })
       .then((res) => {
@@ -78,6 +85,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
   ): Promise<Array<BitcoinRpcTransaction>> => {
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
+      id: this.generateRandomId(),
       params: [blockHash, 2], // verbosity should be 2 in order to retrieve full transaction info
     });
     const blockTxs = blockHashResponse.data.result.tx;

@@ -12,6 +12,8 @@ describe('RpcNetwork', () => {
   beforeEach(() => {
     resetAxiosMock();
     network = new RpcNetwork('', 1);
+    network['generateRandomId'] = () =>
+      '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e';
   });
 
   describe('getBlockAtHeight', () => {
@@ -41,10 +43,12 @@ describe('RpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblockhash',
         params: [testData.blockHeight],
+        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblockheader',
         params: [testData.blockHash, true],
+        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });
   });
@@ -72,6 +76,7 @@ describe('RpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblockchaininfo',
         params: [],
+        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });
   });
@@ -100,6 +105,7 @@ describe('RpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblock',
         params: [testData.blockHash, 2],
+        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });
   });
