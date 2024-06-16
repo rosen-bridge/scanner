@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 0.1.6
+
+### Patch Changes
+
+- @rosen-bridge/scanner@4.0.1
+
 ## 0.1.5
 
 ### Patch Changes

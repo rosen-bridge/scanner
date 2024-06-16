@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-extractor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rosen Bridge extractor interfaces to work with scanner",
   "repository": "",
   "license": "GPL-3.0",
@@ -37,6 +37,8 @@
     "@rosen-bridge/abstract-logger": "^1.0.0",
     "@rosen-clients/ergo-explorer": "^1.1.1",
     "@rosen-clients/ergo-node": "^1.1.1",
+    "ergo-lib-wasm-nodejs": "^0.24.1",
+    "js-sha256": "^0.11.0",
     "lodash-es": "^4.17.21"
   }
 }
