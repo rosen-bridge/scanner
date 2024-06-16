@@ -8,12 +8,12 @@ export interface BitcoinRPCConfig {
 }
 
 export type JsonRpcResult = {
-  id: number;
+  id: string;
   result: any;
 };
 
 export type JsonRpcError = {
-  id: number;
+  id: string;
   error: {
     code: number;
     message?: string;

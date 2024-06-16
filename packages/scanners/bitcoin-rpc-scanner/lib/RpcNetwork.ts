@@ -1,11 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
-import {
-  BitcoinRpcTransaction,
-  BlockChainInfo,
-  BlockHeader,
-  JsonRpcResult,
-} from './types';
+import { BitcoinRpcTransaction, BlockHeader, JsonRpcResult } from './types';
 
 import { randomBytes } from 'crypto';
 
@@ -34,10 +29,11 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
    * @returns Block
    */
   getBlockAtHeight = async (height: number): Promise<Block> => {
+    const randomId = this.generateRandomId();
     // get block hash using block height
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockhash',
-      id: this.generateRandomId(),
+      id: randomId,
       params: [height],
     });
     const blockHash = blockHashResponse.data.result;
@@ -45,9 +41,11 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     // get block headers using block hash
     const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblockheader',
-      id: this.generateRandomId(),
+      id: randomId,
       params: [blockHash, true],
     });
+    if (blockHashResponse.data.id !== randomId)
+      throw Error(`UnexpectedBehavior: Request and response id are different`);
     const blockHeader: BlockHeader = blockHeaderResponse.data.result;
     return {
       parentHash: blockHeader.previousblockhash,
@@ -62,17 +60,16 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
    * Returns current network height
    * @returns current height
    */
-  getCurrentHeight = (): Promise<number> => {
-    return this.client
-      .post<JsonRpcResult>('', {
-        method: 'getblockchaininfo',
-        id: this.generateRandomId(),
-        params: [],
-      })
-      .then((res) => {
-        const blockChainInfo: BlockChainInfo = res.data.result;
-        return blockChainInfo.blocks;
-      });
+  getCurrentHeight = async (): Promise<number> => {
+    const randomId = this.generateRandomId();
+    const result = await this.client.post<JsonRpcResult>('', {
+      method: 'getblockchaininfo',
+      id: randomId,
+      params: [],
+    });
+    if (result.data.id !== randomId)
+      throw Error(`UnexpectedBehavior: Request and response id are different`);
+    return result.data.result.blocks;
   };
 
   /**
@@ -83,11 +80,14 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
   getBlockTxs = async (
     blockHash: string
   ): Promise<Array<BitcoinRpcTransaction>> => {
+    const randomId = this.generateRandomId();
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
-      id: this.generateRandomId(),
+      id: randomId,
       params: [blockHash, 2], // verbosity should be 2 in order to retrieve full transaction info
     });
+    if (blockHashResponse.data.id !== randomId)
+      throw Error(`UnexpectedBehavior: Request and response id are different`);
     const blockTxs = blockHashResponse.data.result.tx;
 
     return blockTxs;
