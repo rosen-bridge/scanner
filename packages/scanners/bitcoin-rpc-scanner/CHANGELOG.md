@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - Add random id to rpc API requests
+- Updated dependencies
   - @rosen-bridge/scanner@4.0.1
 
 ## 0.1.1

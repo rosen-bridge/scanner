@@ -4,7 +4,8 @@
 
 ### Patch Changes
 
-- @rosen-bridge/scanner@4.0.1
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.1
 
 ## 0.2.4
 
