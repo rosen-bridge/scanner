@@ -9,15 +9,22 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
   private readonly timeout: number;
   private client: AxiosInstance;
 
-  constructor(url: string, timeout: number) {
+  constructor(
+    url: string,
+    timeout: number,
+    auth?: {
+      username: string;
+      password: string;
+    }
+  ) {
     super();
     this.url = url;
     this.timeout = timeout;
-    // TODO: add auth? (rpc username and password)
     this.client = axios.create({
       baseURL: this.url,
       timeout: this.timeout,
       headers: { 'Content-Type': 'application/json' },
+      auth: auth,
     });
   }
 

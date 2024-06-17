@@ -14,7 +14,11 @@ export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
      * `initialHeight` by one so that it matches all other rosen-bridge scanners
      */
     this.initialHeight = config.initialHeight + 1;
-    this.network = new RpcNetwork(config.rpcUrl, config.timeout);
+    const auth =
+      config.username && config.password
+        ? { username: config.username, password: config.password }
+        : undefined;
+    this.network = new RpcNetwork(config.rpcUrl, config.timeout, auth);
   }
 
   getFirstBlock = (): Promise<Block> => {
