@@ -1,6 +1,10 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
-## 0.1.2
+## 0.2.0
+
+### Minor Changes
+
+- support authentication
 
 ### Patch Changes
 
