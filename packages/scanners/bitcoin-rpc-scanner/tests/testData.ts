@@ -4,7 +4,7 @@ export const blockHash =
 export const getBlockHashResponse = {
   result: '000000000000000000000cde53a239563c5a947d325c526bf140c7663b989b56',
   error: null,
-  id: null,
+  id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
 export const getBlockHeaderResponse = {
   result: {
@@ -29,7 +29,7 @@ export const getBlockHeaderResponse = {
       '000000000000000000037ce676ece6d1f5b3caa5ddf99e110d15957158b25e26',
   },
   error: null,
-  id: null,
+  id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
 export const block = {
   parentHash:
@@ -98,7 +98,7 @@ export const getBlockchainInfoResponse = {
     warnings: '',
   },
   error: null,
-  id: null,
+  id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
 
 export const blockTxIds = [
@@ -301,5 +301,5 @@ export const getBlockResponse = {
     ],
   },
   error: null,
-  id: null,
+  id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };

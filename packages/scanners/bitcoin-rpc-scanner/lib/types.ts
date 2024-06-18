@@ -5,15 +5,17 @@ export interface BitcoinRPCConfig {
   timeout: number;
   initialHeight: number;
   dataSource: DataSource;
+  username?: string;
+  password?: string;
 }
 
 export type JsonRpcResult = {
-  id: number;
+  id: string;
   result: any;
 };
 
 export type JsonRpcError = {
-  id: number;
+  id: string;
   error: {
     code: number;
     message?: string;

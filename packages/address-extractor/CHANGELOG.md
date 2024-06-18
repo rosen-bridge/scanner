@@ -1,5 +1,16 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.0
+
+### Major Changes
+
+- Use abstract initializable extractor and update initilialization procedure to support both node and expolorer APIs
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.1.1
+
 ## 4.0.0
 
 ### Major Changes

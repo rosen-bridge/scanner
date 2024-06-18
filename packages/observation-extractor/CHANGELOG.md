@@ -1,5 +1,13 @@
 # @rosen-bridge/observation-extractor
 
+## 4.4.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.1.1
+  - @rosen-bridge/scanner@4.0.1
+
 ## 4.4.4
 
 ### Patch Changes

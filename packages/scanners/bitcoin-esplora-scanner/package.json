@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-esplora-scanner",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A Bitcoin blockchain scanner based on Esplora Block Explorer API",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
-    "@rosen-bridge/scanner": "^4.0.0",
+    "@rosen-bridge/scanner": "^4.0.1",
     "axios": "^1.6.8"
   }
 }
