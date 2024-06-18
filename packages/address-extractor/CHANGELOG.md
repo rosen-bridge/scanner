@@ -1,5 +1,11 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.1
+
+### Patch Changes
+
+- Fix ErgoNetworkType import
+
 ## 5.0.0
 
 ### Major Changes

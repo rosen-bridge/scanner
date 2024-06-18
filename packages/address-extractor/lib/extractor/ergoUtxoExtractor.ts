@@ -10,12 +10,12 @@ import {
   OutputBox,
   boxHasToken,
   ExplorerNetwork,
+  ErgoNetworkType,
 } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';
 import { ExtractedBox } from '../interfaces/types';
-import { ErgoNetworkType } from '../../../abstract-extractor/lib/ergo/interfaces';
 
 export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<ExtractedBox> {
   readonly actions: BoxEntityAction;
