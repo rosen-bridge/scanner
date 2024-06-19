@@ -1,5 +1,13 @@
 # @rosen-bridge/scanner
 
+## 4.0.2
+
+### Patch Changes
+
+- Fix initialization height of extractors
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.1.2
+
 ## 4.0.1
 
 ### Patch Changes
