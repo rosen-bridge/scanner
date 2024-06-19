@@ -64,16 +64,17 @@ export class NodeNetwork extends AbstractNetwork {
     offset: number,
     limit: number
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
-    const boxes = await this.api.getBoxesByAddress(address, {
+    const boxes = await this.api.getBoxesByAddressUnspent(address, {
       offset: offset,
       limit: limit,
+      sortDirection: 'desc',
     });
-    if (!boxes.items)
+    if (!boxes)
       throw new Error('Ergo node BoxesByAddress api expected to have items');
     const ergoBoxes = await Promise.all(
-      boxes.items.map(async (box) => await this.convertToErgoBox(box))
+      boxes.map(async (box) => await this.convertToErgoBox(box))
     );
-    return { boxes: ergoBoxes, hasNextBatch: boxes.items.length > 0 };
+    return { boxes: ergoBoxes, hasNextBatch: boxes.length > 0 };
   };
 
   /**

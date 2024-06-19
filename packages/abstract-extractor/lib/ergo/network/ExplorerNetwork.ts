@@ -62,9 +62,10 @@ export class ExplorerNetwork extends AbstractNetwork {
     offset: number,
     limit: number
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
-    const boxes = await this.api.v1.getApiV1BoxesByaddressP1(address, {
+    const boxes = await this.api.v1.getApiV1BoxesUnspentByaddressP1(address, {
       offset: offset,
       limit: limit,
+      sortDirection: 'desc',
     });
     if (!boxes.items)
       throw new Error('Explorer BoxesByAddress api expected to have items');
