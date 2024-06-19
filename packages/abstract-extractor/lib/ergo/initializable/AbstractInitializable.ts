@@ -64,10 +64,11 @@ export abstract class AbstractInitializableErgoExtractor<
     for (const box of filteredBoxes) {
       const data = this.extractBoxData(box, box.blockId, box.inclusionHeight);
       if (!data) continue;
+      const spent = box.spentHeight && box.spentHeight <= initialHeight;
       const extractedData = {
         ...data,
-        spendBlock: box.spentBlockId,
-        spendHeight: box.spentHeight,
+        spendBlock: spent ? box.spentBlockId : undefined,
+        spendHeight: spent ? box.spentHeight : undefined,
       } as ExtractedData;
       this.logger.debug(
         `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${

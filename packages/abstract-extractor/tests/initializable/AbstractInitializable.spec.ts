@@ -65,17 +65,12 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       extractor.hasData = (box: OutputBox) => true;
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ id: 'hash', height: 1252690 });
-      extractor.getTxBlock = txBlockSpy;
-      const data = await extractor.fetchDataWithOffsetLimit(1252680, 0, 2);
+      const data = await extractor.fetchDataWithOffsetLimit(1252678, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
         spentBox.creationHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
           { ...extractedData, spendBlock: undefined, spendHeight: undefined },
@@ -106,20 +101,20 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ hash: 'hash', height: 1252680 });
-      extractor.getTxBlock = txBlockSpy;
       const data = await extractor.fetchDataWithOffsetLimit(1252681, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
         spentBox.creationHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
-          { ...extractedData, spendBlock: 'hash', spendHeight: 1252680 },
+          {
+            ...extractedData,
+            spendBlock:
+              '9239ebca7b3b10701895e491a2213da4e07a37abc413d05434a5fab04993a19d',
+            spendHeight: 1252680,
+          },
         ],
         hasNextBatch: true,
       });
@@ -147,17 +142,12 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ hash: 'hash', height: 1252690 });
-      extractor.getTxBlock = txBlockSpy;
-      const data = await extractor.fetchDataWithOffsetLimit(1252681, 0, 2);
+      const data = await extractor.fetchDataWithOffsetLimit(1252678, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
         spentBox.creationHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
           { ...extractedData, spendBlock: undefined, spendHeight: undefined },
