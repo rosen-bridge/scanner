@@ -46,6 +46,9 @@ export const ergoBoxes = [
       },
     ],
     additionalRegisters: {},
+    spentHeight: 1252680,
+    spentBlock:
+      '9239ebca7b3b10701895e491a2213da4e07a37abc413d05434a5fab04993a19d',
     spentTransactionId:
       'b08fa920a6907d0e76eb0ad754439f1a26fa112b39f4de489620e4e6241930b7',
   },
