@@ -21,17 +21,22 @@ export class NodeNetwork extends AbstractNetwork {
    */
   convertToErgoBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
     const tx = await this.getTxBlock(box.transactionId!);
+    const spendTx = box.spentTransactionId
+      ? await this.getTxBlock(box.spentTransactionId)
+      : undefined;
     return {
       transactionId: box.transactionId || '',
       index: box.index || 0,
       value: box.value || 0n,
       ergoTree: box.ergoTree || '',
       creationHeight: box.creationHeight || 0,
+      inclusionHeight: tx.height,
       assets: box.assets || [],
       additionalRegisters: box.additionalRegisters,
       boxId: box.boxId || '',
       blockId: tx.hash,
-      spentTransactionId: box.spentTransactionId,
+      spentBlockId: spendTx?.hash ?? undefined,
+      spentHeight: spendTx?.height ?? undefined,
     };
   };
 

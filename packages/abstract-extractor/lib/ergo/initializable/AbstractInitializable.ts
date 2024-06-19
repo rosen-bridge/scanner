@@ -58,28 +58,16 @@ export abstract class AbstractInitializableErgoExtractor<
     const apiOutput = await this.getBoxesWithOffsetLimit(offset, limit);
 
     const filteredBoxes = apiOutput.boxes.filter(
-      (box: ErgoBox) => box.creationHeight <= initialHeight && this.hasData(box)
+      (box: ErgoBox) =>
+        box.inclusionHeight <= initialHeight && this.hasData(box)
     );
     for (const box of filteredBoxes) {
-      const data = this.extractBoxData(box, box.blockId, box.creationHeight);
+      const data = this.extractBoxData(box, box.blockId, box.inclusionHeight);
       if (!data) continue;
-      let spendBlock, spendHeight;
-      if (box.spentTransactionId) {
-        const block = await this.getTxBlock(box.spentTransactionId);
-        if (block.height <= initialHeight) {
-          this.logger.debug(
-            `Box with id ${box.boxId} spent at block ${JsonBigInt.stringify(
-              block
-            )} bellow the initial height`
-          );
-          spendBlock = block.hash;
-          spendHeight = block.height;
-        }
-      }
       const extractedData = {
         ...data,
-        spendBlock,
-        spendHeight,
+        spendBlock: box.spentBlockId,
+        spendHeight: box.spentHeight,
       } as ExtractedData;
       this.logger.debug(
         `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${

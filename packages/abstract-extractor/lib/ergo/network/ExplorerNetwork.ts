@@ -3,6 +3,7 @@ import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '../../interfaces';
 import { ErgoBox } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
+import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 export class ExplorerNetwork extends AbstractNetwork {
   private api;
@@ -24,6 +25,26 @@ export class ExplorerNetwork extends AbstractNetwork {
     };
   };
 
+  convertBox = async (box: OutputInfo): Promise<ErgoBox> => {
+    const spendInfo = box.spentTransactionId
+      ? await this.getTxBlock(box.spentTransactionId)
+      : undefined;
+    return {
+      blockId: box.blockId,
+      boxId: box.boxId,
+      creationHeight: box.creationHeight,
+      inclusionHeight: box.settlementHeight,
+      ergoTree: box.ergoTree,
+      index: box.index,
+      transactionId: box.transactionId,
+      value: box.value,
+      additionalRegisters: box.additionalRegisters,
+      assets: box.assets,
+      spentHeight: spendInfo?.height,
+      spentBlockId: spendInfo?.hash,
+    };
+  };
+
   /**
    * use explorer api to return related boxes by specified address
    * @param address
@@ -42,7 +63,11 @@ export class ExplorerNetwork extends AbstractNetwork {
     });
     if (!boxes.items)
       throw new Error('Explorer BoxesByAddress api expected to have items');
-    return { boxes: boxes.items, hasNextBatch: boxes.total > offset + limit };
+    const resultBoxes: Array<ErgoBox> = [];
+    for (const box of boxes.items) {
+      resultBoxes.push(await this.convertBox(box));
+    }
+    return { boxes: resultBoxes, hasNextBatch: boxes.total > offset + limit };
   };
 
   /**
@@ -63,6 +88,10 @@ export class ExplorerNetwork extends AbstractNetwork {
     });
     if (!boxes.items)
       throw new Error('Explorer BoxesByTokeId api expected to have items');
-    return { boxes: boxes.items, hasNextBatch: boxes.total > offset + limit };
+    const resultBoxes: Array<ErgoBox> = [];
+    for (const box of boxes.items) {
+      resultBoxes.push(await this.convertBox(box));
+    }
+    return { boxes: resultBoxes, hasNextBatch: boxes.total > offset + limit };
   };
 }
