@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
+## 0.2.2
+
+### Patch Changes
+
+- @rosen-bridge/scanner@4.0.3
+
 ## 0.2.1
 
 ### Patch Changes
