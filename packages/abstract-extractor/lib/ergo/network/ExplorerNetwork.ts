@@ -3,7 +3,7 @@ import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '../../interfaces';
 import { ErgoBox } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
-import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
+import { V1 } from '@rosen-clients/ergo-explorer';
 
 export class ExplorerNetwork extends AbstractNetwork {
   private api;
@@ -25,7 +25,7 @@ export class ExplorerNetwork extends AbstractNetwork {
     };
   };
 
-  convertBox = async (box: OutputInfo): Promise<ErgoBox> => {
+  convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
     const spendInfo = box.spentTransactionId
       ? await this.getTxBlock(box.spentTransactionId)
       : undefined;
