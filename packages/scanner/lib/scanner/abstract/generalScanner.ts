@@ -115,8 +115,8 @@ abstract class GeneralScanner<
   initialize = async () => {
     const block = await this.getFirstBlock();
     await this.verifyExtractorsInitialization({
-      height: block.blockHeight,
-      hash: block.hash,
+      height: block.blockHeight - 1,
+      hash: block.parentHash,
     });
     await this.processBlock(block);
     const entity = await this.action.getFirstSavedBlock();

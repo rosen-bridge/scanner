@@ -13,11 +13,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an unspent box in the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with unspent box information
-     * - not to call `getTxBlock` since its unspent
      * - return one extracted element (the unspent box) and api total
      */
     it('should extract unspent box data in the initial block', async () => {
@@ -35,7 +34,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(extractSpy).toHaveBeenCalledWith(
         unspentBox,
         unspentBox.blockId,
-        unspentBox.creationHeight
+        unspentBox.inclusionHeight
       );
       expect(txBlockSpy).not.toHaveBeenCalled();
       expect(data).toEqual({
@@ -52,11 +51,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for all boxes
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element created bellow the initial block
      */
     it('should filter boxes created below the initial block', async () => {
@@ -65,17 +63,12 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       extractor.hasData = (box: OutputBox) => true;
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ id: 'hash', height: 1252690 });
-      extractor.getTxBlock = txBlockSpy;
-      const data = await extractor.fetchDataWithOffsetLimit(1252680, 0, 2);
+      const data = await extractor.fetchDataWithOffsetLimit(1252678, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
           { ...extractedData, spendBlock: undefined, spendHeight: undefined },
@@ -90,11 +83,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an spent box created below the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element with spending information
      */
     it('should extract spent box data created and spent below the initial block', async () => {
@@ -106,20 +98,20 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ hash: 'hash', height: 1252680 });
-      extractor.getTxBlock = txBlockSpy;
       const data = await extractor.fetchDataWithOffsetLimit(1252681, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
-          { ...extractedData, spendBlock: 'hash', spendHeight: 1252680 },
+          {
+            ...extractedData,
+            spendBlock:
+              '9239ebca7b3b10701895e491a2213da4e07a37abc413d05434a5fab04993a19d',
+            spendHeight: 1252680,
+          },
         ],
         hasNextBatch: true,
       });
@@ -131,11 +123,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an spent box created below the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element without spending information
      */
     it('should extract spent box data created below the initial block but spent later', async () => {
@@ -147,17 +138,12 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const txBlockSpy = vitest
-        .fn()
-        .mockResolvedValue({ hash: 'hash', height: 1252690 });
-      extractor.getTxBlock = txBlockSpy;
-      const data = await extractor.fetchDataWithOffsetLimit(1252681, 0, 2);
+      const data = await extractor.fetchDataWithOffsetLimit(1252678, 0, 2);
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
-      expect(txBlockSpy).toHaveBeenCalledWith(spentBox.spentTransactionId);
       expect(data).toEqual({
         extractedBoxes: [
           { ...extractedData, spendBlock: undefined, spendHeight: undefined },

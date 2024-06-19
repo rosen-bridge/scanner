@@ -1,5 +1,12 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.2
+
 ## 0.2.5
 
 ### Patch Changes

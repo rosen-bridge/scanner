@@ -38,7 +38,9 @@ export type OutputBox = {
 
 export interface ErgoBox extends OutputBox {
   blockId: string;
-  spentTransactionId?: string;
+  inclusionHeight: number;
+  spentBlockId?: string;
+  spentHeight?: number;
 }
 
 export type Transaction = {

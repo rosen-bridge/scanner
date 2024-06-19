@@ -7,6 +7,7 @@ export const ergoBoxes = [
     value: 14948300000n,
     index: 1,
     creationHeight: 1252681,
+    inclusionHeight: 1252681,
     ergoTree:
       '0008cd03e5f5f63b27f9cdc47a9a8b799a26e5ee66a1e2a5d41d64640df3e64f4d050c18',
     address: '9iD5jMoLjK9azTdigyT8z1QY6qHrA6gVrJamMF8MJ2qt45pJpDc',
@@ -21,7 +22,6 @@ export const ergoBoxes = [
       },
     ],
     additionalRegisters: {},
-    spentTransactionId: undefined,
   },
   {
     boxId: '2708cc15be42eff988c7194c86912d305361c8c12cf9dae2b750dbf5c1519bd0',
@@ -31,6 +31,7 @@ export const ergoBoxes = [
     value: 14981300000n,
     index: 2,
     creationHeight: 1252677,
+    inclusionHeight: 1252677,
     ergoTree:
       '0008cd03e5f5f63b27f9cdc47a9a8b799a26e5ee66a1e2a5d41d64640df3e64f4d050c18',
     address: '9iD5jMoLjK9azTdigyT8z1QY6qHrA6gVrJamMF8MJ2qt45pJpDc',
@@ -45,6 +46,9 @@ export const ergoBoxes = [
       },
     ],
     additionalRegisters: {},
+    spentHeight: 1252680,
+    spentBlockId:
+      '9239ebca7b3b10701895e491a2213da4e07a37abc413d05434a5fab04993a19d',
     spentTransactionId:
       'b08fa920a6907d0e76eb0ad754439f1a26fa112b39f4de489620e4e6241930b7',
   },
