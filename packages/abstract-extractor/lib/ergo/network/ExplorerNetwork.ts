@@ -25,6 +25,11 @@ export class ExplorerNetwork extends AbstractNetwork {
     };
   };
 
+  /**
+   * convert explorer api boxes to ErgoBox interface
+   * @param box
+   * @returns ErgoBox
+   */
   convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
     const spendInfo = box.spentTransactionId
       ? await this.getTxBlock(box.spentTransactionId)

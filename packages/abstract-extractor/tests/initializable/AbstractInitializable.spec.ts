@@ -13,11 +13,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an unspent box in the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with unspent box information
-     * - not to call `getTxBlock` since its unspent
      * - return one extracted element (the unspent box) and api total
      */
     it('should extract unspent box data in the initial block', async () => {
@@ -35,7 +34,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(extractSpy).toHaveBeenCalledWith(
         unspentBox,
         unspentBox.blockId,
-        unspentBox.creationHeight
+        unspentBox.inclusionHeight
       );
       expect(txBlockSpy).not.toHaveBeenCalled();
       expect(data).toEqual({
@@ -52,11 +51,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for all boxes
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element created bellow the initial block
      */
     it('should filter boxes created below the initial block', async () => {
@@ -69,7 +67,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
       expect(data).toEqual({
         extractedBoxes: [
@@ -85,11 +83,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an spent box created below the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element with spending information
      */
     it('should extract spent box data created and spent below the initial block', async () => {
@@ -105,7 +102,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
       expect(data).toEqual({
         extractedBoxes: [
@@ -126,11 +123,10 @@ describe('AbstractInitializableErgoExtractorAction', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for an spent box created below the init block
-     * - spy `extractData` and `getTxBlock`
+     * - spy `extractData`
      * - run test (call `fetchDataWithOffsetLimit`)
      * @expected
      * - to call `extractData` with spent box information
-     * - to call `getTxBlock` since box is spent
      * - return one extracted element without spending information
      */
     it('should extract spent box data created below the initial block but spent later', async () => {
@@ -146,7 +142,7 @@ describe('AbstractInitializableErgoExtractorAction', () => {
       expect(extractSpy).toHaveBeenCalledWith(
         spentBox,
         spentBox.blockId,
-        spentBox.creationHeight
+        spentBox.inclusionHeight
       );
       expect(data).toEqual({
         extractedBoxes: [

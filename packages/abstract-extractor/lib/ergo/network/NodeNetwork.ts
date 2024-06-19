@@ -15,13 +15,13 @@ export class NodeNetwork extends AbstractNetwork {
   }
 
   /**
-   * covert node api boxes to ErgoBox interface
+   * convert node api boxes to ErgoBox interface
    * @param box
    * @returns ErgoBox
    */
   convertToErgoBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
     const tx = await this.getTxBlock(box.transactionId!);
-    const spendTx = box.spentTransactionId
+    const spendInfo = box.spentTransactionId
       ? await this.getTxBlock(box.spentTransactionId)
       : undefined;
     return {
@@ -35,8 +35,8 @@ export class NodeNetwork extends AbstractNetwork {
       additionalRegisters: box.additionalRegisters,
       boxId: box.boxId || '',
       blockId: tx.hash,
-      spentBlockId: spendTx?.hash ?? undefined,
-      spentHeight: spendTx?.height ?? undefined,
+      spentBlockId: spendInfo?.hash ?? undefined,
+      spentHeight: spendInfo?.height ?? undefined,
     };
   };
 
