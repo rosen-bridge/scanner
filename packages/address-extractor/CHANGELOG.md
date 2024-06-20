@@ -1,5 +1,13 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.5
+
+### Patch Changes
+
+- fix storing duplicate boxes
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.1.5
+
 ## 5.0.4
 
 ### Patch Changes

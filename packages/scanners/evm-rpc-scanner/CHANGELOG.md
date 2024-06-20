@@ -1,5 +1,11 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 0.2.9
+
+### Patch Changes
+
+- @rosen-bridge/scanner@4.0.5
+
 ## 0.2.8
 
 ### Patch Changes

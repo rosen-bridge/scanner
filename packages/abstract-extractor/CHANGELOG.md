@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 0.1.5
+
+### Patch Changes
+
+- fix storing duplicate boxes
+
 ## 0.1.4
 
 ### Patch Changes
