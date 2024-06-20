@@ -1,5 +1,12 @@
 # @rosen-bridge/scanner
 
+## 4.0.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.1.5
+
 ## 4.0.4
 
 ### Patch Changes

@@ -82,11 +82,10 @@ export abstract class AbstractErgoExtractor<
           spentInfos.push({ txId: tx.id, boxId: input.boxId, index: boxIndex });
           boxIndex += 1;
         }
-
-        if (boxes.length > 0)
-          await this.actions.insertBoxes(boxes, this.getId());
-        await this.actions.spendBoxes(spentInfos, block, this.getId());
       }
+
+      if (boxes.length > 0) await this.actions.insertBoxes(boxes, this.getId());
+      await this.actions.spendBoxes(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${block}: ${e}`

@@ -60,7 +60,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
           this.logger.info(
             `Updating box ${box.boxId} and extractor ${extractor}`
           );
-          await repository.update({ id: dbBoxes[0].id }, entity);
+          await repository.update({ id: dbBox[0].id }, entity);
           this.logger.debug(
             `Updated entity is [${JsonBI.stringify(
               box
