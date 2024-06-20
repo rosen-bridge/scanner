@@ -10,13 +10,15 @@
 
 ### Patch Changes
 
-- @rosen-bridge/scanner@4.0.4
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.4
 
 ## 0.1.8
 
 ### Patch Changes
 
-- @rosen-bridge/scanner@4.0.3
+- Updated dependencies
+  - @rosen-bridge/scanner@4.0.3
 
 ## 0.1.7
 
