@@ -93,6 +93,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * @param initialBlock
    */
   initializeBoxes = async (initialBlock: BlockInfo) => {
+    const fetched = new Set<string>();
     let trial = 1;
     if (this.initialize) {
       this.logger.debug(
@@ -109,13 +110,18 @@ export abstract class AbstractInitializableErgoExtractor<
             offset,
             API_LIMIT
           );
+          const boxes = data.extractedBoxes.filter((item) => {
+            if (fetched.has(item.boxId)) return false;
+            fetched.add(item.boxId);
+            return true;
+          });
           this.logger.info(
             `Inserting ${
-              data.extractedBoxes.length
+              boxes.length
             } new extracted data in ${this.getId()} initialization`
           );
           const insertSuccess = await this.actions.insertBoxes(
-            data.extractedBoxes,
+            boxes,
             this.getId()
           );
           if (!insertSuccess) throw new Error('Could not store extracted data');
