@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 0.1.4
+
+### Patch Changes
+
+- prevent to store multiple boxes on initialize
+
 ## 0.1.3
 
 ### Patch Changes
