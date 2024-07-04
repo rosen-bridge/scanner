@@ -1,5 +1,16 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 2.0.0
+
+### Major Changes
+
+- consider decimals drop
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.0
+
 ## 1.0.9
 
 ### Patch Changes
