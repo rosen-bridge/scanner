@@ -1,5 +1,16 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- consider decimals drop
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.0
+
 ## 3.0.5
 
 ### Patch Changes

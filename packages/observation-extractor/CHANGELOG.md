@@ -1,5 +1,11 @@
 # @rosen-bridge/observation-extractor
 
+## 5.0.0
+
+### Major Changes
+
+- consider decimals drop
+
 ## 4.4.9
 
 ### Patch Changes
