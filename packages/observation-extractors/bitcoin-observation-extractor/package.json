@@ -37,7 +37,7 @@
     "@rosen-bridge/bitcoin-esplora-scanner": "^0.1.10",
     "@rosen-bridge/bitcoin-rpc-scanner": "^0.2.4",
     "@rosen-bridge/observation-extractor": "^5.0.0",
-    "@rosen-bridge/rosen-extractor": "^6.0.0",
+    "@rosen-bridge/rosen-extractor": "^6.0.1",
     "@rosen-bridge/tokens": "^1.2.0",
     "typeorm": "^0.3.20"
   }
