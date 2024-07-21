@@ -1,5 +1,11 @@
 # @rosen-bridge/observation-extractor
 
+## 5.0.1
+
+### Patch Changes
+
+- update rosen-extractor version
+
 ## 5.0.0
 
 ### Major Changes

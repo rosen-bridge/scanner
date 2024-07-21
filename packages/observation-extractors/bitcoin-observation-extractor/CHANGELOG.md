@@ -1,5 +1,13 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 4.0.1
+
+### Patch Changes
+
+- update rosen-extractor version
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.1
+
 ## 4.0.0
 
 ### Major Changes
