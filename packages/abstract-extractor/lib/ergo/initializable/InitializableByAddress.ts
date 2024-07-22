@@ -2,7 +2,6 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { ErgoExtractedData, ErgoNetworkType, ErgoBox } from '../interfaces';
 import { AbstractInitializableErgoExtractor } from './AbstractInitializable';
-import { BlockInfo } from '../../interfaces';
 import { ExplorerNetwork } from '../network/ExplorerNetwork';
 import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractNetwork } from '../network/AbstractNetwork';
@@ -40,14 +39,5 @@ export abstract class AbstractInitializableByAddressErgoExtractor<
     limit: number
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
     return this.network.getBoxesByAddress(this.address, offset, limit);
-  };
-
-  /**
-   * return block information from the specified network source
-   * @param txId
-   * @return block info
-   */
-  getTxBlock = (txId: string): Promise<BlockInfo> => {
-    return this.network.getTxBlock(txId);
   };
 }

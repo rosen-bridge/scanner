@@ -35,13 +35,6 @@ export abstract class AbstractInitializableErgoExtractor<
   ) => Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }>;
 
   /**
-   * return block information of specified tx
-   * @param txId
-   * @return block info
-   */
-  abstract getTxBlock: (txId: string) => Promise<BlockInfo>;
-
-  /**
    * return all related data below the initial height (including the init height)
    * @param initialHeight
    * @return extracted data in batch
@@ -75,6 +68,8 @@ export abstract class AbstractInitializableErgoExtractor<
         ...data,
         spendBlock: spent ? box.spentBlockId : undefined,
         spendHeight: spent ? box.spentHeight : undefined,
+        spendTxId: spent ? box.spentTransactionId : undefined,
+        spendIndex: spent ? box.spentIndex : undefined,
       } as ExtractedData;
       this.logger.debug(
         `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${

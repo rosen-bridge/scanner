@@ -4,6 +4,7 @@ import { BlockInfo } from '../../interfaces';
 import { ErgoBox } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
 import { V1 } from '@rosen-clients/ergo-explorer';
+import { mapValues, pick } from 'lodash-es';
 
 export class ExplorerNetwork extends AbstractNetwork {
   private api;
@@ -14,14 +15,24 @@ export class ExplorerNetwork extends AbstractNetwork {
   }
 
   /**
-   * return block information of specified tx
-   * @param txId
+   * return spending information of a specified box by having spendTxId
+   * @param boxId
+   * @param spendTxId
    */
-  getTxBlock = async (txId: string): Promise<BlockInfo> => {
-    const tx = await this.api.v1.getApiV1TransactionsP1(txId);
+  getSpendingInfo = async (
+    boxId: string,
+    spendTxId: string
+  ): Promise<BlockInfo & { spendIndex: number }> => {
+    const tx = await this.api.v1.getApiV1TransactionsP1(spendTxId);
+    const spendIndex = tx.inputs?.findIndex((box) => box.boxId === boxId);
+    if (spendIndex == undefined)
+      throw Error(
+        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`
+      );
     return {
       hash: tx.blockId,
       height: tx.inclusionHeight,
+      spendIndex,
     };
   };
 
@@ -32,7 +43,7 @@ export class ExplorerNetwork extends AbstractNetwork {
    */
   convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
     const spendInfo = box.spentTransactionId
-      ? await this.getTxBlock(box.spentTransactionId)
+      ? await this.getSpendingInfo(box.boxId, box.spentTransactionId)
       : undefined;
     return {
       blockId: box.blockId,
@@ -43,10 +54,15 @@ export class ExplorerNetwork extends AbstractNetwork {
       index: box.index,
       transactionId: box.transactionId,
       value: box.value,
-      additionalRegisters: box.additionalRegisters,
-      assets: box.assets,
+      additionalRegisters: mapValues(
+        box.additionalRegisters,
+        'serializedValue'
+      ),
+      assets: box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])),
       spentHeight: spendInfo?.height,
       spentBlockId: spendInfo?.hash,
+      spentTransactionId: box.spentTransactionId,
+      spentIndex: spendInfo?.spendIndex,
     };
   };
 

@@ -1,12 +1,6 @@
-import { BlockInfo } from '../../interfaces';
 import { ErgoBox } from '../interfaces';
-export abstract class AbstractNetwork {
-  /**
-   * return block information of specified tx
-   * @param txId
-   */
-  abstract getTxBlock: (txId: string) => Promise<BlockInfo>;
 
+export abstract class AbstractNetwork {
   /**
    * return related boxes by specified address with limit offset
    * @param address
