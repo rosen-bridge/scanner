@@ -355,7 +355,13 @@ export const fraudBox = {
     },
   ],
   additionalRegisters: {
-    R4: '1a0120fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
+    R4: {
+      serializedValue:
+        '1a0120fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01',
+      sigmaType: 'Coll[Coll[SByte]]',
+      renderedValue:
+        '[fe83cb8a2843fa6f5751d65e4f957fc622c67ab9211f30b44991a1fb03145c01]',
+    },
   },
   mainChain: true,
 };
