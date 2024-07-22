@@ -70,14 +70,6 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
   };
 
   /**
-   * Returns block information of tx
-   * @param txId
-   */
-  getTxBlock = async (txId: string) => {
-    return this.network.getTxBlock(txId);
-  };
-
-  /**
    * extract box data to proper format (not including spending information)
    * @param box
    * @param blockId box inclusion block hash
