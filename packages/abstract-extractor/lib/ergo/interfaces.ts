@@ -41,6 +41,8 @@ export interface ErgoBox extends OutputBox {
   inclusionHeight: number;
   spentBlockId?: string;
   spentHeight?: number;
+  spentTransactionId?: string;
+  spentIndex?: number;
 }
 
 export type Transaction = {
@@ -63,4 +65,6 @@ export interface ErgoExtractedData {
   blockId: string;
   spendBlock?: string;
   spendHeight?: number;
+  spendTxId?: string;
+  spendIndex?: number;
 }

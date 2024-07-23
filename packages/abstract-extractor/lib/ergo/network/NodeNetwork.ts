@@ -19,10 +19,10 @@ export class NodeNetwork extends AbstractNetwork {
    * @param box
    * @returns ErgoBox
    */
-  convertToErgoBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
-    const tx = await this.getTxBlock(box.transactionId!);
+  convertBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
+    const tx = await await this.api.getTxById(box.transactionId!);
     const spendInfo = box.spentTransactionId
-      ? await this.getTxBlock(box.spentTransactionId)
+      ? await this.getSpendingInfo(box.boxId!, box.spentTransactionId)
       : undefined;
     return {
       transactionId: box.transactionId || '',
@@ -30,25 +30,37 @@ export class NodeNetwork extends AbstractNetwork {
       value: box.value || 0n,
       ergoTree: box.ergoTree || '',
       creationHeight: box.creationHeight || 0,
-      inclusionHeight: tx.height,
+      inclusionHeight: tx.inclusionHeight,
       assets: box.assets || [],
       additionalRegisters: box.additionalRegisters,
       boxId: box.boxId || '',
-      blockId: tx.hash,
-      spentBlockId: spendInfo?.hash ?? undefined,
-      spentHeight: spendInfo?.height ?? undefined,
+      blockId: tx.blockId,
+      spentBlockId: spendInfo?.hash,
+      spentHeight: spendInfo?.height,
+      spentTransactionId: box.spentTransactionId,
+      spentIndex: spendInfo?.spendIndex,
     };
   };
 
   /**
-   * return block information of specified tx
-   * @param txId
+   * return spending information of a specified box by having spendTxId
+   * @param boxId
+   * @param spendTxId
    */
-  getTxBlock = async (txId: string): Promise<BlockInfo> => {
-    const tx = await this.api.getTxById(txId);
+  getSpendingInfo = async (
+    boxId: string,
+    spendTxId: string
+  ): Promise<BlockInfo & { spendIndex: number }> => {
+    const tx = await this.api.getTxById(spendTxId);
+    const spendIndex = tx.inputs?.findIndex((box) => box.boxId == boxId);
+    if (spendIndex == undefined)
+      throw Error(
+        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`
+      );
     return {
       hash: tx.blockId,
       height: tx.inclusionHeight,
+      spendIndex,
     };
   };
 
@@ -72,7 +84,7 @@ export class NodeNetwork extends AbstractNetwork {
     if (!boxes)
       throw new Error('Ergo node BoxesByAddress api expected to have items');
     const ergoBoxes = await Promise.all(
-      boxes.map(async (box) => await this.convertToErgoBox(box))
+      boxes.map(async (box) => await this.convertBox(box))
     );
     return { boxes: ergoBoxes, hasNextBatch: boxes.length > 0 };
   };
@@ -96,7 +108,7 @@ export class NodeNetwork extends AbstractNetwork {
     if (!boxes.items)
       throw new Error('Ergo node BoxesByTokenId api expected to have items');
     const ergoBoxes = await Promise.all(
-      boxes.items.map(async (box) => await this.convertToErgoBox(box))
+      boxes.items.map(async (box) => await this.convertBox(box))
     );
     return { boxes: ergoBoxes, hasNextBatch: boxes.items.length > 0 };
   };
