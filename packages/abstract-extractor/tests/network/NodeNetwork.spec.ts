@@ -22,7 +22,7 @@ describe('NodeNetwork', () => {
      * @expected
      * - to convert box properly
      */
-    it('should convert the box properly', async () => {
+    it('should properly convert node api box to ergo box', async () => {
       vitest.mocked(ergoNodeClientFactory).mockReturnValue({
         getTxById: async (txId: string) => {
           if (txId == nodeSpendingTxInfo.id) return nodeSpendingTxInfo;
