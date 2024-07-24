@@ -1,10 +1,11 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 import { BlockInfo } from '../../interfaces';
-import { ErgoBox } from '../interfaces';
+import { ErgoBox, ExtendedTransaction } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
 import { V1 } from '@rosen-clients/ergo-explorer';
 import { mapValues, pick } from 'lodash-es';
+import { API_LIMIT } from '../../constants';
 
 export class ExplorerNetwork extends AbstractNetwork {
   private api;
@@ -64,6 +65,58 @@ export class ExplorerNetwork extends AbstractNetwork {
       spentTransactionId: box.spentTransactionId,
       spentIndex: spendInfo?.spendIndex,
     };
+  };
+
+  /**
+   * convert Explorer transaction to scanner transaction type
+   * @param tx
+   */
+  private convertTransaction = (
+    tx: V1.TransactionInfo
+  ): ExtendedTransaction => {
+    return {
+      id: tx.id,
+      inclusionHeight: tx.inclusionHeight,
+      blockId: tx.blockId,
+      dataInputs:
+        tx.dataInputs?.map((dataInput) => ({
+          boxId: dataInput.boxId,
+        })) ?? [],
+      inputs: tx.inputs?.map((input) => ({ boxId: input.boxId })) ?? [],
+      outputs:
+        tx.outputs?.map((output) => ({
+          boxId: output.boxId,
+          transactionId: output.transactionId,
+          additionalRegisters: mapValues(
+            output.additionalRegisters,
+            'serializedValue'
+          ),
+          assets: output.assets?.map((asset) =>
+            pick(asset, ['tokenId', 'amount'])
+          ),
+          ergoTree: output.ergoTree,
+          creationHeight: output.creationHeight,
+          index: output.index,
+          value: output.value,
+        })) ?? [],
+    };
+  };
+
+  getAddressTransactionsWithHeight = async (
+    address: string,
+    fromHeight: number,
+    toHeight: number
+  ): Promise<Array<ExtendedTransaction>> => {
+    const txs = await this.api.v1.getApiV1AddressesP1Transactions(address, {
+      fromHeight,
+      toHeight,
+      limit: API_LIMIT,
+    });
+    if (!txs.items)
+      throw new Error(
+        'Explorer AddressTransactions api expected to have items'
+      );
+    return txs.items.map((tx) => this.convertTransaction(tx));
   };
 
   /**

@@ -1,9 +1,10 @@
 import ergoNodeClientFactory, {
   IndexedErgoBox,
+  IndexedErgoTransaction,
 } from '@rosen-clients/ergo-node';
 
 import { BlockInfo } from '../../interfaces';
-import { ErgoBox } from '../interfaces';
+import { ErgoBox, ExtendedTransaction } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
 
 export class NodeNetwork extends AbstractNetwork {
@@ -39,6 +40,32 @@ export class NodeNetwork extends AbstractNetwork {
       spentHeight: spendInfo?.height,
       spentTransactionId: box.spentTransactionId,
       spentIndex: spendInfo?.spendIndex,
+    };
+  };
+
+  /**
+   * convert Node transaction to scanner transaction type
+   * @param tx
+   */
+  private convertTransaction = (
+    tx: IndexedErgoTransaction
+  ): ExtendedTransaction => {
+    return {
+      id: tx.id || '',
+      inclusionHeight: tx.inclusionHeight,
+      blockId: tx.blockId,
+      outputs: tx.outputs.map((output) => ({
+        transactionId: output.transactionId || '',
+        index: output.index || 0,
+        value: output.value || 0n,
+        ergoTree: output.ergoTree || '',
+        creationHeight: output.creationHeight || 0,
+        assets: output.assets || [],
+        additionalRegisters: output.additionalRegisters,
+        boxId: output.boxId || '',
+      })),
+      inputs: tx.inputs,
+      dataInputs: tx.dataInputs,
     };
   };
 
@@ -111,5 +138,24 @@ export class NodeNetwork extends AbstractNetwork {
       boxes.items.map(async (box) => await this.convertBox(box))
     );
     return { boxes: ergoBoxes, hasNextBatch: boxes.items.length > 0 };
+  };
+
+  getAddressTransactionsWithOffsetLimit = async (
+    address: string,
+    offset: number,
+    limit: number
+  ): Promise<{ items: Array<ExtendedTransaction>; total: number }> => {
+    const txs = await this.api.getTxsByAddress(address, {
+      offset,
+      limit,
+    });
+    if (!txs.items)
+      throw new Error(
+        'Explorer AddressTransactions api expected to have items'
+      );
+    return {
+      items: txs.items.map((tx) => this.convertTransaction(tx)),
+      total: txs.total!,
+    };
   };
 }
