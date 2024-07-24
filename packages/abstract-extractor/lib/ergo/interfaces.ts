@@ -53,6 +53,11 @@ export type Transaction = {
   size?: bigint;
 };
 
+export interface ExtendedTransaction extends Transaction {
+  inclusionHeight: number;
+  blockId: string;
+}
+
 export interface SpendInfo {
   boxId: string;
   txId: string;

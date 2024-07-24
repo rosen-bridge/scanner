@@ -2,10 +2,10 @@ import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
-  Block,
   AbstractInitializableErgoExtractorAction,
   SpendInfo,
   DB_CHUNK_SIZE,
+  BlockInfo,
 } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
@@ -92,7 +92,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
    */
   spendBoxes = async (
     spendInfos: Array<SpendInfo>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ): Promise<void> => {
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);

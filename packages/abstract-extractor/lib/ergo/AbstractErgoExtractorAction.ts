@@ -1,4 +1,4 @@
-import { Block } from '../interfaces';
+import { BlockInfo } from '../interfaces';
 import { SpendInfo } from './interfaces';
 
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
@@ -21,7 +21,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    */
   abstract spendBoxes: (
     spendInfos: SpendInfo[],
-    block: Block,
+    block: BlockInfo,
     extractorId: string
   ) => Promise<void>;
 

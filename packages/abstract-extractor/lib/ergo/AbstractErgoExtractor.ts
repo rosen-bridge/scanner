@@ -4,7 +4,7 @@ import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { AbstractExtractor } from '../AbstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
-import { Block } from '../interfaces';
+import { BlockInfo } from '../interfaces';
 import {
   Transaction,
   OutputBox,
@@ -52,7 +52,7 @@ export abstract class AbstractErgoExtractor<
    */
   processTransactions = async (
     txs: Transaction[],
-    block: Block
+    block: BlockInfo
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedData> = [];
