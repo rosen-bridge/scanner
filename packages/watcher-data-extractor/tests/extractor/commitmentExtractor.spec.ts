@@ -4,7 +4,12 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
-import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
+import {
+  block,
+  commitmentAddress,
+  RWTId,
+  testTokenMap,
+} from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 
 let dataSource: DataSource;
@@ -26,7 +31,8 @@ describe('CommitmentExtractor', () => {
         'extractorId',
         [commitmentAddress],
         RWTId,
-        dataSource
+        dataSource,
+        testTokenMap
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -45,7 +51,8 @@ describe('CommitmentExtractor', () => {
         'extractorId',
         [commitmentAddress],
         RWTId,
-        dataSource
+        dataSource,
+        testTokenMap
       );
       const tx1 = commitmentTxGenerator(true, 'f1', '11', 'd1');
       const tx2 = commitmentTxGenerator(true, 'f2', '22', 'd2');
@@ -112,7 +119,8 @@ describe('CommitmentExtractor', () => {
         'extractorId',
         [commitmentAddress],
         RWTId,
-        dataSource
+        dataSource,
+        testTokenMap
       );
       const tx1 = commitmentTxGenerator(true, 'wid1', '1', 'digest1');
       const tx2 = commitmentTxGenerator(true, 'wid2', '2', 'digest2');
