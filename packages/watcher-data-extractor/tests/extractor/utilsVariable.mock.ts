@@ -772,3 +772,8 @@ export const spendTriggerTx: Transaction = {
     },
   ],
 };
+
+export const testTokenMap = {
+  idKeys: {},
+  tokens: [],
+};

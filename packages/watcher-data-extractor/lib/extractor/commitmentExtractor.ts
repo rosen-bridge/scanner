@@ -8,6 +8,7 @@ import CommitmentAction from '../actions/commitmentAction';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { JsonBI } from '../utils';
 import { SpendInfo } from '../interfaces/types';
+import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -16,12 +17,14 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
   private readonly commitmentsErgoTrees: Array<string>;
   private readonly RWTId: string;
   private readonly actions: CommitmentAction;
+  private readonly tokenMap: TokenMap;
 
   constructor(
     id: string,
     addresses: Array<string>,
     RWTId: string,
     dataSource: DataSource,
+    tokens: RosenTokens,
     logger?: AbstractLogger
   ) {
     super();
@@ -33,6 +36,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     this.RWTId = RWTId;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new CommitmentAction(dataSource, this.logger);
+    this.tokenMap = new TokenMap(tokens);
   }
 
   /**
@@ -93,7 +97,13 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                     boxSerialized: Buffer.from(
                       decodedBox.sigma_serialize_bytes()
                     ).toString('base64'),
-                    rwtCount: BigInt(output.assets[0].amount).toString(),
+                    rwtCount: this.tokenMap
+                      .wrapAmount(
+                        this.RWTId,
+                        BigInt(output.assets[0].amount),
+                        'ergo'
+                      )
+                      .amount.toString(),
                   });
                 }
               } catch {

@@ -1,5 +1,12 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 7.0.0
+
+### Major Changes
+
+- wrap rwtCount in CommitmentEntity
+- add token map to commitmentExtractor constructor arguments
+
 ## 6.0.5
 
 ### Patch Changes
