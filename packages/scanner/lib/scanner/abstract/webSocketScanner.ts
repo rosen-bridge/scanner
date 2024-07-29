@@ -10,7 +10,7 @@ abstract class WebSocketScanner<
 > extends AbstractScanner<TransactionType> {
   readonly maxTryBlock: number;
 
-  private mutex = new Mutex();
+  protected mutex = new Mutex();
 
   protected constructor(
     logger?: AbstractLogger,
