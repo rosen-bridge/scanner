@@ -1,5 +1,5 @@
 ---
-'@rosen-bridge/scanner': major
+'@rosen-bridge/scanner': minor
 ---
 
 Add ogmios connection close handler

@@ -124,7 +124,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     let skip = 0;
     while (count !== 0) {
       try {
+        const release = await this.mutex.acquire();
         const blocks = await this.action.getLastSavedBlocks(skip, count);
+        release();
         if (blocks.length === 0) count = 0;
         const points =
           blocks.length > 0
@@ -157,22 +159,30 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * Handles ogmios connection closure
    */
   connectionCloseHandler = async () => {
+    this.connected = false;
     this.logger.warn('Ogmios connection closed');
-    await new Promise((resolve) => setTimeout(resolve, RECONNECTION_DELAY));
-    this.logger.debug('Retrying to connect to ogmios client');
     let trial = 0;
-    const reconnectionTrial = setTimeout(async () => {
-      if (this.connected) clearTimeout(reconnectionTrial);
+    const connectionTrial = async () => {
       trial++;
-      if (trial > CONNECTION_RETRIAL)
+      if (trial > CONNECTION_RETRIAL) {
         this.logger.error(
-          `Could not connect to ogmios client after ${CONNECTION_RETRIAL} retrials. Check the ogmios connection and restart the watcher.`
+          `Could not connect to ogmios client after ${CONNECTION_RETRIAL} retrials. Check the ogmios connection and restart the service.`
         );
-      const release = await this.mutex.acquire();
-      this.logger.debug(`Ogmios client connection retrial #${trial}`);
-      await this.start();
-      release();
-    }, this.connectionRetrialInterval);
+        return;
+      }
+      this.logger.debug(
+        `Retrying to connect to ogmios client in trial step #${trial}`
+      );
+      try {
+        await this.start();
+      } catch (e) {
+        this.logger.warn(
+          `An error occurred while reconnecting to ogmios client: ${e}`
+        );
+        setTimeout(connectionTrial, this.connectionRetrialInterval);
+      }
+    };
+    setTimeout(connectionTrial, RECONNECTION_DELAY);
   };
 
   /**
