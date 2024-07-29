@@ -4,6 +4,7 @@ import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
 import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 
 import CollateralAction from '../actions/collateralAction';
 import { DefaultApiLimit } from '../constants';
@@ -15,6 +16,8 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   private readonly ergoTree: string;
   readonly action: CollateralAction;
   private explorerApi;
+  private readonly tokenMap: TokenMap;
+  private rwt: string;
 
   constructor(
     private readonly id: string,
@@ -22,6 +25,8 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     private readonly address: string,
     private readonly dataSource: DataSource,
     explorerUrl: string,
+    tokens: RosenTokens,
+    rwt: string,
     private readonly logger: AbstractLogger = new DummyLogger()
   ) {
     super();
@@ -30,6 +35,8 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.action = new CollateralAction(this.dataSource, this.logger);
     this.explorerApi = ergoExplorerClientFactory(explorerUrl);
+    this.tokenMap = new TokenMap(tokens);
+    this.rwt = rwt;
   }
 
   /**
@@ -303,7 +310,11 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       );
       return undefined;
     }
-    const rwtCount = BigInt(r5);
+    const rwtCount = this.tokenMap.wrapAmount(
+      this.rwt,
+      BigInt(r5),
+      'ergo'
+    ).amount;
     this.logger.debug(
       `Extracted rwtCount=[${rwtCount}] from R5 register of box=[${box.boxId}]`
     );
