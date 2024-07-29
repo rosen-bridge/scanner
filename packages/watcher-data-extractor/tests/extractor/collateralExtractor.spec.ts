@@ -6,6 +6,7 @@ import { CollateralEntity, CollateralExtractor } from '../../lib';
 import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
 import { uint8ArrayToHex } from '../../lib/utils';
+import { RWTId, testTokenMap } from './utilsVariable.mock';
 
 describe('CollateralExtractor', () => {
   let dataSource: DataSource;
@@ -20,7 +21,9 @@ describe('CollateralExtractor', () => {
       testData.awcNft,
       testData.collateralAddress,
       dataSource,
-      testData.explorerUrl
+      testData.explorerUrl,
+      testTokenMap,
+      RWTId
     );
   });
 
