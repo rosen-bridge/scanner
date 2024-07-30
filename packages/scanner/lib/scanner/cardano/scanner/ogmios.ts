@@ -43,6 +43,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   useTls: boolean;
   connectionRetrialInterval: number;
   private connected: boolean;
+  private stopped: boolean;
   name = () => 'cardano-ogmios';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
@@ -161,6 +162,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   connectionCloseHandler = async () => {
     this.connected = false;
     this.logger.warn('Ogmios connection closed');
+    if (this.stopped) return;
     let trial = 0;
     const connectionTrial = async () => {
       trial++;
@@ -189,6 +191,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * start scanner. first find fork point. fork all blocks and request updates from node.
    */
   start = async (): Promise<void> => {
+    this.stopped = false;
     const context: InteractionContext = await createInteractionContext(
       (err) => this.logger.error(`${err}`),
       this.connectionCloseHandler,
@@ -218,6 +221,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    */
   stop = async (): Promise<void> => {
     this.connected = false;
+    this.stopped = true;
     await this.client.shutdown();
   };
 
