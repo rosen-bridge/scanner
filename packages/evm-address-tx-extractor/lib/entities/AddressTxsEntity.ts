@@ -22,4 +22,7 @@ export class AddressTxsEntity {
 
   @Column({ type: 'varchar' })
   extractor: string;
+
+  @Column({ type: 'varchar' })
+  status: string;
 }

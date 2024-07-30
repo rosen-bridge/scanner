@@ -48,7 +48,7 @@ export class TxAction {
     this.logger.info(
       `Inserting new transactions [${txs.map(
         (tx) => tx.signedHash
-      )}] in block ${block} and extractor ${extractor}`
+      )}] in block ${block.hash} and extractor ${extractor}`
     );
     await this.repository
       .createQueryBuilder()
@@ -61,6 +61,7 @@ export class TxAction {
           address: tx.address,
           blockId: block.hash,
           extractor: extractor,
+          status: tx.status,
         }))
       )
       .execute();

@@ -1,7 +1,7 @@
-import { Transaction } from 'ethers';
+import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
 
 export const address = '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa';
-export const txs: Array<Transaction> = [
+export const txs: Array<TransactionResponse> = [
   Transaction.from({
     type: 2,
     to: '0xeDee4752e5a2F595151c94762fB38e5730357785',
@@ -58,7 +58,7 @@ export const txs: Array<Transaction> = [
     },
     hash: '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
   }),
-];
+].map((tx) => new TransactionResponse(tx as any, new JsonRpcProvider()));
 
 export const expectedExtractedTxs = [
   {

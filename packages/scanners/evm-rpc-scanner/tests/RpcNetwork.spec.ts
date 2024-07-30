@@ -1,3 +1,4 @@
+import { Transaction } from 'ethers';
 import * as testData from './testData';
 import { TestEvmRpcNetwork } from './TestRpcNetwork';
 import {
@@ -59,7 +60,7 @@ describe('RPCNetwork', () => {
 
       // check returned value
       for (let i = 0; i < result.length; i++) {
-        const trx = result[i];
+        const trx = Transaction.from(result[i]);
         expect(trx.toJSON()).toEqual(testData.convertedTxList[i]);
       }
     });
