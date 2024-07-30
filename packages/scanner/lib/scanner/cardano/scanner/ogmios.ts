@@ -19,10 +19,7 @@ import {
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import {
-  CONNECTION_RETRIAL,
-  SLOT_SHELLY_NUMBER,
-} from '../../../constants';
+import { CONNECTION_RETRIAL, SLOT_SHELLY_NUMBER } from '../../../constants';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -219,7 +216,6 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * stop ws connection to node.
    */
   stop = async (): Promise<void> => {
-    this.connected = false;
     this.stopped = true;
     await this.client.shutdown();
   };
