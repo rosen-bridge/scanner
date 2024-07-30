@@ -1,5 +1,5 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { EvmRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { EvmEthersRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { RosenTokens } from '@rosen-bridge/tokens';
 import { DataSource } from 'typeorm';
 import { EvmRpcObservationExtractor } from './EvmRpcObservationExtractor';
@@ -16,13 +16,13 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
     super(
       dataSource,
       tokens,
-      new EvmRpcRosenExtractor(
+      new EvmEthersRosenExtractor(
         lockAddress,
         tokens,
         'ethereum',
         'eth',
         logger
-      ) as any, // TODO: fix this!
+      ),
       logger
     );
   }
