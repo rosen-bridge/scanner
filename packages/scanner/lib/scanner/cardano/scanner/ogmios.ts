@@ -21,7 +21,6 @@ import { CardanoOgmiosConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   CONNECTION_RETRIAL,
-  RECONNECTION_DELAY,
   SLOT_SHELLY_NUMBER,
 } from '../../../constants';
 
@@ -184,7 +183,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
         setTimeout(connectionTrial, this.connectionRetrialInterval);
       }
     };
-    setTimeout(connectionTrial, RECONNECTION_DELAY);
+    setTimeout(connectionTrial, this.connectionRetrialInterval);
   };
 
   /**

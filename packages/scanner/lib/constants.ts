@@ -1,3 +1,2 @@
 export const SLOT_SHELLY_NUMBER = 1591566291;
-export const RECONNECTION_DELAY = 1000;
 export const CONNECTION_RETRIAL = 10;
