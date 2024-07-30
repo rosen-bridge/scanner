@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/observation-extractor",
-  "version": "5.0.1",
+  "version": "5.0.1-08d1d81f",
   "description": "Event observation data extractor for different chains",
   "author": "Rosen Team",
   "license": "GPL-3.0",
