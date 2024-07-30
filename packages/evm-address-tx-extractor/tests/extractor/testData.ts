@@ -1,4 +1,5 @@
 import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
+import { EvmTxStatus } from '../../lib';
 
 export const address = '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa';
 export const txs: Array<TransactionResponse> = [
@@ -62,25 +63,31 @@ export const txs: Array<TransactionResponse> = [
 
 export const expectedExtractedTxs = [
   {
-    id: 1,
-    unsignedHash:
-      '0x47098cb4de103a91ce4c73543ec5658b2ca530050ebf77d9dfa22611e9781c54',
-    signedHash:
-      '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
-    nonce: 53,
-    address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
-    blockId: 'block 1',
-    extractor: 'extractor1',
+    status: EvmTxStatus.succeed,
+    tx: {
+      id: 1,
+      unsignedHash:
+        '0x47098cb4de103a91ce4c73543ec5658b2ca530050ebf77d9dfa22611e9781c54',
+      signedHash:
+        '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
+      nonce: 53,
+      address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
+      blockId: 'block 1',
+      extractor: 'extractor1',
+    },
   },
   {
-    id: 2,
-    unsignedHash:
-      '0xc042ca344198b72db99e55b44ceb51cdc719e32bd1ed4881c11e14915654da90',
-    signedHash:
-      '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
-    nonce: 53,
-    address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
-    blockId: 'block 1',
-    extractor: 'extractor1',
+    status: EvmTxStatus.failed,
+    tx: {
+      id: 2,
+      unsignedHash:
+        '0xc042ca344198b72db99e55b44ceb51cdc719e32bd1ed4881c11e14915654da90',
+      signedHash:
+        '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
+      nonce: 53,
+      address: '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa',
+      blockId: 'block 1',
+      extractor: 'extractor1',
+    },
   },
 ];
