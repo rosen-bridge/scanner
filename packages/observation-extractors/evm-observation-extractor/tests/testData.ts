@@ -1,3 +1,4 @@
+import { blake2b } from 'blakejs';
 import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
 
 export const tx = Transaction.from({
@@ -32,4 +33,23 @@ export const rosenData = {
   targetChainTokenId: 'target-token-id',
   sourceTxId:
     '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
+};
+
+export const expectedObservation = {
+  id: 1,
+  fromChain: 'test-chain',
+  toChain: rosenData.toChain,
+  fromAddress: rosenData.fromAddress,
+  toAddress: rosenData.toAddress,
+  height: 1,
+  amount: rosenData.amount,
+  networkFee: rosenData.networkFee,
+  bridgeFee: rosenData.bridgeFee,
+  sourceChainTokenId: rosenData.sourceChainTokenId,
+  targetChainTokenId: rosenData.targetChainTokenId,
+  sourceBlockId: 'block-id',
+  sourceTxId: tx.hash!,
+  block: 'block-id',
+  requestId: Buffer.from(blake2b(tx.hash!, undefined, 32)).toString('hex'),
+  extractor: 'test-observation-extractor',
 };

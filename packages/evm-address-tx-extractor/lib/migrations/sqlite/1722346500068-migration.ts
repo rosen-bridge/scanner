@@ -24,7 +24,8 @@ export class Migration1722346500068 implements MigrationInterface {
                     "nonce",
                     "address",
                     "blockId",
-                    "extractor"
+                    "extractor",
+                    "status"
                 )
             SELECT "id",
                 "unsignedHash",
@@ -32,7 +33,8 @@ export class Migration1722346500068 implements MigrationInterface {
                 "nonce",
                 "address",
                 "blockId",
-                "extractor"
+                "extractor",
+                'succeed'
             FROM "address_txs_entity"
         `);
     await queryRunner.query(`

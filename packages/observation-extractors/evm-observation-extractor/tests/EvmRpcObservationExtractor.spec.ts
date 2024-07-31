@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { blake2b } from 'blakejs';
 import { ObservationEntity } from '@rosen-bridge/observation-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
-import { rosenData, tx, txRes } from './testData';
+import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
 
 vi.mock('ethers', async (importOriginal) => {
@@ -68,25 +68,7 @@ describe('EvmRpcObservationExtractor', () => {
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
       const observation1 = rows[0];
-      const txHash = tx.hash!;
-      expect(observation1).toEqual({
-        id: 1,
-        fromChain: extractor.FROM_CHAIN,
-        toChain: rosenData.toChain,
-        fromAddress: rosenData.fromAddress,
-        toAddress: rosenData.toAddress,
-        height: 1,
-        amount: rosenData.amount,
-        networkFee: rosenData.networkFee,
-        bridgeFee: rosenData.bridgeFee,
-        sourceChainTokenId: rosenData.sourceChainTokenId,
-        targetChainTokenId: rosenData.targetChainTokenId,
-        sourceBlockId: 'block-id',
-        sourceTxId: txHash,
-        block: 'block-id',
-        requestId: Buffer.from(blake2b(txHash, undefined, 32)).toString('hex'),
-        extractor: extractor.getId(),
-      });
+      expect(observation1).toEqual(expectedObservation);
     }, 100000);
 
     /**
