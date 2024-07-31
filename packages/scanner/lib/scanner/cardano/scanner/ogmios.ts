@@ -19,7 +19,7 @@ import {
 import { BlockDbAction } from '../../action';
 import { CardanoOgmiosConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { SLOT_SHELLY_NUMBER } from '../../../constants';
+import { CONNECTION_RETRIAL, SLOT_SHELLY_NUMBER } from '../../../constants';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -37,6 +37,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   host: string;
   port: number;
   useTls: boolean;
+  connectionRetrialInterval: number;
+  private connected: boolean;
+  private stopped: boolean;
   name = () => 'cardano-ogmios';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
@@ -45,7 +48,8 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     this.host = config.nodeHostOrIp;
     this.port = config.nodePort;
     this.useTls = config.useTls ?? false;
-
+    this.connectionRetrialInterval = config.connectionRetrialInterval;
+    this.connected = false;
     this.initPoint = {
       id: config.initialHash,
       slot: config.initialSlot,
@@ -117,7 +121,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     let skip = 0;
     while (count !== 0) {
       try {
+        const release = await this.mutex.acquire();
         const blocks = await this.action.getLastSavedBlocks(skip, count);
+        release();
         if (blocks.length === 0) count = 0;
         const points =
           blocks.length > 0
@@ -147,12 +153,44 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   };
 
   /**
+   * Handles ogmios connection closure
+   */
+  connectionCloseHandler = async () => {
+    this.connected = false;
+    this.logger.warn('Ogmios connection closed');
+    if (this.stopped) return;
+    let trial = 0;
+    const connectionTrial = async () => {
+      trial++;
+      if (trial > CONNECTION_RETRIAL) {
+        this.logger.error(
+          `Could not connect to ogmios client after ${CONNECTION_RETRIAL} retrials. Check the ogmios connection and restart the service.`
+        );
+        return;
+      }
+      this.logger.debug(
+        `Retrying to connect to ogmios client in trial step #${trial}`
+      );
+      try {
+        await this.start();
+      } catch (e) {
+        this.logger.warn(
+          `An error occurred while reconnecting to ogmios client: ${e}`
+        );
+        setTimeout(connectionTrial, this.connectionRetrialInterval);
+      }
+    };
+    setTimeout(connectionTrial, this.connectionRetrialInterval);
+  };
+
+  /**
    * start scanner. first find fork point. fork all blocks and request updates from node.
    */
   start = async (): Promise<void> => {
+    this.stopped = false;
     const context: InteractionContext = await createInteractionContext(
       (err) => this.logger.error(`${err}`),
-      () => this.logger.debug('Connection closed.'),
+      this.connectionCloseHandler,
       { connection: { port: this.port, host: this.host, tls: this.useTls } }
     );
     const intersect = await this.findIntersection(context);
@@ -166,6 +204,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
         },
         { sequential: true }
       );
+      this.connected = true;
       await this.forkBlock(intersect.height + 1);
       await this.client.resume([intersect.point], 2);
     } else {
@@ -177,8 +216,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * stop ws connection to node.
    */
   stop = async (): Promise<void> => {
+    this.stopped = true;
     await this.client.shutdown();
   };
+
+  /**
+   * @returns The connection status of ogmios scanner
+   */
+  getConnectionStatus = () => this.connected;
 }
 
 export { CardanoOgmiosScanner };

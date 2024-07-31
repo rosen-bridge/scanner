@@ -15,6 +15,7 @@ interface CardanoOgmiosConfig {
   maxTryBlock?: number;
   dataSource: DataSource;
   useTls?: boolean;
+  connectionRetrialInterval: number;
 }
 
 interface CardanoBlockFrostConfig {
