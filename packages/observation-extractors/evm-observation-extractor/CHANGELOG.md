@@ -1,5 +1,18 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 3.0.0
+
+### Major Changes
+
+- change transaction type to TransactionResponse
+- check lock transaction status (success or failure) before storing observation
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.2
+  - @rosen-bridge/evm-rpc-scanner@1.0.0
+
 ## 2.0.1
 
 ### Patch Changes

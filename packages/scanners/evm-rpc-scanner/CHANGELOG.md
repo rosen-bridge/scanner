@@ -1,5 +1,11 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 1.0.0
+
+### Major Changes
+
+- change transaction type to TransactionResponse
+
 ## 0.2.9
 
 ### Patch Changes

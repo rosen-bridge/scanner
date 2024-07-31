@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-address-tx-extractor",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "description": "Extract and store EVM chain notable data of transactions for an address",
   "repository": "",
   "license": "GPL-3.0",
