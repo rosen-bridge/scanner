@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
 import { TxAction } from '../actions/db';
-import { Transaction } from 'ethers';
+import { isCallException, Transaction, TransactionResponse } from 'ethers';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ExtractedTx } from '../interfaces/types';
+import { EvmTxStatus, ExtractedTx } from '../interfaces/types';
 import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
-export class EvmTxExtractor extends AbstractExtractor<Transaction> {
+export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
@@ -35,32 +35,40 @@ export class EvmTxExtractor extends AbstractExtractor<Transaction> {
    * @param block
    */
   processTransactions = async (
-    txs: Array<Transaction>,
+    txs: Array<TransactionResponse>,
     block: Block
   ): Promise<boolean> => {
-    const extractedTxs: Array<ExtractedTx> = txs.reduce(
-      (addressTxs: Array<ExtractedTx>, tx: Transaction) => {
-        if (tx.from === null) {
-          throw Error(
-            'ImpossibleBehaviour: RPC transactions must have `from`.'
-          );
+    const extractedTxs: Array<ExtractedTx> = [];
+    for (const txRes of txs) {
+      const tx = Transaction.from(txRes);
+      if (tx.from === null) {
+        throw Error('ImpossibleBehavior: RPC transactions must have `from`.');
+      }
+      if (tx.hash === null) {
+        throw Error('ImpossibleBehavior: RPC transactions must have `hash`.');
+      }
+      if (tx.from === this.address) {
+        let status: EvmTxStatus;
+        try {
+          const result = await txRes.wait(0);
+          if (result) status = EvmTxStatus.succeed;
+          else
+            throw Error(
+              `Impossible behavior: Evm Tx [${txRes.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`
+            );
+        } catch (e) {
+          if (isCallException(e)) status = EvmTxStatus.failed;
+          else throw e;
         }
-        if (tx.hash === null) {
-          throw Error(
-            'ImpossibleBehaviour: RPC transactions must have `hash`.'
-          );
-        }
-        if (tx.from === this.address)
-          addressTxs.push({
-            unsignedHash: tx.unsignedHash,
-            signedHash: tx.hash,
-            nonce: tx.nonce,
-            address: tx.from,
-          });
-        return addressTxs;
-      },
-      []
-    );
+        extractedTxs.push({
+          unsignedHash: tx.unsignedHash,
+          signedHash: tx.hash,
+          nonce: tx.nonce,
+          address: tx.from,
+          status: status,
+        });
+      }
+    }
     await this.action.storeTxs(extractedTxs, block, this.getId());
     return true;
   };

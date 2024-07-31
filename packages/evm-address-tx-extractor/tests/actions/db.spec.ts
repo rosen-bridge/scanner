@@ -1,6 +1,6 @@
 import { createDatabase, generateRandomId } from '../testUtils';
 import { TxAction } from '../../lib/actions/db';
-import { AddressTxsEntity } from '../../lib';
+import { AddressTxsEntity, EvmTxStatus } from '../../lib';
 import { DataSource, Repository } from 'typeorm';
 
 let dataSource: DataSource;
@@ -33,6 +33,7 @@ describe('TxAction', () => {
           address: '0xedee4752e5a2f595151c94762fb38e5730357785',
           blockId: i < 2 ? 'block1' : 'block2',
           extractor: 'extractor 1',
+          status: EvmTxStatus.succeed,
         };
       });
       for (const tx of txs) await repository.insert(tx);
@@ -58,6 +59,7 @@ describe('TxAction', () => {
           address: '0xedee4752e5a2f595151c94762fb38e5730357785',
           blockId: 'block1',
           extractor: i < 2 ? 'extractor 1' : 'extractor 2',
+          status: EvmTxStatus.succeed,
         };
       });
       for (const tx of txs) await repository.insert(tx);
@@ -83,12 +85,14 @@ describe('TxAction', () => {
           signedHash: '0x' + generateRandomId(),
           nonce: 0,
           address: '0xedee4752e5a2f595151c94762fb38e5730357785',
+          status: EvmTxStatus.succeed,
         },
         {
           unsignedHash: '0x' + generateRandomId(),
           signedHash: '0x' + generateRandomId(),
           nonce: 1,
           address: '0xedee4752e5a2f595151c94762fb38e5730357785',
+          status: EvmTxStatus.succeed,
         },
       ];
 
