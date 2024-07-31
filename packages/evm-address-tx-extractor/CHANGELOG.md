@@ -1,5 +1,12 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 1.0.0
+
+### Major Changes
+
+- change transaction type to TransactionResponse
+- add status to AddressTxsEntity which represents if the transaction succeeded or failed
+
 ## 0.1.8
 
 ### Patch Changes
