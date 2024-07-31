@@ -44,6 +44,10 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
     } else throw new Error(`Network type ${type} is not supported`);
   }
 
+  /**
+   * Initialize extractor using Explorer network
+   * @param initialBlock
+   */
   initializeWithExplorer = async (initialBlock: BlockInfo) => {
     let fromHeight = 0,
       toHeight = initialBlock.height;
@@ -75,6 +79,10 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
     });
   };
 
+  /**
+   * Get the total tx count from Node network
+   * @returns total tx count of the address
+   */
   getTotalTxCount = async () => {
     const response = await (
       this.network as NodeNetwork
@@ -82,6 +90,10 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
     return response.total;
   };
 
+  /**
+   * Initialize extractor using Node network
+   * @param initialBlock
+   */
   initializeWithNode = async (initialBlock: BlockInfo) => {
     const txCountBeforeInit = await this.getTotalTxCount();
     await this.initWithRetrial(async () => {
@@ -120,6 +132,11 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
     }
   };
 
+  /**
+   * Process a batch of transactions
+   * group txs into blocks and process them using `processTransactions`
+   * @param txs
+   */
   processTransactionBatch = async (txs: Array<ExtendedTransaction>) => {
     txs = sortBy(txs, (tx) => tx.inclusionHeight);
     const groupedTxs = groupBy(txs, (tx) => tx.blockId);
@@ -138,6 +155,11 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
     }
   };
 
+  /**
+   * Initialize the extractor with retrial on any unexpected problem
+   * its the common part of initialize with Node and Explorer network
+   * @param job
+   */
   initWithRetrial = async (job: () => Promise<void>) => {
     let trial = 1;
     if (this.initialize) {

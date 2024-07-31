@@ -1,9 +1,9 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { AbstractNetwork } from './AbstractNetwork';
+import { V1 } from '@rosen-clients/ergo-explorer';
 
 import { BlockInfo } from '../../interfaces';
 import { ErgoBox, ExtendedTransaction } from '../interfaces';
-import { AbstractNetwork } from './AbstractNetwork';
-import { V1 } from '@rosen-clients/ergo-explorer';
 import { mapValues, pick } from 'lodash-es';
 import { API_LIMIT } from '../../constants';
 
@@ -42,7 +42,10 @@ export class ExplorerNetwork extends AbstractNetwork {
    * @param box
    * @returns ErgoBox
    */
-  convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
+  convertBox = /**
+   * convert Node transaction to extractor transaction type
+   * @param tx
+   */ async (box: V1.OutputInfo): Promise<ErgoBox> => {
     const spendInfo = box.spentTransactionId
       ? await this.getSpendingInfo(box.boxId, box.spentTransactionId)
       : undefined;
@@ -68,7 +71,7 @@ export class ExplorerNetwork extends AbstractNetwork {
   };
 
   /**
-   * convert Explorer transaction to scanner transaction type
+   * convert Explorer transaction to extractor transaction type
    * @param tx
    */
   private convertTransaction = (
@@ -102,6 +105,13 @@ export class ExplorerNetwork extends AbstractNetwork {
     };
   };
 
+  /**
+   * use explorer api to return related transactions of the specified address in the height range
+   * @param tokenId
+   * @param offset
+   * @param limit
+   * @returns related transactions
+   */
   getAddressTransactionsWithHeight = async (
     address: string,
     fromHeight: number,

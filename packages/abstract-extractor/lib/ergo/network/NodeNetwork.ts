@@ -44,7 +44,7 @@ export class NodeNetwork extends AbstractNetwork {
   };
 
   /**
-   * convert Node transaction to scanner transaction type
+   * convert Node transaction to extractor transaction type
    * @param tx
    */
   private convertTransaction = (
@@ -140,6 +140,13 @@ export class NodeNetwork extends AbstractNetwork {
     return { boxes: ergoBoxes, hasNextBatch: boxes.items.length > 0 };
   };
 
+  /**
+   * use node api to return related transactions of the specified address with limit offset
+   * @param tokenId
+   * @param offset
+   * @param limit
+   * @returns related transactions
+   */
   getAddressTransactionsWithOffsetLimit = async (
     address: string,
     offset: number,
