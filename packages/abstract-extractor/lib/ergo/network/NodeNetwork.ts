@@ -20,7 +20,7 @@ export class NodeNetwork extends AbstractNetwork {
    * @param box
    * @returns ErgoBox
    */
-  convertBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
+  private convertBox = async (box: IndexedErgoBox): Promise<ErgoBox> => {
     const tx = await await this.api.getTxById(box.transactionId!);
     const spendInfo = box.spentTransactionId
       ? await this.getSpendingInfo(box.boxId!, box.spentTransactionId)
@@ -64,7 +64,7 @@ export class NodeNetwork extends AbstractNetwork {
         additionalRegisters: output.additionalRegisters,
         boxId: output.boxId || '',
       })),
-      inputs: tx.inputs,
+      inputs: tx.inputs.map((input) => ({ boxId: input.boxId })) ?? [],
       dataInputs: tx.dataInputs,
     };
   };

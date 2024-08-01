@@ -42,7 +42,7 @@ export class ExplorerNetwork extends AbstractNetwork {
    * @param box
    * @returns ErgoBox
    */
-  convertBox = /**
+  private convertBox = /**
    * convert Node transaction to extractor transaction type
    * @param tx
    */ async (box: V1.OutputInfo): Promise<ErgoBox> => {
