@@ -73,7 +73,7 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
           }
         } while (txs.length == API_LIMIT);
         await this.processTransactionBatch(txs);
-        fromHeight = toHeight;
+        fromHeight = toHeight + 1;
         toHeight = initialBlock.height;
       }
     });
@@ -100,7 +100,7 @@ export abstract class AbstractInitializableByTransactionErgoExtractor<
       // Repeat the whole process twice to cover all spent boxes
       // After round 1 all boxes have been saved and processed once
       // After round 2 spending information of all stored boxes are updated successfully
-      for (let round = 0; round <= 2; round++) {
+      for (let round = 0; round <= 1; round++) {
         this.logger.debug(`Starting round ${round} of initialization`);
         let offset = 0,
           total = 1;

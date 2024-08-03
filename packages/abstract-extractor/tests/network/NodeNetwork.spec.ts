@@ -1,6 +1,5 @@
 import { describe, expect, it, vitest } from 'vitest';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
-import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { NodeNetwork } from '../../lib';
 import {
