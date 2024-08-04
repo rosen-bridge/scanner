@@ -1,5 +1,16 @@
 # @rosen-bridge/scanner
 
+## 4.2.0
+
+### Minor Changes
+
+- Add ogmios connection close handler
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.2.0
+
 ## 4.1.0
 
 ### Minor Changes

@@ -1,5 +1,14 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.0.7
+
+### Patch Changes
+
+- Fix explorer response test data
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.2.0
+  - @rosen-bridge/scanner@4.2.0
+
 ## 2.0.6
 
 ### Patch Changes
