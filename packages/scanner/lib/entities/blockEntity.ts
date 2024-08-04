@@ -14,14 +14,10 @@ export class BlockEntity {
   @Column()
   height: number;
 
-  @Column({
-    length: 64,
-  })
+  @Column()
   hash: string;
 
-  @Column({
-    length: 64,
-  })
+  @Column()
   parentHash: string;
 
   @Column()
