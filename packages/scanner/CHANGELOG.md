@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner
 
+## 4.1.0
+
+### Minor Changes
+
+- remove hash and parentHash length constraint in BlockEntity
+
 ## 4.0.5
 
 ### Patch Changes
