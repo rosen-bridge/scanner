@@ -1,5 +1,17 @@
 # @rosen-bridge/scanner
 
+## 4.1.0
+
+### Minor Changes
+
+- Add ogmios connection close handler
+- remove hash and parentHash length constraint in BlockEntity
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.2.0
+
 ## 4.0.5
 
 ### Patch Changes

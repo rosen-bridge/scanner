@@ -1,5 +1,13 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.6
+
+### Patch Changes
+
+- Remove redundant `getTxBlock` function
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.2.0
+
 ## 5.0.5
 
 ### Patch Changes
