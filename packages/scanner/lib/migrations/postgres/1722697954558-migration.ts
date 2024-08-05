@@ -12,11 +12,11 @@ export class migration1722697954558 implements MigrationInterface {
         `);
     await queryRunner.query(`
             ALTER TABLE "block_entity"
-            ALTER COLUMN "hash" TYPE character varying NOT NULL
+            ALTER COLUMN "hash" TYPE character varying
         `);
     await queryRunner.query(`
             ALTER TABLE "block_entity"
-            ALTER COLUMN "parentHash" TYPE character varying NOT NULL
+            ALTER COLUMN "parentHash" TYPE character varying
         `);
     await queryRunner.query(`
             ALTER TABLE "block_entity"
