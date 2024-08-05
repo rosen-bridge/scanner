@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner
 
+## 4.1.1
+
+### Patch Changes
+
+- fix postgres migration
+
 ## 4.1.0
 
 ### Minor Changes
