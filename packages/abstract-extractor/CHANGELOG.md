@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 0.2.0
+
+### Minor Changes
+
+- Add spendIndex to extracted data in initialization
+
 ## 0.1.5
 
 ### Patch Changes

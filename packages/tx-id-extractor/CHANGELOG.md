@@ -1,5 +1,20 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.2.17
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@4.1.1
+
+## 2.2.16
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.2.0
+  - @rosen-bridge/scanner@4.1.0
+
 ## 2.2.15
 
 ### Patch Changes
