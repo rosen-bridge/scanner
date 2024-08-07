@@ -4,12 +4,8 @@ import { Buffer } from 'buffer';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
-  ErgoBox,
-  AbstractNetwork,
-  NodeNetwork,
   OutputBox,
   boxHasToken,
-  ExplorerNetwork,
   ErgoNetworkType,
 } from '@rosen-bridge/abstract-extractor';
 
@@ -21,10 +17,8 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
   readonly actions: BoxEntityAction;
   private readonly id: string;
   private readonly networkType: ergoLib.NetworkPrefix;
-  private readonly address?: string;
   private readonly ergoTree?: string;
   private readonly tokens: Array<string>;
-  network: AbstractNetwork;
 
   constructor(
     dataSource: DataSource,
@@ -32,24 +26,19 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
     networkType: ergoLib.NetworkPrefix,
     url: string,
     type: ErgoNetworkType,
-    address?: string,
+    address: string,
     tokens?: Array<string>,
     logger?: AbstractLogger,
     initialize = true
   ) {
-    super(initialize, logger);
+    super(type, url, address, logger, initialize);
     this.id = id;
     this.networkType = networkType;
-    this.address = address;
     this.ergoTree = address
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
     this.actions = new BoxEntityAction(dataSource, this.logger);
-    if (type == ErgoNetworkType.Explorer)
-      this.network = new ExplorerNetwork(url);
-    else if (type == ErgoNetworkType.Node) this.network = new NodeNetwork(url);
-    else throw Error('Network type is not supported');
   }
 
   /**
@@ -95,24 +84,5 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
       blockId: blockId,
       height: height,
     };
-  };
-
-  /**
-   * return init required boxes with offset limit
-   * @param offset
-   * @param limit
-   * @return boxes in batch
-   */
-  getBoxesWithOffsetLimit = async (
-    offset: number,
-    limit: number
-  ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
-    if (this.address) {
-      return this.network.getBoxesByAddress(this.address, offset, limit);
-    } else if (!this.address && this.tokens.length > 0) {
-      return this.network.getBoxesByAddress(this.tokens[0], offset, limit);
-    } else {
-      return { boxes: [], hasNextBatch: false };
-    }
   };
 }
