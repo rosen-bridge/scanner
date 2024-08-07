@@ -36,7 +36,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         items: [],
         total: 196704,
       });
-      const totalTxCount = await extractor.getTotalTxCount();
+      const totalTxCount = await extractor['getTotalTxCount']();
       expect(totalTxCount).toEqual(196704);
     });
   });
@@ -60,7 +60,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       );
       const processSpy = vitest.fn();
       extractor.processTransactions = processSpy;
-      await extractor.processTransactionBatch(transactionBatch);
+      await extractor['processTransactionBatch'](transactionBatch);
       expect(processSpy).toBeCalledTimes(2);
       expect(processSpy).toHaveBeenCalledWith([transactionBatch[2]], {
         hash: '92eaff11a4a1c29b8654473258f9d837e9ce99fc0a8a4f27c484d5871afcde64',
@@ -103,7 +103,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         removeAllData: removeSpy,
       } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
       const initSpy = vitest.fn();
-      await extractor.initWithRetrial(initSpy);
+      await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).not.toHaveBeenCalled();
       expect(initSpy).not.toHaveBeenCalled();
     });
@@ -131,7 +131,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         removeAllData: removeSpy,
       } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
       const initSpy = vitest.fn();
-      await extractor.initWithRetrial(initSpy);
+      await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).toHaveBeenCalled();
       expect(initSpy).toHaveBeenCalledOnce();
     });
@@ -161,7 +161,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
       const initSpy = vitest.fn().mockRejectedValue(0);
       await expect(
-        async () => await extractor.initWithRetrial(initSpy)
+        async () => await extractor['initWithRetrial'](initSpy)
       ).rejects.toThrowError();
       expect(removeSpy).toHaveBeenCalled();
       expect(initSpy).toHaveBeenCalledTimes(RETRIAL_COUNT);
@@ -195,11 +195,11 @@ describe('AbstractInitializableErgoExtractor', () => {
         items: transactionBatch,
         total: 3,
       });
-      extractor.initWithRetrial = async (job: () => Promise<void>) => job();
-      extractor.getTotalTxCount = async () => 3;
+      extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
+      extractor['getTotalTxCount'] = async () => 3;
       const processSpy = vitest.fn();
-      extractor.processTransactionBatch = processSpy;
-      await extractor.initializeWithNode({ hash: 'hash', height: 1320698 });
+      extractor['processTransactionBatch'] = processSpy;
+      await extractor['initializeWithNode']({ hash: 'hash', height: 1320698 });
       expect(processSpy).toBeCalledTimes(2);
       expect(processSpy).toBeCalledWith([transactionBatch[2]]);
     });
@@ -229,14 +229,14 @@ describe('AbstractInitializableErgoExtractor', () => {
         items: transactionBatch,
         total: 3,
       });
-      extractor.initWithRetrial = async (job: () => Promise<void>) => job();
-      extractor.getTotalTxCount = vitest
+      extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
+      extractor['getTotalTxCount'] = vitest
         .fn()
         .mockResolvedValueOnce(3)
         .mockResolvedValue(4);
-      extractor.processTransactionBatch = vitest.fn();
+      extractor['processTransactionBatch'] = vitest.fn();
       expect(() =>
-        extractor.initializeWithNode({ hash: 'hash', height: 1320698 })
+        extractor['initializeWithNode']({ hash: 'hash', height: 1320698 })
       ).rejects.toThrowError();
     });
   });
@@ -264,7 +264,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         'explorer_url',
         'address'
       );
-      extractor.initWithRetrial = async (job: () => Promise<void>) => job();
+      extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
       const addressTxSpy = vitest
         .fn()
         .mockResolvedValueOnce(new Array(100).fill(transactionBatch[0]))
@@ -274,13 +274,15 @@ describe('AbstractInitializableErgoExtractor', () => {
         extractor['network'] as ExplorerNetwork
       ).getAddressTransactionsWithHeight = addressTxSpy;
       const processSpy = vitest.fn();
-      extractor.processTransactionBatch = processSpy;
-      await extractor.initializeWithExplorer({ hash: 'hash', height: 1320800 });
+      extractor['processTransactionBatch'] = processSpy;
+      await extractor['initializeWithExplorer']({
+        hash: 'hash',
+        height: 1320800,
+      });
       expect(addressTxSpy).toHaveBeenCalledWith('address', 0, 1320800);
       expect(addressTxSpy).toHaveBeenCalledWith('address', 0, 660400);
       expect(addressTxSpy).toHaveBeenLastCalledWith('address', 660401, 1320800);
-      expect(processSpy).toHaveBeenCalledTimes(2);
-      expect(processSpy).toHaveBeenCalledWith([]);
+      expect(processSpy).toHaveBeenCalledTimes(1);
       expect(processSpy).toHaveBeenCalledWith(transactionBatch);
     });
 
@@ -308,7 +310,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         'address'
       );
       // mock `initWithRetrial` to run the job once
-      extractor.initWithRetrial = async (job: () => Promise<void>) => job();
+      extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
       // mock `getAddressTransactionsWithHeight` to return 100 transactions in one block
       const exNetwork = extractor['network'] as ExplorerNetwork;
       const addressTxSpy = vitest
@@ -323,19 +325,25 @@ describe('AbstractInitializableErgoExtractor', () => {
       exNetwork.getAddressTransactionsWithHeight = addressTxSpy;
       // spy all other functions to check the calls
       const blockIdSpy = vi.fn().mockResolvedValue('blockId');
-      const blockTxsSpy = vi.fn();
+      const blockTxsSpy = vi.fn().mockResolvedValue([]);
       exNetwork.getBlockIdAtHeight = blockIdSpy;
       exNetwork.getBlockTxs = blockTxsSpy;
       const processSpy = vitest.fn();
       const processBatchSpy = vitest.fn();
       extractor.processTransactions = processSpy;
-      extractor.processTransactionBatch = processBatchSpy;
+      extractor['processTransactionBatch'] = processBatchSpy;
       // run test (call `initializeWithExplorer`)
-      await extractor.initializeWithExplorer({ hash: 'hash', height: 1320800 });
+      await extractor['initializeWithExplorer']({
+        hash: 'hash',
+        height: 1320800,
+      });
       expect(blockIdSpy).toHaveBeenCalledWith(1320000);
       expect(blockTxsSpy).toHaveBeenCalledWith('blockId');
-      expect(processSpy).toHaveBeenCalled();
-      expect(processBatchSpy).toBeCalledWith([]);
+      expect(processSpy).toHaveBeenCalledWith([], {
+        hash: 'blockId',
+        height: 1320000,
+      });
+      expect(processBatchSpy).not.toBeCalled();
     });
   });
 });

@@ -48,7 +48,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * Initialize extractor using Explorer network
    * @param initialBlock
    */
-  initializeWithExplorer = async (initialBlock: BlockInfo) => {
+  private initializeWithExplorer = async (initialBlock: BlockInfo) => {
     const explorerNetwork = this.network as ExplorerNetwork;
     let fromHeight = 0,
       toHeight = initialBlock.height;
@@ -72,8 +72,9 @@ export abstract class AbstractInitializableErgoExtractor<
             );
           }
         } while (txs.length == API_LIMIT);
-        if (txs.length < API_LIMIT) await this.processTransactionBatch(txs);
-        else {
+        if (txs.length < API_LIMIT) {
+          if (txs.length > 0) await this.processTransactionBatch(txs);
+        } else {
           this.logger.debug(
             `Block at height ${fromHeight} has more than (or equal) ${API_LIMIT} relevant txs, processing all txs in the block`
           );
@@ -97,7 +98,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * Get the total tx count from Node network
    * @returns total tx count of the address
    */
-  getTotalTxCount = async () => {
+  private getTotalTxCount = async () => {
     const response = await (
       this.network as NodeNetwork
     ).getAddressTransactionsWithOffsetLimit(this.address, 0, 0);
@@ -108,7 +109,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * Initialize extractor using Node network
    * @param initialBlock
    */
-  initializeWithNode = async (initialBlock: BlockInfo) => {
+  private initializeWithNode = async (initialBlock: BlockInfo) => {
     const txCountBeforeInit = await this.getTotalTxCount();
     await this.initWithRetrial(async () => {
       // Repeat the whole process twice to cover all spent boxes
@@ -133,7 +134,7 @@ export abstract class AbstractInitializableErgoExtractor<
           this.logger.debug(
             `Found ${txs.length} transactions below the initial height with offset ${offset} and total number of transactions ${total}`
           );
-          await this.processTransactionBatch(txs);
+          if (txs.length > 0) await this.processTransactionBatch(txs);
           offset += API_LIMIT;
         }
       }
@@ -151,7 +152,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * group txs into blocks and process them using `processTransactions`
    * @param txs
    */
-  processTransactionBatch = async (txs: Array<ExtendedTransaction>) => {
+  private processTransactionBatch = async (txs: Array<ExtendedTransaction>) => {
     txs = sortBy(txs, (tx) => tx.inclusionHeight);
     const groupedTxs = groupBy(txs, (tx) => tx.blockId);
     this.logger.debug(
@@ -174,7 +175,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * its the common part of initialize with Node and Explorer network
    * @param job
    */
-  initWithRetrial = async (job: () => Promise<void>) => {
+  private initWithRetrial = async (job: () => Promise<void>) => {
     let trial = 1;
     if (this.initialize) {
       this.logger.debug(
