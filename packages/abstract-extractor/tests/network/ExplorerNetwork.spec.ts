@@ -1,5 +1,6 @@
 import { describe, expect, it, vitest } from 'vitest';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { omit } from 'lodash-es';
 
 import { ExplorerNetwork } from '../../lib';
 import {
@@ -8,6 +9,7 @@ import {
   explorerTxInfo,
   convertedTx,
   explorerTx,
+  explorerBlockTx,
 } from './testData';
 
 vitest.mock('@rosen-clients/ergo-explorer');
@@ -41,7 +43,6 @@ describe('ExplorerNetwork', () => {
      * extractor transaction
      * @dependencies
      * @scenario
-     * - mock getTxById to return creation and spending transaction
      * - run test (call `convertTransaction`)
      * @expected
      * - to convert tx properly
@@ -50,6 +51,25 @@ describe('ExplorerNetwork', () => {
       const explorerNetwork = new ExplorerNetwork('explorer_url');
       const tx = await explorerNetwork['convertTransaction'](explorerTx);
       expect(tx).toEqual(convertedTx);
+    });
+  });
+
+  describe('convertBlockTransaction', () => {
+    /**
+     * @target convertBlockTransaction should properly convert explorer api tx to
+     * transaction type
+     * @dependencies
+     * @scenario
+     * - run test (call `convertBlockTransaction`)
+     * @expected
+     * - to convert tx properly
+     */
+    it('should properly convert explorer api tx to transaction type', async () => {
+      const explorerNetwork = new ExplorerNetwork('explorer_url');
+      const tx = await explorerNetwork['convertBlockTransaction'](
+        explorerBlockTx
+      );
+      expect(tx).toEqual(omit(convertedTx, ['blockId', 'inclusionHeight']));
     });
   });
 });

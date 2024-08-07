@@ -49,15 +49,14 @@ export abstract class AbstractInitializableErgoExtractor<
    * @param initialBlock
    */
   initializeWithExplorer = async (initialBlock: BlockInfo) => {
+    const explorerNetwork = this.network as ExplorerNetwork;
     let fromHeight = 0,
       toHeight = initialBlock.height;
     await this.initWithRetrial(async () => {
       while (fromHeight < toHeight) {
         let txs: Array<ExtendedTransaction>;
         do {
-          txs = await (
-            this.network as ExplorerNetwork
-          ).getAddressTransactionsWithHeight(
+          txs = await explorerNetwork.getAddressTransactionsWithHeight(
             this.address,
             fromHeight,
             toHeight
@@ -66,13 +65,25 @@ export abstract class AbstractInitializableErgoExtractor<
             `Found ${txs.length} for the address transactions from height ${fromHeight} to height ${toHeight}`
           );
           if (txs.length == API_LIMIT) {
+            if (fromHeight == toHeight) break;
             toHeight = Math.floor((toHeight - fromHeight) / 2) + fromHeight;
             this.logger.debug(
               `Limiting the query height range to [${fromHeight}, ${toHeight}]`
             );
           }
         } while (txs.length == API_LIMIT);
-        await this.processTransactionBatch(txs);
+        if (txs.length < API_LIMIT) await this.processTransactionBatch(txs);
+        else {
+          this.logger.debug(
+            `Block at height ${fromHeight} has more than ${API_LIMIT} relevant boxes, processing all txs in the block`
+          );
+          const blockId = await explorerNetwork.getBlockIdAtHeight(fromHeight);
+          const blockTxs = await explorerNetwork.getBlockTxs(blockId);
+          await this.processTransactions(blockTxs, {
+            hash: blockId,
+            height: fromHeight,
+          });
+        }
         fromHeight = toHeight + 1;
         toHeight = initialBlock.height;
       }

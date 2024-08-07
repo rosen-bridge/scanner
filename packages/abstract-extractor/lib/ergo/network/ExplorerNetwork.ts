@@ -3,7 +3,7 @@ import { AbstractNetwork } from './AbstractNetwork';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
 import { BlockInfo } from '../../interfaces';
-import { ErgoBox, ExtendedTransaction } from '../interfaces';
+import { ErgoBox, ExtendedTransaction, Transaction } from '../interfaces';
 import { mapValues, pick } from 'lodash-es';
 import { API_LIMIT } from '../../constants';
 
@@ -42,10 +42,7 @@ export class ExplorerNetwork extends AbstractNetwork {
    * @param box
    * @returns ErgoBox
    */
-  private convertBox = /**
-   * convert Node transaction to extractor transaction type
-   * @param tx
-   */ async (box: V1.OutputInfo): Promise<ErgoBox> => {
+  private convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
     const spendInfo = box.spentTransactionId
       ? await this.getSpendingInfo(box.boxId, box.spentTransactionId)
       : undefined;
@@ -71,7 +68,7 @@ export class ExplorerNetwork extends AbstractNetwork {
   };
 
   /**
-   * convert Explorer transaction to extractor transaction type
+   * convert explorer transaction to extractor transaction type
    * @param tx
    */
   private convertTransaction = (
@@ -106,6 +103,34 @@ export class ExplorerNetwork extends AbstractNetwork {
   };
 
   /**
+   * convert explorer block transaction to transaction type
+   * @param tx
+   */
+  private convertBlockTransaction = (tx: V1.TransactionInfo1): Transaction => {
+    return {
+      id: tx.id,
+      dataInputs:
+        tx.dataInputs?.map((dataInput) => ({
+          boxId: dataInput.id,
+        })) ?? [],
+      inputs: tx.inputs?.map((input) => ({ boxId: input.id })) ?? [],
+      outputs:
+        tx.outputs?.map((output) => ({
+          boxId: output.id,
+          transactionId: output.txId,
+          additionalRegisters: output.additionalRegisters,
+          assets: output.assets?.map((asset) =>
+            pick(asset, ['tokenId', 'amount'])
+          ),
+          ergoTree: output.ergoTree,
+          creationHeight: output.creationHeight,
+          index: output.index,
+          value: output.value,
+        })) ?? [],
+    };
+  };
+
+  /**
    * use explorer api to return related transactions of the specified address in the height range
    * @param tokenId
    * @param offset
@@ -127,6 +152,41 @@ export class ExplorerNetwork extends AbstractNetwork {
         'Explorer AddressTransactions api expected to have items'
       );
     return txs.items.map((tx) => this.convertTransaction(tx));
+  };
+
+  /**
+   * use explorer api to get the block id at the specified height
+   * @param height
+   * @returns block id
+   */
+  getBlockIdAtHeight = async (height: number): Promise<string> => {
+    const header = await this.api.v1.getApiV1BlocksHeaders({
+      offset: height,
+      limit: 1,
+    });
+    if (!header.items) {
+      throw new Error(
+        `Expected explorer block header api at height ${height} to have items`
+      );
+    }
+    return header.items[0].id;
+  };
+
+  /**
+   * use explorer api to return all transactions in a block
+   * @param blockId
+   * @returns converted transactions
+   */
+  getBlockTxs = async (blockId: string): Promise<Array<Transaction>> => {
+    const block = await this.api.v1.getApiV1BlocksP1(blockId);
+    if (!block.block.blockTransactions) {
+      throw new Error(
+        `Expected explorer block api to include block transactions for block ${blockId}`
+      );
+    }
+    return block.block.blockTransactions.map((tx) =>
+      this.convertBlockTransaction(tx)
+    );
   };
 
   /**

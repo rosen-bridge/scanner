@@ -1550,6 +1550,107 @@ export const explorerTx = {
   size: 789,
 };
 
+export const explorerBlockTx = {
+  id: '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+  headerId: 'a39b506bc9ba2b199ff803a967319c67cece3207c7d54cdad79345f8d228d367',
+  inclusionHeight: 1320528,
+  timestamp: 1722500537020n,
+  index: 3,
+  confirmationsCount: 4285,
+  inputs: [
+    {
+      id: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
+      value: 5810250000n,
+      index: 0,
+      spendingProof: undefined,
+      transactionId:
+        '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+      outputTransactionId:
+        'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
+      outputIndex: 0,
+      address:
+        'EfS5abyDe4vKFrJ48K5HnwTqa1ksn238bWFPe84bzVvCGvK1h2B7sgWLETtQuWwzVdBaoRZ1HcyzddrxLcsoM5YEy4UnqcLqMU1MDca1kLw9xbazAM6Awo9y6UVWTkQcS97mYkhkmx2Tewg3JntMgzfLWz5mACiEJEv7potayvk6awmLWS36sJMfXWgnEfNiqTyXNiPzt466cgot3GLcEsYXxKzLXyJ9EfvXpjzC2abTMzVSf1e17BHre4zZvDoAeTqr4igV3ubv2PtJjntvF2ibrDLmwwAyANEhw1yt8C8fCidkf3MAoPE6T53hX3Eb2mp3Xofmtrn4qVgmhNonnV8ekWZWvBTxYiNP8Vu5nc6RMDBv7P1c5rRc3tnDMRh2dUcDD7USyoB9YcvioMfAZGMNfLjWqgYu9Ygw2FokGBPThyWrKQ5nkLJvief1eQJg4wZXKdXWAR7VxwNftdZjPCHcmwn6ByRHZo9kb4Emv3rjfZE',
+    },
+    {
+      id: '4af30f9c715a7e2bc5f05ad8eedfab1592a320f3c7dd3ca6093902f5207b5c05',
+      value: 23326478571n,
+      index: 1,
+      spendingProof:
+        '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
+      transactionId:
+        '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+      outputTransactionId:
+        'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
+      outputIndex: 6,
+      address: '9fzRcctiWfzoJyqGtPWqoXPuxSmFw6zpnjtsQ1B6jSN514XqH4q',
+    },
+  ],
+  dataInputs: [],
+  outputs: [
+    {
+      id: '3729892f2fcd5b05761ab2994bb418947a5e7d6aaeae5c46351b2e6cf29afc34',
+      txId: '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+      value: 5810250000n,
+      index: 0,
+      creationHeight: 1320526,
+      ergoTree:
+        '1014040004000e208c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b903504000400040204020101040205a0c21e040204080500040c040204a0c21e0402050a05c8010402d806d601b2a5730000d602b5db6501fed9010263ed93e4c67202050ec5a7938cb2db63087202730100017302d603b17202d604e4c6b272027303000605d605d90105049590720573047204e4c6b272029972057305000605d606b07202860273067307d901063c400163d803d6088c720601d6098c720801d60a8c72060286029a72097308ededed8c72080293c2b2a5720900d0cde4c6720a040792c1b2a5720900730992da720501997209730ae4c6720a0605ea02d1ededededededed93cbc27201e4c6a7060e927203730b93db63087201db6308a793e4c6720104059db07202730cd9010741639a8c720701e4c68c72070206057e72030593e4c6720105049ae4c6a70504730d92c1720199c1a77e9c9a7203730e730f058c72060292da720501998c72060173109972049d9c720473117312b2ad7202d9010763cde4c672070407e4c6b2a5731300040400',
+      address:
+        'NTkuk55NdwCXkF1e2nCABxq7bHjtinX3wH13zYPZ6qYT71dCoZBe1gZkh9FAr7GeHo2EpFoibzpNQmoi89atUjKRrhZEYrTapdtXrWU4kq319oY7BEWmtmRU9cMohX69XMuxJjJP5hRM8WQLfFnffbjshhEP3ck9CKVEkFRw1JDYkqVke2JVqoMED5yxLVkScbBUiJJLWq9BSbE1JJmmreNVskmWNxWE6V7ksKPxFMoqh1SVePh3UWAaBgGQRZ7TWf4dTBF5KMVHmRXzmQqEu2Fz2yeSLy23sM3pfqa78VuvoFHnTFXYFFxn3DNttxwq3EU3Zv25SmgrWjLKiZjFcEcqGgH6DJ9FZ1DfucVtTXwyDJutY3ksUBaEStRxoUQyRu4EhDobixL3PUWRcxaRJ8JKA9b64ALErGepRHkAoVmS8DaE6VbroskyMuhkTo7LbrzhTyJbqKurEzoEfhYxus7bMpLTePgKcktgRRyB7MjVxjSpxWzZedvzbjzZaHLZLkWZESk1WtdM25My33wtVLNXiTvficEUbjA23sNd24pv1YQ72nY1aqUHa2',
+      assets: [
+        {
+          tokenId:
+            '011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f',
+          index: 0,
+          amount: 1n,
+          name: 'ERGUSD-NFT',
+          decimals: 0,
+          type: 'EIP-004',
+        },
+      ],
+      additionalRegisters: {
+        R4: '05a686a9ad09',
+        R5: '04a299a101',
+        R6: '0e20f7ef73c4a4ab91b84bb0a2905108d534114472ec057be3a57a9dfc9b1fbd85c1',
+      } as V1.OutputInfo1AdditionalRegisters,
+      spentTransactionId:
+        '0ad32fd0423a4d2e551f0ae9be28a650bef4b9420791bd5208c6f35c1b234322',
+      mainChain: true,
+    },
+    {
+      id: '897b3cf050e6fa6e66536caa38185f284ca74423227b3bebdc5a8189d06e4126',
+      txId: '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+      value: 1500000n,
+      index: 1,
+      creationHeight: 1320526,
+      ergoTree:
+        '1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304',
+      address:
+        '2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe',
+      assets: [],
+      additionalRegisters: {},
+      spentTransactionId:
+        '2f768f5b33f54cd00f98509c0d78c195857558087fcbb8395777c22844fdbbfc',
+      mainChain: true,
+    },
+    {
+      id: '918c7a92bf9ab9ba45cb96df067129f3fc0c24b62bf91d7f8c7f1d3062e52426',
+      txId: '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
+      value: 23324978571n,
+      index: 2,
+      creationHeight: 1320526,
+      ergoTree:
+        '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+      address: '9fzRcctiWfzoJyqGtPWqoXPuxSmFw6zpnjtsQ1B6jSN514XqH4q',
+      assets: [],
+      additionalRegisters: {},
+      spentTransactionId:
+        'fc362346389ebad8252c19a6489a5c55eb3afbca4b9e21cc1c8aa4583d1aefd3',
+      mainChain: true,
+    },
+  ],
+};
+
 export const convertedTx = {
   id: '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
   inclusionHeight: 1320528,

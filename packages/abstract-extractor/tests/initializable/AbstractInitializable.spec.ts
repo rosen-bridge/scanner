@@ -1,4 +1,4 @@
-import { describe, expect, it, vitest } from 'vitest';
+import { describe, expect, it, vi, vitest } from 'vitest';
 
 import {
   ErgoNetworkType,
@@ -16,6 +16,7 @@ describe('AbstractInitializableErgoExtractor', () => {
     /**
      * @target getTotalTxCount should return the total tx count
      * @dependencies
+     * - explorer network
      * @scenario
      * - mock extractor
      * - mock `getAddressTransactionsWithOffsetLimit` in node network
@@ -171,6 +172,7 @@ describe('AbstractInitializableErgoExtractor', () => {
     /**
      * @target initializeWithNode should process all transactions bellow the init height twice
      * @dependencies
+     * - node network
      * @scenario
      * - mock extractor
      * - mock `getAddressTransactionsWithOffsetLimit` in node network
@@ -205,6 +207,7 @@ describe('AbstractInitializableErgoExtractor', () => {
     /**
      * @target initializeWithNode should throw error when total transaction count changes
      * @dependencies
+     * - node network
      * @scenario
      * - mock extractor
      * - mock `getAddressTransactionsWithOffsetLimit` in node network
@@ -243,6 +246,7 @@ describe('AbstractInitializableErgoExtractor', () => {
      * @target initializeWithExplorer should limit the height and process
      * transactions when they are less than the API_LIMIT
      * @dependencies
+     * - explorer network
      * @scenario
      * - mock extractor
      * - mock `initWithRetrial` to run the job once
@@ -278,6 +282,60 @@ describe('AbstractInitializableErgoExtractor', () => {
       expect(processSpy).toHaveBeenCalledTimes(2);
       expect(processSpy).toHaveBeenCalledWith([]);
       expect(processSpy).toHaveBeenCalledWith(transactionBatch);
+    });
+
+    /**
+     * @target initializeWithExplorer should process all block transactions when
+     * the number of transactions in the block is more than API_LIMIT
+     * @dependencies
+     * - explorer network
+     * @scenario
+     * - mock extractor
+     * - mock `initWithRetrial` to run the job once
+     * - mock `getAddressTransactionsWithHeight` to return 100 transactions in one block
+     * - spy all other functions to check the calls
+     * - run test (call `initializeWithExplorer`)
+     * @expected
+     * - to process all transactions in block 1320000
+     * - not to stuck at a large block and complete the process
+     */
+    it(`should process all block transactions when the number of transactions in
+      the block is more than API_LIMIT`, async () => {
+      // mock extractor
+      const extractor = new MockedInitializableErgoExtractor(
+        ErgoNetworkType.Explorer,
+        'explorer_url',
+        'address'
+      );
+      // mock `initWithRetrial` to run the job once
+      extractor.initWithRetrial = async (job: () => Promise<void>) => job();
+      // mock `getAddressTransactionsWithHeight` to return 100 transactions in one block
+      const exNetwork = extractor['network'] as ExplorerNetwork;
+      const addressTxSpy = vitest
+        .fn()
+        .mockImplementation(
+          (address: string, fromHeight: number, toHeight: number) => {
+            if (fromHeight <= 1320000 && toHeight >= 1320000)
+              return new Array(100).fill(transactionBatch[0]);
+            return [];
+          }
+        );
+      exNetwork.getAddressTransactionsWithHeight = addressTxSpy;
+      // spy all other functions to check the calls
+      const blockIdSpy = vi.fn().mockResolvedValue('blockId');
+      const blockTxsSpy = vi.fn();
+      exNetwork.getBlockIdAtHeight = blockIdSpy;
+      exNetwork.getBlockTxs = blockTxsSpy;
+      const processSpy = vitest.fn();
+      const processBatchSpy = vitest.fn();
+      extractor.processTransactions = processSpy;
+      extractor.processTransactionBatch = processBatchSpy;
+      // run test (call `initializeWithExplorer`)
+      await extractor.initializeWithExplorer({ hash: 'hash', height: 1320800 });
+      expect(blockIdSpy).toHaveBeenCalledWith(1320000);
+      expect(blockTxsSpy).toHaveBeenCalledWith('blockId');
+      expect(processSpy).toHaveBeenCalled();
+      expect(processBatchSpy).toBeCalledWith([]);
     });
   });
 });
