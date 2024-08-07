@@ -75,10 +75,13 @@ export abstract class AbstractInitializableErgoExtractor<
         if (txs.length < API_LIMIT) await this.processTransactionBatch(txs);
         else {
           this.logger.debug(
-            `Block at height ${fromHeight} has more than ${API_LIMIT} relevant boxes, processing all txs in the block`
+            `Block at height ${fromHeight} has more than (or equal) ${API_LIMIT} relevant txs, processing all txs in the block`
           );
           const blockId = await explorerNetwork.getBlockIdAtHeight(fromHeight);
           const blockTxs = await explorerNetwork.getBlockTxs(blockId);
+          this.logger.debug(
+            `Found ${blockTxs.length} transactions at height ${fromHeight}`
+          );
           await this.processTransactions(blockTxs, {
             hash: blockId,
             height: fromHeight,

@@ -160,16 +160,8 @@ export class ExplorerNetwork extends AbstractNetwork {
    * @returns block id
    */
   getBlockIdAtHeight = async (height: number): Promise<string> => {
-    const header = await this.api.v1.getApiV1BlocksHeaders({
-      offset: height,
-      limit: 1,
-    });
-    if (!header.items) {
-      throw new Error(
-        `Expected explorer block header api at height ${height} to have items`
-      );
-    }
-    return header.items[0].id;
+    const id = await this.api.v0.getApiV0BlocksAtP1(height);
+    return id[0];
   };
 
   /**
