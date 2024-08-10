@@ -55,23 +55,24 @@ export abstract class AbstractInitializableErgoExtractor<
     await this.initWithRetrial(async () => {
       while (fromHeight < toHeight) {
         let txs: Array<ExtendedTransaction>;
-        do {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
           txs = await explorerNetwork.getAddressTransactionsWithHeight(
             this.address,
             fromHeight,
             toHeight
           );
           this.logger.debug(
-            `Found ${txs.length} for the address transactions from height ${fromHeight} to height ${toHeight}`
+            `Found ${txs.length} transactions for the address from height ${fromHeight} to height ${toHeight}`
           );
-          if (txs.length == API_LIMIT) {
-            if (fromHeight == toHeight) break;
-            toHeight = Math.floor((toHeight - fromHeight) / 2) + fromHeight;
-            this.logger.debug(
-              `Limiting the query height range to [${fromHeight}, ${toHeight}]`
-            );
+          if (txs.length < API_LIMIT || fromHeight === toHeight) {
+            break; // Exit loop if we have fewer transactions than the limit or if the range is reduced to a single height
           }
-        } while (txs.length == API_LIMIT);
+          toHeight = Math.floor((toHeight - fromHeight) / 2) + fromHeight;
+          this.logger.debug(
+            `Limiting the query height range to [${fromHeight}, ${toHeight}]`
+          );
+        }
         if (txs.length < API_LIMIT) {
           if (txs.length > 0) await this.processTransactionBatch(txs);
         } else {
