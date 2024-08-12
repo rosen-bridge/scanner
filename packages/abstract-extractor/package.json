@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-clients/ergo-explorer": "^1.1.2",
     "@rosen-clients/ergo-node": "^1.1.1",
     "lodash-es": "^4.17.21"
