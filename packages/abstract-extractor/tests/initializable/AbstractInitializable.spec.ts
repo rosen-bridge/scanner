@@ -47,10 +47,11 @@ describe('AbstractInitializableErgoExtractor', () => {
      * @dependencies
      * @scenario
      * - mock extractor
-     * - mock `getAddressTransactionsWithOffsetLimit` in node network
+     * - spy `processTransactions`
      * - run test (call `processTransactionBatch`)
      * @expected
-     * - return one total tx count
+     * - to group txs in two blocks
+     * - to process each blocks transaction separately
      */
     it('should group transactions and process them in correct order', async () => {
       const extractor = new MockedInitializableErgoExtractor(
@@ -118,6 +119,7 @@ describe('AbstractInitializableErgoExtractor', () => {
      * - mock init job
      * - run test (call `initWithRetrial`)
      * @expected
+     * - to remove database old data once
      * - call init job once
      */
     it('should call init job once', async () => {
@@ -132,7 +134,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
       const initSpy = vitest.fn();
       await extractor['initWithRetrial'](initSpy);
-      expect(removeSpy).toHaveBeenCalled();
+      expect(removeSpy).toHaveBeenCalledOnce();
       expect(initSpy).toHaveBeenCalledOnce();
     });
 
@@ -146,6 +148,7 @@ describe('AbstractInitializableErgoExtractor', () => {
      * - mock init job to throw error
      * - run test (call `initWithRetrial`)
      * @expected
+     * - to remove database old data once
      * - call init job RETRIAL_COUNT number of times
      * - to throw error after trials
      */
@@ -163,7 +166,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       await expect(
         async () => await extractor['initWithRetrial'](initSpy)
       ).rejects.toThrowError();
-      expect(removeSpy).toHaveBeenCalled();
+      expect(removeSpy).toHaveBeenCalledOnce();
       expect(initSpy).toHaveBeenCalledTimes(RETRIAL_COUNT);
     });
   });
@@ -251,6 +254,9 @@ describe('AbstractInitializableErgoExtractor', () => {
      * - mock extractor
      * - mock `initWithRetrial` to run the job once
      * - mock `getAddressTransactionsWithHeight` in explorer network
+     *    return API_LIMIT transactions in first call (to limit the height range)
+     *    return 0 transactions in second call (to pass a range without process)
+     *    return transactionBatch in last call (to process the transactions when they are less than API_LIMIT)
      * - run test (call `initializeWithExplorer`)
      * @expected
      * - to limit the height when the transaction count is equal to API_LIMIT
