@@ -1,5 +1,15 @@
 # @rosen-bridge/abstract-extractor
 
+## 0.3.0
+
+### Minor Changes
+
+- Add abstract extractor class that can be initialized using address transactions.
+
+### Patch Changes
+
+- Change processTransaction Block interface to use minimal information
+
 ## 0.2.0
 
 ### Minor Changes

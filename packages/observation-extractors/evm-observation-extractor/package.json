@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-observation-extractor",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Event observation data extractor for EVM-compatible chains",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
@@ -34,8 +34,8 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^1.0.0",
-    "@rosen-bridge/evm-rpc-scanner": "^1.0.2",
-    "@rosen-bridge/observation-extractor": "^5.0.4",
+    "@rosen-bridge/evm-rpc-scanner": "^1.0.3",
+    "@rosen-bridge/observation-extractor": "^5.0.5",
     "@rosen-bridge/rosen-extractor": "^6.1.1",
     "@rosen-bridge/tokens": "^1.2.0",
     "blakejs": "^1.2.1",

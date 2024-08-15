@@ -1,5 +1,13 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.7
+
+### Patch Changes
+
+- Change processTransaction Block interface to use minimal information
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.3.0
+
 ## 5.0.6
 
 ### Patch Changes
