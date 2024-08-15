@@ -1,7 +1,7 @@
 import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
 import { EvmTxStatus } from '../../lib';
 
-export const address = '0x103931ca7ea5a385918E77E64Fdd96430F6d2ECa';
+export const address = '0x103931ca7ea5a385918e77e64fdd96430f6d2eca';
 export const txs: Array<TransactionResponse> = [
   Transaction.from({
     type: 2,
