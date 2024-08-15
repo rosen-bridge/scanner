@@ -11,6 +11,9 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
   private readonly id: string;
   private readonly address: string;
 
+  /**
+   * address should be lower case (without checksum)
+   */
   constructor(
     dataSource: DataSource,
     id: string,
@@ -47,7 +50,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
       if (tx.hash === null) {
         throw Error('ImpossibleBehavior: RPC transactions must have `hash`.');
       }
-      if (tx.from === this.address) {
+      if (tx.from.toLowerCase() === this.address) {
         let status: EvmTxStatus;
         try {
           const result = await txRes.wait(0);
@@ -64,7 +67,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
           unsignedHash: tx.unsignedHash,
           signedHash: tx.hash,
           nonce: tx.nonce,
-          address: tx.from,
+          address: tx.from.toLowerCase(),
           status: status,
         });
       }

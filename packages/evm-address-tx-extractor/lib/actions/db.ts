@@ -19,7 +19,7 @@ export class TxAction {
    * @param extractor selected extractor
    */
   deleteBlockTxs = async (blockId: string, extractor: string) => {
-    this.logger.info(
+    this.logger.debug(
       `Deleting transactions of block ${blockId} and extractor ${extractor}`
     );
     await this.repository
@@ -45,7 +45,7 @@ export class TxAction {
     extractor: string
   ) => {
     await this.deleteBlockTxs(block.hash, extractor);
-    this.logger.info(
+    this.logger.debug(
       `Inserting new transactions [${txs.map(
         (tx) => tx.signedHash
       )}] in block ${block.hash} and extractor ${extractor}`
