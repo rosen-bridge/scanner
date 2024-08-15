@@ -1,5 +1,15 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 1.0.3
+
+### Patch Changes
+
+- fix address comparision (uses lower case address while comparing)
+- change log levels to debug
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.3.0
+  - @rosen-bridge/scanner@4.1.2
+
 ## 1.0.2
 
 ### Patch Changes
