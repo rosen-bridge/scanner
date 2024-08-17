@@ -1,5 +1,11 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 8.0.0
+
+### Major Changes
+
+- change paymentTxId format in R4 from hex string to string
+
 ## 7.0.3
 
 ### Patch Changes

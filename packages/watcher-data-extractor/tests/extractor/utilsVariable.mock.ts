@@ -694,7 +694,7 @@ export const spendTriggerTx: Transaction = {
       index: 9,
     },
     {
-      boxId: 'ad8f28d284586190025589a314c20c2b9afb62be023596c115c1eacef2a1fc5b',
+      boxId: '6d5526106dc00dd29cae5d1d749ab28891e486e2a8704180d7707c06fe238a3f',
       value: 47000000n,
       ergoTree:
         '0008cd02d0b75bc997751195d143671cc10e8a590f25b987f2b2dd0d99cc5f48c6966d3d',
@@ -706,7 +706,7 @@ export const spendTriggerTx: Transaction = {
         },
       ],
       additionalRegisters: {
-        R4: '0e208379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57',
+        R4: '0e4038333739633633323731376238653162323239316536336232333435643563353463613835303664633966363964383736316461313262666232393034663537',
       },
       creationHeight: 987965,
       transactionId:
