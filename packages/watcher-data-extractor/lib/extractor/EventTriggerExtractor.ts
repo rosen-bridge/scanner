@@ -228,7 +228,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             .register_value(wasm.NonMandatoryRegisterId.R4)
             ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
-            const txId = Buffer.from(R4Serialized).toString('hex');
+            const txId = Buffer.from(R4Serialized).toString();
             paymentTxId = txId;
             if (txId !== '') paymentTxId = txId;
             else {
