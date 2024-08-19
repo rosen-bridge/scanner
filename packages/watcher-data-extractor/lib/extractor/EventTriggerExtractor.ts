@@ -228,15 +228,14 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             .register_value(wasm.NonMandatoryRegisterId.R4)
             ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
-            let txId: string;
-            try {
-              txId = Buffer.from(R4Serialized).toString();
-            } catch (e) {
+            let txId = Buffer.from(R4Serialized).toString();
+            // we assumed txId only includes these characters
+            if (!txId.match(/^[0-9a-zA-Z\-_.]+$/)) {
+              // backward compatibility
               txId = Buffer.from(R4Serialized).toString('hex');
             }
             paymentTxId = txId;
-            if (txId !== '') paymentTxId = txId;
-            else {
+            if (txId === '') {
               paymentTxId = transaction.id;
               this.logger.debug(
                 `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
