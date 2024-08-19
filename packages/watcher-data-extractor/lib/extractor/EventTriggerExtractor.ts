@@ -216,10 +216,7 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     let paymentTxId = '';
     if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
       result = EventResult.fraud;
-    else if (
-      transaction.outputs[0].ergoTree === this.permitErgoTree &&
-      transaction.outputs[1].ergoTree === this.permitErgoTree
-    ) {
+    else if (transaction.outputs[0].ergoTree === this.permitErgoTree) {
       result = EventResult.successful;
       // find first non-watcher box with R4 value
       for (const box of transaction.outputs) {
