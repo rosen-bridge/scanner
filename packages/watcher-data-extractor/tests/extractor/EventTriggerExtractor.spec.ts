@@ -9,6 +9,7 @@ import {
   eventTriggerAddress,
   RWTId,
   spendTriggerTx,
+  spendTriggerTxOldFormat,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
@@ -149,6 +150,47 @@ describe('EventTriggerExtractor', () => {
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
+    });
+
+    /**
+     * @target EventTriggerExtractor.processTransactions should extract result and
+     * paymentTxId of the event in old format succesfully and save them into db
+     * @dependencies
+     * - EventTriggerAction
+     * @scenario
+     * - mock `spendEventTriggers` function of action
+     * - run test
+     * - check if function got called with correct argument
+     * @expected
+     * - `spendEventTriggers` should have been called with 'succesful' result
+     *   and expected paymentTxId
+     */
+    it('should extract result and paymentTxId of the event in old format succesfully and save them into db', async () => {
+      // mock `spendEventTriggers` function of action
+      const extractor = new EventTriggerExtractor(
+        'extractorId',
+        dataSource,
+        eventTriggerAddress,
+        RWTId,
+        permitAddress,
+        fraudAddress
+      );
+      const spendTriggerSpy = jest.spyOn(
+        (extractor as any).actions,
+        'spendEventTriggers'
+      );
+      spendTriggerSpy.mockResolvedValue(undefined);
+      const tx1 = spendTriggerTxOldFormat;
+      const res = await extractor.processTransactions([tx1], block);
+      expect(res).toEqual(true);
+      expect(spendTriggerSpy).toHaveBeenCalledWith(
+        expect.any(Array),
+        block,
+        extractor.id,
+        tx1.id,
+        EventResult.successful,
+        '8379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57'
+      );
     });
 
     /**

@@ -216,7 +216,10 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
     let paymentTxId = '';
     if (transaction.outputs[0].ergoTree === this.fraudErgoTree)
       result = EventResult.fraud;
-    else if (transaction.outputs[0].ergoTree === this.permitErgoTree) {
+    else if (
+      transaction.outputs[0].ergoTree === this.permitErgoTree &&
+      transaction.outputs[1].ergoTree === this.permitErgoTree
+    ) {
       result = EventResult.successful;
       // find first non-watcher box with R4 value
       for (const box of transaction.outputs) {
@@ -228,15 +231,15 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             .register_value(wasm.NonMandatoryRegisterId.R4)
             ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
-            let txId: string;
-            try {
-              txId = Buffer.from(R4Serialized).toString();
-            } catch (e) {
+            let txId = Buffer.from(R4Serialized).toString();
+            // backward compatibility
+            if (!txId.match(/^[0-9a-zA-Z]+$/)) {
               txId = Buffer.from(R4Serialized).toString('hex');
+              // we assumed txId only includes these characters
+              if (!txId.match(/^[0-9a-zA-Z\-_]*$/)) continue;
             }
             paymentTxId = txId;
-            if (txId !== '') paymentTxId = txId;
-            else {
+            if (txId === '') {
               paymentTxId = transaction.id;
               this.logger.debug(
                 `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
