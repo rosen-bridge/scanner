@@ -229,11 +229,10 @@ class EventTriggerExtractor extends AbstractExtractor<Transaction> {
             ?.to_byte_array();
           if (R4Serialized !== undefined && R4Serialized.length > 0) {
             let txId = Buffer.from(R4Serialized).toString();
-            // backward compatibility
-            if (!txId.match(/^[0-9a-zA-Z]+$/)) {
+            // we assumed txId only includes these characters
+            if (!txId.match(/^[0-9a-zA-Z\-_.]+$/)) {
+              // backward compatibility
               txId = Buffer.from(R4Serialized).toString('hex');
-              // we assumed txId only includes these characters
-              if (!txId.match(/^[0-9a-zA-Z\-_]*$/)) continue;
             }
             paymentTxId = txId;
             if (txId === '') {
