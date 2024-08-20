@@ -1,5 +1,11 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 8.0.1
+
+### Patch Changes
+
+- improve event result extractor to avoid unnecessary errors
+
 ## 8.0.0
 
 ### Major Changes
