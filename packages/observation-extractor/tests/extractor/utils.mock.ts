@@ -341,7 +341,7 @@ export const cardanoTxValid = {
         '"to": "ergo",' +
         '"bridgeFee": "10000",' +
         '"networkFee": "10000",' +
-        '"toAddress": "ergoAddress",' +
+        '"toAddress": "9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM",' +
         ' "fromAddress": ["' +
         fromAddress +
         '"] }'

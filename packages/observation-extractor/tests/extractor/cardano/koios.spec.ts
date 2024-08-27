@@ -55,7 +55,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         toChain: 'ergo',
         fromAddress:
           'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',
-        toAddress: 'ergoAddress',
+        toAddress: '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         height: 1,
         amount: '10',
         networkFee: '10000',
@@ -110,7 +110,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         ...cardanoTxValid,
         metadata: {
           '0': JSON.parse(
-            '{"to": "ergo","bridgeFee": "10000","toAddress": "ergoAddress","targetChainTokenId": "cardanoTokenId"}'
+            '{"to": "ergo","bridgeFee": "10000","toAddress": "9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM","targetChainTokenId": "cardanoTokenId"}'
           ),
         },
       };

@@ -1,5 +1,13 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 4.0.6
+
+### Patch Changes
+
+- Verify destination address in observation extractor
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.6
+
 ## 4.0.5
 
 ### Patch Changes

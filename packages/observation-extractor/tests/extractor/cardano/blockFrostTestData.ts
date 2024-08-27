@@ -88,7 +88,7 @@ export const validLockTx = {
       json_metadata: {
         to: 'ergo',
         bridgeFee: '1968503938',
-        toAddress: 'ergoAddress',
+        toAddress: '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         networkFee: '9842520',
         fromAddress: [
           'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',

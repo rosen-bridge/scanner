@@ -39,7 +39,7 @@ describe('extractorErgo', () => {
         true,
         [
           'cardano',
-          'address',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
           '10000',
           '1000',
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
@@ -49,7 +49,12 @@ describe('extractorErgo', () => {
       );
       const Tx2 = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000'],
+        [
+          'cardano',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
+          '10000',
+          '1000',
+        ],
         bankSK,
         watcherSK
       );
@@ -57,7 +62,7 @@ describe('extractorErgo', () => {
         false,
         [
           'cardano',
-          'address',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
           '10000',
           '1000',
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
@@ -82,7 +87,7 @@ describe('extractorErgo', () => {
         fromChain: 'ergo',
         toChain: 'cardano',
         fromAddress: watcherAddress,
-        toAddress: 'address',
+        toAddress: 'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
         height: 1,
         amount: assetAmount,
         networkFee: '10000',
@@ -113,7 +118,13 @@ describe('extractorErgo', () => {
       );
       const Tx1 = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000', watcherAddress],
+        [
+          'cardano',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
+          '10000',
+          '1000',
+          watcherAddress,
+        ],
         bankSK,
         watcherSK
       );
@@ -147,7 +158,7 @@ describe('extractorErgo', () => {
         true,
         [
           'cardano',
-          'address',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
           '10000',
           '1000',
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
@@ -157,7 +168,12 @@ describe('extractorErgo', () => {
       );
       const Tx2 = observationTxGenerator(
         true,
-        ['cardano', 'address', '10000', '1000'],
+        [
+          'cardano',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
+          '10000',
+          '1000',
+        ],
         bankSK,
         watcherSK
       );
@@ -165,7 +181,7 @@ describe('extractorErgo', () => {
         false,
         [
           'cardano',
-          'address',
+          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
           '10000',
           '1000',
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',

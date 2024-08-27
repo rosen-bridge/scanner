@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 3.0.4
+
+### Patch Changes
+
+- Verify destination address in observation extractor
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.6
+
 ## 3.0.3
 
 ### Patch Changes
