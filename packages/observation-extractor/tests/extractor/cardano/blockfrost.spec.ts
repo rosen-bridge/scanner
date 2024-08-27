@@ -64,7 +64,7 @@ describe('cardanoBlockFrostObservationExtractor', () => {
         toChain: 'ergo',
         fromAddress:
           'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',
-        toAddress: 'ergoAddress',
+        toAddress: '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         height: 1,
         amount: '3000000000',
         networkFee: '9842520',
