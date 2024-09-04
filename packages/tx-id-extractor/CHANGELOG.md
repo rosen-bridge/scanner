@@ -1,5 +1,13 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.2.19
+
+### Patch Changes
+
+- Update ogmios client and schema.
+- Updated dependencies
+  - @rosen-bridge/scanner@4.1.3
+
 ## 2.2.18
 
 ### Patch Changes
