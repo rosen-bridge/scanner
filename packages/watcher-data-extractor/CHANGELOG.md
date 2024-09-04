@@ -1,5 +1,12 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 8.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@4.1.3
+
 ## 8.0.1
 
 ### Patch Changes

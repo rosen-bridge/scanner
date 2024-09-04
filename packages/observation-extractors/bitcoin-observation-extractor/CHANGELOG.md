@@ -1,5 +1,14 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 4.0.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.7
+  - @rosen-bridge/bitcoin-esplora-scanner@0.1.14
+  - @rosen-bridge/bitcoin-rpc-scanner@0.2.8
+
 ## 4.0.6
 
 ### Patch Changes

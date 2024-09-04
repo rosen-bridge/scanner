@@ -1,5 +1,13 @@
 # @rosen-bridge/observation-extractor
 
+## 5.0.7
+
+### Patch Changes
+
+- Update ogmios client and schema.
+- Updated dependencies
+  - @rosen-bridge/scanner@4.1.3
+
 ## 5.0.6
 
 ### Patch Changes
