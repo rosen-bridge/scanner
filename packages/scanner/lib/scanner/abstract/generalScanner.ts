@@ -7,7 +7,7 @@ abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
   abstract network: AbstractNetworkConnector<TransactionType>;
-  abstract getFirstBlock: () => Promise<Block>;
+  protected abstract getFirstBlock: () => Promise<Block>;
 
   /**
    * function that checks if fork is happen in the blockchain or not
