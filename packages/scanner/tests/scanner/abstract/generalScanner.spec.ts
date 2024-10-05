@@ -27,7 +27,7 @@ describe('generalScanner', () => {
     it('should return false when database is empty', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      expect(await scanner.isForkHappen()).toBeFalsy();
+      expect(await scanner['isForkHappen']()).toBeFalsy();
     });
 
     /**
@@ -52,7 +52,7 @@ describe('generalScanner', () => {
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
-      expect(await scanner.isForkHappen()).toBeTruthy();
+      expect(await scanner['isForkHappen']()).toBeTruthy();
     });
 
     /**
@@ -77,7 +77,7 @@ describe('generalScanner', () => {
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
-      expect(await scanner.isForkHappen()).toBeFalsy();
+      expect(await scanner['isForkHappen']()).toBeFalsy();
     });
   });
 
@@ -98,7 +98,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(scanner, 'processBlockTransactions')
+        .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -106,7 +106,7 @@ describe('generalScanner', () => {
         blockHeight: 1,
         timestamp: 50,
       };
-      await scanner.processBlock({
+      await scanner['processBlock']({
         hash: '1',
         parentHash: ' ',
         blockHeight: 1,
@@ -134,10 +134,10 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest.spyOn(
-        scanner,
+        scanner as any,
         'processBlockTransactions'
       );
-      const result = await scanner.processBlock({
+      const result = await scanner['processBlock']({
         hash: '1',
         parentHash: '2',
         blockHeight: 1,
@@ -167,7 +167,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(scanner, 'processBlockTransactions')
+        .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -176,7 +176,7 @@ describe('generalScanner', () => {
         timestamp: 50,
         txCount: 1,
       };
-      await scanner.processBlock(block);
+      await scanner['processBlock'](block);
       expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
     });
   });
@@ -245,7 +245,7 @@ describe('generalScanner', () => {
       const lastBlock = await scanner.action.getLastSavedBlock();
       expect(lastBlock).toBeDefined();
       if (lastBlock) {
-        await scanner.stepForward(lastBlock);
+        await scanner['stepForward'](lastBlock);
       }
       expect(await scanner.action.getBlockAtHeight(3)).toBeDefined();
       expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
@@ -305,7 +305,7 @@ describe('generalScanner', () => {
         .mockReturnValue(new Promise((resolve) => resolve(3)));
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
-      await scanner.stepBackward();
+      await scanner['stepBackward']();
       const blockCount = await dataSource
         .getRepository(BlockEntity)
         .findBy({ scanner: scanner.name() });
@@ -323,7 +323,7 @@ describe('generalScanner', () => {
     it('should insert first block', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      await scanner.initialize();
+      await scanner['initialize']();
       const blocks = await dataSource.getRepository(BlockEntity).find();
       expect(blocks.length).toEqual(1);
       const block = blocks[0];
@@ -345,7 +345,7 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
       const mockedInit = jest
-        .spyOn(scanner, 'initialize')
+        .spyOn(scanner as any, 'initialize')
         .mockImplementation()
         .mockReturnValue(
           new Promise((resolve, reject) => {
@@ -409,11 +409,11 @@ describe('generalScanner', () => {
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const processSpy = jest.spyOn(scanner, 'processBlock');
-      jest.spyOn(scanner, 'isForkHappen').mockResolvedValue(false);
+      const processSpy = jest.spyOn(scanner as any, 'processBlock');
+      jest.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
       jest
-        .spyOn(scanner, 'verifyExtractorsInitialization')
-        .mockImplementation((block: InitialInfo) => {
+        .spyOn(scanner as any, 'verifyExtractorsInitialization')
+        .mockImplementation(() => {
           throw Error();
         });
       await scanner.update();
@@ -472,7 +472,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
       const mockedStepForward = jest
-        .spyOn(scanner, 'stepForward')
+        .spyOn(scanner as any, 'stepForward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
@@ -530,7 +530,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
       const mockedStepBackward = jest
-        .spyOn(scanner, 'stepBackward')
+        .spyOn(scanner as any, 'stepBackward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();

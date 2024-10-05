@@ -13,7 +13,7 @@ abstract class GeneralScanner<
    * function that checks if fork is happen in the blockchain or not
    * @return Promise<Boolean>
    */
-  isForkHappen = async (): Promise<boolean> => {
+  protected isForkHappen = async (): Promise<boolean> => {
     const lastSavedBlock = await this.action.getLastSavedBlock();
     if (lastSavedBlock !== undefined) {
       const lastSavedBlockFromNetwork = await this.network.getBlockAtHeight(
@@ -29,7 +29,7 @@ abstract class GeneralScanner<
    * process a block and execute all extractor on it.
    * @param block
    */
-  processBlock = async (block: Block) => {
+  protected processBlock = async (block: Block) => {
     this.logger.debug(
       `Processing block at height [${
         block.blockHeight
@@ -54,7 +54,7 @@ abstract class GeneralScanner<
    * process forward in scanner. get blocks and store information from transactions.
    * @param lastSavedBlock: last saved block entity in database
    */
-  stepForward = async (lastSavedBlock: BlockEntity) => {
+  protected stepForward = async (lastSavedBlock: BlockEntity) => {
     const currentHeight = await this.network.getCurrentHeight();
     const firstBlock = await this.action.getFirstSavedBlock();
     if (!firstBlock || firstBlock.height >= currentHeight) {
@@ -90,7 +90,7 @@ abstract class GeneralScanner<
    * Step backward in blockchain and find fork point.
    * and remove all forked blocks from database
    */
-  stepBackward = async () => {
+  protected stepBackward = async () => {
     let block = await this.action.getLastSavedBlock();
     while (block) {
       const blockFromNetwork = await this.network.getBlockAtHeight(
@@ -112,7 +112,7 @@ abstract class GeneralScanner<
    * Process and store the first block in database
    * @returns
    */
-  initialize = async () => {
+  protected initialize = async () => {
     const block = await this.getFirstBlock();
     await this.verifyExtractorsInitialization({
       height: block.blockHeight - 1,
