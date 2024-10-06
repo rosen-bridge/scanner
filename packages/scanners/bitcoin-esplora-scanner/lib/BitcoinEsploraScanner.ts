@@ -17,7 +17,7 @@ export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransact
     this.network = new EsploraNetwork(config.esploraUrl, config.timeout);
   }
 
-  getFirstBlock = (): Promise<Block> => {
+  protected getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 

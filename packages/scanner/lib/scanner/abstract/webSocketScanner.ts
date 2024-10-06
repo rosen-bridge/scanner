@@ -45,7 +45,10 @@ abstract class WebSocketScanner<
    * @param block
    * @param transactions
    */
-  stepForward = async (block: Block, transactions: Array<TransactionType>) => {
+  protected stepForward = async (
+    block: Block,
+    transactions: Array<TransactionType>
+  ) => {
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
       try {
@@ -82,7 +85,7 @@ abstract class WebSocketScanner<
    * Handle forking a block
    * @param block
    */
-  stepBackward = async (block: Block) => {
+  protected stepBackward = async (block: Block) => {
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
       try {

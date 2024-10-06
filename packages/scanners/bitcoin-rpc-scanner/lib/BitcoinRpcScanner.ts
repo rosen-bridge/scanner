@@ -21,7 +21,7 @@ export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
     this.network = new RpcNetwork(config.rpcUrl, config.timeout, auth);
   }
 
-  getFirstBlock = (): Promise<Block> => {
+  protected getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 

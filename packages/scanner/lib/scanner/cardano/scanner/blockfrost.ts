@@ -25,7 +25,7 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
     );
   }
 
-  getFirstBlock = (): Promise<Block> => {
+  protected getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 

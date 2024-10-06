@@ -61,7 +61,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * @param response: forked block
    * @param requestNext: a function to tell node to send next block
    */
-  rollBackward = async (
+  private rollBackward = async (
     response: BackwardResponse,
     requestNext: () => void
   ) => {
@@ -90,7 +90,10 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * @param response: new block
    * @param requestNext: tell library that this block proceeds. pass next block when available
    */
-  rollForward = async (response: ForwardResponse, requestNext: () => void) => {
+  private rollForward = async (
+    response: ForwardResponse,
+    requestNext: () => void
+  ) => {
     if (response.block.type === 'praos') {
       const praosBlock = response.block as BlockPraos;
       this.logger.debug(
@@ -116,7 +119,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    * find intersect between stored blocks and blockchain.
    * @param context: blockchain context
    */
-  findIntersection = async (context: InteractionContext) => {
+  private findIntersection = async (context: InteractionContext) => {
     let count = 1;
     let skip = 0;
     while (count !== 0) {
@@ -155,7 +158,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   /**
    * Handles ogmios connection closure
    */
-  connectionCloseHandler = async () => {
+  private connectionCloseHandler = async () => {
     this.connected = false;
     this.logger.warn('Ogmios connection closed');
     if (this.stopped) return;

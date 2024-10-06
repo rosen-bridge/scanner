@@ -72,7 +72,7 @@ describe('webSocketScanner', () => {
      * - no block inserted to database
      */
     it('should not insert block in database if current block hash not equals last inserted one', async () => {
-      await scanner.stepForward(
+      await scanner['stepForward'](
         {
           hash: 'block 2',
           parentHash: 'block 0',
@@ -98,7 +98,7 @@ describe('webSocketScanner', () => {
      */
     it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
-      await scanner.stepForward(
+      await scanner['stepForward'](
         {
           hash: 'block 2',
           parentHash: 'block 0',
@@ -120,7 +120,7 @@ describe('webSocketScanner', () => {
      * - must store a block entity to database with correct values
      */
     it('should store block into database', async () => {
-      await scanner.stepForward(
+      await scanner['stepForward'](
         {
           hash: 'block 2',
           parentHash: 'block 1',
@@ -158,7 +158,7 @@ describe('webSocketScanner', () => {
         scanner: scanner.name(),
         timestamp: 2,
       });
-      await scanner.stepBackward({
+      await scanner['stepBackward']({
         blockHeight: 100,
         hash: 'block 1',
         parentHash: 'block 0',

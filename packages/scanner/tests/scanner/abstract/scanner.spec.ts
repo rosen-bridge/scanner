@@ -91,7 +91,7 @@ describe('AbstractScanner', () => {
     it('should remove all blocks to fork point for specific scanner', async () => {
       const scanner1 = new firstScanner(dataSource);
       await insertBlocks(scanner1, 10);
-      await scanner1.forkBlock(3);
+      await scanner1['forkBlock'](3);
       expect(await dataSource.getRepository(BlockEntity).count()).toEqual(2);
     });
 
@@ -106,7 +106,7 @@ describe('AbstractScanner', () => {
       const scanner2 = new secondScanner(dataSource);
       await insertBlocks(scanner1, 10);
       await insertBlocks(scanner2, 10);
-      await scanner1.forkBlock(3);
+      await scanner1['forkBlock'](3);
       expect(
         (
           await dataSource
@@ -135,7 +135,7 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('extractor');
       scanner1.extractors.push(extractor);
       await insertBlocks(scanner1, 10);
-      await scanner1.forkBlock(10);
+      await scanner1['forkBlock'](10);
       expect(extractor.forked.length).toEqual(1);
       expect(extractor.forked[0]).toEqual('10');
     });
@@ -150,7 +150,7 @@ describe('AbstractScanner', () => {
      */
     it('should insert block into database', async () => {
       const scanner = new firstScanner(dataSource);
-      await scanner.processBlockTransactions(
+      await scanner['processBlockTransactions'](
         { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         []
       );
@@ -175,7 +175,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
-      await scanner.processBlockTransactions(
+      await scanner['processBlockTransactions'](
         { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [{ height: 1, blockHash: '1' }]
       );
@@ -196,7 +196,7 @@ describe('AbstractScanner', () => {
         .mockImplementation(() => Promise.reject('this is my error on save'));
       scanner.extractors.push(extractor);
       await expect(() => {
-        return scanner.processBlockTransactions(
+        return scanner['processBlockTransactions'](
           { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
           [{ height: 1, blockHash: '1' }]
         );
@@ -225,7 +225,7 @@ describe('AbstractScanner', () => {
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
-      await scanner.verifyExtractorsInitialization(initInfo);
+      await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
       expect(scanner.extractors[0]).toBe(extractor);
       expect(scanner.newExtractors.length).toBe(0);
@@ -256,7 +256,7 @@ describe('AbstractScanner', () => {
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash' } as InitialInfo;
-      await scanner.verifyExtractorsInitialization(initInfo);
+      await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).not.toHaveBeenCalled();
     });
 
@@ -285,7 +285,7 @@ describe('AbstractScanner', () => {
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
-      await scanner.verifyExtractorsInitialization(initInfo);
+      await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
     });
 
@@ -314,7 +314,7 @@ describe('AbstractScanner', () => {
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
-      await scanner.verifyExtractorsInitialization(initInfo);
+      await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
     });
 
@@ -342,7 +342,7 @@ describe('AbstractScanner', () => {
       scanner['extractors'] = [extractor];
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
-      await scanner.verifyExtractorsInitialization({
+      await scanner['verifyExtractorsInitialization']({
         height: 100,
         hash: 'hash',
       } as InitialInfo);

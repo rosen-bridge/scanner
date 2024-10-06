@@ -36,7 +36,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
     this.logger = logger ? logger : new DummyLogger();
   }
 
-  getFirstBlock = (): Promise<Block> => {
+  protected getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 

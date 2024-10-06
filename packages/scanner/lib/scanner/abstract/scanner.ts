@@ -25,7 +25,7 @@ export abstract class AbstractScanner<TransactionType> {
    * fork blocks from specific height from scanner.
    * @param height: selected height
    */
-  forkBlock = async (height: number) => {
+  protected forkBlock = async (height: number) => {
     let lastBlock = await this.action.getLastSavedBlock();
     while (lastBlock && lastBlock.height >= height) {
       this.logger.debug(
@@ -55,7 +55,7 @@ export abstract class AbstractScanner<TransactionType> {
    * @param block: selected block
    * @param transactions: list of transaction for selected block
    */
-  processBlockTransactions = async (
+  protected processBlockTransactions = async (
     block: Block,
     transactions: Array<TransactionType>
   ) => {
@@ -156,7 +156,7 @@ export abstract class AbstractScanner<TransactionType> {
    * and update the active extractors list
    * @param block
    */
-  verifyExtractorsInitialization = async (block: InitialInfo) => {
+  protected verifyExtractorsInitialization = async (block: InitialInfo) => {
     const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
       return extractors.map((extractor) => extractor.getId());
     };
