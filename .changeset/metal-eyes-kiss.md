@@ -1,8 +1,8 @@
 ---
-'@rosen-bridge/bitcoin-esplora-scanner': patch
-'@rosen-bridge/bitcoin-rpc-scanner': patch
-'@rosen-bridge/evm-rpc-scanner': patch
-'@rosen-bridge/scanner': patch
+'@rosen-bridge/bitcoin-esplora-scanner': major
+'@rosen-bridge/bitcoin-rpc-scanner': major
+'@rosen-bridge/evm-rpc-scanner': major
+'@rosen-bridge/scanner': major
 ---
 
-Use protected methods for scanner instances
+Use protected methods for scanner subclasses
