@@ -7,6 +7,12 @@ interface CardanoKoiosConfig {
   dataSource: DataSource;
 }
 
+interface OgmiosReconnectionConfig {
+  initialDelay?: number;
+  maxDelay?: number;
+  maxAttempts?: number;
+}
+
 interface CardanoOgmiosConfig {
   nodeHostOrIp: string;
   nodePort: number;
@@ -15,7 +21,7 @@ interface CardanoOgmiosConfig {
   maxTryBlock?: number;
   dataSource: DataSource;
   useTls?: boolean;
-  connectionRetrialInterval: number;
+  reconnectionConfig?: OgmiosReconnectionConfig;
 }
 
 interface CardanoBlockFrostConfig {
@@ -34,6 +40,7 @@ interface CardanoGraphQLConfig {
 
 export {
   CardanoKoiosConfig,
+  OgmiosReconnectionConfig,
   CardanoOgmiosConfig,
   CardanoBlockFrostConfig,
   CardanoGraphQLConfig,

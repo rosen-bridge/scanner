@@ -17,9 +17,15 @@ import {
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
 import { BlockDbAction } from '../../action';
-import { CardanoOgmiosConfig } from '../interfaces';
+import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { CONNECTION_RETRIAL, SLOT_SHELLY_NUMBER } from '../../../constants';
+import {
+  RECONNECTION_INITIAL_DELAY,
+  RECONNECTION_MAX_DELAY,
+  SLOT_SHELLY_NUMBER,
+  RECONNECTION_MAX_ATTEMPTS,
+} from '../../../constants';
+import { ExponentialBackoff, handleWhen, retry } from 'cockatiel';
 
 interface BackwardResponse {
   point: PointOrOrigin;
@@ -37,9 +43,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   host: string;
   port: number;
   useTls: boolean;
-  connectionRetrialInterval: number;
   private connected: boolean;
   private stopped: boolean;
+  private reconnectionConfig: OgmiosReconnectionConfig;
   name = () => 'cardano-ogmios';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
@@ -48,11 +54,17 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     this.host = config.nodeHostOrIp;
     this.port = config.nodePort;
     this.useTls = config.useTls ?? false;
-    this.connectionRetrialInterval = config.connectionRetrialInterval;
     this.connected = false;
     this.initPoint = {
       id: config.initialHash,
       slot: config.initialSlot,
+    };
+    this.reconnectionConfig = {
+      initialDelay:
+        config.reconnectionConfig?.initialDelay ?? RECONNECTION_INITIAL_DELAY,
+      maxDelay: config.reconnectionConfig?.maxDelay ?? RECONNECTION_MAX_DELAY,
+      maxAttempts:
+        config.reconnectionConfig?.maxAttempts ?? RECONNECTION_MAX_ATTEMPTS,
     };
   }
 
@@ -162,28 +174,31 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     this.connected = false;
     this.logger.warn('Ogmios connection closed');
     if (this.stopped) return;
-    let trial = 0;
-    const connectionTrial = async () => {
-      trial++;
-      if (trial > CONNECTION_RETRIAL) {
-        this.logger.error(
-          `Could not connect to ogmios client after ${CONNECTION_RETRIAL} retrials. Check the ogmios connection and restart the service.`
+
+    const retryPolicy = retry(
+      handleWhen((error: Error) => {
+        this.logger.warn(
+          `An error occurred while reconnecting to ogmios client: ${error}`
         );
-        return;
+        return true;
+      }),
+      {
+        maxAttempts: this.reconnectionConfig.maxAttempts,
+        backoff: new ExponentialBackoff({
+          maxDelay: this.reconnectionConfig.maxDelay,
+          initialDelay: this.reconnectionConfig.initialDelay,
+        }),
       }
+    );
+
+    let trial = 0;
+    retryPolicy.execute(async () => {
+      trial++;
       this.logger.debug(
         `Retrying to connect to ogmios client in trial step #${trial}`
       );
-      try {
-        await this.start();
-      } catch (e) {
-        this.logger.warn(
-          `An error occurred while reconnecting to ogmios client: ${e}`
-        );
-        setTimeout(connectionTrial, this.connectionRetrialInterval);
-      }
-    };
-    setTimeout(connectionTrial, this.connectionRetrialInterval);
+      return await this.start();
+    });
   };
 
   /**
