@@ -26,7 +26,6 @@ import {
   RECONNECTION_MAX_ATTEMPTS,
 } from '../../../constants';
 import { ExponentialBackoff, handleWhen, retry } from 'cockatiel';
-import { error } from 'console';
 
 interface BackwardResponse {
   point: PointOrOrigin;
