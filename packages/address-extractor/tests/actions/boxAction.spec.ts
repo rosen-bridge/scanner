@@ -5,6 +5,7 @@ import { BoxEntityAction } from '../../lib/actions/boxAction';
 import { createDatabase } from '../extractor/utils.mock';
 import { BoxEntity } from '../../lib';
 import { ExtractedBox } from '../../lib/interfaces/types';
+import { block1, block2 } from './testData';
 
 let dataSource: DataSource;
 let action: BoxEntityAction;
@@ -25,13 +26,11 @@ describe('BoxAction', () => {
      */
     it('should checks boxes saved successfully', async () => {
       const box: ExtractedBox = {
-        height: 100,
-        blockId: 'block1',
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
       };
-      await action.insertBoxes([box], 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address');
@@ -61,10 +60,8 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized-new',
         address: 'address-new',
-        blockId: 'block1',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address-new');
@@ -94,10 +91,8 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized-new',
         address: 'address-new',
-        blockId: 'block1',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       expect(await repository.count()).toEqual(2);
       const stored = (await repository.findBy({ extractor: 'extractor' }))[0];
       expect(stored.address).toEqual('address-new');
@@ -120,10 +115,8 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
       await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
@@ -145,10 +138,8 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
       await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
@@ -170,10 +161,8 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'block1',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'block1' } as Block,
@@ -203,12 +192,10 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.deleteBlockBoxes('create-block', 'extractor1');
+      await action.deleteBlockBoxes(block1.hash, 'extractor1');
       expect(await repository.count()).toEqual(0);
     });
 
@@ -224,16 +211,18 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
-        spendBlock: 'spend-block',
-        spendHeight: 200,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        block2,
+        'extractor1'
+      );
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
+      console.log(JSON.stringify(boxEntity1));
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes('spend-block', 'extractor1');
+      await action.deleteBlockBoxes(block2.hash, 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).toBeNull();
@@ -251,16 +240,17 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
-        spendBlock: 'spend-block',
-        spendHeight: 200,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        block2,
+        'extractor1'
+      );
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes('spend-block', 'extractor2');
+      await action.deleteBlockBoxes(block2.hash, 'extractor2');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).not.toBeNull();
@@ -278,16 +268,17 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
-        spendBlock: 'create-block',
-        spendHeight: 100,
       };
-      await action.insertBoxes([box], 'extractor1');
+      await action.insertBoxes([box], block1, 'extractor1');
+      await action.spendBoxes(
+        [{ boxId: 'boxid', txId: 'txId', index: 0 }],
+        block1,
+        'extractor1'
+      );
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes('create-block', 'extractor1');
+      await action.deleteBlockBoxes(block1.hash, 'extractor1');
       expect(await repository.count()).toEqual(0);
     });
   });
@@ -307,11 +298,9 @@ describe('BoxAction', () => {
         boxId: 'boxid',
         serialized: 'serialized',
         address: 'address',
-        blockId: 'create-block',
-        height: 100,
       };
-      await action.insertBoxes([box], 'extractor');
-      const result = await action.removeAllData('extractor');
+      await action.insertBoxes([box], block1, 'extractor');
+      await action.removeAllData('extractor');
       expect(await repository.find()).toHaveLength(0);
     });
   });

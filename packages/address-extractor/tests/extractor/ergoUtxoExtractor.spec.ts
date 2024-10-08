@@ -32,7 +32,7 @@ describe('AddressExtractor', () => {
      * - extract the box information
      */
     it('should extract data in correct format', () => {
-      const data = extractor.extractBoxData(tx1.outputs[0], 'blockId', 100);
+      const data = extractor.extractBoxData(tx1.outputs[0]);
       expect(data).toEqual(extractedBox);
     });
   });
