@@ -65,11 +65,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
    * @param height box inclusion block height
    * @return extracted data in proper format
    */
-  extractBoxData = (
-    box: OutputBox,
-    blockId: string,
-    height: number
-  ): Omit<ExtractedBox, 'spendBlock' | 'spendHeight'> | undefined => {
+  extractBoxData = (box: OutputBox): ExtractedBox | undefined => {
     const ergoBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
     return {
       boxId: ergoBox.box_id().to_str(),
@@ -81,8 +77,6 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
       serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
         'base64'
       ),
-      blockId: blockId,
-      height: height,
     };
   };
 }

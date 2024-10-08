@@ -100,8 +100,6 @@ export const extractedData = {
   boxId: 'boxId1',
   address: 'address1',
   serialized: 'serialized1',
-  blockId: 'blockId1',
-  height: 98,
 };
 
 export const block: Block = {

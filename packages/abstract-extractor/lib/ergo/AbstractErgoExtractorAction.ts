@@ -10,6 +10,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    */
   abstract insertBoxes: (
     data: ExtractedData[],
+    block: BlockInfo,
     extractorId: string
   ) => Promise<boolean>;
 

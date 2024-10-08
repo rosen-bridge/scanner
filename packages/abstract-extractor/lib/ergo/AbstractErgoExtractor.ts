@@ -31,11 +31,7 @@ export abstract class AbstractErgoExtractor<
    * @param height box inclusion block height
    * @return extracted data in proper format
    */
-  abstract extractBoxData: (
-    box: OutputBox,
-    blockId: string,
-    height: number
-  ) => Omit<ExtractedData, 'spendBlock' | 'spendHeight'> | undefined;
+  abstract extractBoxData: (box: OutputBox) => ExtractedData | undefined;
 
   /**
    * check proper data format in the box
@@ -63,11 +59,7 @@ export abstract class AbstractErgoExtractor<
             continue;
           }
           this.logger.debug(`Trying to extract data from box ${output.boxId}`);
-          const extractedData = this.extractBoxData(
-            output,
-            block.hash,
-            block.height
-          );
+          const extractedData = this.extractBoxData(output);
           if (extractedData) {
             this.logger.debug(
               `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${
@@ -84,7 +76,8 @@ export abstract class AbstractErgoExtractor<
         }
       }
 
-      if (boxes.length > 0) await this.actions.insertBoxes(boxes, this.getId());
+      if (boxes.length > 0)
+        await this.actions.insertBoxes(boxes, block, this.getId());
       await this.actions.spendBoxes(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
