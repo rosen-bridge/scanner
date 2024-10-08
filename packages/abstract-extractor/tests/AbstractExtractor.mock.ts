@@ -17,10 +17,8 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<ErgoExtractedData
   hasData = (box: V1.OutputInfo | OutputBox) => false;
 
   extractBoxData = (
-    box: V1.OutputInfo | OutputBox,
-    blockId: string,
-    height: number
-  ): Omit<ErgoExtractedData, 'spendBlock' | 'spendHeight'> | undefined => {
+    box: V1.OutputInfo | OutputBox
+  ): ErgoExtractedData | undefined => {
     return undefined;
   };
 }
