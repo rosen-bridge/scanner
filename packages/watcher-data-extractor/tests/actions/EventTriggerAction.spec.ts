@@ -23,15 +23,15 @@ describe('EventTrigger', () => {
     repository = dataSource.getRepository(EventTriggerEntity);
   });
 
-  describe('storeEventTriggers', () => {
+  describe('insertBoxes', () => {
     /**
      * 2 valid EventTrigger Box should save successfully
      * Dependency: Nothing
      * Scenario: 2 EventTrigger should save successfully
-     * Expected: storeEventTriggers should returns true and database row count should be 2
+     * Expected: insertBoxes should returns true and database row count should be 2
      */
     it('gets two EventBoxes and dataBase row should be 2', async () => {
-      const res = await action.storeEventTriggers(
+      const res = await action.insertBoxes(
         [sampleEventTrigger1, sampleEventTrigger2],
         block,
         'extractor1'
@@ -82,7 +82,7 @@ describe('EventTrigger', () => {
         },
       ]);
       const [firstInsertRows] = await repository.findAndCount();
-      const res = await action.storeEventTriggers(
+      const res = await action.insertBoxes(
         [sampleEventTrigger3, sampleEventTrigger4],
         block,
         'second-extractor'
@@ -116,7 +116,7 @@ describe('EventTrigger', () => {
      * Dependency: 2 eventTrigger should be in the database
      * Scenario: 2 eventTrigger added to the table and then another eventTrigger with same 'boxId' & 'extractor' but different
      *  'eventId' field added to table
-     * Expected: storeEventTriggers should returns true and last eventTrigger fields should update
+     * Expected: insertBoxes should returns true and last eventTrigger fields should update
      */
     it('checks that duplicated eventTrigger updated with same extractor', async () => {
       await repository.insert([
@@ -135,7 +135,7 @@ describe('EventTrigger', () => {
           sourceChainHeight: 11,
         },
       ]);
-      const res = await action.storeEventTriggers(
+      const res = await action.insertBoxes(
         [{ ...sampleEventTrigger1, toAddress: 'updatedAddress' }],
         block,
         'first-extractor'
@@ -181,7 +181,7 @@ describe('EventTrigger', () => {
           height: 1,
         },
       ]);
-      const res = await action.storeEventTriggers(
+      const res = await action.insertBoxes(
         [sampleEventTrigger1],
         block,
         'second-extractor'
@@ -206,7 +206,7 @@ describe('EventTrigger', () => {
      * Dependency: 2 eventTrigger should be in the database table for the 'first-extractor'
      * Scenario: 2 eventTrigger added to the table and then another eventTrigger with same 'extractor' but different
      *  'boxId' field added to table
-     * Expected: storeEventTriggers should returns true and each saved eventTrigger should have valid eventTrigger in
+     * Expected: insertBoxes should returns true and each saved eventTrigger should have valid eventTrigger in
      *  each step and new eventTriggers should insert in the database
      */
     it('two eventTrigger with two different boxId but same extractor', async () => {
@@ -226,7 +226,7 @@ describe('EventTrigger', () => {
           height: 1,
         },
       ]);
-      const res = await action.storeEventTriggers(
+      const res = await action.insertBoxes(
         [sampleEventTrigger3],
         block,
         'first-extractor'
@@ -253,19 +253,23 @@ describe('EventTrigger', () => {
    * Scenario: 1 eventTrigger spendBlock should update successfully
    * Expected: one eventTrigger spendBlock should be equal to 'hash'
    */
-  describe('spendEventTriggers', () => {
+  describe('spendBoxes', () => {
     it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
       await repository.insert([
         sampleEventEntity,
         { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
       ]);
-      await action.spendEventTriggers(
-        ['id'],
+      await action.spendBoxes(
+        [
+          {
+            boxId: 'id',
+            txId: 'spendTxId',
+            index: 0,
+            extras: [EventResult.fraud, ''],
+          },
+        ],
         block,
-        'extractorId',
-        'spendTxId',
-        EventResult.fraud,
-        ''
+        'extractorId'
       );
       expect(
         (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
@@ -276,22 +280,14 @@ describe('EventTrigger', () => {
     });
   });
 
-  describe('deleteBlock', () => {
+  describe('deleteBlockBoxes', () => {
     beforeEach(async () => {
-      await action.storeEventTriggers(
-        [sampleEventTrigger1],
-        block,
-        'extractor1'
-      );
-      await action.storeEventTriggers(
-        [sampleEventTrigger2],
-        block2,
-        'extractor2'
-      );
+      await action.insertBoxes([sampleEventTrigger1], block, 'extractor1');
+      await action.insertBoxes([sampleEventTrigger2], block2, 'extractor2');
     });
 
     /**
-     * @target eventTriggerActions.deleteBlock should remove the trigger existed on the removed block
+     * @target eventTriggerActions.deleteBlockBoxes should remove the trigger existed on the removed block
      * @dependencies
      * @scenario
      * - delete the block which is the trigger created on
@@ -303,13 +299,13 @@ describe('EventTrigger', () => {
     it('should remove the trigger existed on the removed block', async () => {
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await action.deleteBlock('hash', 'extractor1');
+      await action.deleteBlockBoxes('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
     });
 
     /**
-     * @target eventTriggerActions.deleteBlock should set the spendBlock to null when spent block is forked
+     * @target eventTriggerActions.deleteBlockBoxes should set the spendBlock to null when spent block is forked
      * @dependencies
      * @scenario
      * - spend the stored trigger in the database
@@ -325,13 +321,17 @@ describe('EventTrigger', () => {
       const spentTxId = 'txId';
       const result = EventResult.fraud;
       const paymentTxId = '';
-      await action.spendEventTriggers(
-        [sampleEventTrigger1.boxId],
+      await action.spendBoxes(
+        [
+          {
+            boxId: sampleEventTrigger1.boxId,
+            txId: spentTxId,
+            index: 0,
+            extras: [result, paymentTxId],
+          },
+        ],
         block2,
-        'extractor1',
-        spentTxId,
-        result,
-        paymentTxId
+        'extractor1'
       );
       let storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
@@ -341,7 +341,7 @@ describe('EventTrigger', () => {
       expect(storedEntity!.result).toEqual(result);
       expect(storedEntity!.paymentTxId).toEqual(paymentTxId);
 
-      await action.deleteBlock(block2.hash, 'extractor1');
+      await action.deleteBlockBoxes(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
       });
