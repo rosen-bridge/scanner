@@ -61,8 +61,6 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<Extrac
   /**
    * extract box data to proper format (not including spending information)
    * @param box
-   * @param blockId box inclusion block hash
-   * @param height box inclusion block height
    * @return extracted data in proper format
    */
   extractBoxData = (box: OutputBox): ExtractedBox | undefined => {

@@ -27,6 +27,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
   /**
    * insert all extracted box data in an atomic transaction
    * @param boxes
+   * @param block
    * @param extractor
    * @return success
    */
