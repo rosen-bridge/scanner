@@ -220,7 +220,6 @@ describe('BoxAction', () => {
       );
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
-      console.log(JSON.stringify(boxEntity1));
       expect(boxEntity1.spendBlock).not.toBeNull();
       await action.deleteBlockBoxes(block2.hash, 'extractor1');
       expect(await repository.count()).toEqual(1);
