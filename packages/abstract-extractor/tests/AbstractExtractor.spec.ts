@@ -38,12 +38,8 @@ describe('AbstractErgoExtractor', () => {
       extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(
-        tx.outputs[0],
-        block.hash,
-        block.height
-      );
-      expect(insertSpy).toBeCalledWith([extractedData], 'Test');
+      expect(extractSpy).toBeCalledWith(tx.outputs[0]);
+      expect(insertSpy).toBeCalledWith([extractedData], block, 'Test');
     });
 
     /**

@@ -66,10 +66,4 @@ export interface SpendInfo {
 
 export interface ErgoExtractedData {
   boxId: string;
-  height: number;
-  blockId: string;
-  spendBlock?: string;
-  spendHeight?: number;
-  spendTxId?: string;
-  spendIndex?: number;
 }

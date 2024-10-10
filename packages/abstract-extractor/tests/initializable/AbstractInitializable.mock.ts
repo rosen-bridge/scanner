@@ -21,11 +21,7 @@ export class MockedInitializableErgoExtractor extends AbstractInitializableErgoE
     return Promise.resolve({ boxes: ergoBoxes, hasNextBatch: true });
   };
 
-  extractBoxData = (
-    box: V1.OutputInfo | OutputBox,
-    blockId: string,
-    height: number
-  ) => {
+  extractBoxData = (box: V1.OutputInfo | OutputBox) => {
     return undefined;
   };
 }

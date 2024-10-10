@@ -5,11 +5,13 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**
    * insert all extracted box data in an atomic transaction
    * @param data
+   * @param block
    * @param extractorId
    * @return process success
    */
   abstract insertBoxes: (
     data: ExtractedData[],
+    block: BlockInfo,
     extractorId: string
   ) => Promise<boolean>;
 

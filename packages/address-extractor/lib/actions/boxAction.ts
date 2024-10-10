@@ -27,10 +27,15 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
   /**
    * insert all extracted box data in an atomic transaction
    * @param boxes
+   * @param block
    * @param extractor
    * @return success
    */
-  insertBoxes = async (boxes: Array<ExtractedBox>, extractor: string) => {
+  insertBoxes = async (
+    boxes: Array<ExtractedBox>,
+    block: BlockInfo,
+    extractor: string
+  ) => {
     const boxIds = boxes.map((item) => item.boxId);
     const dbBoxes = await this.datasource.getRepository(BoxEntity).findBy({
       boxId: In(boxIds),
@@ -48,10 +53,8 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
         const entity = {
           address: box.address,
           boxId: box.boxId,
-          createBlock: box.blockId,
-          creationHeight: box.height,
-          spendBlock: box.spendBlock,
-          spendHeight: box.spendHeight,
+          createBlock: block.hash,
+          creationHeight: block.height,
           serialized: box.serialized,
           extractor: extractor,
         };
