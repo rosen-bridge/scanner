@@ -57,6 +57,11 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
 
   /**
    * check proper data format in the box
+   *  - box ergoTree
+   *  - RWT in first token place
+   *  - widListHash in R4
+   *  - event data in R5
+   *  - widCount in R7
    * @param box
    * @return true if the box has the required data and false otherwise
    */
