@@ -62,6 +62,7 @@ export interface SpendInfo {
   boxId: string;
   txId: string;
   index: number;
+  extras?: string[];
 }
 
 export interface ErgoExtractedData {
