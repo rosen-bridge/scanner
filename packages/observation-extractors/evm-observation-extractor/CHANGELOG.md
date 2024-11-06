@@ -1,5 +1,17 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 3.1.0
+
+### Minor Changes
+
+- Add Binance RPC observation extractor
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/evm-rpc-scanner@2.0.0
+  - @rosen-bridge/observation-extractor@5.0.8
+
 ## 3.0.5
 
 ### Patch Changes
