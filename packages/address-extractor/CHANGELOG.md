@@ -1,5 +1,13 @@
 # @rosen-bridge/address-extractor
 
+## 5.0.8
+
+### Patch Changes
+
+- Remove unnecessary properties from abstract extracted data type
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.3.1
+
 ## 5.0.7
 
 ### Patch Changes

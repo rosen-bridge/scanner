@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-extractor
 
+## 0.3.1
+
+### Patch Changes
+
+- Remove unnecessary properties from abstract extracted data type
+- Add extras field to store extra information for spending
+
 ## 0.3.0
 
 ### Minor Changes
