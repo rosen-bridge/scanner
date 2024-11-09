@@ -128,7 +128,7 @@ describe('EventTriggerExtractor', () => {
      * 2 valid eventTrigger should save successfully
      * Dependency: Nothing
      * Scenario: block with 5 transaction passed to the function and 2 of the transactions are valid eventTrigger
-     * Expected: processTransactions should returns true and database row count should be 2
+     * Expected: processTransactions should returns true and database row count should be 2 and call the registered callbacks
      */
     it('should save 2 eventTrigger successfully out of 5 transaction', async () => {
       const repository1 = dataSource.getRepository(EventTriggerEntity);
@@ -144,6 +144,8 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress
       );
+      const callback = jest.fn();
+      extractor.registerCallback('callback-id', callback);
       const tx1 = eventTriggerTxGenerator(true, ['aa'], sampleEventData);
       const tx2 = eventTriggerTxGenerator(true, [], sampleEventData);
       const tx3 = eventTriggerTxGenerator(false, ['bb'], sampleEventData);
@@ -157,6 +159,7 @@ describe('EventTriggerExtractor', () => {
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
+      expect(callback).toHaveBeenCalled();
     });
 
     /**
@@ -206,11 +209,13 @@ describe('EventTriggerExtractor', () => {
      * - EventTriggerAction
      * @scenario
      * - mock `spendBoxes` function of action
+     * - register a callback
      * - run test
      * - check if function got called with correct argument
      * @expected
      * - `spendBoxes` should have been called with 'succesful' result
      *   and expected paymentTxId
+     * - callback should be called
      */
     it('should extract result and paymentTxId of the event succesfully and save them into db', async () => {
       // mock `spendBoxes` function of action
@@ -224,6 +229,8 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress
       );
+      const callback = jest.fn();
+      extractor.registerCallback('callback-id', callback);
       const spendTriggerSpy = jest.spyOn(
         (extractor as any).actions,
         'spendBoxes'
@@ -237,6 +244,7 @@ describe('EventTriggerExtractor', () => {
         block,
         extractor.id
       );
+      expect(callback).toHaveBeenCalled();
     });
   });
 

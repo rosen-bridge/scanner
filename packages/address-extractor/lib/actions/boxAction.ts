@@ -97,7 +97,8 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     spendInfos: Array<SpendInfo>,
     block: BlockInfo,
     extractor: string
-  ): Promise<void> => {
+  ): Promise<number> => {
+    let affectedRows = 0;
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const boxIds = spendInfoChunk.map((info) => info.boxId);
@@ -107,6 +108,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
+        affectedRows += updateResult.affected;
         const spentRows = await this.repository.findBy({
           boxId: In(boxIds),
           spendBlock: block.hash,
@@ -118,6 +120,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
         }
       }
     }
+    return affectedRows;
   };
 
   /**

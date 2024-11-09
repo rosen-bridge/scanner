@@ -14,7 +14,7 @@ import { FraudAction } from '../actions/fraudAction';
 import { DefaultApiLimit } from '../constants';
 import { ExtractedFraud } from '../interfaces/types';
 
-export class FraudExtractor implements AbstractExtractor<Transaction> {
+export class FraudExtractor extends AbstractExtractor<Transaction> {
   private readonly logger: AbstractLogger;
   private readonly actions: FraudAction;
   private readonly id: string;
@@ -30,6 +30,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     rwt: string,
     logger?: AbstractLogger
   ) {
+    super();
     this.id = id;
     this.ergoTree = wasm.Address.from_base58(fraudAddress)
       .to_ergo_tree()
@@ -347,5 +348,23 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
       }
     }
     return extractedFrauds;
+  };
+
+  /**
+   * adds a callback
+   * @param id callback id
+   * @param callback
+   */
+  registerCallback = (id: string, callback: () => Promise<void>) => {
+    this.callbacks.set(id, callback);
+  };
+
+  /**
+   * removes a callback
+   * @param id callback id
+   * @param callback
+   */
+  unregisterCallback = (id: string) => {
+    this.callbacks.delete(id);
   };
 }

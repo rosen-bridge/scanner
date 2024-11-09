@@ -114,13 +114,15 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
     extractorId: string
-  ): Promise<void> => {
+  ): Promise<number> => {
+    let affectedRows = 0;
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const spentTriggers = await this.repository.findBy({
         boxId: In(spendInfoChunk.map((spendInfo) => spendInfo.boxId)),
         extractor: extractorId,
       });
+      affectedRows += spentTriggers.length;
       for (const spentTrigger of spentTriggers) {
         const spendInfo = spendInfoChunk.find(
           (info) => info.boxId === spentTrigger.boxId
@@ -150,6 +152,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         );
       }
     }
+    return affectedRows;
   };
 
   /**

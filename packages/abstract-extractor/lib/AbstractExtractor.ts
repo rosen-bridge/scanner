@@ -1,6 +1,12 @@
 import { BlockInfo, Block } from './interfaces';
 
 export abstract class AbstractExtractor<TransactionType> {
+  protected callbacks: Map<string, () => Promise<void>>;
+
+  constructor() {
+    this.callbacks = new Map();
+  }
+
   /**
    * process a list of transactions in a block and store required information
    * @param txs list of transactions in the block
@@ -28,4 +34,22 @@ export abstract class AbstractExtractor<TransactionType> {
    * @param initialBlock
    */
   abstract initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
+
+  /**
+   * adds a callback
+   * @param id callback id
+   * @param callback
+   */
+  registerCallback = (id: string, callback: () => Promise<void>) => {
+    this.callbacks.set(id, callback);
+  };
+
+  /**
+   * removes a callback
+   * @param id callback id
+   * @param callback
+   */
+  unregisterCallback = (id: string) => {
+    this.callbacks.delete(id);
+  };
 }

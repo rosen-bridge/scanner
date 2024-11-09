@@ -16,7 +16,8 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   ) => Promise<boolean>;
 
   /**
-   * update spending information of stored boxes
+   * update spending information of stored boxes and returns the
+   * number of affected rows
    * @param spendInfos
    * @param block
    * @param extractorId
@@ -25,7 +26,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
     spendInfos: SpendInfo[],
     block: BlockInfo,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<number>;
 
   /**
    * delete extracted data from a specific block

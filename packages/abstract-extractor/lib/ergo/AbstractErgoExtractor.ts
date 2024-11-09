@@ -74,9 +74,30 @@ export abstract class AbstractErgoExtractor<
         }
       }
 
-      if (boxes.length > 0)
+      let affected = false;
+      if (boxes.length > 0) {
         await this.actions.insertBoxes(boxes, block, this.getId());
-      await this.actions.spendBoxes(spentInfos, block, this.getId());
+        affected = true;
+      }
+      const affectedRows = await this.actions.spendBoxes(
+        spentInfos,
+        block,
+        this.getId()
+      );
+      if (affectedRows > 0) affected = true;
+      if (affected) {
+        // database is updated. executing callbacks...
+        for (const idCallbackPair of this.callbacks) {
+          idCallbackPair[1]().catch((e) => {
+            this.logger.debug(
+              `An error occurred while executing callback [${
+                idCallbackPair[0]
+              }] in extractor [${this.getId()}]: ${e}`
+            );
+            if (e instanceof Error && e.stack) this.logger.debug(e.stack);
+          });
+        }
+      }
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
