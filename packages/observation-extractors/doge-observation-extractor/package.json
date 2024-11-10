@@ -36,8 +36,8 @@
     "@rosen-bridge/abstract-logger": "^1.0.0",
     "@rosen-bridge/observation-extractor": "^5.0.7",
     "@rosen-bridge/tokens": "^1.2.0",
-    "@rosen-bridge/doge-esplora-scanner": "file:../../scanners/doge-esplora-scanner",
-    "@rosen-bridge/rosen-extractor": "file:../../../../utils/packages/rosen-extractor",
+    "@rosen-bridge/doge-esplora-scanner": "0.0.0",
+    "@rosen-bridge/rosen-extractor": "^6.2.0",
     "typeorm": "^0.3.20"
   }
 }
