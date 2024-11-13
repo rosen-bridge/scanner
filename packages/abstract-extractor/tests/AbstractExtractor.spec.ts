@@ -1,5 +1,5 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
-import { describe, it, expect, vitest } from 'vitest';
+import { describe, it, expect, vitest, vi } from 'vitest';
 
 import {
   OutputBox,
@@ -47,6 +47,7 @@ describe('AbstractErgoExtractor', () => {
      * @dependencies
      * @scenario
      * - mock extractor
+     * - register a callback
      * - spy `extractBoxData`, `insertBoxes` and `spendBoxes`
      * - run test (call `processTransactions`)
      * @expected
@@ -55,10 +56,13 @@ describe('AbstractErgoExtractor', () => {
      */
     it('should extract spend info of transaction spend related boxes', async () => {
       const extractor = new MockedErgoExtractor();
+      const callback = vi.fn();
+      extractor.registerCallback(`callback-id`, callback);
       const extractSpy = vitest.fn();
       extractor.extractBoxData = extractSpy;
       const insertSpy = vitest.fn();
       const spendSpy = vitest.fn();
+      spendSpy.mockResolvedValue(2);
       extractor['actions'] = {
         insertBoxes: insertSpy,
         spendBoxes: spendSpy,
