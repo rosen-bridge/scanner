@@ -349,22 +349,4 @@ export class FraudExtractor extends AbstractExtractor<Transaction> {
     }
     return extractedFrauds;
   };
-
-  /**
-   * adds a callback
-   * @param id callback id
-   * @param callback
-   */
-  registerCallback = (id: string, callback: () => Promise<void>) => {
-    this.callbacks.set(id, callback);
-  };
-
-  /**
-   * removes a callback
-   * @param id callback id
-   * @param callback
-   */
-  unregisterCallback = (id: string) => {
-    this.callbacks.delete(id);
-  };
 }
