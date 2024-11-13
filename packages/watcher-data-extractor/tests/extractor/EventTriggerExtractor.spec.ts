@@ -144,8 +144,6 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress
       );
-      const callback = jest.fn();
-      extractor.registerCallback('callback-id', callback);
       const tx1 = eventTriggerTxGenerator(true, ['aa'], sampleEventData);
       const tx2 = eventTriggerTxGenerator(true, [], sampleEventData);
       const tx3 = eventTriggerTxGenerator(false, ['bb'], sampleEventData);
@@ -159,7 +157,6 @@ describe('EventTriggerExtractor', () => {
       const repository = dataSource.getRepository(EventTriggerEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toBe(2);
-      expect(callback).toHaveBeenCalled();
     });
 
     /**
@@ -229,8 +226,6 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress
       );
-      const callback = jest.fn();
-      extractor.registerCallback('callback-id', callback);
       const spendTriggerSpy = jest.spyOn(
         (extractor as any).actions,
         'spendBoxes'
@@ -244,7 +239,6 @@ describe('EventTriggerExtractor', () => {
         block,
         extractor.id
       );
-      expect(callback).toHaveBeenCalled();
     });
   });
 

@@ -1,5 +1,4 @@
 ---
-'@rosen-bridge/watcher-data-extractor': minor
 '@rosen-bridge/address-extractor': minor
 ---
 

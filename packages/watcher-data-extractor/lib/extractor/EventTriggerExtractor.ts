@@ -205,30 +205,9 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
           });
       });
 
-      let affected = false;
-      if (boxes.length > 0) {
+      if (boxes.length > 0)
         await this.actions.insertBoxes(boxes, block, this.getId());
-        affected = true;
-      }
-      const affectedRows = await this.actions.spendBoxes(
-        spendInfoArray,
-        block,
-        this.id
-      );
-      if (affectedRows > 0) affected = true;
-      if (affected) {
-        // database is updated. executing callbacks...
-        for (const idCallbackPair of this.callbacks) {
-          idCallbackPair[1]().catch((e) => {
-            this.logger.debug(
-              `An error occurred while executing callback [${
-                idCallbackPair[0]
-              }] in extractor [${this.getId()}]: ${e}`
-            );
-            if (e instanceof Error && e.stack) this.logger.debug(e.stack);
-          });
-        }
-      }
+      await this.actions.spendBoxes(spendInfoArray, block, this.id);
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${block}: ${e}`

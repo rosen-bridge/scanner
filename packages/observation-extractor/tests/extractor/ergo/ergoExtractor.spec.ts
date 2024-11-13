@@ -31,12 +31,10 @@ describe('extractorErgo', () => {
      * Dependency: action.storeObservations
      * Scenario: one valid observation should save successfully
      * Expected: processTransactions should returns true and database row count should be 1 and database fields
-     *  should fulfill expected values and call the registered callback
+     *  should fulfill expected values
      */
     it('checks valid transaction', async () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
-      const callback = jest.fn();
-      extractor.registerCallback('callback-id', callback);
       const Tx1 = observationTxGenerator(
         true,
         [
@@ -104,14 +102,13 @@ describe('extractorErgo', () => {
         block: '1',
         extractor: 'ergo-observation-extractor',
       });
-      expect(callback).toHaveBeenCalled();
     });
 
     /**
      * 1 Valid Transaction but invalid bankAddress should not save
      * Dependency: action.storeObservations
      * Scenario: one valid observation with invalid bankAddress should not save in the database
-     * Expected: processTransactions should returns true and database row count should be 0 and no callback should be called
+     * Expected: processTransactions should returns true and database row count should be 0
      */
     it('checks observation with invalid bankAddress should not saved', async () => {
       const extractor = new ExtractorErgo(
@@ -119,8 +116,6 @@ describe('extractorErgo', () => {
         tokens,
         '9gDQ7emWoxJkAHW8kSwniCkDa43G2w9LCL9voHgfj2AvXfFSQ8i'
       );
-      const callback = jest.fn();
-      extractor.registerCallback('callback-id', callback);
       const Tx1 = observationTxGenerator(
         true,
         [
@@ -141,7 +136,6 @@ describe('extractorErgo', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-      expect(callback).not.toHaveBeenCalled();
     });
 
     /**
