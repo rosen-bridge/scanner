@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 3.1.1
+
+### Patch Changes
+
+- Update rosen-extractor version
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@5.0.9
+
 ## 3.1.0
 
 ### Minor Changes
