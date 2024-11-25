@@ -5,7 +5,7 @@ import {
   OutputBox,
   ErgoExtractedData,
   AbstractErgoExtractorAction,
-} from '../lib';
+} from '../../lib';
 
 export class MockedErgoExtractor extends AbstractErgoExtractor<ErgoExtractedData> {
   actions: AbstractErgoExtractorAction<ErgoExtractedData>;

@@ -22,7 +22,8 @@ describe('TxAction', () => {
      * - insert five transaction for two blocks
      * - call deleteBlockTxs
      * @expected
-     * - AddressTxsEntity records count must be 2
+     * - it should return 2
+     * - AddressTxsEntity records count must be 3
      */
     it('should delete only expected block txs', async () => {
       const txs = [0, 1, 2, 3, 4].map((i) => {
@@ -37,8 +38,9 @@ describe('TxAction', () => {
         };
       });
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTxs('block1', 'extractor 1');
+      const result = await action.deleteBlockTxs('block1', 'extractor 1');
       expect(await repository.count()).toEqual(3);
+      expect(result).toEqual(2);
     });
 
     /**
@@ -48,7 +50,8 @@ describe('TxAction', () => {
      * - insert five transaction for two extractor for same block
      * - call deleteBlockTxs
      * @expected
-     * - AddressTxsEntity records count must be 2
+     * - it should return 2
+     * - AddressTxsEntity records count must be 3
      */
     it('should delete only selected extractor txs', async () => {
       const txs = [0, 1, 2, 3, 4].map((i) => {
@@ -63,8 +66,9 @@ describe('TxAction', () => {
         };
       });
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTxs('block1', 'extractor 1');
+      const result = await action.deleteBlockTxs('block1', 'extractor 1');
       expect(await repository.count()).toEqual(3);
+      expect(result).toEqual(2);
     });
   });
 

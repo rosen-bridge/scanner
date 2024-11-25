@@ -1,4 +1,4 @@
-import { Block } from '../lib';
+import { Block } from '../../lib';
 
 export const tx = {
   id: '3b91fbd2b6f4f3f971098655ffa320841001b071908de057cdf8c425cd3b3e61',

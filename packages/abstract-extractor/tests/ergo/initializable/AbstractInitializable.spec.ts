@@ -5,11 +5,11 @@ import {
   NodeNetwork,
   ErgoExtractedData,
   ExplorerNetwork,
-} from '../../lib';
+} from '../../../lib';
 import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { transactionBatch } from './testData';
-import { RETRIAL_COUNT } from '../../lib/constants';
-import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializable';
+import { RETRIAL_COUNT } from '../../../lib/constants';
+import { AbstractInitializableErgoExtractorAction } from '../../../lib/ergo/initializable';
 
 describe('AbstractInitializableErgoExtractor', () => {
   describe('getTotalTxCount', () => {

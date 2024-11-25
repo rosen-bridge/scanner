@@ -118,13 +118,14 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'block1' } as Block,
         'extractor1'
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
+      expect(result).toEqual(1);
     });
 
     /**
@@ -141,13 +142,14 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'hash' } as Block,
         'extractor2'
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
+      expect(result).toEqual(0);
     });
 
     /**
@@ -163,7 +165,7 @@ describe('BoxAction', () => {
         address: 'address',
       };
       await action.insertBoxes([box], block1, 'extractor');
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'block1' } as Block,
         'extractor'
@@ -176,6 +178,7 @@ describe('BoxAction', () => {
       expect(stored.boxId).toEqual('boxid');
       expect(stored.serialized).toEqual('serialized');
       expect(stored.createBlock).toEqual('block1');
+      expect(result).toEqual(1);
     });
   });
 
@@ -195,7 +198,8 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      expect(result).toEqual(1);
       expect(await repository.count()).toEqual(0);
     });
 
@@ -221,7 +225,8 @@ describe('BoxAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      expect(result).toEqual(1);
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).toBeNull();
@@ -249,7 +254,8 @@ describe('BoxAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block2.hash, 'extractor2');
+      const result = await action.deleteBlockBoxes(block2.hash, 'extractor2');
+      expect(result).toEqual(0);
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).not.toBeNull();
@@ -277,7 +283,8 @@ describe('BoxAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      expect(result).toEqual(1);
       expect(await repository.count()).toEqual(0);
     });
   });

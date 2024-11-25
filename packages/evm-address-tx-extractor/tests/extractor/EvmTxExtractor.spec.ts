@@ -27,15 +27,18 @@ describe('EvmTxExtractor', () => {
      * transactions of the address into database
      * @dependency
      * @scenario
+     * - mock `callCallbacks`
      * - mock `wait` function of the transactions
      *   - two txs to return the transaction
      *   - one tx to throw CallException
      * - call processTransactions with 3 txs in a block
      * @expected
      * - two instances of txId must be inserted into database with expected data
+     * - `callCallbacks` should have been called
      */
     it('should insert all transactions of the address into database', async () => {
       const extractor = new EvmTxExtractor(dataSource, 'extractor1', address);
+      const callerSpy = vi.spyOn(extractor, 'callCallbacks');
       const repository = dataSource.getRepository(AddressTxsEntity);
       await repository.createQueryBuilder().delete().execute();
       vi.spyOn(txs[0], 'wait').mockReturnValue(Transaction.from(txs[0]) as any);
@@ -63,6 +66,28 @@ describe('EvmTxExtractor', () => {
         expect(element.extractor).toEqual('extractor1');
         expect(element.status).toEqual(status);
       }
+      expect(callerSpy).toHaveBeenCalledOnce();
+    });
+
+    /**
+     * @target EvmTxExtractor.processTransactions should do nothing
+     * when no tx is inserted into database
+     * @dependency
+     * @scenario
+     * - call processTransactions with no tx in a block
+     * @expected
+     * - `callCallbacks` should have NOT been called
+     */
+    it('should do nothing when no tx is inserted into database', async () => {
+      const extractor = new EvmTxExtractor(dataSource, 'extractor1', address);
+      const callerSpy = vi.spyOn(extractor, 'callCallbacks');
+      await extractor.processTransactions([], {
+        height: 0,
+        hash: 'block 1',
+        parentHash: '',
+        timestamp: 10,
+      });
+      expect(callerSpy).not.toHaveBeenCalled();
     });
   });
 });

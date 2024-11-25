@@ -6,7 +6,6 @@ import { EvmTxStatus, ExtractedTx } from '../interfaces/types';
 import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
-  readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
   private readonly address: string;
@@ -20,10 +19,9 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
     address: string,
     logger: AbstractLogger = new DummyLogger()
   ) {
-    super();
+    super(logger);
     this.id = id;
     this.address = address;
-    this.logger = logger;
     this.action = new TxAction(dataSource, this.logger);
   }
 
@@ -73,6 +71,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
       }
     }
     await this.action.storeTxs(extractedTxs, block, this.getId());
+    if (extractedTxs.length > 0) this.callCallbacks();
     return true;
   };
 
@@ -81,7 +80,8 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.action.deleteBlockTxs(hash, this.getId());
+    const affectedRows = await this.action.deleteBlockTxs(hash, this.getId());
+    if (affectedRows > 0) this.callCallbacks();
   };
 
   /**

@@ -1,10 +1,13 @@
-import { BlockInfo, Block } from './interfaces';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockInfo, Block, ExtractorCallback } from './interfaces';
 
 export abstract class AbstractExtractor<TransactionType> {
-  protected callbacks: Map<string, () => Promise<void>>;
+  readonly logger: AbstractLogger;
+  protected callbacks: Map<string, ExtractorCallback>;
 
-  constructor() {
+  constructor(logger = new DummyLogger()) {
     this.callbacks = new Map();
+    this.logger = logger;
   }
 
   /**
@@ -40,7 +43,7 @@ export abstract class AbstractExtractor<TransactionType> {
    * @param id callback id
    * @param callback
    */
-  registerCallback = (id: string, callback: () => Promise<void>) => {
+  registerCallback = (id: string, callback: ExtractorCallback) => {
     this.callbacks.set(id, callback);
   };
 
@@ -51,5 +54,22 @@ export abstract class AbstractExtractor<TransactionType> {
    */
   unregisterCallback = (id: string) => {
     this.callbacks.delete(id);
+  };
+
+  /**
+   * calls all registered callbacks
+   */
+  callCallbacks = (): void => {
+    // database is updated. executing callbacks...
+    for (const idCallbackPair of this.callbacks) {
+      idCallbackPair[1](this.getId()).catch((e) => {
+        this.logger.debug(
+          `An error occurred while executing callback [${
+            idCallbackPair[0]
+          }] in extractor [${this.getId()}] on process: ${e}`
+        );
+        if (e instanceof Error && e.stack) this.logger.debug(e.stack);
+      });
+    }
   };
 }

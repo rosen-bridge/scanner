@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { AbstractExtractor } from '../AbstractExtractor';
@@ -17,11 +17,9 @@ export abstract class AbstractErgoExtractor<
 > extends AbstractExtractor<Transaction> {
   protected readonly dataSource: DataSource;
   protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
-  protected logger: AbstractLogger;
 
   constructor(logger = new DummyLogger()) {
-    super();
-    this.logger = logger;
+    super(logger);
   }
 
   /**
@@ -85,19 +83,7 @@ export abstract class AbstractErgoExtractor<
         this.getId()
       );
       if (affectedRows > 0) affected = true;
-      if (affected) {
-        // database is updated. executing callbacks...
-        for (const idCallbackPair of this.callbacks) {
-          idCallbackPair[1]().catch((e) => {
-            this.logger.debug(
-              `An error occurred while executing callback [${
-                idCallbackPair[0]
-              }] in extractor [${this.getId()}]: ${e}`
-            );
-            if (e instanceof Error && e.stack) this.logger.debug(e.stack);
-          });
-        }
-      }
+      if (affected) this.callCallbacks();
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
@@ -113,6 +99,10 @@ export abstract class AbstractErgoExtractor<
    * @param hash block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockBoxes(hash, this.getId());
+    const affectedRows = await this.actions.deleteBlockBoxes(
+      hash,
+      this.getId()
+    );
+    if (affectedRows > 0) this.callCallbacks();
   };
 }

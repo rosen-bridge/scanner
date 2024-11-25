@@ -15,6 +15,7 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["vitest/globals"]
   }
 }

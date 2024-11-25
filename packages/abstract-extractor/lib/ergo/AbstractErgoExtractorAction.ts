@@ -34,9 +34,10 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    * if a box is created in this block remove it from database
    * @param block
    * @param extractorId
+   * @return number of affected rows
    */
   abstract deleteBlockBoxes: (
     block: string,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<number>;
 }

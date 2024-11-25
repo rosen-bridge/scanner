@@ -22,7 +22,7 @@ export class TxAction {
     this.logger.debug(
       `Deleting transactions of block ${blockId} and extractor ${extractor}`
     );
-    await this.repository
+    const deleteResult = await this.repository
       .createQueryBuilder()
       .delete()
       .where('extractor = :extractor AND blockId = :blockId', {
@@ -30,6 +30,7 @@ export class TxAction {
         extractor: extractor,
       })
       .execute();
+    return deleteResult.affected ?? 0;
   };
 
   /**

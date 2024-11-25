@@ -142,13 +142,14 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     this.logger.info(
       `Deleting boxes in block ${block} and extractor ${extractor}`
     );
-    await this.repository.delete({
+    const deleteResult = await this.repository.delete({
       extractor: extractor,
       createBlock: block,
     });
-    await this.repository.update(
+    const updateResult = await this.repository.update(
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: 0 }
     );
+    return (deleteResult.affected ?? 0) + (updateResult.affected ?? 0);
   };
 }
