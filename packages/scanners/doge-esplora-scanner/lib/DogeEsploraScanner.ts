@@ -18,7 +18,7 @@ export class DogeEsploraScanner extends GeneralScanner<DogeEsploraTransaction> {
     this.network = new DogeEsploraNetwork(config.esploraUrl, config.timeout);
   }
 
-  protected getFirstBlock = (): Promise<Block> => {
+  getFirstBlock = (): Promise<Block> => {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 

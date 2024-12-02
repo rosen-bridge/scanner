@@ -1,5 +1,13 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.0.10
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@5.0.0
+  - @rosen-bridge/abstract-extractor@0.3.1
+
 ## 2.0.9
 
 ### Patch Changes

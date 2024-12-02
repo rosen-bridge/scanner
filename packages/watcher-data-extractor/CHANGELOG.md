@@ -1,5 +1,17 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 9.0.0
+
+### Major Changes
+
+- Refactor event trigger extractor to extend abstract initializable class
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@5.0.0
+  - @rosen-bridge/abstract-extractor@0.3.1
+
 ## 8.0.2
 
 ### Patch Changes

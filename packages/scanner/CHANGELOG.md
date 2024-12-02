@@ -1,5 +1,18 @@
 # @rosen-bridge/scanner
 
+## 5.0.0
+
+### Major Changes
+
+- Add ogmios connection retrial with exponential backoff policy
+- Use protected methods for scanner subclasses
+- Use protected methods for inner functionalities in abstract scanner
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@0.3.1
+
 ## 4.1.3
 
 ### Patch Changes

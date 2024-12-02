@@ -14,6 +14,7 @@ import {
 import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
 import { EventResult } from '../../lib';
+import { ErgoNetworkType } from '@rosen-bridge/abstract-extractor';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -51,6 +52,8 @@ describe('EventTriggerExtractor', () => {
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
@@ -72,6 +75,8 @@ describe('EventTriggerExtractor', () => {
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
@@ -132,6 +137,8 @@ describe('EventTriggerExtractor', () => {
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
@@ -158,18 +165,20 @@ describe('EventTriggerExtractor', () => {
      * @dependencies
      * - EventTriggerAction
      * @scenario
-     * - mock `spendEventTriggers` function of action
+     * - mock `spendBoxes` function of action
      * - run test
      * - check if function got called with correct argument
      * @expected
-     * - `spendEventTriggers` should have been called with 'succesful' result
+     * - `spendBoxes` should have been called with 'succesful' result
      *   and expected paymentTxId
      */
     it('should extract result and paymentTxId of the event in old format succesfully and save them into db', async () => {
-      // mock `spendEventTriggers` function of action
+      // mock `spendBoxes` function of action
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
@@ -177,7 +186,7 @@ describe('EventTriggerExtractor', () => {
       );
       const spendTriggerSpy = jest.spyOn(
         (extractor as any).actions,
-        'spendEventTriggers'
+        'spendBoxes'
       );
       spendTriggerSpy.mockResolvedValue(undefined);
       const tx1 = spendTriggerTxOldFormat;
@@ -186,10 +195,7 @@ describe('EventTriggerExtractor', () => {
       expect(spendTriggerSpy).toHaveBeenCalledWith(
         expect.any(Array),
         block,
-        extractor.id,
-        tx1.id,
-        EventResult.successful,
-        '8379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57'
+        extractor.id
       );
     });
 
@@ -199,18 +205,20 @@ describe('EventTriggerExtractor', () => {
      * @dependencies
      * - EventTriggerAction
      * @scenario
-     * - mock `spendEventTriggers` function of action
+     * - mock `spendBoxes` function of action
      * - run test
      * - check if function got called with correct argument
      * @expected
-     * - `spendEventTriggers` should have been called with 'succesful' result
+     * - `spendBoxes` should have been called with 'succesful' result
      *   and expected paymentTxId
      */
     it('should extract result and paymentTxId of the event succesfully and save them into db', async () => {
-      // mock `spendEventTriggers` function of action
+      // mock `spendBoxes` function of action
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
@@ -218,7 +226,7 @@ describe('EventTriggerExtractor', () => {
       );
       const spendTriggerSpy = jest.spyOn(
         (extractor as any).actions,
-        'spendEventTriggers'
+        'spendBoxes'
       );
       spendTriggerSpy.mockResolvedValue(undefined);
       const tx1 = spendTriggerTx;
@@ -227,10 +235,7 @@ describe('EventTriggerExtractor', () => {
       expect(spendTriggerSpy).toHaveBeenCalledWith(
         expect.any(Array),
         block,
-        extractor.id,
-        tx1.id,
-        EventResult.successful,
-        '8379c632717b8e1b2291e63b2345d5c54ca8506dc9f69d8761da12bfb2904f57'
+        extractor.id
       );
     });
   });
@@ -247,6 +252,8 @@ describe('EventTriggerExtractor', () => {
       const extractor = new EventTriggerExtractor(
         'extractorId',
         dataSource,
+        ErgoNetworkType.Node,
+        'node_url',
         eventTriggerAddress,
         RWTId,
         permitAddress,
