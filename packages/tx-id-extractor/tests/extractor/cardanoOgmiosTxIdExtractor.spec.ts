@@ -14,15 +14,18 @@ describe('CardanoOgmiosTxIdExtractor', () => {
      * @target CardanoOgmiosTxIdExtractor.processTransactions should store all transaction ids of block in database
      * @dependency
      * @scenario
+     * - mock `callCallbacks`
      * - call processTransactions with 3 txs in a block
      * @expected
      * - three instance of txId must insert to database with expected data
+     * - `callCallbacks` should have NOT been called
      */
     it('should store all transaction ids of block in database', async () => {
       const extractor = new CardanoOgmiosTxIdExtractor(
         dataSource,
         'extractor1'
       );
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       const repository = dataSource.getRepository(TxIdEntity);
       await repository.createQueryBuilder().delete().execute();
       await extractor.processTransactions(txs, {
@@ -45,6 +48,33 @@ describe('CardanoOgmiosTxIdExtractor', () => {
         expect(element.blockId).toEqual('block 1');
         expect(element.extractor).toEqual('extractor1');
       }
+      expect(callerSpy).toHaveBeenCalled();
+    });
+
+    /**
+     * @target CardanoOgmiosTxIdExtractor.processTransactions should do nothing when no tx is extracted
+     * @dependency
+     * @scenario
+     * - mock `callCallbacks`
+     * - call processTransactions with no tx in a block
+     * @expected
+     * - `callCallbacks` should have NOT been called
+     */
+    it('should do nothing when no tx is extracted', async () => {
+      const extractor = new CardanoOgmiosTxIdExtractor(
+        dataSource,
+        'extractor1'
+      );
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
+      const repository = dataSource.getRepository(TxIdEntity);
+      await repository.createQueryBuilder().delete().execute();
+      await extractor.processTransactions([], {
+        height: 0,
+        hash: 'block 1',
+        parentHash: '',
+        timestamp: 10,
+      });
+      expect(callerSpy).not.toHaveBeenCalled();
     });
   });
 });

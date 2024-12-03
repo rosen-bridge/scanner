@@ -22,6 +22,7 @@ describe('TxAction', () => {
      * - insert two transaction for a block
      * - call deleteBlockTxs
      * @expected
+     * - should return number of deleted rows
      * - TxEntities must be empty
      */
     it('should delete all stored txs for specific block', async () => {
@@ -30,7 +31,8 @@ describe('TxAction', () => {
         { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTxs('block1', 'extractor 1');
+      const result = await action.deleteBlockTxs('block1', 'extractor 1');
+      expect(result).toEqual(2);
       expect(await repository.count()).toEqual(0);
     });
 
@@ -41,6 +43,7 @@ describe('TxAction', () => {
      * - insert four transaction for two blocks
      * - call deleteBlockTxs
      * @expected
+     * - should return number of deleted rows
      * - TxEntities elements count must be 2
      */
     it('should delete only expected block txs', async () => {
@@ -51,7 +54,8 @@ describe('TxAction', () => {
         { txId: 'txid2block2', blockId: 'block2', extractor: 'extractor 1' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTxs('block1', 'extractor 1');
+      const result = await action.deleteBlockTxs('block1', 'extractor 1');
+      expect(result).toEqual(2);
       expect(await repository.count()).toEqual(2);
     });
 
@@ -62,6 +66,7 @@ describe('TxAction', () => {
      * - insert four transaction for two extractor for same block
      * - call deleteBlockTxs
      * @expected
+     * - should return number of deleted rows
      * - TxEntities elements count must be 2
      */
     it('should delete only selected extractor txs', async () => {
@@ -72,7 +77,8 @@ describe('TxAction', () => {
         { txId: 'txid2block1', blockId: 'block1', extractor: 'extractor 2' },
       ];
       for (const tx of txs) await repository.insert(tx);
-      await action.deleteBlockTxs('block1', 'extractor 1');
+      const result = await action.deleteBlockTxs('block1', 'extractor 1');
+      expect(result).toEqual(2);
       expect(await repository.count()).toEqual(2);
     });
   });

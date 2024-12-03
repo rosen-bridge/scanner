@@ -36,6 +36,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   ): Promise<boolean> => {
     const txIds = txs.map((item) => item.id);
     await this.action.storeTxs(txIds, block, this.getId());
+    if (txIds.length > 0) this.callCallbacks();
     return true;
   };
 
@@ -44,7 +45,8 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.action.deleteBlockTxs(hash, this.getId());
+    const affectedRows = await this.action.deleteBlockTxs(hash, this.getId());
+    if (affectedRows > 0) this.callCallbacks();
   };
 
   /**
