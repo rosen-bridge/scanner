@@ -35,6 +35,7 @@ describe('extractorErgo', () => {
      */
     it('checks valid transaction', async () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       const Tx1 = observationTxGenerator(
         true,
         [
@@ -102,6 +103,7 @@ describe('extractorErgo', () => {
         block: '1',
         extractor: 'ergo-observation-extractor',
       });
+      expect(callerSpy).toHaveBeenCalled();
     });
 
     /**
@@ -143,6 +145,7 @@ describe('extractorErgo', () => {
      * output box with invalid creation height
      * @dependencies
      * @scenario
+     * - mock `callCallbacks`
      * - mock test txs
      * - mock block with high height
      * - run test
@@ -151,9 +154,11 @@ describe('extractorErgo', () => {
      * @expected
      * - it should return true
      * - no observation should be stored
+     * - `callCallbacks` should have NOT been called
      */
     it('should ignore tx containing output box with invalid creation height', async () => {
       const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       const Tx1 = observationTxGenerator(
         true,
         [
@@ -197,6 +202,7 @@ describe('extractorErgo', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
+      expect(callerSpy).not.toHaveBeenCalled();
     });
   });
 });

@@ -74,6 +74,7 @@ describe('EvmTxExtractor', () => {
      * when no tx is inserted into database
      * @dependency
      * @scenario
+     * - mock `callCallbacks`
      * - call processTransactions with no tx in a block
      * @expected
      * - `callCallbacks` should have NOT been called

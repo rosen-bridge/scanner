@@ -346,7 +346,7 @@ export const cardanoTxValid = {
         '"toAddress": "ergoAddress",' +
         ' "fromAddress": ["' +
         fromAddress +
-        '"] }'
+        '"] }',
     ),
   },
   tx_hash: '9f00d372e930d685c3b410a10f2bd035cd9a927c4fd8ef8e419c79b210af7ba6',
@@ -450,28 +450,28 @@ export const observationTxGenerator = (
   ],
   bankSecret: string,
   watcherSecret: string,
-  boxValue = '1100000000'
+  boxValue = '1100000000',
 ) => {
   const bankSK = wasm.SecretKey.dlog_from_bytes(
-    Uint8Array.from(Buffer.from(bankSecret, 'hex'))
+    Uint8Array.from(Buffer.from(bankSecret, 'hex')),
   );
   const bankAddress = wasm.Contract.pay_to_address(bankSK.get_address());
   const watcherSK = wasm.SecretKey.dlog_from_bytes(
-    Uint8Array.from(Buffer.from(watcherSecret, 'hex'))
+    Uint8Array.from(Buffer.from(watcherSecret, 'hex')),
   );
   const watcherAddress = wasm.Contract.pay_to_address(watcherSK.get_address());
   const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(boxValue));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     bankAddress,
-    0
+    0,
   );
   if (hasToken) {
     outBoxBuilder.add_token(
       wasm.TokenId.from_str(
-        'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3'
+        'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
       ),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
     );
   }
   const registerValue = data.map((val) => {
@@ -479,7 +479,7 @@ export const observationTxGenerator = (
   });
   outBoxBuilder.set_register_value(
     4,
-    wasm.Constant.from_coll_coll_byte(registerValue)
+    wasm.Constant.from_coll_coll_byte(registerValue),
   );
 
   const outBox = outBoxBuilder.build();
@@ -488,10 +488,10 @@ export const observationTxGenerator = (
     tokens.add(
       new wasm.Token(
         wasm.TokenId.from_str(
-          'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3'
+          'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
         ),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-      )
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
+      ),
     );
   }
 
@@ -501,7 +501,7 @@ export const observationTxGenerator = (
     bankAddress,
     wasm.TxId.zero(),
     0,
-    new wasm.Tokens()
+    new wasm.Tokens(),
   );
 
   const inputBoxWatcher = new wasm.ErgoBox(
@@ -510,7 +510,7 @@ export const observationTxGenerator = (
     watcherAddress,
     wasm.TxId.zero(),
     0,
-    tokens
+    tokens,
   );
 
   const unspentBoxes = new wasm.ErgoBoxes(inputBoxBank);
@@ -519,7 +519,7 @@ export const observationTxGenerator = (
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
   const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64())
+    outBoxValue.as_i64().checked_add(fee.as_i64()),
   );
   const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
   const tx = wasm.TxBuilder.new(
@@ -527,7 +527,7 @@ export const observationTxGenerator = (
     txOutputs,
     0,
     fee,
-    watcherSK.get_address()
+    watcherSK.get_address(),
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
@@ -540,7 +540,7 @@ export const observationTxGenerator = (
     ctx,
     tx,
     unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([])
+    wasm.ErgoBoxes.from_boxes_json([]),
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
@@ -549,7 +549,7 @@ export const generateBlockEntity = (
   dataSource: DataSource,
   hash: string,
   parent?: string,
-  height?: number
+  height?: number,
 ) => {
   const repository = dataSource.getRepository(BlockEntity);
   return repository.create({

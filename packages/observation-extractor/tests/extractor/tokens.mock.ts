@@ -13,7 +13,7 @@ export const tokens: RosenTokens = {
   },
   tokens: [
     {
-      [ErgoObservationExtractor.FROM_CHAIN]: {
+      ergo: {
         tokenId: ERGO_NATIVE_TOKEN,
         name: ERGO_NATIVE_TOKEN,
         decimals: 9,
@@ -22,7 +22,7 @@ export const tokens: RosenTokens = {
           residency: 'wrapped',
         },
       },
-      [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
+      cardano: {
         tokenId:
           'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
         policyId: 'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2',
@@ -36,7 +36,7 @@ export const tokens: RosenTokens = {
       },
     },
     {
-      [ErgoObservationExtractor.FROM_CHAIN]: {
+      ergo: {
         tokenId:
           'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
         id: 'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
@@ -48,7 +48,7 @@ export const tokens: RosenTokens = {
           type: 'EIP-004',
         },
       },
-      [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
+      cardano: {
         tokenId: CARDANO_NATIVE_TOKEN,
         policyId: '',
         assetName: '41441',

@@ -30,7 +30,7 @@ describe('EvmRpcObservationExtractor', () => {
       },
       {
         get: vi.fn(),
-      } as any
+      } as any,
     );
   });
 
@@ -40,6 +40,7 @@ describe('EvmRpcObservationExtractor', () => {
      * should return true and insert observation into database on valid lock tx
      * @dependencies
      * @scenario
+     * - mock `callCallbacks`
      * - mock rosen-extractor to return rosen data
      * - mock `wait` function of the transaction to return tx object
      * - run test
@@ -48,16 +49,18 @@ describe('EvmRpcObservationExtractor', () => {
      * @expected
      * - it should return true
      * - observation should be inserted into database
+     * - `callCallbacks` should have been called
      */
     it('should return true and insert observation into database on valid lock tx', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
+      const callerSpy = vi.spyOn(extractor, 'callCallbacks');
 
       vi.spyOn(txRes, 'wait').mockReturnValue(tx as any);
 
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -69,6 +72,7 @@ describe('EvmRpcObservationExtractor', () => {
       expect(rowsCount).toEqual(1);
       const observation1 = rows[0];
       expect(observation1).toEqual(expectedObservation);
+      expect(callerSpy).toHaveBeenCalledOnce();
     }, 100000);
 
     /**
@@ -76,6 +80,7 @@ describe('EvmRpcObservationExtractor', () => {
      * should return true but insert no tx when transaction is failed
      * @dependencies
      * @scenario
+     * - mock `callCallbacks`
      * - mock rosen-extractor to return rosen data
      * - mock `wait` function of the transaction to throw CallException error
      * - run test
@@ -84,9 +89,11 @@ describe('EvmRpcObservationExtractor', () => {
      * @expected
      * - it should return true
      * - no observation should be inserted into database
+     * - `callCallbacks` should have NOT been called
      */
     it('should return true but insert no tx when transaction is failed', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
+      const callerSpy = vi.spyOn(extractor, 'callCallbacks');
 
       vi.spyOn(txRes, 'wait').mockImplementation((x: number | undefined) => {
         throw {
@@ -97,7 +104,7 @@ describe('EvmRpcObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -107,6 +114,7 @@ describe('EvmRpcObservationExtractor', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
+      expect(callerSpy).not.toHaveBeenCalled();
     }, 100000);
 
     /**
@@ -127,7 +135,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid

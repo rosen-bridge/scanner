@@ -76,7 +76,24 @@ export abstract class AbstractObservationExtractor<
         });
       }
     });
-    return this.actions.storeObservations(observations, block, this.getId());
+    return this.storeObservations(observations, block);
+  };
+
+  /**
+   * stores extracted observations in database and call the callbacks
+   * @param observations
+   */
+  protected storeObservations = async (
+    observations: Array<ExtractedObservation>,
+    block: Block
+  ) => {
+    const status = await this.actions.storeObservations(
+      observations,
+      block,
+      this.getId()
+    );
+    if (status && observations.length > 0) this.callCallbacks();
+    return status;
   };
 
   /**
@@ -84,7 +101,11 @@ export abstract class AbstractObservationExtractor<
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockObservation(hash, this.getId());
+    const affectedRows = await this.actions.deleteBlockObservation(
+      hash,
+      this.getId()
+    );
+    if (affectedRows > 0) this.callCallbacks();
   };
 
   /**

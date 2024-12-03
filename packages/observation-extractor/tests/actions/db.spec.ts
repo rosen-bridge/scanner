@@ -280,7 +280,8 @@ describe('ObservationEntityAction', () => {
       expect(
         (await dataSource.getRepository(ObservationEntity).find()).length
       ).toEqual(4);
-      await action.deleteBlockObservation('block1', 'ergo');
+      const result = await action.deleteBlockObservation('block1', 'ergo');
+      expect(result).toEqual(1);
       expect(
         (await dataSource.getRepository(ObservationEntity).find()).length
       ).toEqual(3);

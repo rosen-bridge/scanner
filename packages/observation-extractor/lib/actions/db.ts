@@ -96,9 +96,10 @@ export class ObservationEntityAction {
     this.logger.info(
       `Deleting observations in block ${block} and extractor ${extractor}`
     );
-    await this.observationRepository.delete({
+    const deleteResult = await this.observationRepository.delete({
       block: block,
       extractor: extractor,
     });
+    return deleteResult.affected ?? 0;
   };
 }

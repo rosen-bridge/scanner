@@ -11,7 +11,7 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
     lockAddress: string,
     dataSource: DataSource,
     tokens: RosenTokens,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
@@ -21,9 +21,9 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
         tokens,
         'ethereum',
         'eth',
-        logger
+        logger,
       ),
-      logger
+      logger,
     );
   }
 

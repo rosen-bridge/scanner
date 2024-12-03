@@ -2,21 +2,16 @@ import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
-import { ObservationEntityAction } from '../../actions/db';
 import { Transaction } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { RosenTokens } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import { Block } from '@rosen-bridge/abstract-extractor';
+import { AbstractObservationExtractor } from '../abstract/AbstractObservationExtractor';
 
-export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
-  readonly logger: AbstractLogger;
-  private readonly dataSource: DataSource;
-  private readonly tokens: TokenMap;
-  private readonly actions: ObservationEntityAction;
-  private readonly extractor: ErgoNodeRosenExtractor;
-  static readonly FROM_CHAIN: string = 'ergo';
+export class ErgoObservationExtractor extends AbstractObservationExtractor<Transaction> {
+  readonly FROM_CHAIN: string = 'ergo';
 
   constructor(
     dataSource: DataSource,
@@ -24,12 +19,12 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     address: string,
     logger?: AbstractLogger
   ) {
-    super();
-    this.dataSource = dataSource;
-    this.tokens = new TokenMap(tokens);
-    this.logger = logger ? logger : new DummyLogger();
-    this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new ErgoNodeRosenExtractor(address, tokens, this.logger);
+    super(
+      dataSource,
+      tokens,
+      new ErgoNodeRosenExtractor(address, tokens, logger),
+      logger
+    );
   }
 
   /**
@@ -69,7 +64,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               blake2b(transaction.id, undefined, 32)
             ).toString('hex');
             observations.push({
-              fromChain: ErgoObservationExtractor.FROM_CHAIN,
+              fromChain: this.FROM_CHAIN,
               toChain: data.toChain,
               networkFee: data.networkFee,
               bridgeFee: data.bridgeFee,
@@ -84,8 +79,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
             });
           }
         });
-        this.actions
-          .storeObservations(observations, block, this.getId())
+        this.storeObservations(observations, block)
           .then((status) => {
             resolve(status);
           })
@@ -105,18 +99,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   };
 
   /**
-   * fork one block and remove all stored information for this block
-   * @param hash: block hash
+   * gets transaction id from TransactionType
    */
-  forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockObservation(hash, this.getId());
-  };
-
-  /**
-   * Extractor box initialization
-   * No action needed in cardano extractors
-   */
-  initializeBoxes = async () => {
-    return;
-  };
+  getTxId = (tx: Transaction) => tx.id;
 }
