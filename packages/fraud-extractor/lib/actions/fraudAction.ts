@@ -129,8 +129,9 @@ export class FraudAction {
     block: Block,
     extractor: string,
     txId: string
-  ): Promise<void> => {
+  ): Promise<number> => {
     const spendIdChunks = chunk(spendIds, dbIdChunkSize);
+    let affectedRows = 0;
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.repository.update(
         { boxId: In(spendIdChunk), extractor: extractor },
@@ -138,6 +139,7 @@ export class FraudAction {
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
+        affectedRows += updateResult.affected;
         const spentRows = await this.repository.findBy({
           boxId: In(spendIdChunk),
           spendBlock: block.hash,
@@ -150,6 +152,7 @@ export class FraudAction {
         }
       }
     }
+    return affectedRows;
   };
 
   /**
@@ -159,7 +162,7 @@ export class FraudAction {
    * @param block
    * @param extractor
    */
-  deleteBlock = async (block: string, extractor: string): Promise<void> => {
+  deleteBlock = async (block: string, extractor: string): Promise<number> => {
     this.logger.info(`Deleting frauds in block [${block}]`);
     const invalidRows = await this.repository.findBy({
       extractor: extractor,
@@ -191,6 +194,7 @@ export class FraudAction {
         );
       }
     }
+    return invalidRows.length + updatingRows.length;
   };
 
   /**

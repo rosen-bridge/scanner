@@ -41,13 +41,16 @@ describe('fraudExtractor', () => {
      * @dependencies
      * - Database
      * @scenario
+     * - mock `callCallbacks`
      * - mock a block and fraud transaction
      * - process fraud transaction
      * - check the stored information
      * @expected
      * - should store one fraud in the database
+     * - `callCallbacks` should have been called
      */
     it('should save a fraud from the transaction', async () => {
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       await extractor.processTransactions(
         [
           generateFraudTx(
@@ -65,6 +68,24 @@ describe('fraudExtractor', () => {
       );
       expect(fraud.creationBlock).toEqual(block.hash);
       expect(fraud.creationHeight).toEqual(block.height);
+      expect(callerSpy).toHaveBeenCalled();
+    });
+
+    /**
+     * @target fraudExtractor.processTransactions should do nothing when no fraud is extracted
+     * @dependencies
+     * - Database
+     * @scenario
+     * - mock `callCallbacks`
+     * - mock a block with no tx
+     * - process fraud transactions
+     * @expected
+     * - `callCallbacks` should have NOT been called
+     */
+    it('should do nothing when no fraud is extracted', async () => {
+      const callerSpy = jest.spyOn(extractor, 'callCallbacks');
+      await extractor.processTransactions([], block);
+      expect(callerSpy).not.toHaveBeenCalled();
     });
   });
 

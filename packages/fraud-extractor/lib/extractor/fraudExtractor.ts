@@ -15,7 +15,6 @@ import { DefaultApiLimit } from '../constants';
 import { ExtractedFraud } from '../interfaces/types';
 
 export class FraudExtractor extends AbstractExtractor<Transaction> {
-  private readonly logger: AbstractLogger;
   private readonly actions: FraudAction;
   private readonly id: string;
   private readonly ergoTree: string;
@@ -30,13 +29,12 @@ export class FraudExtractor extends AbstractExtractor<Transaction> {
     rwt: string,
     logger?: AbstractLogger
   ) {
-    super();
+    super(logger);
     this.id = id;
     this.ergoTree = wasm.Address.from_base58(fraudAddress)
       .to_ergo_tree()
       .to_base16_bytes();
     this.rwt = rwt;
-    this.logger = logger ? logger : new DummyLogger();
     this.actions = new FraudAction(dataSource, this.logger);
     this.api = ergoExplorerClientFactory(explorerUrl);
   }
@@ -105,17 +103,23 @@ export class FraudExtractor extends AbstractExtractor<Transaction> {
           .storeBlockFrauds(newFrauds, block, this.getId())
           .then(async (status) => {
             if (status) {
-              if (newFrauds.length > 0)
+              let affected = false;
+              if (newFrauds.length > 0) {
                 this.logger.debug(
                   `successfully stored new frauds at hight ${block.height}`
                 );
-              for (const spendIds of txSpendIds)
-                await this.actions.spendFrauds(
+                affected = true;
+              }
+              for (const spendIds of txSpendIds) {
+                const affectedRows = await this.actions.spendFrauds(
                   spendIds.spendBoxes,
                   block,
                   this.getId(),
                   spendIds.txId
                 );
+                if (affectedRows > 0) affected = true;
+              }
+              if (affected) this.callCallbacks();
             }
             resolve(status);
           })
@@ -136,7 +140,8 @@ export class FraudExtractor extends AbstractExtractor<Transaction> {
    * @param hash: block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlock(hash, this.getId());
+    const affectedRows = await this.actions.deleteBlock(hash, this.getId());
+    if (affectedRows > 0) this.callCallbacks();
   };
 
   /**

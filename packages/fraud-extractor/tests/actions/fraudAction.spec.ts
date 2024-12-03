@@ -109,12 +109,19 @@ describe('FraudAction', () => {
      * - spend the fraud with its boxId
      * - check stored fraud spend block information
      * @expected
+     * - should return number of updated frauds
      * - the fraud spendBlock and spendHeight are updated
      */
     it('should update the spending information of an stored fraud', async () => {
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
-      await action.spendFrauds(['boxId'], block, 'extractor', 'txId');
+      const result = await action.spendFrauds(
+        ['boxId'],
+        block,
+        'extractor',
+        'txId'
+      );
+      expect(result).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
       expect(stored.spendHeight).toEqual(100);
@@ -129,12 +136,19 @@ describe('FraudAction', () => {
      * - spend the fraud with its boxId but different extractor
      * - check stored fraud spend block information
      * @expected
+     * - should return zero since no fraud is updated
      * - the fraud spendBlock and spendHeight are not updated
      */
     it('should NOT update the spending information of an stored fraud with different extractor', async () => {
       await action.storeBlockFrauds([fraud], block, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendFrauds(['boxId'], block, 'extractor2', 'txId');
+      const result = await action.spendFrauds(
+        ['boxId'],
+        block,
+        'extractor2',
+        'txId'
+      );
+      expect(result).toEqual(0);
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
       expect(stored.spendHeight).toBeNull();
@@ -151,12 +165,14 @@ describe('FraudAction', () => {
      * - fork the block
      * - check stored fraud
      * @expected
+     * - should return number of affected rows
      * - the fraud should not exist after forking the block
      */
     it('should remove frauds in a forked block', async () => {
       await action.storeBlockFrauds([fraud], block, 'extractor');
       expect(await repository.count()).toEqual(1);
-      await action.deleteBlock(block.hash, 'extractor');
+      const result = await action.deleteBlock(block.hash, 'extractor');
+      expect(result).toEqual(1);
       expect(await repository.count()).toEqual(0);
     });
 
@@ -170,6 +186,7 @@ describe('FraudAction', () => {
      * - fork the block
      * - check stored fraud spending information
      * @expected
+     * - should return number of affected rows
      * - to remove fraud spending information after a fork event
      */
     it('should remove spending information when spent on a forked block', async () => {
@@ -178,7 +195,8 @@ describe('FraudAction', () => {
       expect(await repository.count()).toEqual(1);
       const FraudEntity1 = (await repository.find())[0];
       expect(FraudEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlock(nextBlock.hash, 'extractor');
+      const result = await action.deleteBlock(nextBlock.hash, 'extractor');
+      expect(result).toEqual(1);
       expect(await repository.count()).toEqual(1);
       const FraudEntity2 = (await repository.find())[0];
       expect(FraudEntity2.spendBlock).toBeNull();
@@ -194,6 +212,7 @@ describe('FraudAction', () => {
      * - fork the block
      * - check stored fraud spending information
      * @expected
+     * - should return number of affected rows
      * - to not change the fraud spending information
      */
     it('should NOT remove the spending information when report is from a different extractor', async () => {
@@ -202,7 +221,8 @@ describe('FraudAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).toEqual('block2');
-      await action.deleteBlock(nextBlock.hash, 'extractor2');
+      const result = await action.deleteBlock(nextBlock.hash, 'extractor2');
+      expect(result).toEqual(0);
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).toEqual('block2');
