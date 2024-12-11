@@ -3,7 +3,7 @@ import EventTriggerEntity from './entities/EventTriggerEntity';
 import CommitmentEntity from './entities/CommitmentEntity';
 import CommitmentExtractor from './extractor/commitmentExtractor';
 import PermitEntity from './entities/PermitEntity';
-import PermitExtractor from './extractor/permitExtractor';
+import PermitExtractor from './extractor/PermitExtractor';
 import EventTriggerExtractor from './extractor/EventTriggerExtractor';
 import CollateralEntity from './entities/CollateralEntity';
 import { CollateralExtractor } from './extractor/collateralExtractor';

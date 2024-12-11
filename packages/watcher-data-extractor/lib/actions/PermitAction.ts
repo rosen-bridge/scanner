@@ -1,13 +1,20 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import {
+  AbstractInitializableErgoExtractorAction,
+  Block,
+  BlockInfo,
+  SpendInfo,
+} from '@rosen-bridge/abstract-extractor';
 
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
 import { dbIdChunkSize } from '../constants';
 
-class PermitAction {
+class PermitAction
+  implements AbstractInitializableErgoExtractorAction<ExtractedPermit>
+{
   readonly logger: AbstractLogger;
   private readonly datasource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
@@ -19,54 +26,14 @@ class PermitAction {
   }
 
   /**
-   * insert a new permit boxes in the database
-   * @param permits
-   * @param initialHeight
-   * @param extractor
-   */
-  insertPermit = async (permit: ExtractedPermit, extractor: string) => {
-    return this.permitRepository.insert({
-      boxId: permit.boxId,
-      boxSerialized: permit.boxSerialized,
-      block: permit.block,
-      height: permit.height,
-      extractor: extractor,
-      WID: permit.WID,
-      txId: permit.txId,
-      spendBlock: permit.spendBlock,
-      spendHeight: permit.spendHeight,
-    });
-  };
-
-  /**
-   * update an unspent permit in the database
-   * @param permit
-   * @param extractor
-   */
-  updatePermit = async (permit: ExtractedPermit, extractor: string) => {
-    await this.permitRepository.update(
-      { boxId: permit.boxId, extractor: extractor },
-      {
-        boxSerialized: permit.boxSerialized,
-        block: permit.block,
-        height: permit.height,
-        WID: permit.WID,
-        txId: permit.txId,
-        spendBlock: null,
-        spendHeight: null,
-      }
-    );
-  };
-
-  /**
-   * It stores list of permits in the dataSource with block id
+   * insert all extracted permits for a block in an atomic db transaction
    * @param permits
    * @param block
    * @param extractor
    */
-  storePermits = async (
+  insertBoxes = async (
     permits: Array<ExtractedPermit>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ) => {
     if (permits.length === 0) return true;
@@ -120,25 +87,26 @@ class PermitAction {
 
   /**
    * Update spendBlock and spendHeight of permits spent on the block
-   * @param spendId
+   * @param spendInfoArray
    * @param block
    * @param extractor
    */
-  spendPermits = async (
-    spendId: Array<string>,
-    block: Block,
+  spendBoxes = async (
+    spendInfoArray: SpendInfo[],
+    block: BlockInfo,
     extractor: string
   ): Promise<void> => {
-    const spendIdChunks = chunk(spendId, dbIdChunkSize);
-    for (const spendIdChunk of spendIdChunks) {
+    const spendInfoChunks = chunk(spendInfoArray, dbIdChunkSize);
+    for (const spendInfoChunk of spendInfoChunks) {
+      const boxIds = spendInfoChunk.map((info) => info.boxId);
       const updateResult = await this.permitRepository.update(
-        { boxId: In(spendIdChunk), extractor: extractor },
+        { boxId: In(boxIds), extractor: extractor },
         { spendBlock: block.hash, spendHeight: block.height }
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
         const spentRows = await this.permitRepository.findBy({
-          boxId: In(spendIdChunk),
+          boxId: In(boxIds),
           spendBlock: block.hash,
         });
         for (const row of spentRows) {
@@ -151,12 +119,16 @@ class PermitAction {
   };
 
   /**
-   * Delete all permits corresponding to the block(id) and extractor(id)
-   * and update all permits spent on the specified block
+   * delete extracted data from a specific block for specified extractor
+   * if a box is spend in this block mark it as unspent
+   * if a box is created in this block remove it from database
    * @param block
    * @param extractor
    */
-  deleteBlock = async (block: string, extractor: string): Promise<void> => {
+  deleteBlockBoxes = async (
+    block: string,
+    extractor: string
+  ): Promise<void> => {
     this.logger.info(
       `Deleting permits at block ${block} and extractor ${extractor}`
     );
@@ -168,49 +140,14 @@ class PermitAction {
   };
 
   /**
-   *  Returns all stored permit box ids
-   */
-  getAllPermitBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.permitRepository.find({
-      where: {
-        extractor: extractor,
-      },
-      select: {
-        boxId: true,
-      },
-    });
-    return boxIds.map((item: { boxId: string }) => item.boxId);
-  };
-
-  /**
-   * Removes specified permit
+   * remove all existing data for the extractor
    * @param boxId
    * @param extractor
    */
-  removePermit = async (boxId: string, extractor: string) => {
-    return await this.permitRepository.delete({
-      boxId: boxId,
+  removeAllData = async (extractor: string) => {
+    await this.permitRepository.delete({
       extractor: extractor,
     });
-  };
-
-  /**
-   * Update the permit spending information
-   * @param boxId
-   * @param extractor
-   * @param blockId
-   * @param blockHeight
-   */
-  updateSpendBlock = async (
-    boxId: string,
-    extractor: string,
-    blockId: string,
-    blockHeight: number
-  ) => {
-    return await this.permitRepository.update(
-      { boxId: boxId, extractor: extractor },
-      { spendBlock: blockId, spendHeight: blockHeight }
-    );
   };
 }
 
