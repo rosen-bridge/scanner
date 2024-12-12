@@ -53,15 +53,6 @@ export const sampleEventEntity: EventTriggerEntity = {
   sourceChainHeight: 10,
 };
 
-export const sampleExtractedPermit = {
-  boxId: '1',
-  boxSerialized: 'serialized1',
-  WID: 'wid1',
-  txId: 'txId1',
-  block: 'blockId',
-  height: 100,
-};
-
 export const last10BlockHeader = [
   {
     extensionId:

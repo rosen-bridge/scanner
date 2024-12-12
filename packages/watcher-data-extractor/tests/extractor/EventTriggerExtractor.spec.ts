@@ -13,7 +13,6 @@ import {
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { sampleEventEntity } from './utilsVariable.mock';
-import { EventResult } from '../../lib';
 import { ErgoNetworkType } from '@rosen-bridge/abstract-extractor';
 
 let dataSource: DataSource;
