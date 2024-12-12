@@ -26,9 +26,10 @@ class PermitExtractor extends AbstractInitializableErgoExtractor<ExtractedPermit
     url: string,
     address: string,
     RWT: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    initialize = true
   ) {
-    super(type, url, address);
+    super(type, url, address, logger, initialize);
     this.id = id;
     this.permitErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()

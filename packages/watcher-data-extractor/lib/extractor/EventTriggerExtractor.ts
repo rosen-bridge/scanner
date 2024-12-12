@@ -33,9 +33,10 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
     RWT: string,
     permitAddress: string,
     fraudAddress: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    initialize = true
   ) {
-    super(type, url, address, logger);
+    super(type, url, address, logger, initialize);
     this.id = id;
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
