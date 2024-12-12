@@ -1,10 +1,9 @@
 import { DataSource, Repository } from 'typeorm';
 
-import PermitAction from '../../lib/actions/permitAction';
+import PermitAction from '../../lib/actions/PermitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import { block, block2 } from '../extractor/utilsVariable.mock';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
 
 const samplePermit1 = {
   boxId: '1',
@@ -45,7 +44,7 @@ describe('PermitEntityAction', () => {
     repository = dataSource.getRepository(PermitEntity);
   });
 
-  describe('storePermits', () => {
+  describe('insertBoxes', () => {
     /**
      * 2 valid PermitBox should save successfully
      * Dependency: Nothing
@@ -53,7 +52,7 @@ describe('PermitEntityAction', () => {
      * Expected: storeBoxes should returns true and database row count should be 2
      */
     it('gets two PermitBox and dataBase row should be 2', async () => {
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [samplePermit1, samplePermit2],
         block,
         'extractor1'
@@ -87,7 +86,7 @@ describe('PermitEntityAction', () => {
      * different permit with different extractor should save successfully
      * Dependency: permit for the first extractor should be in the database
      * Scenario: second extractor should save different permit in the database
-     * Expected: storePermits should returns true and each saved permit should have valid fields
+     * Expected: insertBoxes should returns true and each saved permit should have valid fields
      */
     it('checks that permit saved successfully with two different extractor', async () => {
       await repository.insert([
@@ -104,7 +103,7 @@ describe('PermitEntityAction', () => {
           height: 1,
         },
       ]);
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [samplePermit3, samplePermit4],
         block,
         'second-extractor'
@@ -138,7 +137,7 @@ describe('PermitEntityAction', () => {
      * Dependency: 2 permit should be in the database
      * Scenario: 2 permit added to the table and then another permit with same 'boxId' & 'extractor' but different
      *  'boxSerialized' field added to table
-     * Expected: storePermits should returns true and last permit fields should update
+     * Expected: insertBoxes should returns true and last permit fields should update
      */
     it('checks that duplicated permit updated with same extractor', async () => {
       await repository.insert([
@@ -155,7 +154,7 @@ describe('PermitEntityAction', () => {
           height: 1,
         },
       ]);
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [{ ...samplePermit1, boxSerialized: 'updatedBoxSerialized' }],
         block,
         'first-extractor'
@@ -201,7 +200,7 @@ describe('PermitEntityAction', () => {
           height: 1,
         },
       ]);
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [{ ...samplePermit1 }],
         block,
         'second-extractor'
@@ -228,7 +227,7 @@ describe('PermitEntityAction', () => {
      * Dependency: 2 permit should be in the database table for the 'first-extractor'
      * Scenario: 2 permit added to the table and then another permit with same 'extractor' but different
      *  'boxId' field added to table
-     * Expected: storePermits should returns true and each saved permit should have valid permit in
+     * Expected: insertBoxes should returns true and each saved permit should have valid permit in
      *  each step and new permits should insert in the database
      */
     it('two permit with two different boxId but same extractor', async () => {
@@ -246,7 +245,7 @@ describe('PermitEntityAction', () => {
           height: 1,
         },
       ]);
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [{ ...samplePermit3 }],
         block,
         'first-extractor'
@@ -269,9 +268,9 @@ describe('PermitEntityAction', () => {
     });
   });
 
-  describe('spendPermits', () => {
+  describe('spendBoxes', () => {
     it('sets one spendBlock for one permit & one row should have spendBlock', async () => {
-      const res = await action.storePermits(
+      const res = await action.insertBoxes(
         [samplePermit1, samplePermit2],
         block,
         'extractor1'
@@ -280,17 +279,24 @@ describe('PermitEntityAction', () => {
       expect((await repository.findBy({ spendBlock: 'hash' })).length).toEqual(
         0
       );
-      await action.spendPermits(['1', 'boxId10'], block, 'extractor1');
+      await action.spendBoxes(
+        [
+          { boxId: '1', txId: 'txId', index: 0 },
+          { boxId: 'boxId10', txId: 'txId', index: 1 },
+        ],
+        block,
+        'extractor1'
+      );
       expect(
         (await repository.findBy({ boxId: '1', spendBlock: 'hash' })).length
       ).toEqual(1);
     });
   });
 
-  describe('deleteBlock', () => {
+  describe('deleteBlockBoxes', () => {
     beforeEach(async () => {
-      await action.storePermits([samplePermit1], block, 'extractor1');
-      await action.storePermits(
+      await action.insertBoxes([samplePermit1], block, 'extractor1');
+      await action.insertBoxes(
         [samplePermit2],
         { ...block, hash: 'hash2' },
         'extractor2'
@@ -298,7 +304,7 @@ describe('PermitEntityAction', () => {
     });
 
     /**
-     * @target permitEntityAction.deleteBlock should remove the permit existed on the removed block
+     * @target permitEntityAction.deleteBlockBoxes should remove the permit existed on the removed block
      * @dependencies
      * @scenario
      * - delete the block which is the permit created on
@@ -310,13 +316,13 @@ describe('PermitEntityAction', () => {
     it('should remove the permit existed on the removed block', async () => {
       let [_, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await action.deleteBlock('hash', 'extractor1');
+      await action.deleteBlockBoxes('hash', 'extractor1');
       [_, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
     });
 
     /**
-     * @target permitEntityAction.deleteBlock should set the spendBlock to null when spent block is forked
+     * @target permitEntityAction.deleteBlockBoxes should set the spendBlock to null when spent block is forked
      * @dependencies
      * @scenario
      * - spend the stored permit in the database
@@ -327,13 +333,17 @@ describe('PermitEntityAction', () => {
      * - it should set the spent block to null when the block is removed
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
-      await action.spendPermits([samplePermit1.boxId], block2, 'extractor1');
+      await action.spendBoxes(
+        [{ boxId: samplePermit1.boxId, txId: 'txId', index: 0 }],
+        block2,
+        'extractor1'
+      );
       let storedEntity = await repository.findOne({
         where: { boxId: samplePermit1.boxId, extractor: 'extractor1' },
       });
       expect(storedEntity!.spendBlock).toEqual(block2.hash);
 
-      await action.deleteBlock(block2.hash, 'extractor1');
+      await action.deleteBlockBoxes(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: samplePermit1.boxId, extractor: 'extractor1' },
       });
@@ -341,121 +351,22 @@ describe('PermitEntityAction', () => {
     });
   });
 
-  describe('insertPermit', () => {
+  describe('removeAllData', () => {
     /**
-     * @target permitAction.insertPermit should insert the new permit at initialization
-     * @dependencies
-     * @scenario
-     * - insert an initial permit
-     * - fetch and check the permit information
-     * @expected
-     * - it should insert the new permit
-     */
-    it('should insert the new permit at initialization', async () => {
-      await action.insertPermit(samplePermit1, 'extractor');
-      const stored = (await repository.find())[0];
-      expect(stored.WID).toEqual(samplePermit1.WID);
-      expect(stored.boxId).toEqual(samplePermit1.boxId);
-      expect(stored.txId).toEqual(samplePermit1.txId);
-      expect(stored.height).toEqual(samplePermit1.height);
-      expect(stored.block).toEqual(samplePermit1.block);
-    });
-  });
-
-  describe('updatePermit', () => {
-    /**
-     * @target permitAction.updatePermit should update the unspent permit information
-     * @dependencies
-     * @scenario
-     * - insert a mocked permit
-     * - update the permit with new spend block information
-     * - fetch that permit and check the result
-     * @expected
-     * - it should remove the spend height and spend block from an unspent permit existing in the database
-     */
-    it('should update the unspent permit information', async () => {
-      await repository.insert({
-        ...samplePermit1,
-        spendBlock: 'spendBlock',
-        spendHeight: 109,
-      });
-      const permit: ExtractedPermit = {
-        ...samplePermit1,
-      };
-      await action.updatePermit(permit, 'extractor');
-      const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toBeNull();
-      expect(stored.spendHeight).toBeNull();
-    });
-  });
-
-  describe('getAllBoxIds', () => {
-    /**
-     * @target permitAction.getAllBoxIds should return all permit boxIds in the database
+     * @target permitAction.removeAllData should remove all data related to this extractor
      * @dependencies
      * @scenario
      * - insert two mocked permits
-     * - call getAllBoxIds
-     * - check to have both permit boxIds
+     * - call removeAllData
+     * - check to have no remaining data
      * @expected
-     * - it should return two permit boxIds stored in the database
+     * - data should be empty
      */
-    it('should return all boxIds in the database', async () => {
+    it('should remove all related data in the database', async () => {
       await repository.insert([samplePermit1, samplePermit2]);
-      const boxIds = await action.getAllPermitBoxIds('extractor');
-      expect(boxIds).toHaveLength(2);
-      expect(boxIds).toEqual([samplePermit1.boxId, samplePermit2.boxId]);
-    });
-  });
-
-  describe('removePermit', () => {
-    /**
-     * @target permitAction.removePermit should remove the permit in the database
-     * @dependencies
-     * @scenario
-     * - insert a mocked permit
-     * - delete the permit and check the deletion
-     * @expected
-     * - it should remove the permit in the database
-     */
-    it('should remove the permit in the database', async () => {
-      await repository.insert([samplePermit1]);
-      const result = await action.removePermit(
-        samplePermit1.boxId,
-        samplePermit1.extractor
-      );
-      expect(result.affected).toEqual(1);
-    });
-  });
-
-  describe('updateSpendBlock', () => {
-    /**
-     * @target permitAction.updateSpendBlock should update the spend block information
-     * @dependencies
-     * @scenario
-     * - insert a mocked permit
-     * - update the permit with new spend block information
-     * - fetch that permit and check the result
-     * @expected
-     * - it should update the permit spend block id and height
-     */
-    it('should update the spend block information', async () => {
-      await repository.insert([
-        {
-          ...samplePermit1,
-          spendBlock: 'spendBlock',
-          spendHeight: 100,
-        },
-      ]);
-      await action.updateSpendBlock(
-        samplePermit1.boxId,
-        samplePermit1.extractor,
-        'spendBlock-new',
-        110
-      );
-      const stored = (await repository.find())[0];
-      expect(stored.spendBlock).toEqual('spendBlock-new');
-      expect(stored.spendHeight).toEqual(110);
+      await action.removeAllData('extractor');
+      const data = await repository.find({ where: { extractor: 'extractor' } });
+      expect(data).toHaveLength(0);
     });
   });
 });

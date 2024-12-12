@@ -3,7 +3,6 @@ import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
-  Block,
   BlockInfo,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
@@ -16,11 +15,11 @@ class PermitAction
   implements AbstractInitializableErgoExtractorAction<ExtractedPermit>
 {
   readonly logger: AbstractLogger;
-  private readonly datasource: DataSource;
+  private readonly dataSource: DataSource;
   private readonly permitRepository: Repository<PermitEntity>;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.datasource = dataSource;
+    this.dataSource = dataSource;
     this.logger = logger ? logger : new DummyLogger();
     this.permitRepository = dataSource.getRepository(PermitEntity);
   }
@@ -43,7 +42,7 @@ class PermitAction
       extractor: extractor,
     });
     let success = true;
-    const queryRunner = this.datasource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const repository = await queryRunner.manager.getRepository(PermitEntity);
