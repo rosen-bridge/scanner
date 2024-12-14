@@ -7,7 +7,7 @@ import {
   AbstractErgoExtractorAction,
 } from '../lib';
 import { block, extractedData, tx } from './testData';
-import { MockedErgoExtractor } from './AbstractExtractor.mock';
+import { MockedErgoExtractor } from './AbstractErgoExtractor.mock';
 
 describe('AbstractErgoExtractor', () => {
   describe('processTransactions', () => {
@@ -22,6 +22,7 @@ describe('AbstractErgoExtractor', () => {
      * @expected
      * - to call `extractBoxData` for the specific box
      * - to insert the extracted box to database
+     * - to return true when total procedure is successful
      */
     it('should process boxes with data and insert data into database', async () => {
       const extractor = new MockedErgoExtractor();
@@ -31,29 +32,33 @@ describe('AbstractErgoExtractor', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest.fn();
+      const insertSpy = vitest.fn().mockResolvedValue(true);
+      const spendSpy = vitest.fn();
       extractor['actions'] = {
         insertBoxes: insertSpy,
+        spendBoxes: spendSpy,
       } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
-      extractor.processTransactions([tx], block);
+      const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
       expect(extractSpy).toBeCalledWith(tx.outputs[0]);
       expect(insertSpy).toBeCalledWith([extractedData], block, 'Test');
+      expect(result).toEqual(true);
     });
 
     /**
-     * @target processTransactions should extract spend info of transaction spend related boxes
+     * @target processTransactions should extract spending information of all input boxes
      * @dependencies
      * @scenario
-     * - mock extractor
+     * - mock extractor (hasData returns false as default)
      * - spy `extractBoxData`, `insertBoxes` and `spendBoxes`
      * - run test (call `processTransactions`)
      * @expected
      * - not to call `extractBoxData` and `insertBoxes` when there is not any box with data
      * - to extractor spend info of input boxes and call `spendBoxes`
+     * - to return true when total procedure is successful
      */
-    it('should extract spend info of transaction spend related boxes', async () => {
+    it('should extract spending information of all input boxes', async () => {
       const extractor = new MockedErgoExtractor();
       const extractSpy = vitest.fn();
       extractor.extractBoxData = extractSpy;
@@ -63,7 +68,7 @@ describe('AbstractErgoExtractor', () => {
         insertBoxes: insertSpy,
         spendBoxes: spendSpy,
       } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
-      extractor.processTransactions([tx], block);
+      const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).not.toBeCalled();
       expect(insertSpy).not.toBeCalled();
@@ -75,6 +80,39 @@ describe('AbstractErgoExtractor', () => {
         block,
         'Test'
       );
+      expect(result).toEqual(true);
+    });
+
+    /**
+     * @target processTransactions should return false if data insertion fails
+     * @dependencies
+     * @scenario
+     * - mock extractor
+     * - mock `hasData` to return true for one box
+     * - spy `extractBoxData` and `insertBoxes`
+     * - run test (call `processTransactions`)
+     * @expected
+     * - to return false when `insertBoxes` returns false
+     * - not to call `spendBoxes` if data insertion fails
+     */
+    it('should return false if data insertion fails', async () => {
+      const extractor = new MockedErgoExtractor();
+      extractor.hasData = (box: V1.OutputInfo | OutputBox) => {
+        if (box.boxId == tx.outputs[0].boxId) return true;
+        return false;
+      };
+      const extractSpy = vitest.fn().mockReturnValue(extractedData);
+      extractor.extractBoxData = extractSpy;
+      const insertSpy = vitest.fn().mockResolvedValue(false);
+      const spendSpy = vitest.fn();
+      extractor['actions'] = {
+        insertBoxes: insertSpy,
+        spendBoxes: spendSpy,
+      } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
+      const result = await extractor.processTransactions([tx], block);
+
+      expect(result).toEqual(false);
+      expect(spendSpy).not.toBeCalled();
     });
   });
 

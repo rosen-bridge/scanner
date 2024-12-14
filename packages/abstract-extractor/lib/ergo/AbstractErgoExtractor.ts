@@ -74,12 +74,22 @@ export abstract class AbstractErgoExtractor<
         }
       }
 
-      if (boxes.length > 0)
-        await this.actions.insertBoxes(boxes, block, this.getId());
+      if (boxes.length > 0) {
+        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+          this.logger.warn(
+            `Data insertion failed for ${this.getId()} at the block ${
+              block.height
+            }`
+          );
+          return false;
+        }
+      }
       await this.actions.spendBoxes(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
-        `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
+        `Processing transactions failed for ${this.getId()} at the block ${
+          block.height
+        } with error: ${e}`
       );
       return false;
     }
