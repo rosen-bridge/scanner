@@ -3,10 +3,6 @@ interface ExtractedPermit {
   boxSerialized: string;
   WID: string;
   txId: string;
-  block?: string;
-  height?: number;
-  spendBlock?: string;
-  spendHeight?: number;
 }
 
 export { ExtractedPermit };

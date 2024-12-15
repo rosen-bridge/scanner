@@ -13,9 +13,8 @@ import PermitAction from '../actions/PermitAction';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 
 class PermitExtractor extends AbstractInitializableErgoExtractor<ExtractedPermit> {
-  readonly logger: AbstractLogger;
   id: string;
-  readonly actions: PermitAction;
+  protected readonly actions: PermitAction;
   private readonly permitErgoTree: string;
   private readonly RWT: string;
 

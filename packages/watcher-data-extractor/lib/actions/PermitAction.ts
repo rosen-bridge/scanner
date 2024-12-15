@@ -61,17 +61,17 @@ class PermitAction
           txId: permit.txId,
         };
         if (!saved) {
-          this.logger.debug(
+          this.logger.info(
             `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await repository.insert(entity);
         } else {
-          this.logger.debug(
+          this.logger.info(
             `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
           );
           await repository.update({ boxId: permit.boxId }, entity);
         }
-        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
+        this.logger.debug(`Stored permit entity: ${JSON.stringify(entity)}`);
       }
       await queryRunner.commitTransaction();
     } catch (e) {
