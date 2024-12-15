@@ -1,20 +1,25 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import {
+  AbstractInitializableErgoExtractorAction,
+  BlockInfo,
+  SpendInfo,
+} from '@rosen-bridge/abstract-extractor';
 
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
-import { SpendInfo } from '../interfaces/types';
 
-class CommitmentAction {
+class CommitmentAction
+  implements AbstractInitializableErgoExtractorAction<extractedCommitment>
+{
   readonly logger: AbstractLogger;
-  private readonly datasource: DataSource;
+  private readonly dataSource: DataSource;
   private readonly commitmentRepository: Repository<CommitmentEntity>;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.datasource = dataSource;
+    this.dataSource = dataSource;
     this.logger = logger ? logger : new DummyLogger();
     this.commitmentRepository = dataSource.getRepository(CommitmentEntity);
   }
@@ -25,9 +30,9 @@ class CommitmentAction {
    * @param block
    * @param extractor
    */
-  storeCommitments = async (
+  insertBoxes = async (
     commitments: Array<extractedCommitment>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ): Promise<boolean> => {
     if (commitments.length === 0) return true;
@@ -37,7 +42,7 @@ class CommitmentAction {
       extractor: extractor,
     });
     let success = true;
-    const queryRunner = this.datasource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const repository = await queryRunner.manager.getRepository(
@@ -87,14 +92,14 @@ class CommitmentAction {
   };
 
   /**
-   * Update spendBlock and spendHeight of commitments spent on the block
+   * update spendBlock and spendHeight of commitments spent on the block
    * @param spendId
    * @param block
    * @param extractor
    */
-  spendCommitments = async (
+  spendBoxes = async (
     spendId: Array<SpendInfo>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ): Promise<void> => {
     // TODO: improve updating (local:ergo/rosen-bridge/scanner#85)
@@ -134,12 +139,13 @@ class CommitmentAction {
   };
 
   /**
-   * Delete all commitments corresponding to the block(id) and extractor(id)
-   * and update all commitments spent on the specified block
+   * delete extracted data from a specific block for specified extractor
+   * if a box is spend in this block mark it as unspent
+   * if a box is created in this block remove it from database
    * @param block
    * @param extractor
    */
-  deleteBlock = async (block: string, extractor: string) => {
+  deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(
       `Deleting commitments of block [${block}] and extractor ${extractor}`
     );
@@ -151,6 +157,17 @@ class CommitmentAction {
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: null, spendTxId: null, spendIndex: null }
     );
+  };
+
+  /**
+   * remove all existing data for the extractor
+   * @param boxId
+   * @param extractor
+   */
+  removeAllData = async (extractor: string) => {
+    await this.commitmentRepository.delete({
+      extractor: extractor,
+    });
   };
 }
 

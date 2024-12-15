@@ -1,39 +1,41 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
-import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import {
+  AbstractInitializableErgoExtractor,
+  ErgoNetworkType,
+  OutputBox,
+} from '@rosen-bridge/abstract-extractor';
 
 import CommitmentAction from '../actions/commitmentAction';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { JsonBI } from '../utils';
-import { SpendInfo } from '../interfaces/types';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 
-class CommitmentExtractor extends AbstractExtractor<Transaction> {
-  readonly logger: AbstractLogger;
+class CommitmentExtractor extends AbstractInitializableErgoExtractor<extractedCommitment> {
   id: string;
-  private readonly dataSource: DataSource;
-  private readonly commitmentsErgoTrees: Array<string>;
-  private readonly RWTId: string;
-  private readonly actions: CommitmentAction;
+  protected readonly actions: CommitmentAction;
+  private readonly commitmentsErgoTree: string;
+  private readonly RWT: string;
   private readonly tokenMap: TokenMap;
 
   constructor(
     id: string,
-    addresses: Array<string>,
-    RWTId: string,
     dataSource: DataSource,
+    type: ErgoNetworkType,
+    url: string,
+    address: string,
+    RWT: string,
     tokens: RosenTokens,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    initialize = false
   ) {
-    super();
+    super(type, url, address, logger, initialize);
     this.id = id;
-    this.dataSource = dataSource;
-    this.commitmentsErgoTrees = addresses.map((address) =>
-      wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
-    );
-    this.RWTId = RWTId;
+    this.commitmentsErgoTree = wasm.Address.from_base58(address)
+      .to_ergo_tree()
+      .to_base16_bytes();
+    this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new CommitmentAction(dataSource, this.logger);
     this.tokenMap = new TokenMap(tokens);
@@ -45,113 +47,81 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
   getId = () => this.id;
 
   /**
-   * gets block id and transactions corresponding to the block and saves if they are valid rosen
-   *  transactions and in case of success return true and in case of failure returns false
-   * @param txs
-   * @param block
+   * check proper data format in the box
+   *  - box ergoTree
+   *  - RWT in first token place
+   *  - wid in R4
+   * @param box
+   * @return true if the box has the required data and false otherwise
    */
-  processTransactions = (
-    txs: Array<Transaction>,
-    block: Block
-  ): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
+  hasData = (box: OutputBox): boolean => {
+    if (
+      box.additionalRegisters &&
+      box.additionalRegisters.R4 &&
+      box.assets &&
+      box.assets.length > 0 &&
+      box.assets[0].tokenId === this.RWT &&
+      box.ergoTree === this.commitmentsErgoTree
+    ) {
       try {
-        const commitments: Array<extractedCommitment> = [];
-        const spendIds: Array<SpendInfo> = [];
-        txs.forEach((transaction) => {
-          // process outputs
-          for (const output of transaction.outputs) {
-            if (
-              output.assets &&
-              output.additionalRegisters &&
-              output.assets.length > 0 &&
-              output.assets[0].tokenId === this.RWTId &&
-              this.commitmentsErgoTrees.indexOf(output.ergoTree) !== -1
-            ) {
-              try {
-                const decodedBox = wasm.ErgoBox.from_json(
-                  JsonBI.stringify(output)
-                );
-                const R4 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R4
-                );
-                const R5 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R5
-                );
-                const R6 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R6
-                );
-                if (R4 && R5 && R6) {
-                  const R4Value = R4.to_byte_array();
-                  const R5Value = R5.to_byte_array();
-                  const R6Value = R6.to_byte_array();
-                  const WID = Buffer.from(R4Value).toString('hex');
-                  const requestId = Buffer.from(R5Value).toString('hex');
-                  const eventDigest = Buffer.from(R6Value).toString('hex');
-                  commitments.push({
-                    txId: transaction.id,
-                    WID: WID,
-                    commitment: eventDigest,
-                    eventId: requestId,
-                    boxId: output.boxId,
-                    boxSerialized: Buffer.from(
-                      decodedBox.sigma_serialize_bytes()
-                    ).toString('base64'),
-                    rwtCount: this.tokenMap
-                      .wrapAmount(
-                        this.RWTId,
-                        BigInt(output.assets[0].amount),
-                        'ergo'
-                      )
-                      .amount.toString(),
-                  });
-                }
-              } catch {
-                // empty
-              }
-            }
-          }
-          // process inputs
-          for (let i = 0; i < transaction.inputs.length; i++) {
-            spendIds.push({
-              boxId: transaction.inputs[i].boxId,
-              txId: transaction.id,
-              index: i,
-            });
-          }
-        });
-        // process save commitments
-        this.actions
-          .storeCommitments(commitments, block, this.id)
-          .then(() => {
-            this.actions.spendCommitments(spendIds, block, this.id).then(() => {
-              resolve(true);
-            });
-          })
-          .catch((e) => reject(e));
+        const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
+        const R4Serialized = parsedBox
+          .register_value(wasm.NonMandatoryRegisterId.R4)!
+          .to_byte_array();
+        const R5Serialized = parsedBox
+          .register_value(wasm.NonMandatoryRegisterId.R4)!
+          .to_byte_array();
+        const R6Serialized = parsedBox
+          .register_value(wasm.NonMandatoryRegisterId.R4)!
+          .to_byte_array();
+        if (R4Serialized && R5Serialized && R6Serialized) return true;
       } catch (e) {
-        this.logger.error(
-          `Error in soring permits of the block ${block}: ${e}`
+        this.logger.warn(
+          `Error occurred while parsing commitment box with boxId [${box.boxId}], error: ${e}`
         );
-        reject(e);
       }
-    });
+    }
+    return false;
   };
 
   /**
-   * fork one block and remove all stored information for this block
-   * @param hash: block hash
+   * extract box data to proper format (not including spending information)
+   * @param box
+   * @return extracted data in proper format
    */
-  forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlock(hash, this.getId());
-  };
-
-  /**
-   * Extractor box initialization
-   * No action needed for commitment extractor
-   */
-  initializeBoxes = async () => {
-    return;
+  extractBoxData = (
+    box: OutputBox
+  ): Omit<extractedCommitment, 'spendBlock' | 'spendHeight'> | undefined => {
+    try {
+      const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
+      const R4Serialized = parsedBox
+        .register_value(wasm.NonMandatoryRegisterId.R4)!
+        .to_byte_array();
+      const R5Serialized = parsedBox
+        .register_value(wasm.NonMandatoryRegisterId.R4)!
+        .to_byte_array();
+      const R6Serialized = parsedBox
+        .register_value(wasm.NonMandatoryRegisterId.R4)!
+        .to_byte_array();
+      return {
+        boxId: box.boxId,
+        boxSerialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
+          'base64'
+        ),
+        WID: Buffer.from(R4Serialized).toString('hex'),
+        commitment: Buffer.from(R5Serialized).toString('hex'),
+        eventId: Buffer.from(R6Serialized).toString('hex'),
+        txId: box.transactionId,
+        rwtCount: this.tokenMap
+          .wrapAmount(this.RWT, BigInt(box.assets![0].amount), 'ergo')
+          .amount.toString(),
+      };
+    } catch (e) {
+      this.logger.warn(
+        `Unexpected error occurred while extracting permit data for box ${box.boxId}: ${e}`
+      );
+      return undefined;
+    }
   };
 }
 
