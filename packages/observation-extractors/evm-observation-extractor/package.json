@@ -33,12 +33,12 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/evm-rpc-scanner": "^2.0.0",
     "@rosen-bridge/observation-extractor": "^5.0.9",
-    "@rosen-bridge/rosen-extractor": "^6.3.0",
-    "@rosen-bridge/tokens": "^1.2.0",
+    "@rosen-bridge/rosen-extractor": "^7.0.0",
+    "@rosen-bridge/tokens": "^2.0.0",
     "blakejs": "^1.2.1",
-    "ethers": "^6.11.0"
+    "ethers": "^6.11.1"
   }
 }

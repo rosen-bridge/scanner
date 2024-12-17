@@ -1,13 +1,13 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { Block, BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
-import { DogeEsploraConfig, DogeEsploraTransaction } from './types';
-import { DogeEsploraNetwork } from './EsploraNetwork';
+import { BitcoinEsploraConfig, BitcoinEsploraTransaction } from './types';
+import { EsploraNetwork } from './EsploraNetwork';
 
-export class DogeEsploraScanner extends GeneralScanner<DogeEsploraTransaction> {
+export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   readonly initialHeight: number;
-  network: DogeEsploraNetwork;
+  network: EsploraNetwork;
 
-  constructor(config: DogeEsploraConfig, logger?: AbstractLogger) {
+  constructor(config: BitcoinEsploraConfig, logger?: AbstractLogger) {
     super(logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
@@ -15,7 +15,7 @@ export class DogeEsploraScanner extends GeneralScanner<DogeEsploraTransaction> {
      * `initialHeight` by one so that it matches all other rosen-bridge scanners
      */
     this.initialHeight = config.initialHeight + 1;
-    this.network = new DogeEsploraNetwork(config.esploraUrl, config.timeout);
+    this.network = new EsploraNetwork(config.esploraUrl, config.timeout);
   }
 
   getFirstBlock = (): Promise<Block> => {
