@@ -1,17 +1,17 @@
 import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
-import { DogeEsploraTransaction } from '@rosen-bridge/doge-esplora-scanner';
 import { DogeEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { RosenTokens } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from 'typeorm';
+import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-esplora-scanner';
 
-export class DogeEsploraObservationExtractor extends AbstractObservationExtractor<DogeEsploraTransaction> {
+export class DogeEsploraObservationExtractor extends AbstractObservationExtractor<BitcoinEsploraTransaction> {
   readonly FROM_CHAIN = 'dogecoin';
 
   constructor(
     lockAddress: string,
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     logger?: AbstractLogger
   ) {
     super(
@@ -30,5 +30,5 @@ export class DogeEsploraObservationExtractor extends AbstractObservationExtracto
   /**
    * gets transaction id from TransactionType
    */
-  getTxId = (tx: DogeEsploraTransaction) => tx.txid;
+  getTxId = (tx: BitcoinEsploraTransaction) => tx.txid;
 }
