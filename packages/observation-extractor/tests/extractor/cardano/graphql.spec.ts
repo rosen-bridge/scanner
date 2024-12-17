@@ -7,6 +7,7 @@ import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 import { DataSource } from 'typeorm';
 import { validLockTx, bankAddress } from './graphQLTestData';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 let dataSource: DataSource;
 
@@ -31,10 +32,12 @@ describe('CardanoGraphQLObservationExtractor', () => {
     it('should return true and insert observation into database on valid lock tx', async () => {
       const tx = validLockTx;
 
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       // run test
       const extractor = new CardanoGraphQLObservationExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         bankAddress
       );
       const res = await extractor.processTransactions(
@@ -89,10 +92,12 @@ describe('CardanoGraphQLObservationExtractor', () => {
     it('should return true with no observation in database on invalid lock tx', async () => {
       const tx = validLockTx;
 
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       // run test
       const extractor = new CardanoGraphQLObservationExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'
       );
       const res = await extractor.processTransactions(

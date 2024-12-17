@@ -10,6 +10,7 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { CARDANO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 import { DataSource } from 'typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -34,7 +35,9 @@ describe('extractorErgo', () => {
      *  should fulfill expected values
      */
     it('checks valid transaction', async () => {
-      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
+      const extractor = new ExtractorErgo(dataSource, tokenMap, bankAddress);
       const Tx1 = observationTxGenerator(
         true,
         [
@@ -111,9 +114,11 @@ describe('extractorErgo', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('checks observation with invalid bankAddress should not saved', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       const extractor = new ExtractorErgo(
         dataSource,
-        tokens,
+        tokenMap,
         '9gDQ7emWoxJkAHW8kSwniCkDa43G2w9LCL9voHgfj2AvXfFSQ8i'
       );
       const Tx1 = observationTxGenerator(
@@ -153,7 +158,9 @@ describe('extractorErgo', () => {
      * - no observation should be stored
      */
     it('should ignore tx containing output box with invalid creation height', async () => {
-      const extractor = new ExtractorErgo(dataSource, tokens, bankAddress);
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
+      const extractor = new ExtractorErgo(dataSource, tokenMap, bankAddress);
       const Tx1 = observationTxGenerator(
         true,
         [
