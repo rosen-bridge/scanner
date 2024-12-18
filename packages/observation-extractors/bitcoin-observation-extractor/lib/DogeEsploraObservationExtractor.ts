@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm';
 import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-esplora-scanner';
 
 export class DogeEsploraObservationExtractor extends AbstractObservationExtractor<BitcoinEsploraTransaction> {
-  readonly FROM_CHAIN = 'dogecoin';
+  readonly FROM_CHAIN = 'doge';
 
   constructor(
     lockAddress: string,
