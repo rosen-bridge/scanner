@@ -129,10 +129,6 @@ export abstract class AbstractInitializableErgoExtractor<
             API_LIMIT
           );
           total = response.total;
-          this.logger.debug(
-            `length: ${response.items.length}, initial height: ${initialBlock.height}`
-          );
-          this.logger.debug(`${response.items[0].inclusionHeight}`);
           const txs = response.items.filter(
             (tx) => tx.inclusionHeight <= initialBlock.height
           );
