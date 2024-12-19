@@ -167,7 +167,11 @@ export abstract class AbstractInitializableErgoExtractor<
       this.logger.debug(
         `Processing transactions at height ${blockTxs[0].inclusionHeight}`
       );
-      await this.processTransactions(blockTxs, block);
+      const success = await this.processTransactions(blockTxs, block);
+      if (!success)
+        throw Error(
+          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`
+        );
     }
   };
 

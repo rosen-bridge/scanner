@@ -59,7 +59,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         'node_url',
         'address'
       );
-      const processSpy = vitest.fn();
+      const processSpy = vitest.fn().mockResolvedValue(true);
       extractor.processTransactions = processSpy;
       await extractor['processTransactionBatch'](transactionBatch);
       expect(processSpy).toBeCalledTimes(2);
@@ -74,6 +74,28 @@ describe('AbstractInitializableErgoExtractor', () => {
           height: 1320705,
         }
       );
+    });
+
+    /**
+     * @target processTransactionBatch should throw error when processing transactions fails for a block
+     * @dependencies
+     * @scenario
+     * - mock extractor
+     * - spy `processTransactions` to return false (always fails)
+     * - run test (call `processTransactionBatch`)
+     * @expected
+     * - to throw error
+     */
+    it('should throw error when processing transactions fails for a block', async () => {
+      const extractor = new MockedInitializableErgoExtractor(
+        ErgoNetworkType.Node,
+        'node_url',
+        'address'
+      );
+      extractor.processTransactions = vitest.fn().mockResolvedValue(false);
+      await expect(() =>
+        extractor['processTransactionBatch'](transactionBatch)
+      ).rejects.toThrowError();
     });
   });
 
