@@ -1,14 +1,19 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
-import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { DataSource, In, Repository } from 'typeorm';
+import {
+  AbstractInitializableErgoExtractorAction,
+  BlockInfo,
+  SpendInfo,
+} from '@rosen-bridge/abstract-extractor';
 
 import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
-import { SpendInfo } from '../interfaces/types';
 
-class CollateralAction {
+class CollateralAction
+  implements AbstractInitializableErgoExtractorAction<ExtractedCollateral>
+{
   private readonly collateralRepository: Repository<CollateralEntity>;
 
   constructor(
@@ -19,44 +24,6 @@ class CollateralAction {
   }
 
   /**
-   * inserts a collateral into the database
-   *
-   * @param {ExtractedCollateral} collateral
-   * @param {string} extractor
-   * @memberof CollateralAction
-   */
-  insertCollateral = async (
-    collateral: ExtractedCollateral,
-    extractor: string
-  ) => {
-    return await this.collateralRepository.insert({
-      ...collateral,
-      extractor,
-    });
-  };
-
-  /**
-   * updates a collateral into the database
-   *
-   * @param {ExtractedCollateral} collateral
-   * @param {string} extractor
-   * @memberof CollateralAction
-   */
-  updateCollateral = async (
-    collateral: Partial<ExtractedCollateral> &
-      Pick<ExtractedCollateral, 'boxId'>,
-    extractor: string
-  ) => {
-    return await this.collateralRepository.update(
-      {
-        extractor,
-        boxId: collateral.boxId,
-      },
-      collateral
-    );
-  };
-
-  /**
    * stores list of collaterals
    *
    * @param {Array<ExtractedCollateral>} collaterals
@@ -65,9 +32,9 @@ class CollateralAction {
    * @return {Promise<boolean>}
    * @memberof CollateralAction
    */
-  storeCollaterals = async (
+  insertBoxes = async (
     collaterals: Array<ExtractedCollateral>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ): Promise<boolean> => {
     if (collaterals.length == 0) {
@@ -82,7 +49,7 @@ class CollateralAction {
       rwtCount: col.rwtCount,
       txId: col.txId,
       block: block.hash,
-      height: col.height != undefined ? col.height : block.height,
+      height: block.height,
     }));
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -168,9 +135,9 @@ class CollateralAction {
    * @return {Promise<void>}
    * @memberof CollateralAction
    */
-  spendCollaterals = async (
+  spendBoxes = async (
     spendInfos: Array<SpendInfo>,
-    block: Block,
+    block: BlockInfo,
     extractor: string
   ): Promise<void> => {
     for (const spendInfo of spendInfos) {
@@ -201,28 +168,6 @@ class CollateralAction {
   };
 
   /**
-   * Returns all stored unspent collateral box IDs
-   *
-   * @param {string} extractor
-   * @return {Promise<Array<string>>}
-   * @memberof CollateralAction
-   */
-  getUnspentCollateralBoxIds = async (
-    extractor: string
-  ): Promise<Array<string>> => {
-    const boxIds = await this.collateralRepository.find({
-      where: {
-        extractor: extractor,
-        spendBlock: IsNull(),
-      },
-      select: {
-        boxId: true,
-      },
-    });
-    return boxIds.map((box) => box.boxId);
-  };
-
-  /**
    * Delete all collaterals corresponding to the passed block and extractor and
    * update all collaterals spent in the specified block
    *
@@ -231,7 +176,7 @@ class CollateralAction {
    * @return {Promise<void>}
    * @memberof CollateralAction
    */
-  async deleteBlock(block: string, extractor: string): Promise<void> {
+  async deleteBlockBoxes(block: string, extractor: string): Promise<void> {
     this.logger.info(
       `Deleting collaterals in block=[${block}] and extractor=[${extractor}]`
     );
@@ -256,19 +201,14 @@ class CollateralAction {
   }
 
   /**
-   * deletes the specified collateral box from database
+   * remove all existing data for the extractor
    *
-   * @param {string} boxId
    * @param {string} extractor
-   * @return {Promise<DeleteResult>}
+   * @return {Promise<void>}
    * @memberof CollateralAction
    */
-  deleteCollateral = async (
-    boxId: string,
-    extractor: string
-  ): Promise<DeleteResult> => {
-    return await this.collateralRepository.delete({
-      boxId: boxId,
+  removeAllData = async (extractor: string): Promise<void> => {
+    await this.collateralRepository.delete({
       extractor: extractor,
     });
   };

@@ -1,12 +1,11 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { Block, SpendInfo } from '@rosen-bridge/abstract-extractor';
 
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
-import { SpendInfo } from '../interfaces/types';
 
 class CommitmentAction {
   readonly logger: AbstractLogger;
