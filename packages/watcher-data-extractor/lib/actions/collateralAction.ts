@@ -80,9 +80,9 @@ class CollateralAction
         collateralsToUpdate
       );
 
-      if (collateralsToUpdate.length > 0) {
+      if (collateralsToInsert.length > 0) {
         this.logger.info(
-          `Inserting boxes with following IDs into the database: [${collateralsToInsert
+          `Inserting collaterals with following boxIds into the database: [${collateralsToInsert
             .map((col) => col.boxId)
             .join(', ')}]`
         );
@@ -96,7 +96,7 @@ class CollateralAction
 
       if (collateralsToUpdate.length > 0)
         this.logger.info(
-          `Updating boxes with following IDs in the database: [${collateralsToUpdate
+          `Updating collaterals with following boxIds in the database: [${collateralsToUpdate
             .map((col) => col.boxId)
             .join(', ')}]`
         );
