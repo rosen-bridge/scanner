@@ -1,5 +1,7 @@
 import { intersection } from 'lodash-es';
 import { OutputBox } from './interfaces';
+import { RETRIAL_COUNT } from '../constants';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 /**
  * Check box to have specified tokens
@@ -15,8 +17,38 @@ export const boxHasToken = (box: OutputBox, tokenIds: string[]) => {
 };
 
 /**
- * Async function that resolves after a specific time
+ * Create delay in procedures based on the specified time in milliseconds
  * @param time
  */
 export const delay = async (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time));
+
+/**
+ * Retry the request in case of failure
+ * Throw error if request fails after RETRIAL_COUNT retrials
+ * Wait for 1 second between each trial
+ * @param request
+ * @param logger
+ * @returns
+ */
+export const requestWithRetrial = async <returnT>(
+  request: () => Promise<returnT>,
+  logger: AbstractLogger
+): Promise<returnT> => {
+  let trial = 0;
+  while (true) {
+    try {
+      const result = await request();
+      return result;
+    } catch (e) {
+      if (trial >= RETRIAL_COUNT)
+        throw new Error(
+          `request failed after ${trial} retrials with error: ${e}`
+        );
+      trial++;
+      logger.warn(`request failed with error ${e}`);
+      logger.debug(`Retrying the request with retrial step ${trial}`);
+      await delay(1000);
+    }
+  }
+};

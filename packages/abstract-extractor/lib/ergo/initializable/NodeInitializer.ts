@@ -1,10 +1,11 @@
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ErgoExtractedData } from '../interfaces';
+import { ErgoExtractedData, ExtendedTransaction } from '../interfaces';
 import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractInitializableErgoExtractor } from './AbstractInitializable';
 import { BlockInfo } from '../../interfaces';
 import PQueue from 'p-queue';
 import { API_LIMIT, MAX_PARALLEL_REQUESTS } from '../../constants';
+import { delay, requestWithRetrial } from '../utils';
 
 export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
   private network: NodeNetwork;
@@ -23,9 +24,11 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
    * @returns total tx count of the address
    */
   private getTotalTxCount = async () => {
-    const response = await (
-      this.network as NodeNetwork
-    ).getAddressTransactionsWithOffsetLimit(this.address, 0, 0);
+    const response = await this.network.getAddressTransactionsWithOffsetLimit(
+      this.address,
+      0,
+      0
+    );
     return response.total;
   };
 
@@ -35,15 +38,24 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
    * @param limit
    * @param initialHeight
    */
-  private processWithOffset = async (
+  private processWithOffsetLimit = async (
     offset: number,
     limit: number,
     initialHeight: number
   ) => {
-    this.logger.debug(`Requesting transactions with offset ${offset}`);
-    const response = await (
-      this.network as NodeNetwork
-    ).getAddressTransactionsWithOffsetLimit(this.address, offset, limit);
+    this.logger.debug(`Requesting node getTxsByAddress with offset ${offset}`);
+    const response = await requestWithRetrial<{
+      items: ExtendedTransaction[];
+      total: number;
+    }>(
+      () =>
+        this.network.getAddressTransactionsWithOffsetLimit(
+          this.address,
+          offset,
+          limit
+        ),
+      this.logger
+    );
     const txs = response.items.filter(
       (tx) => tx.inclusionHeight <= initialHeight
     );
@@ -69,10 +81,10 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
       this.logger.debug(`Starting round ${round} of initialization`);
       const promiseQueue = new PQueue({ concurrency: MAX_PARALLEL_REQUESTS });
       while (offset < total) {
-        new Promise((resolve) => setTimeout(resolve, 100));
+        await delay(100);
         ((offset: number) =>
           promiseQueue.add(() =>
-            this.processWithOffset(offset, API_LIMIT, initialBlock.height)
+            this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height)
           ))(offset);
         offset += API_LIMIT;
       }
