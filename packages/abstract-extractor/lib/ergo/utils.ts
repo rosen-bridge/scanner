@@ -13,3 +13,10 @@ export const boxHasToken = (box: OutputBox, tokenIds: string[]) => {
   if (requiredTokens.length == tokenIds.length) return true;
   return false;
 };
+
+/**
+ * Async function that resolves after a specific time
+ * @param time
+ */
+export const delay = async (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time));
