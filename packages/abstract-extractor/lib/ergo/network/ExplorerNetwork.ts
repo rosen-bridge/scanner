@@ -1,56 +1,26 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { AbstractNetwork } from './AbstractNetwork';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
-import { BlockInfo } from '../../interfaces';
-import { ErgoBox, ExtendedTransaction, Transaction } from '../interfaces';
+import { ExtendedTransaction, OutputBox, Transaction } from '../interfaces';
 import { mapValues, pick } from 'lodash-es';
 import { API_LIMIT } from '../../constants';
 
-export class ExplorerNetwork extends AbstractNetwork {
+export class ExplorerNetwork {
   private api;
 
   constructor(url: string) {
-    super();
     this.api = ergoExplorerClientFactory(url);
   }
 
   /**
-   * return spending information of a specified box by having spendTxId
-   * @param boxId
-   * @param spendTxId
-   */
-  getSpendingInfo = async (
-    boxId: string,
-    spendTxId: string
-  ): Promise<BlockInfo & { spendIndex: number }> => {
-    const tx = await this.api.v1.getApiV1TransactionsP1(spendTxId);
-    const spendIndex = tx.inputs?.findIndex((box) => box.boxId === boxId);
-    if (spendIndex == undefined)
-      throw Error(
-        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`
-      );
-    return {
-      hash: tx.blockId,
-      height: tx.inclusionHeight,
-      spendIndex,
-    };
-  };
-
-  /**
-   * convert explorer api boxes to ErgoBox interface
+   * convert explorer api output boxes to OutputBox interface
    * @param box
-   * @returns ErgoBox
+   * @returns OutputBox
    */
-  private convertBox = async (box: V1.OutputInfo): Promise<ErgoBox> => {
-    const spendInfo = box.spentTransactionId
-      ? await this.getSpendingInfo(box.boxId, box.spentTransactionId)
-      : undefined;
+  private convertOutputBox = (box: V1.OutputInfo): OutputBox => {
     return {
-      blockId: box.blockId,
       boxId: box.boxId,
-      creationHeight: box.creationHeight,
-      inclusionHeight: box.settlementHeight,
+      creationHeight: box.settlementHeight,
       ergoTree: box.ergoTree,
       index: box.index,
       transactionId: box.transactionId,
@@ -60,10 +30,27 @@ export class ExplorerNetwork extends AbstractNetwork {
         'serializedValue'
       ),
       assets: box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])),
-      spentHeight: spendInfo?.height,
-      spentBlockId: spendInfo?.hash,
-      spentTransactionId: box.spentTransactionId,
-      spentIndex: spendInfo?.spendIndex,
+    };
+  };
+
+  /**
+   * convert explorer api input boxes to OutputBox interface
+   * @param box
+   * @returns OutputBox
+   */
+  private convertInputBox = (box: V1.InputInfo): OutputBox => {
+    return {
+      boxId: box.boxId,
+      creationHeight: box.outputSettledAt,
+      ergoTree: box.ergoTree,
+      index: box.index,
+      transactionId: box.outputTransactionId,
+      value: box.value,
+      additionalRegisters: mapValues(
+        box.additionalRegisters,
+        'serializedValue'
+      ),
+      assets: box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])),
     };
   };
 
@@ -82,23 +69,8 @@ export class ExplorerNetwork extends AbstractNetwork {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.boxId,
         })) ?? [],
-      inputs: tx.inputs?.map((input) => ({ boxId: input.boxId })) ?? [],
-      outputs:
-        tx.outputs?.map((output) => ({
-          boxId: output.boxId,
-          transactionId: output.transactionId,
-          additionalRegisters: mapValues(
-            output.additionalRegisters,
-            'serializedValue'
-          ),
-          assets: output.assets?.map((asset) =>
-            pick(asset, ['tokenId', 'amount'])
-          ),
-          ergoTree: output.ergoTree,
-          creationHeight: output.creationHeight,
-          index: output.index,
-          value: output.value,
-        })) ?? [],
+      inputs: tx.inputs?.map((input) => this.convertInputBox(input)) ?? [],
+      outputs: tx.outputs?.map((output) => this.convertOutputBox(output)) ?? [],
     };
   };
 
@@ -179,56 +151,5 @@ export class ExplorerNetwork extends AbstractNetwork {
     return block.block.blockTransactions.map((tx) =>
       this.convertBlockTransaction(tx)
     );
-  };
-
-  /**
-   * use explorer api to return related boxes by specified address
-   * @param address
-   * @param offset
-   * @param limit
-   * @returns related boxes
-   */
-  getBoxesByAddress = async (
-    address: string,
-    offset: number,
-    limit: number
-  ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
-    const boxes = await this.api.v1.getApiV1BoxesUnspentByaddressP1(address, {
-      offset: offset,
-      limit: limit,
-      sortDirection: 'desc',
-    });
-    if (!boxes.items)
-      throw new Error('Explorer BoxesByAddress api expected to have items');
-    const resultBoxes: Array<ErgoBox> = [];
-    for (const box of boxes.items) {
-      resultBoxes.push(await this.convertBox(box));
-    }
-    return { boxes: resultBoxes, hasNextBatch: boxes.total > offset + limit };
-  };
-
-  /**
-   * use explorer api to return related boxes by specified token id
-   * @param tokenId
-   * @param offset
-   * @param limit
-   * @returns related boxes
-   */
-  getBoxesByTokenId = async (
-    tokenId: string,
-    offset: number,
-    limit: number
-  ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
-    const boxes = await this.api.v1.getApiV1BoxesBytokenidP1(tokenId, {
-      offset: offset,
-      limit: limit,
-    });
-    if (!boxes.items)
-      throw new Error('Explorer BoxesByTokeId api expected to have items');
-    const resultBoxes: Array<ErgoBox> = [];
-    for (const box of boxes.items) {
-      resultBoxes.push(await this.convertBox(box));
-    }
-    return { boxes: resultBoxes, hasNextBatch: boxes.total > offset + limit };
   };
 }

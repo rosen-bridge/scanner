@@ -33,7 +33,7 @@ export type OutputBox = {
   assets?: Array<Asset>;
   additionalRegisters?: AdditionalRegisters;
   transactionId: string;
-  index: bigint | number;
+  index: number;
 };
 
 export interface ErgoBox extends OutputBox {
@@ -56,6 +56,7 @@ export type Transaction = {
 export interface ExtendedTransaction extends Transaction {
   inclusionHeight: number;
   blockId: string;
+  inputs: OutputBox[];
 }
 
 export interface SpendInfo {
