@@ -11,6 +11,7 @@ import { groupBy, sortBy } from 'lodash-es';
 import { Mutex } from 'await-semaphore';
 import { ExplorerInitializer } from './ExplorerInitializer';
 import { NodeInitializer } from './NodeInitializer';
+import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
 export abstract class AbstractInitializableErgoExtractor<
   ExtractedData extends ErgoExtractedData
@@ -25,15 +26,28 @@ export abstract class AbstractInitializableErgoExtractor<
   constructor(
     type: ErgoNetworkType,
     url: string,
-    address: string,
+    private address: string,
     logger?: AbstractLogger,
-    private initialize = true
+    private initialize = true,
+    maxParallelRequests = MAX_PARALLEL_REQUESTS
   ) {
     super(logger);
     if (type == ErgoNetworkType.Explorer) {
-      this.initializer = new ExplorerInitializer(this, url, address, logger);
+      this.initializer = new ExplorerInitializer(
+        this,
+        url,
+        address,
+        maxParallelRequests,
+        logger
+      );
     } else if (type == ErgoNetworkType.Node) {
-      this.initializer = new NodeInitializer(this, url, address, logger);
+      this.initializer = new NodeInitializer(
+        this,
+        url,
+        address,
+        maxParallelRequests,
+        logger
+      );
     } else throw new Error(`Network type ${type} is not supported`);
   }
 

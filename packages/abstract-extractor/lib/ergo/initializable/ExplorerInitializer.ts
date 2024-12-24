@@ -12,6 +12,7 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
     private extractor: AbstractInitializableErgoExtractor<ExtractedData>,
     url: string,
     private address: string,
+    private maxParallelRequests: number,
     private logger = new DummyLogger()
   ) {
     this.network = new ExplorerNetwork(url);

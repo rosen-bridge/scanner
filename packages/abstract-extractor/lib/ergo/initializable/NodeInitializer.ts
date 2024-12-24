@@ -4,7 +4,7 @@ import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractInitializableErgoExtractor } from './AbstractInitializable';
 import { BlockInfo } from '../../interfaces';
 import PQueue from 'p-queue';
-import { API_LIMIT, MAX_PARALLEL_REQUESTS } from '../../constants';
+import { API_LIMIT } from '../../constants';
 import { delay, requestWithRetrial } from '../utils';
 
 export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
@@ -14,6 +14,7 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
     private extractor: AbstractInitializableErgoExtractor<ExtractedData>,
     url: string,
     private address: string,
+    private maxParallelRequests: number,
     private logger = new DummyLogger()
   ) {
     this.network = new NodeNetwork(url);
@@ -79,7 +80,9 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
     // After round 2 spending information of all stored boxes are updated successfully
     while (round < 2) {
       this.logger.debug(`Starting round ${round} of initialization`);
-      const promiseQueue = new PQueue({ concurrency: MAX_PARALLEL_REQUESTS });
+      const promiseQueue = new PQueue({
+        concurrency: this.maxParallelRequests,
+      });
       while (offset < total) {
         await delay(100);
         ((offset: number) =>
