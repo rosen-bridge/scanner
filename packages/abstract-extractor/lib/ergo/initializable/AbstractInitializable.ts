@@ -41,6 +41,7 @@ export abstract class AbstractInitializableErgoExtractor<
         url,
         address,
         maxParallelRequests,
+        this.processTransactionBatch,
         logger
       );
     } else if (type == ErgoNetworkType.Node) {

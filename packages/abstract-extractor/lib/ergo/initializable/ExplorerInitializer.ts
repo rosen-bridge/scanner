@@ -13,6 +13,9 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
     url: string,
     private address: string,
     private maxParallelRequests: number,
+    private processTransactionBatch: (
+      txs: ExtendedTransaction[]
+    ) => Promise<void>,
     private logger = new DummyLogger()
   ) {
     this.network = new ExplorerNetwork(url);
@@ -46,7 +49,7 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
         );
       }
       if (txs.length < API_LIMIT) {
-        if (txs.length > 0) await this.extractor.processTransactionBatch(txs);
+        if (txs.length > 0) await this.processTransactionBatch(txs);
       } else {
         this.logger.debug(
           `Block at height ${fromHeight} has more than (or equal) ${API_LIMIT} relevant txs, processing all txs in the block`

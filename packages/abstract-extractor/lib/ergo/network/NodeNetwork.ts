@@ -23,7 +23,7 @@ export class NodeNetwork {
       index: box.index || 0,
       value: box.value || 0n,
       ergoTree: box.ergoTree || '',
-      creationHeight: box.inclusionHeight || 0,
+      creationHeight: box.creationHeight || 0,
       assets: box.assets || [],
       additionalRegisters: box.additionalRegisters,
       boxId: box.boxId || '',

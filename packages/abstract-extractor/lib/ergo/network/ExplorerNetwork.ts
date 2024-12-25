@@ -20,7 +20,7 @@ export class ExplorerNetwork {
   private convertOutputBox = (box: V1.OutputInfo): OutputBox => {
     return {
       boxId: box.boxId,
-      creationHeight: box.settlementHeight,
+      creationHeight: box.creationHeight,
       ergoTree: box.ergoTree,
       index: box.index,
       transactionId: box.transactionId,
