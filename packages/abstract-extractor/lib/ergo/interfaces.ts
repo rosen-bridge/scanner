@@ -66,6 +66,11 @@ export interface SpendInfo {
   extras?: string[];
 }
 
+export interface ExtendedSpendInfo extends SpendInfo {
+  height: number;
+  block: string;
+}
+
 export interface ErgoExtractedData {
   boxId: string;
 }

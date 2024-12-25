@@ -1,7 +1,6 @@
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ErgoExtractedData, ExtendedTransaction } from '../interfaces';
 import { NodeNetwork } from '../network/NodeNetwork';
-import { AbstractInitializableErgoExtractor } from './AbstractInitializable';
 import { BlockInfo } from '../../interfaces';
 import PQueue from 'p-queue';
 import { API_LIMIT } from '../../constants';
@@ -11,10 +10,12 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
   private network: NodeNetwork;
 
   constructor(
-    private extractor: AbstractInitializableErgoExtractor<ExtractedData>,
     url: string,
     private address: string,
     private maxParallelRequests: number,
+    private processTransactionBatch: (
+      txs: ExtendedTransaction[]
+    ) => Promise<void>,
     private logger = new DummyLogger()
   ) {
     this.network = new NodeNetwork(url);
@@ -63,7 +64,7 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
     this.logger.debug(
       `Found ${txs.length} new transactions below the initial height with offset ${offset}, total is ${response.total}`
     );
-    if (txs.length > 0) await this.extractor.processTransactionBatch(txs);
+    if (txs.length > 0) await this.processTransactionBatch(txs);
     this.logger.debug(`Processing completed for request with offset ${offset}`);
   };
 
@@ -73,27 +74,18 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
    */
   initialize = async (initialBlock: BlockInfo) => {
     let offset = 0,
-      total = await this.getTotalTxCount(),
-      round = 0;
-    // Repeat the whole process twice to cover all spent boxes
-    // After round 1 all boxes have been saved and processed once
-    // After round 2 spending information of all stored boxes are updated successfully
-    while (round < 2) {
-      this.logger.debug(`Starting round ${round} of initialization`);
-      const promiseQueue = new PQueue({
-        concurrency: this.maxParallelRequests,
-      });
-      while (offset < total) {
-        await delay(100);
-        ((offset: number) =>
-          promiseQueue.add(() =>
-            this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height)
-          ))(offset);
-        offset += API_LIMIT;
-      }
-      await promiseQueue.onIdle();
-      round++;
-      offset = 0;
+      total = await this.getTotalTxCount();
+    const promiseQueue = new PQueue({
+      concurrency: this.maxParallelRequests,
+    });
+    while (offset < total) {
+      await delay(100);
+      ((offset: number) =>
+        promiseQueue.add(() =>
+          this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height)
+        ))(offset);
+      offset += API_LIMIT;
     }
+    await promiseQueue.onIdle();
   };
 }
