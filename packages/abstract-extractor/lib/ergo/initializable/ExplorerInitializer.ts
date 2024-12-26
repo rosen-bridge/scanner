@@ -48,24 +48,27 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
     ).total;
   };
 
-  processRange = async (rangeQuery: RangeQuery) => {
-    if (rangeQuery.count! == 0) return;
-    this.logger.debug(`Processing started for ${JSON.stringify(rangeQuery)}`);
+  processRange = async (start: number, end: number, count?: number) => {
+    if (count && count == 0) return 0;
     const txs = await requestWithRetrial(
       () =>
-        this.network.getAddressTransactionsWithHeight(
-          this.address,
-          rangeQuery.start,
-          rangeQuery.end
-        ),
+        this.network.getAddressTransactionsWithHeight(this.address, start, end),
       this.logger
     );
-    if (txs.total != rangeQuery.count)
-      this.logger.warn(
-        `############################ Range query count ${rangeQuery.count} differs from total ${txs.total}`
+    if (count && txs.total != count)
+      this.logger.error(
+        `Impossible behavior: Range query count ${count} differs from total ${txs.total} for range [${start}, ${end}]`
       );
-    await this.processTransactionBatch(txs.items);
-    this.logger.debug(`Processing finished for ${JSON.stringify(rangeQuery)}`);
+    if (txs.total <= API_LIMIT && txs.total > 0) {
+      this.logger.debug(
+        `Processing started for [${start}, ${end}] with ${txs.total} txs}`
+      );
+      await this.processTransactionBatch(txs.items);
+      this.logger.debug(
+        `Processing finished for [${start}, ${end}] with ${txs.total} txs}`
+      );
+    }
+    return txs.total;
   };
 
   processBlockAtHeight = async (height: number) => {
@@ -111,28 +114,41 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
         const newQueryEnd =
           Math.floor((lastRangeQuery.end - lastRangeQuery.start) / 2) +
           lastRangeQuery.start;
-        const newRangeQuery = {
-          start: lastRangeQuery.start,
-          end: newQueryEnd,
-          count: await this.getRangeTxCount(lastRangeQuery.start, newQueryEnd),
-        };
-        this.logger.debug(
-          `Limiting the range by adding a new range query ${JSON.stringify(
-            newRangeQuery
-          )}`
+        const newQueryCount = await this.processRange(
+          lastRangeQuery.start,
+          newQueryEnd
         );
-        this.rangeList.push(newRangeQuery);
+        if (newQueryCount > API_LIMIT) {
+          const newRangeQuery = {
+            start: lastRangeQuery.start,
+            end: newQueryEnd,
+            count: newQueryCount,
+          };
+          this.logger.debug(
+            `Limiting the range by adding a new range query ${JSON.stringify(
+              newRangeQuery
+            )}`
+          );
+          this.rangeList.push(newRangeQuery);
+        } else {
+          this.logger.debug(
+            `Processed range [${lastRangeQuery.start}, ${newQueryEnd}] with ${newQueryCount} txs in first round`
+          );
+          this.updateRangeList(newQueryEnd + 1, newQueryCount);
+        }
       } else {
         if (lastRangeQuery.count <= API_LIMIT) {
           this.logger.debug(`Processing transactions in range query`);
-          this.promiseQueue.add(() => this.processRange(lastRangeQuery));
+          await this.processRange(
+            lastRangeQuery.start,
+            lastRangeQuery.end,
+            lastRangeQuery.count
+          );
         } else {
           this.logger.debug(
             `processing extra large block at height ${lastRangeQuery.start}`
           );
-          this.promiseQueue.add(() =>
-            this.processBlockAtHeight(lastRangeQuery.start)
-          );
+          await this.processBlockAtHeight(lastRangeQuery.start);
         }
         this.rangeList.pop();
         this.updateRangeList(lastRangeQuery.end + 1, lastRangeQuery.count);
