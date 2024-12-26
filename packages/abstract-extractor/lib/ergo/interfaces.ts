@@ -74,3 +74,11 @@ export interface ExtendedSpendInfo extends SpendInfo {
 export interface ErgoExtractedData {
   boxId: string;
 }
+
+export interface RangeQuery {
+  start: number;
+  end: number;
+  count: number;
+}
+
+export type RangeList = RangeQuery[];
