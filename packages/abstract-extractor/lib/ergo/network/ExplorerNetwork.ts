@@ -41,9 +41,9 @@ export class ExplorerNetwork {
   private convertInputBox = (box: V1.InputInfo): OutputBox => {
     return {
       boxId: box.boxId,
-      creationHeight: box.outputSettledAt,
+      creationHeight: box.outputCreatedAt,
       ergoTree: box.ergoTree,
-      index: box.index,
+      index: box.outputIndex,
       transactionId: box.outputTransactionId,
       value: box.value,
       additionalRegisters: mapValues(
@@ -112,18 +112,22 @@ export class ExplorerNetwork {
   getAddressTransactionsWithHeight = async (
     address: string,
     fromHeight: number,
-    toHeight: number
-  ): Promise<Array<ExtendedTransaction>> => {
+    toHeight: number,
+    limit = API_LIMIT
+  ): Promise<{ items: Array<ExtendedTransaction>; total: number }> => {
     const txs = await this.api.v1.getApiV1AddressesP1Transactions(address, {
       fromHeight,
       toHeight,
-      limit: API_LIMIT,
+      limit: limit,
     });
     if (!txs.items)
       throw new Error(
         'Explorer AddressTransactions api expected to have items'
       );
-    return txs.items.map((tx) => this.convertTransaction(tx));
+    return {
+      items: txs.items.map((tx) => this.convertTransaction(tx)),
+      total: txs.total,
+    };
   };
 
   /**

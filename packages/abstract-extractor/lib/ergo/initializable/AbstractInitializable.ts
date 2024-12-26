@@ -97,12 +97,13 @@ export abstract class AbstractInitializableErgoExtractor<
     tx: ExtendedTransaction
   ): ExtendedSpendInfo[] => {
     const txSpendInfo = [];
-    for (const box of tx.inputs) {
+    for (let i = 0; i < tx.inputs.length; i++) {
+      const box = tx.inputs[i];
       if (this.hasData(box)) {
         txSpendInfo.push({
           boxId: box.boxId,
           txId: box.transactionId,
-          index: box.index,
+          index: i,
           height: tx.inclusionHeight,
           block: tx.blockId,
         });

@@ -1,7 +1,7 @@
 import { intersection } from 'lodash-es';
 import { OutputBox } from './interfaces';
 import { RETRIAL_COUNT } from '../constants';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 /**
  * Check box to have specified tokens
@@ -33,7 +33,7 @@ export const delay = async (time: number) =>
  */
 export const requestWithRetrial = async <returnT>(
   request: () => Promise<returnT>,
-  logger: AbstractLogger
+  logger = new DummyLogger()
 ): Promise<returnT> => {
   let trial = 0;
   while (true) {
