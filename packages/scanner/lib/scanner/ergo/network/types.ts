@@ -33,7 +33,7 @@ export type OutputBox = {
   assets?: Array<Asset>;
   additionalRegisters?: AdditionalRegisters;
   transactionId: string;
-  index: bigint | number;
+  index: number;
 };
 
 export type Transaction = {
