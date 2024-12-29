@@ -46,10 +46,7 @@ export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
     initialHeight: number
   ) => {
     this.logger.debug(`Requesting node getTxsByAddress with offset ${offset}`);
-    const response = await requestWithRetrial<{
-      items: ExtendedTransaction[];
-      total: number;
-    }>(
+    const response = await requestWithRetrial(
       () =>
         this.network.getAddressTransactionsWithOffsetLimit(
           this.address,
