@@ -1,12 +1,12 @@
 import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
-import { BitcoinRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
-import { BitcoinRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { DogeEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from 'typeorm';
+import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-esplora-scanner';
 
-export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor<BitcoinRpcTransaction> {
-  readonly FROM_CHAIN = 'bitcoin';
+export class DogeEsploraObservationExtractor extends AbstractObservationExtractor<BitcoinEsploraTransaction> {
+  readonly FROM_CHAIN = 'doge';
 
   constructor(
     lockAddress: string,
@@ -17,7 +17,7 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
     super(
       dataSource,
       tokens,
-      new BitcoinRpcRosenExtractor(lockAddress, tokens, logger),
+      new DogeEsploraRosenExtractor(lockAddress, tokens, logger),
       logger
     );
   }
@@ -25,10 +25,10 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
   /**
    * gets Id for current extractor
    */
-  getId = () => 'bitcoin-rpc-extractor';
+  getId = () => 'doge-esplora-extractor';
 
   /**
    * gets transaction id from TransactionType
    */
-  getTxId = (tx: BitcoinRpcTransaction) => tx.txid;
+  getTxId = (tx: BitcoinEsploraTransaction) => tx.txid;
 }

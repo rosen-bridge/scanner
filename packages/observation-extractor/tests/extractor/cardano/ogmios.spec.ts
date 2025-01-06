@@ -5,6 +5,7 @@ import { tokens } from '../tokens.mock';
 import { Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/scanner';
 import { ObservationEntity } from '../../../lib';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;
@@ -14,9 +15,11 @@ const bankAddress =
 describe('CardanoOgmiosObservationExtractor', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
+    const tokenMap = new TokenMap();
+    await tokenMap.updateConfigByJson(tokens);
     extractor = new CardanoOgmiosObservationExtractor(
       dataSource,
-      tokens,
+      tokenMap,
       bankAddress
     );
   });
