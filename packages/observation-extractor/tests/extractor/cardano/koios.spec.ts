@@ -54,12 +54,12 @@ describe('cardanoKoiosObservationExtractor', () => {
         fromChain: 'cardano',
         toChain: 'ergo',
         fromAddress:
-          'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0',
+          'addr1qytsk73jatycajqksafza5z90cw3zj2exhtdqx226r2l6dphvyt647kn7zl3svpnzjmuty2sfsr28cmf3aaa263hazqqxwdedk',
         toAddress: '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         height: 1,
-        amount: '10',
-        networkFee: '10000',
-        bridgeFee: '10000',
+        amount: '1635516886333',
+        networkFee: '3829872',
+        bridgeFee: '10376749',
         sourceChainTokenId:
           'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
         targetChainTokenId: ERGO_NATIVE_TOKEN,
@@ -108,10 +108,11 @@ describe('cardanoKoiosObservationExtractor', () => {
       );
       const Tx: KoiosTransaction = {
         ...cardanoTxValid,
-        metadata: {
-          '0': JSON.parse(
-            '{"to": "ergo","bridgeFee": "10000","toAddress": "9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM","targetChainTokenId": "cardanoTokenId"}'
-          ),
+        auxiliary_data: {
+          prefer_alonzo_format: false,
+          metadata: {
+            '0': '{"map":[{"k":{"string":"to"},"v":{"string":"ergo"}},{"k":{"string":"bridgeFee"},"v":{"string":"10376749"}},{"k":{"string":"networkFee"},"v":{"string":"3829872"}},{"k":{"string":"toAddress"},"v":{"string":"9hZxV3YNSfbCqS6GEses7DhAVSatvaoNtdsiNvkimPGG2c8fzkG"}}}',
+          },
         },
       };
       const res = await extractor.processTransactions(
