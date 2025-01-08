@@ -2,7 +2,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { BlockInfo, Block, ExtractorCallback } from './interfaces';
 
 export abstract class AbstractExtractor<TransactionType> {
-  readonly logger: AbstractLogger;
+  protected readonly logger: AbstractLogger;
   protected callbacks: Map<string, ExtractorCallback>;
 
   constructor(logger = new DummyLogger()) {

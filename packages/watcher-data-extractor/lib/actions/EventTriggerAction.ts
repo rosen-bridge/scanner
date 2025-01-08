@@ -188,6 +188,8 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         paymentTxId: null,
       }
     );
+    // TODO: fix
+    return 0;
   };
 }
 

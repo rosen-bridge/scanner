@@ -4,7 +4,7 @@ import { blake2b } from 'blakejs';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 import { Block } from '@rosen-bridge/abstract-extractor';
@@ -15,7 +15,7 @@ export class ErgoObservationExtractor extends AbstractObservationExtractor<Trans
 
   constructor(
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     address: string,
     logger?: AbstractLogger
   ) {

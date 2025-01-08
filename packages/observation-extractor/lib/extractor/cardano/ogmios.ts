@@ -15,7 +15,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
 
   constructor(
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     address: string,
     logger?: AbstractLogger
   ) {

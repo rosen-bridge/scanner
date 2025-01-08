@@ -67,20 +67,17 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
    */
   hasData = (box: OutputBox): boolean => {
     try {
-      const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
       if (
         box.additionalRegisters &&
         box.additionalRegisters.R4 &&
         box.additionalRegisters.R5 &&
         box.additionalRegisters.R7 &&
-        parsedBox.register_value(wasm.NonMandatoryRegisterId.R4) &&
-        parsedBox.register_value(wasm.NonMandatoryRegisterId.R5) &&
-        parsedBox.register_value(wasm.NonMandatoryRegisterId.R7) &&
         box.assets &&
         box.assets.length > 0 &&
         box.assets[0].tokenId === this.RWT &&
         box.ergoTree === this.eventTriggerErgoTree
       ) {
+        const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
         const R4Serialized = parsedBox
           .register_value(wasm.NonMandatoryRegisterId.R4)!
           .to_byte_array();

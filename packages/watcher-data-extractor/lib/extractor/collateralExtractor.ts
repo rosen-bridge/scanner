@@ -22,9 +22,9 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     private readonly address: string,
     private readonly dataSource: DataSource,
     explorerUrl: string,
-    private readonly logger: AbstractLogger = new DummyLogger()
+    logger: AbstractLogger
   ) {
-    super();
+    super(logger);
     this.ergoTree = ergoLib.Address.from_base58(this.address)
       .to_ergo_tree()
       .to_base16_bytes();

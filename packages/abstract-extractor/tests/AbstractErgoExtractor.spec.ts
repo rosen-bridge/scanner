@@ -13,9 +13,13 @@ describe('AbstractExtractor', () => {
    */
   it(`should call all registered callbacks`, async () => {
     const extractor = new TestAbstractExtractor();
-    const callback1 = vi.fn().mockImplementation(async () => {});
+    const callback1 = vi.fn().mockImplementation(async () => {
+      undefined;
+    });
     extractor.registerCallback(`callback-id-1`, callback1);
-    const callback2 = vi.fn().mockImplementation(async () => {});
+    const callback2 = vi.fn().mockImplementation(async () => {
+      undefined;
+    });
     extractor.registerCallback(`callback-id-2`, callback2);
     extractor.callCallbacks();
     expect(callback1).toHaveBeenCalledOnce();

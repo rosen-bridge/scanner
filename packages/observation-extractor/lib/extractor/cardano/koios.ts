@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { KoiosTransaction } from '../../interfaces/koiosTransaction';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { AbstractObservationExtractor } from '../abstract/AbstractObservationExtractor';
 
@@ -10,7 +10,7 @@ export class CardanoKoiosObservationExtractor extends AbstractObservationExtract
 
   constructor(
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     address: string,
     logger?: AbstractLogger
   ) {

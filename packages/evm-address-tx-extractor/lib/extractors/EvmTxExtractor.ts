@@ -70,8 +70,10 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
         });
       }
     }
-    await this.action.storeTxs(extractedTxs, block, this.getId());
-    if (extractedTxs.length > 0) this.callCallbacks();
+    if (extractedTxs.length > 0) {
+      await this.action.storeTxs(extractedTxs, block, this.getId());
+      this.callCallbacks();
+    }
     return true;
   };
 

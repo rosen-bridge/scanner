@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
@@ -12,7 +12,7 @@ import { ExtractedObservation } from '../../interfaces/extractedObservation';
 export abstract class AbstractObservationExtractor<
   TransactionType
 > extends AbstractExtractor<TransactionType> {
-  readonly logger: AbstractLogger;
+  protected readonly logger: AbstractLogger;
   protected readonly dataSource: DataSource;
   protected readonly tokens: TokenMap;
   protected readonly actions: ObservationEntityAction;
@@ -21,13 +21,13 @@ export abstract class AbstractObservationExtractor<
 
   constructor(
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
     logger?: AbstractLogger
   ) {
     super();
     this.dataSource = dataSource;
-    this.tokens = new TokenMap(tokens);
+    this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
     this.extractor = extractor;

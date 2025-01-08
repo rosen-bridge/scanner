@@ -1,20 +1,20 @@
 import { DataSource } from 'typeorm';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { tokens } from '../tokens.mock';
-import {
-  TestAbstractObservationExtractor,
-} from './TestAbstractObservationExtractor';
+import { TestAbstractObservationExtractor } from './TestAbstractObservationExtractor';
 import { ExtractedObservation, ObservationEntity } from '../../../lib';
 import { rosenData, tx } from './testData';
 import { blake2b } from 'blakejs';
-
+import { TokenMap } from '@rosen-bridge/tokens';
 describe('AbstractObservationExtractor', () => {
   let dataSource: DataSource;
   let extractor: TestAbstractObservationExtractor;
 
   beforeEach(async () => {
     dataSource = await createDatabase();
-    extractor = new TestAbstractObservationExtractor(dataSource, tokens, {
+    const tokenMap = new TokenMap();
+    await tokenMap.updateConfigByJson(tokens);
+    extractor = new TestAbstractObservationExtractor(dataSource, tokenMap, {
       get: jest.fn(),
     } as any);
   });
@@ -134,11 +134,13 @@ describe('AbstractObservationExtractor', () => {
         targetChainTokenId: rosenData.targetChainTokenId,
         sourceBlockId: 'source-block-id',
         sourceTxId: 'txHash',
-        requestId: Buffer.from(blake2b('txHash', undefined, 32)).toString('hex'),
-      }
+        requestId: Buffer.from(blake2b('txHash', undefined, 32)).toString(
+          'hex'
+        ),
+      };
       const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       const block = generateBlockEntity(dataSource, 'block-id');
-      await extractor.callStoreObservations([observation], block)
+      await extractor.callStoreObservations([observation], block);
 
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();
@@ -159,7 +161,9 @@ describe('AbstractObservationExtractor', () => {
         sourceBlockId: observation.sourceBlockId,
         sourceTxId: observation.sourceTxId,
         block: block.hash,
-        requestId: Buffer.from(blake2b(observation.sourceTxId, undefined, 32)).toString('hex'),
+        requestId: Buffer.from(
+          blake2b(observation.sourceTxId, undefined, 32)
+        ).toString('hex'),
         extractor: extractor.getId(),
       });
 
@@ -182,7 +186,7 @@ describe('AbstractObservationExtractor', () => {
     it('should do nothing when no observation is extracted', async () => {
       const callerSpy = jest.spyOn(extractor, 'callCallbacks');
       const block = generateBlockEntity(dataSource, 'block-id');
-      await extractor.callStoreObservations([], block)
+      await extractor.callStoreObservations([], block);
 
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();

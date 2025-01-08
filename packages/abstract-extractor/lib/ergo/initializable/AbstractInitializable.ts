@@ -112,14 +112,15 @@ export abstract class AbstractInitializableErgoExtractor<
    */
   private initializeWithNode = async (initialBlock: BlockInfo) => {
     const txCountBeforeInit = await this.getTotalTxCount();
+    let offset = 0,
+      total = 1,
+      round = 1;
     await this.initWithRetrial(async () => {
       // Repeat the whole process twice to cover all spent boxes
       // After round 1 all boxes have been saved and processed once
       // After round 2 spending information of all stored boxes are updated successfully
-      for (let round = 0; round <= 1; round++) {
+      while (round <= 2) {
         this.logger.debug(`Starting round ${round} of initialization`);
-        let offset = 0,
-          total = 1;
         while (offset < total) {
           const response = await (
             this.network as NodeNetwork
@@ -138,6 +139,8 @@ export abstract class AbstractInitializableErgoExtractor<
           if (txs.length > 0) await this.processTransactionBatch(txs);
           offset += API_LIMIT;
         }
+        round++;
+        offset = 0; // next round initial offset
       }
     });
     const txCountAfterInit = await this.getTotalTxCount();
@@ -167,7 +170,11 @@ export abstract class AbstractInitializableErgoExtractor<
       this.logger.debug(
         `Processing transactions at height ${blockTxs[0].inclusionHeight}`
       );
-      await this.processTransactions(blockTxs, block);
+      const success = await this.processTransactions(blockTxs, block);
+      if (!success)
+        throw Error(
+          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`
+        );
     }
   };
 

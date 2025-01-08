@@ -74,7 +74,14 @@ export abstract class AbstractErgoExtractor<
 
       let affected = false;
       if (boxes.length > 0) {
-        await this.actions.insertBoxes(boxes, block, this.getId());
+        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+          this.logger.warn(
+            `Data insertion failed for ${this.getId()} at the block ${
+              block.height
+            }`
+          );
+          return false;
+        }
         affected = true;
       }
       const affectedRows = await this.actions.spendBoxes(
@@ -84,9 +91,12 @@ export abstract class AbstractErgoExtractor<
       );
       if (affectedRows > 0) affected = true;
       if (affected) this.callCallbacks();
+      await this.actions.spendBoxes(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
-        `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
+        `Processing transactions failed for ${this.getId()} at the block ${
+          block.height
+        } with error: ${e}`
       );
       return false;
     }

@@ -19,7 +19,7 @@
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-logger": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner": "^5.0.0",
     "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^0.3.1",
