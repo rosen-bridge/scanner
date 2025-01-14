@@ -1,5 +1,5 @@
 import { BlockInfo } from '../interfaces';
-import { SpendInfo } from './interfaces';
+import { ErgoExtractedData, SpendInfo } from './interfaces';
 
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**
@@ -13,7 +13,13 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
     data: ExtractedData[],
     block: BlockInfo,
     extractorId: string
-  ) => Promise<boolean>;
+  ) => Promise<
+    | {
+        insertedData: ExtractedData[];
+        updatedData: ErgoExtractedData[];
+      }
+    | undefined
+  >;
 
   /**
    * update spending information of stored boxes
@@ -25,7 +31,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
     spendInfos: SpendInfo[],
     block: BlockInfo,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<ErgoExtractedData[]>;
 
   /**
    * delete extracted data from a specific block
@@ -37,5 +43,8 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
   abstract deleteBlockBoxes: (
     block: string,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<{
+    deletedData: ExtractedData[];
+    updatedData: ErgoExtractedData[];
+  }>;
 }

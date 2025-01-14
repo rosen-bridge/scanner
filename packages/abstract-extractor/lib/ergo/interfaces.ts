@@ -68,3 +68,24 @@ export interface SpendInfo {
 export interface ErgoExtractedData {
   boxId: string;
 }
+
+export enum CallbackType {
+  Insert = 'insert',
+  Update = 'update',
+  Spend = 'spend',
+  Delete = 'delete',
+}
+
+export type CallbackDataMap<ExtractedData extends ErgoExtractedData> = {
+  [CallbackType.Update]: ErgoExtractedData[];
+  [CallbackType.Insert]: ExtractedData[];
+  [CallbackType.Delete]: (ExtractedData & {
+    spendBlock?: string;
+    spendHeight?: number;
+  })[];
+  [CallbackType.Spend]: ErgoExtractedData[];
+};
+
+export type CallbackMap<ExtractedData extends ErgoExtractedData> = {
+  [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
+};

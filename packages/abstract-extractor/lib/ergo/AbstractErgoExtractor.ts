@@ -10,6 +10,9 @@ import {
   OutputBox,
   ErgoExtractedData,
   SpendInfo,
+  CallbackType,
+  CallbackMap,
+  CallbackDataMap,
 } from './interfaces';
 
 export abstract class AbstractErgoExtractor<
@@ -18,10 +21,54 @@ export abstract class AbstractErgoExtractor<
   protected readonly dataSource: DataSource;
   protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
   protected logger: AbstractLogger;
+  protected callbacks: {
+    [K in CallbackType]: Map<string, CallbackMap<ExtractedData>[K]>;
+  } = {
+    [CallbackType.Update]: new Map(),
+    [CallbackType.Insert]: new Map(),
+    [CallbackType.Delete]: new Map(),
+    [CallbackType.Spend]: new Map(),
+  };
 
   constructor(logger = new DummyLogger()) {
     super();
     this.logger = logger;
+  }
+
+  registerCallback<T extends CallbackType>(
+    type: T,
+    id: string,
+    callback: CallbackMap<ExtractedData>[T]
+  ): void {
+    const callbackMap = this.callbacks[type];
+    if (callbackMap.has(id)) {
+      this.logger.warn(
+        `Callback with Id [${id}] is already registered for type [${type}].`
+      );
+      return;
+    }
+    callbackMap.set(id, callback);
+  }
+
+  unregisterCallback(type: CallbackType, id: string): void {
+    const callbackMap = this.callbacks[type];
+    if (!callbackMap.has(id)) {
+      this.logger.warn(
+        `Callback with Id [${id}] is not registered for type [${type}].`
+      );
+      return;
+    }
+    callbackMap.delete(id);
+  }
+
+  triggerCallbacks<T extends CallbackType>(
+    type: T,
+    data: CallbackDataMap<ExtractedData>[T]
+  ): void {
+    const callbackMap = this.callbacks[type];
+    callbackMap.forEach((callback) => {
+      callback(data);
+    });
   }
 
   /**
@@ -64,7 +111,7 @@ export abstract class AbstractErgoExtractor<
                 output.boxId
               }`
             );
-            boxes.push(extractedData as ExtractedData);
+            boxes.push(extractedData);
           }
         }
         let boxIndex = 1;
@@ -75,7 +122,12 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+        const result = await this.actions.insertBoxes(
+          boxes,
+          block,
+          this.getId()
+        );
+        if (!result) {
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
@@ -83,8 +135,17 @@ export abstract class AbstractErgoExtractor<
           );
           return false;
         }
+        this.triggerCallbacks(CallbackType.Insert, result.insertedData);
+        this.triggerCallbacks(CallbackType.Update, result.updatedData);
       }
-      await this.actions.spendBoxes(spentInfos, block, this.getId());
+      const spentData = await this.actions.spendBoxes(
+        spentInfos,
+        block,
+        this.getId()
+      );
+      if (spentData.length > 0) {
+        this.triggerCallbacks(CallbackType.Spend, spentData);
+      }
     } catch (e) {
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
@@ -93,7 +154,6 @@ export abstract class AbstractErgoExtractor<
       );
       return false;
     }
-
     return true;
   };
 
@@ -102,6 +162,8 @@ export abstract class AbstractErgoExtractor<
    * @param hash block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockBoxes(hash, this.getId());
+    const result = await this.actions.deleteBlockBoxes(hash, this.getId());
+    this.triggerCallbacks(CallbackType.Delete, result.deletedData);
+    this.triggerCallbacks(CallbackType.Update, result.updatedData);
   };
 }
