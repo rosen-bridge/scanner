@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
+import { Mutex } from 'await-semaphore';
 
 import { AbstractExtractor } from '../AbstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
@@ -29,39 +30,70 @@ export abstract class AbstractErgoExtractor<
     [CallbackType.Delete]: new Map(),
     [CallbackType.Spend]: new Map(),
   };
+  private callbackMutex = new Mutex();
 
   constructor(logger = new DummyLogger()) {
     super();
     this.logger = logger;
   }
 
-  registerCallback<T extends CallbackType>(
+  /**
+   * register a new callback with id on a type
+   * returns false if an extractor is already registered with the same id and
+   * wont update the callback
+   * @param type
+   * @param id
+   * @param callback
+   * @returns success status
+   */
+  registerCallback = async <T extends CallbackType>(
     type: T,
     id: string,
     callback: CallbackMap<ExtractedData>[T]
-  ): void {
+  ): Promise<boolean> => {
+    const release = await this.callbackMutex.acquire();
     const callbackMap = this.callbacks[type];
     if (callbackMap.has(id)) {
       this.logger.warn(
         `Callback with Id [${id}] is already registered for type [${type}].`
       );
-      return;
+      return false;
     }
     callbackMap.set(id, callback);
-  }
+    release();
+    return true;
+  };
 
-  unregisterCallback(type: CallbackType, id: string): void {
+  /**
+   * unregister a callback with specific id on a type
+   * returns false if there is no registered callback with the id
+   * @param type
+   * @param id
+   * @returns success status
+   */
+  unregisterCallback = async (
+    type: CallbackType,
+    id: string
+  ): Promise<boolean> => {
+    const release = await this.callbackMutex.acquire();
     const callbackMap = this.callbacks[type];
     if (!callbackMap.has(id)) {
       this.logger.warn(
         `Callback with Id [${id}] is not registered for type [${type}].`
       );
-      return;
+      return false;
     }
     callbackMap.delete(id);
-  }
+    release();
+    return true;
+  };
 
-  triggerCallbacks<T extends CallbackType>(
+  /**
+   * trigger all callbacks registered on a specific type with the provided data
+   * @param type
+   * @param data
+   */
+  protected triggerCallbacks<T extends CallbackType>(
     type: T,
     data: CallbackDataMap<ExtractedData>[T]
   ): void {
