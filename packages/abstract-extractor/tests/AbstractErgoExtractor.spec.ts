@@ -150,14 +150,23 @@ describe('AbstractErgoExtractor', () => {
      */
     it('should remove all data extracted from the specified block', async () => {
       const extractor = new MockedErgoExtractor();
-      const removeSpy = vitest
-        .fn()
-        .mockResolvedValue({ deletedData: [], updatedData: [] });
+      const removeSpy = vitest.fn().mockResolvedValue({
+        deletedData: [{ boxId: 'box1' }],
+        updatedData: [{ boxId: 'box2' }],
+      });
       extractor['actions'] = {
         deleteBlockBoxes: removeSpy,
       } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
-      extractor.forkBlock(block.hash);
+      const triggerCallbackSpy = vitest.fn().mockClear();
+      extractor['triggerCallbacks'] = triggerCallbackSpy;
+      await extractor.forkBlock(block.hash);
       expect(removeSpy).toBeCalledWith(block.hash, 'Test');
+      expect(triggerCallbackSpy).toBeCalledWith(CallbackType.Delete, [
+        { boxId: 'box1' },
+      ]);
+      expect(triggerCallbackSpy).toBeCalledWith(CallbackType.Update, [
+        { boxId: 'box2' },
+      ]);
     });
   });
 
