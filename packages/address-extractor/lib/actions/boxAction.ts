@@ -1,11 +1,12 @@
-import { DataSource, In, Repository } from 'typeorm';
-import { chunk } from 'lodash-es';
+import { DataSource, In, Repository, Not } from 'typeorm';
+import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
   SpendInfo,
   DB_CHUNK_SIZE,
   BlockInfo,
+  ErgoExtractedData,
 } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
@@ -36,45 +37,55 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     block: BlockInfo,
     extractor: string
   ) => {
-    const boxIds = boxes.map((item) => item.boxId);
-    const dbBoxes = await this.datasource.getRepository(BoxEntity).findBy({
-      boxId: In(boxIds),
-      extractor: extractor,
-    });
-    if (dbBoxes.length > 0)
-      this.logger.debug(`Found stored boxes with same boxId`, dbBoxes);
     let success = true;
+    let boxesToInsert: ExtractedBox[] = [],
+      boxesToUpdate: ExtractedBox[] = [];
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const repository = await queryRunner.manager.getRepository(BoxEntity);
     try {
-      for (const box of boxes) {
-        const entity = {
+      const createEntities = (boxes: ExtractedBox[]) =>
+        boxes.map((box) => ({
           address: box.address,
           boxId: box.boxId,
           createBlock: block.hash,
           creationHeight: block.height,
           serialized: box.serialized,
           extractor: extractor,
-        };
-        const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
-        if (dbBox.length > 0) {
-          this.logger.info(
-            `Updating box ${box.boxId} and extractor ${extractor}`
-          );
-          await repository.update({ id: dbBox[0].id }, entity);
-          this.logger.debug(
-            `Updated entity is [${JsonBI.stringify(
-              box
-            )}], and stored similar box is [${JsonBI.stringify(dbBox)}]`
-          );
-        } else {
-          this.logger.info(`Storing box ${box.boxId}`);
-          await repository.insert(entity);
-          this.logger.debug(`Stored ${JsonBI.stringify(entity)}`);
-        }
+        }));
+
+      const dbBoxIds = (
+        await this.datasource.getRepository(BoxEntity).findBy({
+          boxId: In(boxes.map((item) => item.boxId)),
+          extractor: extractor,
+        })
+      ).map((box) => box.boxId);
+      if (dbBoxIds.length > 0)
+        this.logger.debug(`Found stored boxes with same boxId`, dbBoxIds);
+
+      boxesToUpdate = boxes.filter((box) => dbBoxIds.includes(box.boxId));
+      boxesToInsert = difference(boxes, boxesToUpdate);
+
+      if (boxesToInsert.length > 0) {
+        this.logger.debug(`Inserting boxes`);
+        await repository.insert(createEntities(boxesToInsert));
       }
+      if (boxesToUpdate.length > 0)
+        this.logger.info(
+          `Updating boxes with following Ids in the database: [${boxesToUpdate
+            .map((col) => col.boxId)
+            .join(', ')}]`
+        );
+      createEntities(boxesToUpdate).forEach(async (boxEntity) => {
+        this.logger.debug(
+          `Updating boxes in database [${JsonBI.stringify(boxEntity)}]`
+        );
+        await repository.update(
+          { boxId: boxEntity.boxId, extractor: extractor },
+          boxEntity
+        );
+      });
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
@@ -83,7 +94,12 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     } finally {
       await queryRunner.release();
     }
-    return success;
+    if (success)
+      return {
+        insertedData: boxesToInsert,
+        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
+      };
+    return undefined;
   };
 
   /**
@@ -97,7 +113,8 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     spendInfos: Array<SpendInfo>,
     block: BlockInfo,
     extractor: string
-  ): Promise<void> => {
+  ): Promise<ErgoExtractedData[]> => {
+    const spentData = [];
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const boxIds = spendInfoChunk.map((info) => info.boxId);
@@ -111,6 +128,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
           boxId: In(boxIds),
           spendBlock: block.hash,
         });
+        spentData.push(...spentRows);
         for (const row of spentRows) {
           this.logger.debug(
             `Spent box with boxId [${row.boxId}] at height ${block.height}`
@@ -118,6 +136,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
         }
       }
     }
+    return spentData.map((data) => pick(data, 'boxId'));
   };
 
   /**
@@ -134,11 +153,22 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
    * if a box is created in this block remove it from database
    * @param block
    * @param extractorId
+   * @return deleted items and updated box ids
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(
       `Deleting boxes in block ${block} and extractor ${extractor}`
     );
+    const deletedData = await this.repository.find({
+      where: { extractor: extractor, createBlock: block },
+    });
+    const updatedData = await this.repository.find({
+      where: {
+        extractor: extractor,
+        spendBlock: block,
+        createBlock: Not(block),
+      },
+    });
     await this.repository.delete({
       extractor: extractor,
       createBlock: block,
@@ -147,5 +177,17 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: 0 }
     );
+    return {
+      deletedData: deletedData.map((data) =>
+        pick(data, [
+          'boxId',
+          'address',
+          'serialized',
+          'spendBlock',
+          'spendHeight',
+        ])
+      ),
+      updatedData: updatedData.map((data) => pick(data, 'boxId')),
+    };
   };
 }
