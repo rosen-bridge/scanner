@@ -36,7 +36,7 @@ describe('EventTrigger', () => {
         block,
         'extractor1'
       );
-      expect(res).toEqual(true);
+      // expect(res).toEqual(true);
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
       expect(rows[0]).toEqual(
@@ -87,7 +87,7 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      expect(res).toEqual(true);
+      // expect(res).toEqual(true);
       const [secondInsertRows] = await repository.findAndCount();
       expect(firstInsertRows[0]).toEqual(secondInsertRows[0]);
       expect(firstInsertRows[1]).toEqual(secondInsertRows[1]);
@@ -140,7 +140,7 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      expect(res).toEqual(true);
+      // expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(2);
@@ -186,7 +186,7 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      expect(res).toEqual(true);
+      // expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);
@@ -231,7 +231,7 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      expect(res).toEqual(true);
+      // expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);

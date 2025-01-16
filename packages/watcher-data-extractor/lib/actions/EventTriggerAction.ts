@@ -1,4 +1,4 @@
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
@@ -10,7 +10,7 @@ import {
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
-import { chunk } from 'lodash-es';
+import { chunk, difference, pick } from 'lodash-es';
 
 class EventTriggerAction extends AbstractInitializableErgoExtractorAction<ExtractedEventTrigger> {
   readonly logger: AbstractLogger;
@@ -35,13 +35,33 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     block: BlockInfo,
     extractorId: string
   ) => {
-    if (eventTriggers.length === 0) return true;
-    const boxIds = eventTriggers.map((trigger) => trigger.boxId);
-    const savedTriggers = await this.repository.findBy({
-      boxId: In(boxIds),
-      extractor: extractorId,
-    });
-    let success = true;
+    let success = true,
+      boxesToInsert: ExtractedEventTrigger[] = [],
+      boxesToUpdate: ExtractedEventTrigger[] = [];
+    const createEntity = (triggerBoxes: ExtractedEventTrigger[]) =>
+      triggerBoxes.map((trigger) => ({
+        txId: trigger.txId,
+        eventId: trigger.eventId,
+        boxId: trigger.boxId,
+        boxSerialized: trigger.boxSerialized,
+        block: block.hash,
+        height: block.height,
+        extractor: extractorId,
+        WIDsCount: trigger.WIDsCount,
+        WIDsHash: trigger.WIDsHash,
+        amount: trigger.amount,
+        bridgeFee: trigger.bridgeFee,
+        fromAddress: trigger.fromAddress,
+        toAddress: trigger.toAddress,
+        fromChain: trigger.fromChain,
+        networkFee: trigger.networkFee,
+        sourceChainTokenId: trigger.sourceChainTokenId,
+        targetChainTokenId: trigger.targetChainTokenId,
+        sourceBlockId: trigger.sourceBlockId,
+        toChain: trigger.toChain,
+        sourceTxId: trigger.sourceTxId,
+        sourceChainHeight: trigger.sourceChainHeight,
+      }));
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -49,46 +69,37 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
       EventTriggerEntity
     );
     try {
-      for (const trigger of eventTriggers) {
-        const saved = savedTriggers.some((entity) => {
-          return entity.boxId === trigger.boxId;
-        });
-        const entity = {
-          txId: trigger.txId,
-          eventId: trigger.eventId,
-          boxId: trigger.boxId,
-          boxSerialized: trigger.boxSerialized,
-          block: block.hash,
-          height: block.height,
+      const savedTriggerIds = (
+        await this.repository.findBy({
+          boxId: In(eventTriggers.map((trigger) => trigger.boxId)),
           extractor: extractorId,
-          WIDsCount: trigger.WIDsCount,
-          WIDsHash: trigger.WIDsHash,
-          amount: trigger.amount,
-          bridgeFee: trigger.bridgeFee,
-          fromAddress: trigger.fromAddress,
-          toAddress: trigger.toAddress,
-          fromChain: trigger.fromChain,
-          networkFee: trigger.networkFee,
-          sourceChainTokenId: trigger.sourceChainTokenId,
-          targetChainTokenId: trigger.targetChainTokenId,
-          sourceBlockId: trigger.sourceBlockId,
-          toChain: trigger.toChain,
-          sourceTxId: trigger.sourceTxId,
-          sourceChainHeight: trigger.sourceChainHeight,
-        };
-        if (!saved) {
-          this.logger.info(
-            `Storing event trigger [${trigger.boxId}] for event [${trigger.eventId}] at height ${block.height} and extractor ${extractorId}`
-          );
-          await repository.insert(entity);
-        } else {
-          this.logger.info(
-            `Updating event trigger ${trigger.boxId} for event [${trigger.eventId}] at height ${block.height} and extractor ${extractorId}`
-          );
-          await repository.update({ boxId: trigger.boxId }, entity);
-        }
-        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
+        })
+      ).map((trigger) => trigger.boxId);
+
+      boxesToUpdate = eventTriggers.filter((box) =>
+        savedTriggerIds.includes(box.boxId)
+      );
+      boxesToInsert = difference(eventTriggers, boxesToUpdate);
+
+      if (boxesToInsert.length > 0) {
+        this.logger.debug(`Inserting boxes`);
+        await repository.insert(createEntity(boxesToInsert));
       }
+      if (boxesToUpdate.length > 0)
+        this.logger.info(
+          `Updating boxes with following Ids in the database: [${boxesToUpdate
+            .map((col) => col.boxId)
+            .join(', ')}]`
+        );
+      createEntity(boxesToUpdate).forEach(async (boxEntity) => {
+        this.logger.debug(
+          `Updating boxes in database [${JsonBI.stringify(boxEntity)}]`
+        );
+        await repository.update(
+          { boxId: boxEntity.boxId, extractor: extractorId },
+          boxEntity
+        );
+      });
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(
@@ -99,7 +110,13 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     } finally {
       await queryRunner.release();
     }
-    return success;
+    if (success) {
+      return {
+        insertedData: boxesToInsert,
+        updatedData: boxesToUpdate,
+      };
+    }
+    return undefined;
   };
 
   /**
@@ -114,7 +131,8 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
     extractorId: string
-  ): Promise<void> => {
+  ) => {
+    const spentData = [];
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const spentTriggers = await this.repository.findBy({
@@ -140,6 +158,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
             paymentTxId: spendInfo.extras[1],
           }
         );
+        spentData.push(pick(spendInfo, 'boxId'));
         this.logger.info(
           `Spent trigger [${spentTrigger.boxId}] of event [${spentTrigger.eventId}] at height ${block.height}`
         );
@@ -150,6 +169,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         );
       }
     }
+    return spentData;
   };
 
   /**
@@ -171,6 +191,16 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     this.logger.info(
       `Deleting event triggers at block ${block} and extractor ${extractor}`
     );
+    const deletedData = await this.repository.find({
+      where: { extractor: extractor, block: block },
+    });
+    const updatedData = await this.repository.find({
+      where: {
+        extractor: extractor,
+        spendBlock: block,
+        block: Not(block),
+      },
+    });
     await this.repository.delete({
       block: block,
       extractor: extractor,
@@ -185,6 +215,10 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         paymentTxId: null,
       }
     );
+    return {
+      deletedData,
+      updatedData,
+    };
   };
 }
 
