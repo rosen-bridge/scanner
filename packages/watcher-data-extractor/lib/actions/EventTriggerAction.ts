@@ -113,7 +113,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     if (success) {
       return {
         insertedData: boxesToInsert,
-        updatedData: boxesToUpdate,
+        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
       };
     }
     return undefined;
@@ -217,7 +217,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     );
     return {
       deletedData,
-      updatedData,
+      updatedData: updatedData.map((data) => pick(data, 'boxId')),
     };
   };
 }

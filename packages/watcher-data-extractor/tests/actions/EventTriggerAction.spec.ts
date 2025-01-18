@@ -36,7 +36,10 @@ describe('EventTrigger', () => {
         block,
         'extractor1'
       );
-      // expect(res).toEqual(true);
+      expect(res).toEqual({
+        insertedData: [sampleEventTrigger1, sampleEventTrigger2],
+        updatedData: [],
+      });
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
       expect(rows[0]).toEqual(
@@ -87,7 +90,10 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      // expect(res).toEqual(true);
+      expect(res).toEqual({
+        insertedData: [sampleEventTrigger3, sampleEventTrigger4],
+        updatedData: [],
+      });
       const [secondInsertRows] = await repository.findAndCount();
       expect(firstInsertRows[0]).toEqual(secondInsertRows[0]);
       expect(firstInsertRows[1]).toEqual(secondInsertRows[1]);
@@ -140,7 +146,10 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      // expect(res).toEqual(true);
+      expect(res).toEqual({
+        insertedData: [],
+        updatedData: [{ boxId: sampleEventTrigger1.boxId }],
+      });
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(2);
@@ -186,7 +195,10 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      // expect(res).toEqual(true);
+      expect(res).toEqual({
+        insertedData: [sampleEventTrigger1],
+        updatedData: [],
+      });
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);
@@ -231,7 +243,10 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      // expect(res).toEqual(true);
+      expect(res).toEqual({
+        insertedData: [sampleEventTrigger3],
+        updatedData: [],
+      });
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);
@@ -259,7 +274,7 @@ describe('EventTrigger', () => {
         sampleEventEntity,
         { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
       ]);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [
           {
             boxId: 'id',
@@ -277,6 +292,7 @@ describe('EventTrigger', () => {
       expect(
         (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length
       ).toEqual(0);
+      expect(result).toEqual([{ boxId: 'id' }]);
     });
   });
 
@@ -299,9 +315,13 @@ describe('EventTrigger', () => {
     it('should remove the trigger existed on the removed block', async () => {
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await action.deleteBlockBoxes('hash', 'extractor1');
+      const result = await action.deleteBlockBoxes('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
+      expect(result).toMatchObject({
+        deletedData: [sampleEventTrigger1],
+        updatedData: [],
+      });
     });
 
     /**
@@ -341,7 +361,7 @@ describe('EventTrigger', () => {
       expect(storedEntity!.result).toEqual(result);
       expect(storedEntity!.paymentTxId).toEqual(paymentTxId);
 
-      await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      const res = await action.deleteBlockBoxes(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
       });
@@ -349,6 +369,7 @@ describe('EventTrigger', () => {
       expect(storedEntity!.spendTxId).toBeNull();
       expect(storedEntity!.result).toBeNull();
       expect(storedEntity!.paymentTxId).toBeNull();
+      expect(res).toEqual({ deletedData: [], updatedData: [{ boxId: '1' }] });
     });
   });
 });
