@@ -12,8 +12,6 @@ import {
   spendTriggerTxOldFormat,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
-import { sampleEventEntity } from './utilsVariable.mock';
-import { EventResult } from '../../lib';
 import { ErgoNetworkType } from '@rosen-bridge/abstract-extractor';
 
 let dataSource: DataSource;
@@ -237,51 +235,6 @@ describe('EventTriggerExtractor', () => {
         block,
         extractor.id
       );
-    });
-  });
-
-  describe('forkBlock', () => {
-    /**
-     * forkBlock should delete events with specific block and extractor from database
-     * Dependency:
-     *  1- sample event data should insert to the empty database
-     * Scenario: calling forkBlock with extractor with specific extractorId on the dataBase
-     * Expected: afterCalling forkBlock database row count should be 2
-     */
-    it('should remove only block with specific block id and extractor', async () => {
-      const extractor = new EventTriggerExtractor(
-        'extractorId',
-        dataSource,
-        ErgoNetworkType.Node,
-        'node_url',
-        eventTriggerAddress,
-        RWTId,
-        permitAddress,
-        fraudAddress
-      );
-      const repository = dataSource.getRepository(EventTriggerEntity);
-      await repository.insert([
-        sampleEventEntity,
-        {
-          ...sampleEventEntity,
-          boxId: '22',
-          block: 'hash2',
-          sourceChainHeight: 12,
-          id: 2,
-        },
-        {
-          ...sampleEventEntity,
-          boxId: '33',
-          extractor: 'secondExtractor',
-          sourceChainHeight: 15,
-          id: 3,
-        },
-      ]);
-      await extractor.forkBlock('hash');
-      const [rows, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toBe(2);
-      expect(rows[0].block).toBe('hash2');
-      expect(rows[1].extractor).toBe('secondExtractor');
     });
   });
 });

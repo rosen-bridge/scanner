@@ -26,9 +26,12 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
 
   /**
    * insert all extracted eventTriggers for a block in an atomic db transaction
+   * update the data if a box with the same id is already stored in db
    * @param eventTriggers
    * @param block
    * @param extractorId
+   * @return inserted items and updated box ids
+   * returns undefined in case of any problem
    */
   insertBoxes = async (
     eventTriggers: Array<ExtractedEventTrigger>,
@@ -126,6 +129,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
    * @param spendInfArray
    * @param block
    * @param extractorId
+   * @returns spent box ids
    */
   spendBoxes = async (
     spendInfoArray: Array<SpendInfo>,
@@ -186,6 +190,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
    * if a box is created in this block remove it from database
    * @param block
    * @param extractor
+   * @return deleted items and updated box ids
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(

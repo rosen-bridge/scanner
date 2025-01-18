@@ -27,10 +27,12 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
 
   /**
    * insert all extracted box data in an atomic transaction
+   * update the data if a box with the same id is already stored in db
    * @param boxes
    * @param block
    * @param extractor
-   * @return success
+   * @return inserted items and updated box ids
+   * returns undefined in case of any problem
    */
   insertBoxes = async (
     boxes: Array<ExtractedBox>,
@@ -108,6 +110,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
    * @param spendInfos
    * @param block
    * @param extractor
+   * @returns spent box ids
    */
   spendBoxes = async (
     spendInfos: Array<SpendInfo>,
