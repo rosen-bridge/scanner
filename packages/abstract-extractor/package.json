@@ -39,6 +39,7 @@
     "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-clients/ergo-explorer": "^1.1.2",
     "@rosen-clients/ergo-node": "^1.1.1",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "typeorm": "^0.3.20"
   }
 }

@@ -1,4 +1,3 @@
-import { DataSource } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Mutex } from 'await-semaphore';
@@ -15,12 +14,16 @@ import {
   CallbackMap,
   CallbackDataMap,
 } from './interfaces';
+import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractor<
-  ExtractedData extends ErgoExtractedData
+  ExtractedData extends ErgoExtractedData,
+  ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractExtractor<Transaction> {
-  protected readonly dataSource: DataSource;
-  protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
+  protected abstract actions: AbstractErgoExtractorAction<
+    ExtractedData,
+    ExtractorEntity
+  >;
   protected logger: AbstractLogger;
   protected callbacks: {
     [K in CallbackType]: Map<string, CallbackMap<ExtractedData>[K]>;

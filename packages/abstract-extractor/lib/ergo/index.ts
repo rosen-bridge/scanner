@@ -6,3 +6,4 @@ export * from './network/NodeNetwork';
 export * from './network/AbstractNetwork';
 export * from './initializable';
 export * from './utils';
+export * from './AbstractErgoExtractorEntity';
