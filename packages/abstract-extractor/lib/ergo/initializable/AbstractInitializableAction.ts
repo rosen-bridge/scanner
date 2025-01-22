@@ -2,11 +2,11 @@ import { DataSource, EntityTarget, ObjectLiteral } from 'typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';
-import { ErgoExtractedData } from '../interfaces';
+import { AbstractBoxData } from '../interfaces';
 import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 
 export abstract class AbstractInitializableErgoExtractorAction<
-  ExtractedData extends ErgoExtractedData,
+  ExtractedData extends AbstractBoxData,
   ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractErgoExtractorAction<ExtractedData, ExtractorEntity> {
   constructor(

@@ -8,7 +8,7 @@ import { BlockInfo } from '../interfaces';
 import {
   Transaction,
   OutputBox,
-  ErgoExtractedData,
+  AbstractBoxData,
   SpendInfo,
   CallbackType,
   CallbackMap,
@@ -17,7 +17,7 @@ import {
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractor<
-  ExtractedData extends ErgoExtractedData,
+  ExtractedData extends AbstractBoxData,
   ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractExtractor<Transaction> {
   protected abstract actions: AbstractErgoExtractorAction<

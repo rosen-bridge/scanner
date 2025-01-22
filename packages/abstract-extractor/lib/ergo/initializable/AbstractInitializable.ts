@@ -2,7 +2,7 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { groupBy, sortBy } from 'lodash-es';
 
 import {
-  ErgoExtractedData,
+  AbstractBoxData,
   ErgoNetworkType,
   ExtendedTransaction,
 } from '../interfaces';
@@ -15,7 +15,7 @@ import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 
 export abstract class AbstractInitializableErgoExtractor<
-  ExtractedData extends ErgoExtractedData,
+  ExtractedData extends AbstractBoxData,
   ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
   protected initialize: boolean;

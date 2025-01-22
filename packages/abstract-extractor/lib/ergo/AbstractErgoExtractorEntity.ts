@@ -4,24 +4,24 @@ export abstract class AbstractErgoExtractorEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
-  @Column()
-  serialized: string;
-
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendBlock?: string | null;
 
-  @Column({ nullable: true })
-  spendHeight?: number;
+  @Column({ nullable: true, type: 'int' })
+  spendHeight?: number | null;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
+
+  @Column({ type: 'varchar' })
+  serialized: string;
 }
