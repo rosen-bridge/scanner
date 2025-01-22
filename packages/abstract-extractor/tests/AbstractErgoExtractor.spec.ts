@@ -19,7 +19,7 @@ describe('AbstractErgoExtractor', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for one box
-     * - spy `extractBoxData` and `insertBoxes`
+     * - spy `extractBoxData` and `storeBoxes`
      * - run test (call `processTransactions`)
      * @expected
      * - to call `extractBoxData` for the specific box
@@ -36,12 +36,12 @@ describe('AbstractErgoExtractor', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest
+      const storeSpy = vitest
         .fn()
         .mockResolvedValue({ insertedData: [extractedData], updatedData: [] });
       const spendSpy = vitest.fn().mockResolvedValue([]);
       extractor['actions'] = {
-        insertBoxes: insertSpy,
+        storeBoxes: storeSpy,
         spendBoxes: spendSpy,
       } as unknown as AbstractErgoExtractorAction<
         AbstractBoxData,
@@ -51,7 +51,7 @@ describe('AbstractErgoExtractor', () => {
 
       expect(extractSpy).toBeCalledTimes(1);
       expect(extractSpy).toBeCalledWith(tx.outputs[0]);
-      expect(insertSpy).toBeCalledWith([extractedData], block, 'Test');
+      expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Insert, [
         extractedData,
@@ -63,10 +63,10 @@ describe('AbstractErgoExtractor', () => {
      * @dependencies
      * @scenario
      * - mock extractor (hasData returns false as default)
-     * - spy `extractBoxData`, `insertBoxes` and `spendBoxes`
+     * - spy `extractBoxData`, `storeBoxes` and `spendBoxes`
      * - run test (call `processTransactions`)
      * @expected
-     * - not to call `extractBoxData` and `insertBoxes` when there is not any box with data
+     * - not to call `extractBoxData` and `storeBoxes` when there is not any box with data
      * - to extractor spend info of input boxes and call `spendBoxes`
      * - to return true when total procedure is successful
      */
@@ -76,7 +76,7 @@ describe('AbstractErgoExtractor', () => {
       extractor['triggerCallbacks'] = triggerCallbacks;
       const extractSpy = vitest.fn();
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest
+      const storeSpy = vitest
         .fn()
         .mockResolvedValue({ insertedData: [], updatedData: [] });
       const spendSpy = vitest
@@ -86,7 +86,7 @@ describe('AbstractErgoExtractor', () => {
           { boxId: tx.inputs[1].boxId },
         ]);
       extractor['actions'] = {
-        insertBoxes: insertSpy,
+        storeBoxes: storeSpy,
         spendBoxes: spendSpy,
       } as unknown as AbstractErgoExtractorAction<
         AbstractBoxData,
@@ -95,7 +95,7 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).not.toBeCalled();
-      expect(insertSpy).not.toBeCalled();
+      expect(storeSpy).not.toBeCalled();
       expect(spendSpy).toBeCalledWith(
         [
           { boxId: tx.inputs[0].boxId, txId: tx.id, index: 1 },
@@ -117,10 +117,10 @@ describe('AbstractErgoExtractor', () => {
      * @scenario
      * - mock extractor
      * - mock `hasData` to return true for one box
-     * - spy `extractBoxData` and `insertBoxes`
+     * - spy `extractBoxData` and `storeBoxes`
      * - run test (call `processTransactions`)
      * @expected
-     * - to return false when `insertBoxes` returns undefined
+     * - to return false when `storeBoxes` returns undefined
      * - not to call `spendBoxes` if data insertion fails
      */
     it('should return false if data insertion fails', async () => {
@@ -131,10 +131,10 @@ describe('AbstractErgoExtractor', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest.fn().mockResolvedValue(undefined);
+      const storeSpy = vitest.fn().mockResolvedValue(undefined);
       const spendSpy = vitest.fn();
       extractor['actions'] = {
-        insertBoxes: insertSpy,
+        storeBoxes: storeSpy,
         spendBoxes: spendSpy,
       } as unknown as AbstractErgoExtractorAction<
         AbstractBoxData,

@@ -157,7 +157,7 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        const result = await this.actions.insertBoxes(
+        const result = await this.actions.storeBoxes(
           boxes,
           block,
           this.getId()

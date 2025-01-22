@@ -17,18 +17,18 @@ describe('AbstractErgoExtractorAction', () => {
     repository = dataSource.getRepository(TestEntity);
   });
 
-  describe('insertBoxes', () => {
+  describe('storeBoxes', () => {
     /**
-     * @target insertBoxes should save the passed box entities to database
+     * @target storeBoxes should save the passed box entities to database
      * @dependencies
      * @scenario
-     * - run test (call `insertBoxes` with 2 new boxes)
+     * - run test (call `storeBoxes` with 2 new boxes)
      * @expected
      * - to save 2 new entities
      * - to return 2 inserted entity data
      */
     it(`should save the passed box entities to database`, async () => {
-      const result = await action.insertBoxes(
+      const result = await action.storeBoxes(
         sampleEntities.slice(0, 2),
         block,
         'extractor1'
@@ -60,11 +60,11 @@ describe('AbstractErgoExtractorAction', () => {
     });
 
     /**
-     * @target insertBoxes should correctly save boxes with different extractors
+     * @target storeBoxes should correctly save boxes with different extractors
      * @dependencies
      * @scenario
      * - insert 2 boxes belonging to first-extractor
-     * - run test (call `insertBoxes` with same boxes for the second-extractor)
+     * - run test (call `storeBoxes` with same boxes for the second-extractor)
      * @expected
      * - to save 2 new entities belonging to second-extractor
      * - to return 2 new inserted entity data
@@ -85,7 +85,7 @@ describe('AbstractErgoExtractorAction', () => {
         },
       ]);
 
-      const result = await action.insertBoxes(
+      const result = await action.storeBoxes(
         [sampleEntities[0], sampleEntities[1]],
         block,
         'second-extractor'
@@ -116,16 +116,16 @@ describe('AbstractErgoExtractorAction', () => {
     });
 
     /**
-     * @target insertBoxes should update boxes correctly
+     * @target storeBoxes should update boxes correctly
      * @dependencies
      * @scenario
      * - insert 2 boxes
-     * - run test (call `insertBoxes` with the same boxes and updated info)
+     * - run test (call `storeBoxes` with the same boxes and updated info)
      * @expected
      * - to update the existing box in database
      * - to return updated box id
      */
-    it(`insertBoxes should update boxes correctly`, async () => {
+    it(`storeBoxes should update boxes correctly`, async () => {
       await repository.insert([
         {
           ...sampleEntities[0],
@@ -141,7 +141,7 @@ describe('AbstractErgoExtractorAction', () => {
         },
       ]);
 
-      const result = await action.insertBoxes(
+      const result = await action.storeBoxes(
         [
           {
             ...sampleEntities[0],
@@ -165,7 +165,12 @@ describe('AbstractErgoExtractorAction', () => {
       });
       expect(result).toEqual({
         insertedData: [],
-        updatedData: [{ boxId: sampleEntities[0].boxId }],
+        updatedData: [
+          {
+            boxId: sampleEntities[0].boxId,
+            serialized: 'updatedBoxSerialized',
+          },
+        ],
       });
     });
   });
@@ -183,7 +188,7 @@ describe('AbstractErgoExtractorAction', () => {
      * - return boxId and serialized of spent box
      */
     it(`should set spendBlock and spendHeight for a set of boxes`, async () => {
-      await action.insertBoxes(sampleEntities.slice(0, 2), block, 'extractor1');
+      await action.storeBoxes(sampleEntities.slice(0, 2), block, 'extractor1');
 
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
       const spendInfos: Array<SpendInfo> = [
@@ -227,8 +232,8 @@ describe('AbstractErgoExtractorAction', () => {
      * - to return the deleted entity data
      */
     it(`should delete the boxes created in the specified block`, async () => {
-      await action.insertBoxes(sampleEntities.slice(0, 2), block, 'extractor1');
-      await action.insertBoxes(sampleEntities.slice(2), block2, 'extractor1');
+      await action.storeBoxes(sampleEntities.slice(0, 2), block, 'extractor1');
+      await action.storeBoxes(sampleEntities.slice(2), block2, 'extractor1');
 
       const result = await action.deleteBlockBoxes(block2.hash, 'extractor1');
 
@@ -258,7 +263,7 @@ describe('AbstractErgoExtractorAction', () => {
      * - to return the updated entity boxId and serialized
      */
     it(`should update the boxes spent in the specified block`, async () => {
-      await action.insertBoxes(sampleEntities, block, 'extractor1');
+      await action.storeBoxes(sampleEntities, block, 'extractor1');
       const spendInfos: Array<SpendInfo> = [
         { txId: 'txId', boxId: sampleEntities[0].boxId, index: 0 },
       ];

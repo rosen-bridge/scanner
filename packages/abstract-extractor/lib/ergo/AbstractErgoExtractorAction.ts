@@ -60,7 +60,7 @@ export abstract class AbstractErgoExtractorAction<
    * @return inserted items and updated box ids
    * returns undefined in case of any problem
    */
-  insertBoxes = async (
+  storeBoxes = async (
     boxes: Array<ExtractedData>,
     block: BlockInfo,
     extractor: string
@@ -122,7 +122,9 @@ export abstract class AbstractErgoExtractorAction<
     if (success)
       return {
         insertedData: boxesToInsert,
-        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
+        updatedData: boxesToUpdate.map((data) =>
+          pick(data, 'boxId', 'serialized')
+        ),
       };
     return undefined;
   };
