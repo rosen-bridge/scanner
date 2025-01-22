@@ -3,9 +3,10 @@ import { describe, it, expect, vitest } from 'vitest';
 
 import {
   OutputBox,
-  ErgoExtractedData,
+  AbstractBoxData,
   AbstractErgoExtractorAction,
   CallbackType,
+  AbstractErgoExtractorEntity,
 } from '../lib';
 import { block, extractedData, tx } from './testData';
 import { MockedErgoExtractor } from './AbstractErgoExtractor.mock';
@@ -42,7 +43,10 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         insertBoxes: insertSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
@@ -84,7 +88,10 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         insertBoxes: insertSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).not.toBeCalled();
@@ -129,7 +136,10 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         insertBoxes: insertSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const result = await extractor.processTransactions([tx], block);
 
       expect(result).toEqual(false);
@@ -156,7 +166,10 @@ describe('AbstractErgoExtractor', () => {
       });
       extractor['actions'] = {
         deleteBlockBoxes: removeSpy,
-      } as unknown as AbstractErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const triggerCallbackSpy = vitest.fn().mockClear();
       extractor['triggerCallbacks'] = triggerCallbackSpy;
       await extractor.forkBlock(block.hash);
@@ -314,7 +327,7 @@ describe('AbstractErgoExtractor', () => {
         'callback0',
         insertCallback
       );
-      const insertedData = [{ boxId: 'boxId' }];
+      const insertedData = [{ boxId: 'boxId', serialized: 'serialized' }];
       await extractor['triggerCallbacks'](CallbackType.Insert, insertedData);
       expect(insertCallback).toBeCalledWith(insertedData);
     });

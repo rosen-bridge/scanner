@@ -3,8 +3,9 @@ import { describe, expect, it, vi, vitest } from 'vitest';
 import {
   ErgoNetworkType,
   NodeNetwork,
-  ErgoExtractedData,
+  AbstractBoxData,
   ExplorerNetwork,
+  AbstractErgoExtractorEntity,
 } from '../../lib';
 import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { transactionBatch } from './testData';
@@ -124,7 +125,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn();
       await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).not.toHaveBeenCalled();
@@ -153,7 +157,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn();
       await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).toHaveBeenCalledOnce();
@@ -183,7 +190,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as unknown as AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn().mockRejectedValue(0);
       await expect(
         async () => await extractor['initWithRetrial'](initSpy)
