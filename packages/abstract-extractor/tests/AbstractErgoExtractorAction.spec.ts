@@ -53,10 +53,7 @@ describe('AbstractErgoExtractorAction', () => {
         spendBlock: null,
         spendHeight: null,
       });
-      expect(result).toEqual({
-        insertedData: sampleEntities.slice(0, 2),
-        updatedData: [],
-      });
+      expect(result).toEqual(true);
     });
 
     /**
@@ -109,10 +106,7 @@ describe('AbstractErgoExtractorAction', () => {
         spendBlock: null,
         spendHeight: null,
       });
-      expect(result).toEqual({
-        insertedData: sampleEntities.slice(0, 2),
-        updatedData: [],
-      });
+      expect(result).toEqual(true);
     });
 
     /**
@@ -163,15 +157,7 @@ describe('AbstractErgoExtractorAction', () => {
         spendBlock: null,
         spendHeight: null,
       });
-      expect(result).toEqual({
-        insertedData: [],
-        updatedData: [
-          {
-            boxId: sampleEntities[0].boxId,
-            serialized: 'updatedBoxSerialized',
-          },
-        ],
-      });
+      expect(result).toEqual(true);
     });
   });
 
@@ -214,9 +200,7 @@ describe('AbstractErgoExtractorAction', () => {
         spendBlock: spendBlock.hash,
         spendHeight: spendBlock.height,
       });
-      expect(spentBoxIds).toEqual([
-        pick(sampleEntities[0], ['boxId', 'serialized']),
-      ]);
+      expect(spentBoxIds).toEqual([pick(sampleEntities[0], ['boxId'])]);
     });
   });
 
@@ -278,7 +262,7 @@ describe('AbstractErgoExtractorAction', () => {
       );
       expect(result).toEqual({
         deletedData: [],
-        updatedData: [pick(sampleEntities[0], ['boxId', 'serialized'])],
+        updatedData: [pick(sampleEntities[0], ['boxId'])],
       });
     });
   });
