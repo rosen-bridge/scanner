@@ -208,19 +208,13 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
           });
       });
       if (boxes.length > 0) {
-        const result = await this.actions.storeBoxes(
-          boxes,
-          block,
-          this.getId()
-        );
-        if (!result) {
+        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed at height ${block.height} for extractor ${this.id}`
           );
           return false;
         }
-        this.triggerCallbacks(CallbackType.Insert, result.insertedData);
-        this.triggerCallbacks(CallbackType.Update, result.updatedData);
+        this.triggerCallbacks(CallbackType.Insert, boxes);
       }
       const spentData = await this.actions.spendBoxes(
         spendInfoArray,

@@ -1,6 +1,7 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Mutex } from 'await-semaphore';
+import { v4 as uuidv4 } from 'uuid';
 
 import { AbstractExtractor } from '../AbstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
@@ -41,43 +42,32 @@ export abstract class AbstractErgoExtractor<
   }
 
   /**
-   * register a new callback with id on a type
-   * returns false if an extractor is already registered with the same id and
-   * wont update the callback
+   * hook a new callback on a callback type
    * @param type
    * @param id
    * @param callback
-   * @returns success status
+   * @returns callback registered id
    */
-  registerCallback = async <T extends CallbackType>(
+  hook = async <T extends CallbackType>(
     type: T,
-    id: string,
     callback: CallbackMap<ExtractedData>[T]
-  ): Promise<boolean> => {
+  ): Promise<string> => {
     const release = await this.callbackMutex.acquire();
     const callbackMap = this.callbacks[type];
-    if (callbackMap.has(id)) {
-      this.logger.warn(
-        `Callback with Id [${id}] is already registered for type [${type}].`
-      );
-      return false;
-    }
+    const id = uuidv4();
     callbackMap.set(id, callback);
     release();
-    return true;
+    return id;
   };
 
   /**
-   * unregister a callback with specific id on a type
+   * unhook a callback on a type
    * returns false if there is no registered callback with the id
    * @param type
    * @param id
    * @returns success status
    */
-  unregisterCallback = async (
-    type: CallbackType,
-    id: string
-  ): Promise<boolean> => {
+  unhook = async (type: CallbackType, id: string): Promise<boolean> => {
     const release = await this.callbackMutex.acquire();
     const callbackMap = this.callbacks[type];
     if (!callbackMap.has(id)) {
@@ -157,12 +147,7 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        const result = await this.actions.storeBoxes(
-          boxes,
-          block,
-          this.getId()
-        );
-        if (!result) {
+        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
@@ -170,8 +155,7 @@ export abstract class AbstractErgoExtractor<
           );
           return false;
         }
-        this.triggerCallbacks(CallbackType.Insert, result.insertedData);
-        this.triggerCallbacks(CallbackType.Update, result.updatedData);
+        this.triggerCallbacks(CallbackType.Insert, boxes);
       }
       const spentData = await this.actions.spendBoxes(
         spentInfos,
@@ -198,7 +182,9 @@ export abstract class AbstractErgoExtractor<
    */
   forkBlock = async (hash: string): Promise<void> => {
     const result = await this.actions.deleteBlockBoxes(hash, this.getId());
-    this.triggerCallbacks(CallbackType.Delete, result.deletedData);
-    this.triggerCallbacks(CallbackType.Update, result.updatedData);
+    if (result.deletedData.length > 0)
+      this.triggerCallbacks(CallbackType.Delete, result.deletedData);
+    if (result.updatedData.length > 0)
+      this.triggerCallbacks(CallbackType.Update, result.updatedData);
   };
 }

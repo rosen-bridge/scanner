@@ -64,7 +64,7 @@ export abstract class AbstractErgoExtractorAction<
     boxes: Array<ExtractedData>,
     block: BlockInfo,
     extractor: string
-  ) => {
+  ): Promise<boolean> => {
     let success = true;
     let boxesToInsert: ExtractedData[] = [],
       boxesToUpdate: ExtractedData[] = [];
@@ -119,12 +119,7 @@ export abstract class AbstractErgoExtractorAction<
     } finally {
       await queryRunner.release();
     }
-    if (success)
-      return {
-        insertedData: boxesToInsert,
-        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
-      };
-    return undefined;
+    return success;
   };
 
   /**
