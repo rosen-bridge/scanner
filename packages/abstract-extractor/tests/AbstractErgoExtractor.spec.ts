@@ -170,151 +170,96 @@ describe('AbstractErgoExtractor', () => {
     });
   });
 
-  describe('registerCallback', () => {
+  describe('hook', () => {
     /**
-     * @target registerCallback should register a new callback on insert with the new id
+     * @target hook should hook a new callback on insert with the new id
      * @dependencies
      * @scenario
      * - mock extractor
      * - mock a callback for insert
-     * - run test (call `registerCallback`)
+     * - run test (call `hook`)
      * @expected
-     * - register the callback with the specified id
+     * - hook the callback with the specified id
      * - return true
      */
-    it('should register a new callback on insert with the new id', async () => {
+    it('should hook a new callback on insert with the new id', async () => {
       const extractor = new MockedErgoExtractor();
       const insertCallback = vitest.fn();
-      const result = await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
-        insertCallback
+      const id = await extractor.hook(CallbackType.Insert, insertCallback);
+      expect(extractor['callbacks'][CallbackType.Insert]).toEqual(
+        new Map().set(id, insertCallback)
       );
-      expect(result).toBeTruthy();
-      expect(
-        extractor['callbacks'][CallbackType.Insert].get('callback0')
-      ).toEqual(insertCallback);
-    });
-
-    /**
-     * @target registerCallback should not register a callback with the duplicated id
-     * @dependencies
-     * @scenario
-     * - mock extractor
-     * - mock two callbacks for insert
-     * - register the first callback
-     * - run test (call `registerCallback` with the same id for second callback)
-     * @expected
-     * - not to register the callback with a repeated id
-     * - return false
-     */
-    it('should not register a callback with the duplicated id', async () => {
-      const extractor = new MockedErgoExtractor();
-      const insertCallback = vitest.fn();
-      const insertCallback2 = vitest.fn();
-      await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
-        insertCallback
-      );
-      const result = await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
-        insertCallback2
-      );
-      expect(result).toBeFalsy();
-      expect(
-        extractor['callbacks'][CallbackType.Insert].get('callback0')
-      ).toEqual(insertCallback);
     });
   });
 
-  describe('unregisterCallback', () => {
+  describe('unhook', () => {
     /**
-     * @target unregisterCallback should unregister the callback on insert with the specified id
+     * @target unhook should unhook the callback on insert with the specified id
      * @dependencies
      * @scenario
      * - mock extractor
      * - mock a callback for insert
-     * - register the callback
-     * - run test (call `unregisterCallback`)
+     * - hook the callback
+     * - run test (call `unhook`)
      * @expected
-     * - unregister the callback with the specified id
+     * - unhook the callback with the specified id
      * - return true
      */
-    it('should unregister the callback on insert with the specified id', async () => {
+    it('should unhook the callback on insert with the specified id', async () => {
       const extractor = new MockedErgoExtractor();
       const insertCallback = vitest.fn();
-      await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
-        insertCallback
-      );
-      const result = await extractor.unregisterCallback(
-        CallbackType.Insert,
-        'callback0'
-      );
+      const id = await extractor.hook(CallbackType.Insert, insertCallback);
+      const result = await extractor.unhook(CallbackType.Insert, id);
       expect(result).toBeTruthy();
-      expect(
-        extractor['callbacks'][CallbackType.Insert].get('callback0')
-      ).toEqual(undefined);
+      expect(extractor['callbacks'][CallbackType.Insert].get(id)).toEqual(
+        undefined
+      );
     });
 
     /**
-     * @target unregisterCallback should not unregister callbacks with the same id on other types
+     * @target unhook should not unhook callbacks with the same id on other types
      * @dependencies
      * @scenario
      * - mock extractor
      * - mock two callbacks for insert
-     * - register the first callback
-     * - run test (call `unregisterCallback` with the same id for second callback)
+     * - hook the first callback
+     * - run test (call `unhook` with the same id for second callback)
      * @expected
-     * - not to change registered callbacks when the callback with the id
+     * - not to change hooked callbacks when the callback with the id
      * doesn't exists on the specified type
      * - return false
      */
-    it('should not unregister callbacks with the same id on other types', async () => {
+    it('should not unhook callbacks with the same id on other types', async () => {
       const extractor = new MockedErgoExtractor();
       const insertCallback = vitest.fn();
-      await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
+      const id = await extractor.hook(CallbackType.Insert, insertCallback);
+      const result = await extractor.unhook(CallbackType.Update, id);
+      expect(result).toBeFalsy();
+      expect(extractor['callbacks'][CallbackType.Insert].get(id)).toEqual(
         insertCallback
       );
-      const result = await extractor.unregisterCallback(
-        CallbackType.Update,
-        'callback0'
+      expect(extractor['callbacks'][CallbackType.Update].get(id)).toEqual(
+        undefined
       );
-      expect(result).toBeFalsy();
-      expect(
-        extractor['callbacks'][CallbackType.Insert].get('callback0')
-      ).toEqual(insertCallback);
-      expect(
-        extractor['callbacks'][CallbackType.Update].get('callback0')
-      ).toEqual(undefined);
     });
   });
 
   describe('triggerCallbacks', () => {
     /**
-     * @target triggerCallbacks should trigger all callbacks registered on a type
+     * @target triggerCallbacks should trigger all callbacks hooked on a type
      * @dependencies
      * @scenario
      * - mock extractor
      * - mock a callback for insert
-     * - register the callback
+     * - hook the callback
      * - run test (call `triggerCallbacks` for insert type)
      * @expected
      * - trigger all callbacks with the specified id
      */
-    it('should trigger all callbacks registered on a type', async () => {
+    it('should trigger all callbacks hooked on a type', async () => {
       const extractor = new MockedErgoExtractor();
       const insertCallback = vitest.fn();
-      await extractor.registerCallback(
-        CallbackType.Insert,
-        'callback0',
-        insertCallback
-      );
+      await extractor.hook(CallbackType.Insert, insertCallback);
       const insertedData = [{ boxId: 'boxId' }];
       await extractor['triggerCallbacks'](CallbackType.Insert, insertedData);
       expect(insertCallback).toBeCalledWith(insertedData);
