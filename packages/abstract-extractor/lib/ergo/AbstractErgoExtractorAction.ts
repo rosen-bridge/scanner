@@ -11,7 +11,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { BlockInfo } from '../interfaces';
-import { AbstractBoxData, SpendInfo } from './interfaces';
+import { AbstractBoxData, BoxInfo, SpendInfo } from './interfaces';
 import { DB_CHUNK_SIZE } from '../constants';
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
@@ -122,9 +122,7 @@ export abstract class AbstractErgoExtractorAction<
     if (success)
       return {
         insertedData: boxesToInsert,
-        updatedData: boxesToUpdate.map((data) =>
-          pick(data, 'boxId', 'serialized')
-        ),
+        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
       };
     return undefined;
   };
@@ -144,7 +142,7 @@ export abstract class AbstractErgoExtractorAction<
     spendInfos: Array<SpendInfo>,
     block: BlockInfo,
     extractor: string
-  ): Promise<AbstractBoxData[]> => {
+  ): Promise<BoxInfo[]> => {
     const spentData = [];
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
@@ -170,7 +168,7 @@ export abstract class AbstractErgoExtractorAction<
         }
       }
     }
-    return spentData.map((data) => pick(data, ['boxId', 'serialized']));
+    return spentData.map((data) => pick(data, 'boxId'));
   };
 
   /**
@@ -181,7 +179,10 @@ export abstract class AbstractErgoExtractorAction<
    * @param extractorId
    * @return deleted items and updated box ids
    */
-  deleteBlockBoxes = async (block: string, extractor: string) => {
+  deleteBlockBoxes = async (
+    block: string,
+    extractor: string
+  ): Promise<{ deletedData: ExtractedData[]; updatedData: BoxInfo[] }> => {
     this.logger.info(
       `Deleting boxes in block ${block} and extractor ${extractor}`
     );
@@ -208,9 +209,7 @@ export abstract class AbstractErgoExtractorAction<
     );
     return {
       deletedData: this.convertEntityToData(deletedData),
-      updatedData: updatedData.map((data) =>
-        pick(data, ['boxId', 'serialized'])
-      ),
+      updatedData: updatedData.map((data) => pick(data, 'boxId')),
     };
   };
 }

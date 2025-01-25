@@ -77,14 +77,15 @@ export enum CallbackType {
   Delete = 'delete',
 }
 
+export interface BoxInfo {
+  boxId: string;
+}
+
 export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
-  [CallbackType.Update]: AbstractBoxData[];
+  [CallbackType.Update]: BoxInfo[];
   [CallbackType.Insert]: ExtractedData[];
-  [CallbackType.Delete]: (ExtractedData & {
-    spendBlock?: string;
-    spendHeight?: number;
-  })[];
-  [CallbackType.Spend]: AbstractBoxData[];
+  [CallbackType.Delete]: ExtractedData[];
+  [CallbackType.Spend]: BoxInfo[];
 };
 
 export type CallbackMap<ExtractedData extends AbstractBoxData> = {
