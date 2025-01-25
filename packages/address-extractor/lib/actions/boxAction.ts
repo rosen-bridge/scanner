@@ -27,67 +27,55 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
 
   /**
    * insert all extracted box data in an atomic transaction
-   * update the data if a box with the same id is already stored in db
    * @param boxes
    * @param block
    * @param extractor
-   * @return inserted items and updated box ids
-   * returns undefined in case of any problem
+   * @return success
    */
   insertBoxes = async (
     boxes: Array<ExtractedBox>,
     block: BlockInfo,
     extractor: string
   ) => {
+    const boxIds = boxes.map((item) => item.boxId);
+    const dbBoxes = await this.datasource.getRepository(BoxEntity).findBy({
+      boxId: In(boxIds),
+      extractor: extractor,
+    });
+    if (dbBoxes.length > 0)
+      this.logger.debug(`Found stored boxes with same boxId`, dbBoxes);
     let success = true;
-    let boxesToInsert: ExtractedBox[] = [],
-      boxesToUpdate: ExtractedBox[] = [];
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const repository = await queryRunner.manager.getRepository(BoxEntity);
     try {
-      const createEntities = (boxes: ExtractedBox[]) =>
-        boxes.map((box) => ({
+      for (const box of boxes) {
+        const entity = {
           address: box.address,
           boxId: box.boxId,
           createBlock: block.hash,
           creationHeight: block.height,
           serialized: box.serialized,
           extractor: extractor,
-        }));
-
-      const dbBoxIds = (
-        await this.datasource.getRepository(BoxEntity).findBy({
-          boxId: In(boxes.map((item) => item.boxId)),
-          extractor: extractor,
-        })
-      ).map((box) => box.boxId);
-      if (dbBoxIds.length > 0)
-        this.logger.debug(`Found stored boxes with same boxId`, dbBoxIds);
-
-      boxesToUpdate = boxes.filter((box) => dbBoxIds.includes(box.boxId));
-      boxesToInsert = difference(boxes, boxesToUpdate);
-
-      if (boxesToInsert.length > 0) {
-        this.logger.debug(`Inserting boxes`);
-        await repository.insert(createEntities(boxesToInsert));
+        };
+        const dbBox = dbBoxes.filter((item) => item.boxId === box.boxId);
+        if (dbBox.length > 0) {
+          this.logger.info(
+            `Updating box ${box.boxId} and extractor ${extractor}`
+          );
+          await repository.update({ id: dbBox[0].id }, entity);
+          this.logger.debug(
+            `Updated entity is [${JsonBI.stringify(
+              box
+            )}], and stored similar box is [${JsonBI.stringify(dbBox)}]`
+          );
+        } else {
+          this.logger.info(`Storing box ${box.boxId}`);
+          await repository.insert(entity);
+          this.logger.debug(`Stored ${JsonBI.stringify(entity)}`);
+        }
       }
-      if (boxesToUpdate.length > 0)
-        this.logger.info(
-          `Updating boxes with following Ids in the database: [${boxesToUpdate
-            .map((col) => col.boxId)
-            .join(', ')}]`
-        );
-      createEntities(boxesToUpdate).forEach(async (boxEntity) => {
-        this.logger.debug(
-          `Updating boxes in database [${JsonBI.stringify(boxEntity)}]`
-        );
-        await repository.update(
-          { boxId: boxEntity.boxId, extractor: extractor },
-          boxEntity
-        );
-      });
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
@@ -96,12 +84,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
     } finally {
       await queryRunner.release();
     }
-    if (success)
-      return {
-        insertedData: boxesToInsert,
-        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
-      };
-    return undefined;
+    return success;
   };
 
   /**

@@ -26,45 +26,22 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
 
   /**
    * insert all extracted eventTriggers for a block in an atomic db transaction
-   * update the data if a box with the same id is already stored in db
    * @param eventTriggers
    * @param block
    * @param extractorId
-   * @return inserted items and updated box ids
-   * returns undefined in case of any problem
    */
   insertBoxes = async (
     eventTriggers: Array<ExtractedEventTrigger>,
     block: BlockInfo,
     extractorId: string
   ) => {
-    let success = true,
-      boxesToInsert: ExtractedEventTrigger[] = [],
-      boxesToUpdate: ExtractedEventTrigger[] = [];
-    const createEntity = (triggerBoxes: ExtractedEventTrigger[]) =>
-      triggerBoxes.map((trigger) => ({
-        txId: trigger.txId,
-        eventId: trigger.eventId,
-        boxId: trigger.boxId,
-        boxSerialized: trigger.boxSerialized,
-        block: block.hash,
-        height: block.height,
-        extractor: extractorId,
-        WIDsCount: trigger.WIDsCount,
-        WIDsHash: trigger.WIDsHash,
-        amount: trigger.amount,
-        bridgeFee: trigger.bridgeFee,
-        fromAddress: trigger.fromAddress,
-        toAddress: trigger.toAddress,
-        fromChain: trigger.fromChain,
-        networkFee: trigger.networkFee,
-        sourceChainTokenId: trigger.sourceChainTokenId,
-        targetChainTokenId: trigger.targetChainTokenId,
-        sourceBlockId: trigger.sourceBlockId,
-        toChain: trigger.toChain,
-        sourceTxId: trigger.sourceTxId,
-        sourceChainHeight: trigger.sourceChainHeight,
-      }));
+    if (eventTriggers.length === 0) return true;
+    const boxIds = eventTriggers.map((trigger) => trigger.boxId);
+    const savedTriggers = await this.repository.findBy({
+      boxId: In(boxIds),
+      extractor: extractorId,
+    });
+    let success = true;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -72,37 +49,46 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
       EventTriggerEntity
     );
     try {
-      const savedTriggerIds = (
-        await this.repository.findBy({
-          boxId: In(eventTriggers.map((trigger) => trigger.boxId)),
+      for (const trigger of eventTriggers) {
+        const saved = savedTriggers.some((entity) => {
+          return entity.boxId === trigger.boxId;
+        });
+        const entity = {
+          txId: trigger.txId,
+          eventId: trigger.eventId,
+          boxId: trigger.boxId,
+          boxSerialized: trigger.boxSerialized,
+          block: block.hash,
+          height: block.height,
           extractor: extractorId,
-        })
-      ).map((trigger) => trigger.boxId);
-
-      boxesToUpdate = eventTriggers.filter((box) =>
-        savedTriggerIds.includes(box.boxId)
-      );
-      boxesToInsert = difference(eventTriggers, boxesToUpdate);
-
-      if (boxesToInsert.length > 0) {
-        this.logger.debug(`Inserting boxes`);
-        await repository.insert(createEntity(boxesToInsert));
+          WIDsCount: trigger.WIDsCount,
+          WIDsHash: trigger.WIDsHash,
+          amount: trigger.amount,
+          bridgeFee: trigger.bridgeFee,
+          fromAddress: trigger.fromAddress,
+          toAddress: trigger.toAddress,
+          fromChain: trigger.fromChain,
+          networkFee: trigger.networkFee,
+          sourceChainTokenId: trigger.sourceChainTokenId,
+          targetChainTokenId: trigger.targetChainTokenId,
+          sourceBlockId: trigger.sourceBlockId,
+          toChain: trigger.toChain,
+          sourceTxId: trigger.sourceTxId,
+          sourceChainHeight: trigger.sourceChainHeight,
+        };
+        if (!saved) {
+          this.logger.info(
+            `Storing event trigger [${trigger.boxId}] for event [${trigger.eventId}] at height ${block.height} and extractor ${extractorId}`
+          );
+          await repository.insert(entity);
+        } else {
+          this.logger.info(
+            `Updating event trigger ${trigger.boxId} for event [${trigger.eventId}] at height ${block.height} and extractor ${extractorId}`
+          );
+          await repository.update({ boxId: trigger.boxId }, entity);
+        }
+        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
       }
-      if (boxesToUpdate.length > 0)
-        this.logger.info(
-          `Updating boxes with following Ids in the database: [${boxesToUpdate
-            .map((col) => col.boxId)
-            .join(', ')}]`
-        );
-      createEntity(boxesToUpdate).forEach(async (boxEntity) => {
-        this.logger.debug(
-          `Updating boxes in database [${JsonBI.stringify(boxEntity)}]`
-        );
-        await repository.update(
-          { boxId: boxEntity.boxId, extractor: extractorId },
-          boxEntity
-        );
-      });
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(
@@ -113,13 +99,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     } finally {
       await queryRunner.release();
     }
-    if (success) {
-      return {
-        insertedData: boxesToInsert,
-        updatedData: boxesToUpdate.map((data) => pick(data, 'boxId')),
-      };
-    }
-    return undefined;
+    return success;
   };
 
   /**

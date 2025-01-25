@@ -30,7 +30,7 @@ describe('BoxAction', () => {
         serialized: 'serialized',
         address: 'address',
       };
-      const result = await action.insertBoxes([box], block1, 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address');
@@ -38,7 +38,6 @@ describe('BoxAction', () => {
       expect(stored.serialized).toEqual('serialized');
       expect(stored.creationHeight).toEqual(100);
       expect(stored.createBlock).toEqual('block1');
-      expect(result).toEqual({ insertedData: [box], updatedData: [] });
     });
 
     /**
@@ -62,7 +61,7 @@ describe('BoxAction', () => {
         serialized: 'serialized-new',
         address: 'address-new',
       };
-      const result = await action.insertBoxes([box], block1, 'extractor');
+      await action.insertBoxes([box], block1, 'extractor');
       expect(await repository.count()).toEqual(1);
       const stored = (await repository.find())[0];
       expect(stored.address).toEqual('address-new');
@@ -70,10 +69,6 @@ describe('BoxAction', () => {
       expect(stored.serialized).toEqual('serialized-new');
       expect(stored.creationHeight).toEqual(100);
       expect(stored.createBlock).toEqual('block1');
-      expect(result).toEqual({
-        insertedData: [],
-        updatedData: [{ boxId: 'boxid' }],
-      });
     });
 
     /**
@@ -113,7 +108,9 @@ describe('BoxAction', () => {
      * spend box must update its corresponding box entity
      * Dependency: Stored box entity in database
      * Scenario: Call store block with stored box id
-     * Expected: spendHeight of box in database must be updated
+     * Expected:
+     *  - spendHeight of box in database must be updated
+     *  - to return the spent box ids
      */
     it('should set spendBlock on spend box', async () => {
       const box: ExtractedBox = {
@@ -137,7 +134,10 @@ describe('BoxAction', () => {
      * spend box must not update other extractor
      * Dependency: Stored box entity in database
      * Scenario: Call store block with stored box id with different extractor
-     * Expected: spendHeight of box must no changed
+     * Expected:
+     *  - spendHeight of box must no changed
+     *  - to return empty array (no spent boxes)
+     *
      */
     it("shouldn't change spend block of other extractor", async () => {
       const box: ExtractedBox = {
@@ -192,7 +192,9 @@ describe('BoxAction', () => {
      * Dependency: Nothing
      * Scenario: create a box for specific block
      *           then call deleteBlockBoxes
-     * Expected: must delete box from database
+     * Expected:
+     *  - must delete box from database
+     *  - to return deleted box information
      */
     it('should delete box from database when call delete box with boxId', async () => {
       const box: ExtractedBox = {
@@ -215,7 +217,9 @@ describe('BoxAction', () => {
      * Dependency: A spent box with different created block and spend block
      * Scenario: insert an unspent box for specific block
      *           then call deleteBlockBoxes
-     * Expected: must set spendBlock to null
+     * Expected:
+     *  - must set spendBlock to null
+     *  - to return spent box id
      */
     it('should set spendBlock to null', async () => {
       const box: ExtractedBox = {
@@ -275,7 +279,9 @@ describe('BoxAction', () => {
      * Dependency: A spent box with different created block and spend block
      * Scenario: create a box for specific block and spend it in same block
      *           then call deleteBlockBoxes for other extractor
-     * Expected: must delete box
+     * Expected:
+     *  - must delete box
+     *  - to return deleted box information
      */
     it('should delete boxes create and spend in one block', async () => {
       const box: ExtractedBox = {

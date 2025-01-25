@@ -36,10 +36,7 @@ describe('EventTrigger', () => {
         block,
         'extractor1'
       );
-      expect(res).toEqual({
-        insertedData: [sampleEventTrigger1, sampleEventTrigger2],
-        updatedData: [],
-      });
+      expect(res).toEqual(true);
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
       expect(rows[0]).toEqual(
@@ -90,10 +87,7 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      expect(res).toEqual({
-        insertedData: [sampleEventTrigger3, sampleEventTrigger4],
-        updatedData: [],
-      });
+      expect(res).toEqual(true);
       const [secondInsertRows] = await repository.findAndCount();
       expect(firstInsertRows[0]).toEqual(secondInsertRows[0]);
       expect(firstInsertRows[1]).toEqual(secondInsertRows[1]);
@@ -146,10 +140,7 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      expect(res).toEqual({
-        insertedData: [],
-        updatedData: [{ boxId: sampleEventTrigger1.boxId }],
-      });
+      expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(2);
@@ -195,10 +186,7 @@ describe('EventTrigger', () => {
         block,
         'second-extractor'
       );
-      expect(res).toEqual({
-        insertedData: [sampleEventTrigger1],
-        updatedData: [],
-      });
+      expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);
@@ -243,10 +231,7 @@ describe('EventTrigger', () => {
         block,
         'first-extractor'
       );
-      expect(res).toEqual({
-        insertedData: [sampleEventTrigger3],
-        updatedData: [],
-      });
+      expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
       expect(secondInsertRowsCount).toEqual(3);
@@ -261,15 +246,18 @@ describe('EventTrigger', () => {
     });
   });
 
-  /**
-   * testing spendBlock row update works correctly
-   * Dependency:
-   *  1- adding eventTrigger to the database
-   * Scenario: 1 eventTrigger spendBlock should update successfully
-   * Expected: one eventTrigger spendBlock should be equal to 'hash'
-   */
   describe('spendBoxes', () => {
-    it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
+    /**
+     * @target eventTriggerActions.spendBoxes should spend specified boxes and update spend block info
+     * @dependencies
+     * @scenario
+     * - insert two boxes with different id
+     * - run test (call `spendBoxes` with mocked data spending the first box)
+     * @expected
+     * - to spend the box with boxId equals to 'id'
+     * - to return the spent box id
+     */
+    it('should spend specified boxes and update spend block info', async () => {
       await repository.insert([
         sampleEventEntity,
         { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
@@ -311,6 +299,7 @@ describe('EventTrigger', () => {
      * @expected
      * - it should have two triggers at first
      * - it should remove one trigger within the removed block
+     * - to return the deleted box information
      */
     it('should remove the trigger existed on the removed block', async () => {
       let [, rowsCount] = await repository.findAndCount();
@@ -336,6 +325,7 @@ describe('EventTrigger', () => {
      * - it should set result and paymentTxId when spent on a block
      * - it should set the spent data to null when the block is removed
      * - it should set result and paymentTxId to null when the block is removed
+     * - to return the updated box id
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
       const spentTxId = 'txId';
