@@ -1,5 +1,6 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
+@Unique(['boxId', 'extractor'])
 export abstract class AbstractErgoExtractorEntity {
   @PrimaryGeneratedColumn()
   id: number;
