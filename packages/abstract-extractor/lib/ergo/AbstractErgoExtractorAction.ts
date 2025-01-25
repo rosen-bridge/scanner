@@ -14,13 +14,7 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
     data: ExtractedData[],
     block: BlockInfo,
     extractorId: string
-  ) => Promise<
-    | {
-        insertedData: ExtractedData[];
-        updatedData: ErgoExtractedData[];
-      }
-    | undefined
-  >;
+  ) => Promise<boolean>;
 
   /**
    * update spending information of stored boxes

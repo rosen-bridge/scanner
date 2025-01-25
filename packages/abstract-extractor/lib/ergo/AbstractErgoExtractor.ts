@@ -154,12 +154,7 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        const result = await this.actions.insertBoxes(
-          boxes,
-          block,
-          this.getId()
-        );
-        if (!result) {
+        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
@@ -167,8 +162,7 @@ export abstract class AbstractErgoExtractor<
           );
           return false;
         }
-        this.triggerCallbacks(CallbackType.Insert, result.insertedData);
-        this.triggerCallbacks(CallbackType.Update, result.updatedData);
+        this.triggerCallbacks(CallbackType.Insert, boxes);
       }
       const spentData = await this.actions.spendBoxes(
         spentInfos,
@@ -195,7 +189,9 @@ export abstract class AbstractErgoExtractor<
    */
   forkBlock = async (hash: string): Promise<void> => {
     const result = await this.actions.deleteBlockBoxes(hash, this.getId());
-    this.triggerCallbacks(CallbackType.Delete, result.deletedData);
-    this.triggerCallbacks(CallbackType.Update, result.updatedData);
+    if (result.deletedData.length > 0)
+      this.triggerCallbacks(CallbackType.Delete, result.deletedData);
+    if (result.updatedData.length > 0)
+      this.triggerCallbacks(CallbackType.Update, result.updatedData);
   };
 }

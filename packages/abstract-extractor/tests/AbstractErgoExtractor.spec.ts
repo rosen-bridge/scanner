@@ -24,6 +24,7 @@ describe('AbstractErgoExtractor', () => {
      * - to call `extractBoxData` for the specific box
      * - to insert the extracted box to database
      * - to return true when total procedure is successful
+     * - to trigger `INSERT` callbacks with correct data
      */
     it('should process boxes with data and insert data into database', async () => {
       const extractor = new MockedErgoExtractor();
@@ -35,9 +36,7 @@ describe('AbstractErgoExtractor', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest
-        .fn()
-        .mockResolvedValue({ insertedData: [extractedData], updatedData: [] });
+      const insertSpy = vitest.fn().mockResolvedValue(true);
       const spendSpy = vitest.fn().mockResolvedValue([]);
       extractor['actions'] = {
         insertBoxes: insertSpy,
@@ -65,6 +64,7 @@ describe('AbstractErgoExtractor', () => {
      * - not to call `extractBoxData` and `insertBoxes` when there is not any box with data
      * - to extractor spend info of input boxes and call `spendBoxes`
      * - to return true when total procedure is successful
+     * - to trigger `SPEND` callbacks with correct data
      */
     it('should extract spending information of all input boxes', async () => {
       const extractor = new MockedErgoExtractor();
@@ -72,9 +72,7 @@ describe('AbstractErgoExtractor', () => {
       extractor['triggerCallbacks'] = triggerCallbacks;
       const extractSpy = vitest.fn();
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest
-        .fn()
-        .mockResolvedValue({ insertedData: [], updatedData: [] });
+      const insertSpy = vitest.fn().mockResolvedValue(true);
       const spendSpy = vitest
         .fn()
         .mockResolvedValue([
@@ -113,7 +111,7 @@ describe('AbstractErgoExtractor', () => {
      * - spy `extractBoxData` and `insertBoxes`
      * - run test (call `processTransactions`)
      * @expected
-     * - to return false when `insertBoxes` returns undefined
+     * - to return false when `insertBoxes` returns false
      * - not to call `spendBoxes` if data insertion fails
      */
     it('should return false if data insertion fails', async () => {
@@ -124,7 +122,7 @@ describe('AbstractErgoExtractor', () => {
       };
       const extractSpy = vitest.fn().mockReturnValue(extractedData);
       extractor.extractBoxData = extractSpy;
-      const insertSpy = vitest.fn().mockResolvedValue(undefined);
+      const insertSpy = vitest.fn().mockResolvedValue(false);
       const spendSpy = vitest.fn();
       extractor['actions'] = {
         insertBoxes: insertSpy,
@@ -147,6 +145,8 @@ describe('AbstractErgoExtractor', () => {
      * - run test (call `forkBlock`)
      * @expected
      * - to call `deleteBlockBoxes` for the specific box
+     * - to trigger `DELETE` callbacks for the deleted box
+     * - to trigger `UPDATE` callbacks for the spent box
      */
     it('should remove all data extracted from the specified block', async () => {
       const extractor = new MockedErgoExtractor();
@@ -269,7 +269,8 @@ describe('AbstractErgoExtractor', () => {
      * - register the first callback
      * - run test (call `unregisterCallback` with the same id for second callback)
      * @expected
-     * - do nothing if callback with the id doesn't exists on the specified type
+     * - not to change registered callbacks when the callback with the id
+     * doesn't exists on the specified type
      * - return false
      */
     it('should not unregister callbacks with the same id on other types', async () => {
