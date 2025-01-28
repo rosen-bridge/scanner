@@ -1,11 +1,11 @@
 import { DataSource, Repository } from 'typeorm';
 import { describe, it, expect, beforeEach } from 'vitest';
+import { pick } from 'lodash-es';
 
 import { TestErgoExtractorAction } from './AbstractErgoExtractorAction.mock';
 import { createDatabase, TestEntity } from './testUtils';
 import { block, block2, sampleEntities } from './testData';
 import { SpendInfo } from '../lib';
-import { pick } from 'lodash-es';
 
 describe('AbstractErgoExtractorAction', () => {
   let dataSource: DataSource;

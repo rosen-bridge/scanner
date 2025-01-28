@@ -10,7 +10,6 @@ import {
 } from '../lib';
 import { block, extractedData, tx } from './testData';
 import { MockedErgoExtractor } from './AbstractErgoExtractor.mock';
-import { serialize } from 'v8';
 
 describe('AbstractErgoExtractor', () => {
   describe('processTransactions', () => {

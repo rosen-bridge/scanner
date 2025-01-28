@@ -2,14 +2,14 @@ import { DataSource } from 'typeorm';
 import { pick } from 'lodash-es';
 
 import {
-  AbstractErgoExtractorAction,
   AbstractErgoExtractorEntity,
   BlockInfo,
   AbstractBoxData,
-} from '../lib';
-import { TestEntity } from './testUtils';
+  AbstractInitializableErgoExtractorAction,
+} from '../../lib';
+import { TestEntity } from '../testUtils';
 
-export class TestErgoExtractorAction extends AbstractErgoExtractorAction<
+export class TestInitializableErgoExtractorAction extends AbstractInitializableErgoExtractorAction<
   AbstractBoxData,
   AbstractErgoExtractorEntity
 > {

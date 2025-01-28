@@ -1,4 +1,4 @@
-import { DataSource, EntityTarget, ObjectLiteral } from 'typeorm';
+import { DataSource, EntityTarget } from 'typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';
