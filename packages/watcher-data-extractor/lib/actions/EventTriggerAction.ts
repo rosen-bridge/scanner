@@ -4,13 +4,14 @@ import {
   AbstractInitializableErgoExtractorAction,
   BlockInfo,
   DB_CHUNK_SIZE,
+  ErgoExtractedData,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
-import { chunk, difference, pick } from 'lodash-es';
+import { chunk, pick } from 'lodash-es';
 
 class EventTriggerAction extends AbstractInitializableErgoExtractorAction<ExtractedEventTrigger> {
   readonly logger: AbstractLogger;
@@ -115,7 +116,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
     extractorId: string
-  ) => {
+  ): Promise<ErgoExtractedData[]> => {
     const spentData = [];
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
