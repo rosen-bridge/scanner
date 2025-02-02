@@ -1,16 +1,17 @@
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
   BlockInfo,
   DB_CHUNK_SIZE,
+  ErgoExtractedData,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
-import { chunk } from 'lodash-es';
+import { chunk, pick } from 'lodash-es';
 
 class EventTriggerAction extends AbstractInitializableErgoExtractorAction<ExtractedEventTrigger> {
   readonly logger: AbstractLogger;
@@ -109,12 +110,14 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
    * @param spendInfArray
    * @param block
    * @param extractorId
+   * @returns spent box ids
    */
   spendBoxes = async (
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
     extractorId: string
-  ): Promise<void> => {
+  ): Promise<ErgoExtractedData[]> => {
+    const spentData = [];
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const spentTriggers = await this.repository.findBy({
@@ -140,6 +143,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
             paymentTxId: spendInfo.extras[1],
           }
         );
+        spentData.push(pick(spendInfo, 'boxId'));
         this.logger.info(
           `Spent trigger [${spentTrigger.boxId}] of event [${spentTrigger.eventId}] at height ${block.height}`
         );
@@ -150,6 +154,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         );
       }
     }
+    return spentData;
   };
 
   /**
@@ -166,11 +171,22 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
    * if a box is created in this block remove it from database
    * @param block
    * @param extractor
+   * @return deleted items and updated box ids
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(
       `Deleting event triggers at block ${block} and extractor ${extractor}`
     );
+    const deletedData = await this.repository.find({
+      where: { extractor: extractor, block: block },
+    });
+    const updatedData = await this.repository.find({
+      where: {
+        extractor: extractor,
+        spendBlock: block,
+        block: Not(block),
+      },
+    });
     await this.repository.delete({
       block: block,
       extractor: extractor,
@@ -185,6 +201,10 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<Extrac
         paymentTxId: null,
       }
     );
+    return {
+      deletedData,
+      updatedData: updatedData.map((data) => pick(data, 'boxId')),
+    };
   };
 }
 

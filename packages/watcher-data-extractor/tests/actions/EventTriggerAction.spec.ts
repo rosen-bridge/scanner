@@ -246,20 +246,23 @@ describe('EventTrigger', () => {
     });
   });
 
-  /**
-   * testing spendBlock row update works correctly
-   * Dependency:
-   *  1- adding eventTrigger to the database
-   * Scenario: 1 eventTrigger spendBlock should update successfully
-   * Expected: one eventTrigger spendBlock should be equal to 'hash'
-   */
   describe('spendBoxes', () => {
-    it('sets one spendBlock for one eventTrigger & one row should have spendBlock', async () => {
+    /**
+     * @target eventTriggerActions.spendBoxes should spend specified boxes and update spend block info
+     * @dependencies
+     * @scenario
+     * - insert two boxes with different id
+     * - run test (call `spendBoxes` with mocked data spending the first box)
+     * @expected
+     * - to spend the box with boxId equals to 'id'
+     * - to return the spent box id
+     */
+    it('should spend specified boxes and update spend block info', async () => {
       await repository.insert([
         sampleEventEntity,
         { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
       ]);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [
           {
             boxId: 'id',
@@ -277,6 +280,7 @@ describe('EventTrigger', () => {
       expect(
         (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length
       ).toEqual(0);
+      expect(result).toEqual([{ boxId: 'id' }]);
     });
   });
 
@@ -295,13 +299,18 @@ describe('EventTrigger', () => {
      * @expected
      * - it should have two triggers at first
      * - it should remove one trigger within the removed block
+     * - to return the deleted box information
      */
     it('should remove the trigger existed on the removed block', async () => {
       let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
-      await action.deleteBlockBoxes('hash', 'extractor1');
+      const result = await action.deleteBlockBoxes('hash', 'extractor1');
       [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
+      expect(result).toMatchObject({
+        deletedData: [sampleEventTrigger1],
+        updatedData: [],
+      });
     });
 
     /**
@@ -316,6 +325,7 @@ describe('EventTrigger', () => {
      * - it should set result and paymentTxId when spent on a block
      * - it should set the spent data to null when the block is removed
      * - it should set result and paymentTxId to null when the block is removed
+     * - to return the updated box id
      */
     it('should set the spendBlock to null when spent block is forked', async () => {
       const spentTxId = 'txId';
@@ -341,7 +351,7 @@ describe('EventTrigger', () => {
       expect(storedEntity!.result).toEqual(result);
       expect(storedEntity!.paymentTxId).toEqual(paymentTxId);
 
-      await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      const res = await action.deleteBlockBoxes(block2.hash, 'extractor1');
       storedEntity = await repository.findOne({
         where: { boxId: sampleEventTrigger1.boxId, extractor: 'extractor1' },
       });
@@ -349,6 +359,7 @@ describe('EventTrigger', () => {
       expect(storedEntity!.spendTxId).toBeNull();
       expect(storedEntity!.result).toBeNull();
       expect(storedEntity!.paymentTxId).toBeNull();
+      expect(res).toEqual({ deletedData: [], updatedData: [{ boxId: '1' }] });
     });
   });
 });

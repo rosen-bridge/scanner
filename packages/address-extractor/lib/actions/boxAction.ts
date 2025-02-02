@@ -1,11 +1,12 @@
-import { DataSource, In, Repository } from 'typeorm';
-import { chunk } from 'lodash-es';
+import { DataSource, In, Repository, Not } from 'typeorm';
+import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
   SpendInfo,
   DB_CHUNK_SIZE,
   BlockInfo,
+  ErgoExtractedData,
 } from '@rosen-bridge/abstract-extractor';
 
 import { BoxEntity } from '../entities/boxEntity';
@@ -92,12 +93,14 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
    * @param spendInfos
    * @param block
    * @param extractor
+   * @returns spent box ids
    */
   spendBoxes = async (
     spendInfos: Array<SpendInfo>,
     block: BlockInfo,
     extractor: string
-  ): Promise<void> => {
+  ): Promise<ErgoExtractedData[]> => {
+    const spentData = [];
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const boxIds = spendInfoChunk.map((info) => info.boxId);
@@ -111,6 +114,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
           boxId: In(boxIds),
           spendBlock: block.hash,
         });
+        spentData.push(...spentRows);
         for (const row of spentRows) {
           this.logger.debug(
             `Spent box with boxId [${row.boxId}] at height ${block.height}`
@@ -118,6 +122,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
         }
       }
     }
+    return spentData.map((data) => pick(data, 'boxId'));
   };
 
   /**
@@ -134,11 +139,22 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
    * if a box is created in this block remove it from database
    * @param block
    * @param extractorId
+   * @return deleted items and updated box ids
    */
   deleteBlockBoxes = async (block: string, extractor: string) => {
     this.logger.info(
       `Deleting boxes in block ${block} and extractor ${extractor}`
     );
+    const deletedData = await this.repository.find({
+      where: { extractor: extractor, createBlock: block },
+    });
+    const updatedData = await this.repository.find({
+      where: {
+        extractor: extractor,
+        spendBlock: block,
+        createBlock: Not(block),
+      },
+    });
     await this.repository.delete({
       extractor: extractor,
       createBlock: block,
@@ -147,5 +163,17 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<Ex
       { spendBlock: block, extractor: extractor },
       { spendBlock: null, spendHeight: 0 }
     );
+    return {
+      deletedData: deletedData.map((data) =>
+        pick(data, [
+          'boxId',
+          'address',
+          'serialized',
+          'spendBlock',
+          'spendHeight',
+        ])
+      ),
+      updatedData: updatedData.map((data) => pick(data, 'boxId')),
+    };
   };
 }

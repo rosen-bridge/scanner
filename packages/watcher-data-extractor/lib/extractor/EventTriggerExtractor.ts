@@ -6,6 +6,7 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
   BlockInfo,
+  CallbackType,
   ErgoNetworkType,
   OutputBox,
   SpendInfo,
@@ -201,9 +202,21 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
             extras: [result, paymentTxId],
           });
       });
-      if (boxes.length > 0)
-        await this.actions.insertBoxes(boxes, block, this.getId());
-      await this.actions.spendBoxes(spendInfoArray, block, this.id);
+      if (boxes.length > 0) {
+        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+          this.logger.warn(
+            `Data insertion failed at height ${block.height} for extractor ${this.id}`
+          );
+          return false;
+        }
+        this.triggerCallbacks(CallbackType.Insert, boxes);
+      }
+      const spentData = await this.actions.spendBoxes(
+        spendInfoArray,
+        block,
+        this.id
+      );
+      this.triggerCallbacks(CallbackType.Spend, spentData);
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${block}: ${e}`

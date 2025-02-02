@@ -108,7 +108,9 @@ describe('BoxAction', () => {
      * spend box must update its corresponding box entity
      * Dependency: Stored box entity in database
      * Scenario: Call store block with stored box id
-     * Expected: spendHeight of box in database must be updated
+     * Expected:
+     *  - spendHeight of box in database must be updated
+     *  - to return the spent box ids
      */
     it('should set spendBlock on spend box', async () => {
       const box: ExtractedBox = {
@@ -118,20 +120,24 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'block1' } as Block,
         'extractor1'
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('block1');
+      expect(result).toEqual([{ boxId: 'boxid' }]);
     });
 
     /**
      * spend box must not update other extractor
      * Dependency: Stored box entity in database
      * Scenario: Call store block with stored box id with different extractor
-     * Expected: spendHeight of box must no changed
+     * Expected:
+     *  - spendHeight of box must no changed
+     *  - to return empty array (no spent boxes)
+     *
      */
     it("shouldn't change spend block of other extractor", async () => {
       const box: ExtractedBox = {
@@ -141,13 +147,14 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.spendBoxes(
+      const result = await action.spendBoxes(
         [{ boxId: 'boxid', txId: 'txId', index: 0 }],
         { height: 100, hash: 'hash' } as Block,
         'extractor2'
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toBeNull();
+      expect(result).toEqual([]);
     });
 
     /**
@@ -185,7 +192,9 @@ describe('BoxAction', () => {
      * Dependency: Nothing
      * Scenario: create a box for specific block
      *           then call deleteBlockBoxes
-     * Expected: must delete box from database
+     * Expected:
+     *  - must delete box from database
+     *  - to return deleted box information
      */
     it('should delete box from database when call delete box with boxId', async () => {
       const box: ExtractedBox = {
@@ -195,8 +204,12 @@ describe('BoxAction', () => {
       };
       await action.insertBoxes([box], block1, 'extractor1');
       expect(await repository.count()).toEqual(1);
-      await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block1.hash, 'extractor1');
       expect(await repository.count()).toEqual(0);
+      expect(result).toEqual({
+        deletedData: [{ ...box, spendBlock: null, spendHeight: null }],
+        updatedData: [],
+      });
     });
 
     /**
@@ -204,7 +217,9 @@ describe('BoxAction', () => {
      * Dependency: A spent box with different created block and spend block
      * Scenario: insert an unspent box for specific block
      *           then call deleteBlockBoxes
-     * Expected: must set spendBlock to null
+     * Expected:
+     *  - must set spendBlock to null
+     *  - to return spent box id
      */
     it('should set spendBlock to null', async () => {
       const box: ExtractedBox = {
@@ -221,10 +236,14 @@ describe('BoxAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block2.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block2.hash, 'extractor1');
       expect(await repository.count()).toEqual(1);
       const boxEntity2 = (await repository.find())[0];
       expect(boxEntity2.spendBlock).toBeNull();
+      expect(result).toEqual({
+        deletedData: [],
+        updatedData: [{ boxId: 'boxid' }],
+      });
     });
 
     /**
@@ -234,7 +253,7 @@ describe('BoxAction', () => {
      *           then call deleteBlockBoxes for other extractor
      * Expected: must not set spendBlock to null
      */
-    it('should set spendBlock to null', async () => {
+    it('should not change other extractor boxes', async () => {
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -260,9 +279,11 @@ describe('BoxAction', () => {
      * Dependency: A spent box with different created block and spend block
      * Scenario: create a box for specific block and spend it in same block
      *           then call deleteBlockBoxes for other extractor
-     * Expected: must delete box
+     * Expected:
+     *  - must delete box
+     *  - to return deleted box information
      */
-    it('should set spendBlock to null', async () => {
+    it('should delete boxes create and spend in one block', async () => {
       const box: ExtractedBox = {
         boxId: 'boxid',
         serialized: 'serialized',
@@ -277,8 +298,14 @@ describe('BoxAction', () => {
       expect(await repository.count()).toEqual(1);
       const boxEntity1 = (await repository.find())[0];
       expect(boxEntity1.spendBlock).not.toBeNull();
-      await action.deleteBlockBoxes(block1.hash, 'extractor1');
+      const result = await action.deleteBlockBoxes(block1.hash, 'extractor1');
       expect(await repository.count()).toEqual(0);
+      expect(result).toEqual({
+        deletedData: [
+          { ...box, spendBlock: block1.hash, spendHeight: block1.height },
+        ],
+        updatedData: [],
+      });
     });
   });
 

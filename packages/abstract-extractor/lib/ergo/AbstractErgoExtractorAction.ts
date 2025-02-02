@@ -1,5 +1,5 @@
 import { BlockInfo } from '../interfaces';
-import { SpendInfo } from './interfaces';
+import { ErgoExtractedData, SpendInfo } from './interfaces';
 
 export abstract class AbstractErgoExtractorAction<ExtractedData> {
   /**
@@ -7,7 +7,8 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    * @param data
    * @param block
    * @param extractorId
-   * @return process success
+   * @returns inserted data and updated data
+   * returns undefined if the process is unsuccessful
    */
   abstract insertBoxes: (
     data: ExtractedData[],
@@ -20,12 +21,13 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    * @param spendInfos
    * @param block
    * @param extractorId
+   * @returns spent boxes boxIds
    */
   abstract spendBoxes: (
     spendInfos: SpendInfo[],
     block: BlockInfo,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<ErgoExtractedData[]>;
 
   /**
    * delete extracted data from a specific block
@@ -33,9 +35,13 @@ export abstract class AbstractErgoExtractorAction<ExtractedData> {
    * if a box is created in this block remove it from database
    * @param block
    * @param extractorId
+   * @returns deleted data and updated data
    */
   abstract deleteBlockBoxes: (
     block: string,
     extractorId: string
-  ) => Promise<void>;
+  ) => Promise<{
+    deletedData: ExtractedData[];
+    updatedData: ErgoExtractedData[];
+  }>;
 }
