@@ -72,7 +72,7 @@ export abstract class AbstractErgoExtractorAction<
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const repository = await queryRunner.manager.getRepository(this.repo);
+      const repository = queryRunner.manager.getRepository(this.repo);
       const dbBoxIds = (
         await repository.findBy({
           boxId: In(boxes.map((item) => item.boxId)),
@@ -97,20 +97,18 @@ export abstract class AbstractErgoExtractorAction<
             .map((col) => col.boxId)
             .join(', ')}]`
         );
-      this.createEntity(boxesToUpdate, block, extractor).forEach(
-        async (box) => {
-          this.logger.debug(
-            `Updating boxes in database [${JsonBigInt.stringify(box)}]`
-          );
-          await repository.update(
-            {
-              boxId: box.boxId,
-              extractor: extractor,
-            } as FindOptionsWhere<ExtractorEntity>,
-            box as any
-          );
-        }
-      );
+      for (const box of this.createEntity(boxesToUpdate, block, extractor)) {
+        this.logger.debug(
+          `Updating boxes in database [${JsonBigInt.stringify(box)}]`
+        );
+        await repository.update(
+          {
+            boxId: box.boxId,
+            extractor: extractor,
+          } as FindOptionsWhere<ExtractorEntity>,
+          box as any
+        );
+      }
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
@@ -171,7 +169,7 @@ export abstract class AbstractErgoExtractorAction<
    * if a box is spend in this block mark it as unspent
    * if a box is created in this block remove it from database
    * @param block
-   * @param extractorId
+   * @param extractor
    * @return deleted items and updated box ids
    */
   deleteBlockBoxes = async (
