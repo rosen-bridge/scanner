@@ -1,5 +1,18 @@
 # @rosen-bridge/abstract-extractor
 
+## 1.0.0
+
+### Major Changes
+
+- Move database action shared logic to abstract class
+- Add callback support to abstract ergo extractor and update abstract db action interface
+
+### Patch Changes
+
+- Ensure initialization with the node is stateful and resilient to network issues
+- Fix `processTransaction` to return false if data insertion encounters error
+- Modify the initialization procedure to retry upon failure
+
 ## 0.3.1
 
 ### Patch Changes
