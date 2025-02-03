@@ -34,7 +34,7 @@ export const sampleEventEntity: EventTriggerEntity = {
   eventId: 'eventId',
   extractor: 'extractorId',
   boxId: 'id',
-  boxSerialized: 'boxSerialized',
+  serialized: 'boxSerialized',
   block: 'hash',
   height: 10,
   toAddress: 'cardanoAddr2',

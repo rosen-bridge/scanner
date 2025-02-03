@@ -16,8 +16,12 @@ import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
 import { EventResult } from '../types';
+import EventTriggerEntity from '../entities/EventTriggerEntity';
 
-class EventTriggerExtractor extends AbstractInitializableErgoExtractor<ExtractedEventTrigger> {
+class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
+  ExtractedEventTrigger,
+  EventTriggerEntity
+> {
   id: string;
   protected readonly actions: EventTriggerAction;
   private readonly eventTriggerErgoTree: string;
@@ -34,9 +38,10 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
     RWT: string,
     permitAddress: string,
     fraudAddress: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    initialize = true
   ) {
-    super(type, url, address, logger);
+    super(type, url, address, logger, initialize);
     this.id = id;
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
@@ -124,7 +129,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
         eventId: eventId,
         txId: box.transactionId,
         boxId: box.boxId,
-        boxSerialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
+        serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
           'base64'
         ),
         toChain: Buffer.from(R5Serialized[2]).toString(),
@@ -203,7 +208,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<Extracted
           });
       });
       if (boxes.length > 0) {
-        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed at height ${block.height} for extractor ${this.id}`
           );

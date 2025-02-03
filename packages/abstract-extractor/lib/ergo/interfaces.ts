@@ -65,8 +65,9 @@ export interface SpendInfo {
   extras?: string[];
 }
 
-export interface ErgoExtractedData {
+export interface AbstractBoxData {
   boxId: string;
+  serialized: string;
 }
 
 export enum CallbackType {
@@ -76,16 +77,17 @@ export enum CallbackType {
   Delete = 'delete',
 }
 
-export type CallbackDataMap<ExtractedData extends ErgoExtractedData> = {
-  [CallbackType.Update]: ErgoExtractedData[];
+export interface BoxInfo {
+  boxId: string;
+}
+
+export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
+  [CallbackType.Update]: BoxInfo[];
   [CallbackType.Insert]: ExtractedData[];
-  [CallbackType.Delete]: (ExtractedData & {
-    spendBlock?: string;
-    spendHeight?: number;
-  })[];
-  [CallbackType.Spend]: ErgoExtractedData[];
+  [CallbackType.Delete]: ExtractedData[];
+  [CallbackType.Spend]: BoxInfo[];
 };
 
-export type CallbackMap<ExtractedData extends ErgoExtractedData> = {
+export type CallbackMap<ExtractedData extends AbstractBoxData> = {
   [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
 };

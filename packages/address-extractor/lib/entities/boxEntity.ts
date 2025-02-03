@@ -1,31 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AbstractErgoExtractorEntity } from '@rosen-bridge/abstract-extractor';
+import { Column, Entity } from 'typeorm';
 
 @Entity('box_entity')
-export class BoxEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class BoxEntity extends AbstractErgoExtractorEntity {
   @Column()
   address: string;
-
-  @Column()
-  boxId: string;
-
-  @Column()
-  createBlock: string;
-
-  @Column()
-  creationHeight: number;
-
-  @Column()
-  serialized: string;
-
-  @Column({ nullable: true, type: 'text' })
-  spendBlock?: string | null;
-
-  @Column({ nullable: true })
-  spendHeight?: number;
-
-  @Column()
-  extractor: string;
 }

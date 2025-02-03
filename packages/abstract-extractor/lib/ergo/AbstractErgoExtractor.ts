@@ -1,4 +1,3 @@
-import { DataSource } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Mutex } from 'await-semaphore';
@@ -10,18 +9,22 @@ import { BlockInfo } from '../interfaces';
 import {
   Transaction,
   OutputBox,
-  ErgoExtractedData,
+  AbstractBoxData,
   SpendInfo,
   CallbackType,
   CallbackMap,
   CallbackDataMap,
 } from './interfaces';
+import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractor<
-  ExtractedData extends ErgoExtractedData
+  ExtractedData extends AbstractBoxData,
+  ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractExtractor<Transaction> {
-  protected readonly dataSource: DataSource;
-  protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
+  protected abstract actions: AbstractErgoExtractorAction<
+    ExtractedData,
+    ExtractorEntity
+  >;
   protected logger: AbstractLogger;
   protected callbacks: {
     [K in CallbackType]: Map<string, CallbackMap<ExtractedData>[K]>;
@@ -144,7 +147,7 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
