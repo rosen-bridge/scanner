@@ -1,5 +1,22 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 10.0.0
+
+### Major Changes
+
+- Update database entity and action to extend the abstract class
+
+### Minor Changes
+
+- Update db action interface to support callbacks
+
+### Patch Changes
+
+- Optimize `hasData` function not to deserialize all unrelated boxes
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.0
+  - @rosen-bridge/scanner@5.0.1
+
 ## 9.0.0
 
 ### Major Changes

@@ -35,7 +35,7 @@
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/bitcoin-esplora-scanner": "^1.0.0",
-    "@rosen-bridge/bitcoin-rpc-scanner": "^1.0.0",
+    "@rosen-bridge/bitcoin-rpc-scanner": "^1.0.1",
     "@rosen-bridge/observation-extractor": "^5.0.9",
     "@rosen-bridge/rosen-extractor": "^7.0.1",
     "@rosen-bridge/tokens": "^2.0.0",
