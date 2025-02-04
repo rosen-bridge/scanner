@@ -1,10 +1,13 @@
 # @rosen-bridge/address-extractor
 
-## 5.1.0
+## 6.0.0
+
+### Major Changes
+
+- Update database entity and action to extend the abstract class
 
 ### Minor Changes
 
-- Update database entity and action to extend the abstract class
 - Update db action interface to support callbacks
 
 ### Patch Changes
