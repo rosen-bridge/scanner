@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 1.1.0
+
+### Minor Changes
+
+- Add Doge
+
 ## 1.0.0
 
 ### Major Changes

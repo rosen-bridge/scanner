@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
+## 1.1.0
+
+### Minor Changes
+
+- Add doge RPC to the scanner
+
 ## 1.0.1
 
 ### Patch Changes

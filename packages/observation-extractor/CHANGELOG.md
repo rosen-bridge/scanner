@@ -1,5 +1,15 @@
 # @rosen-bridge/observation-extractor
 
+## 6.0.0
+
+### Major Changes
+
+- Change RosenTokens to TokenMap
+
+### Minor Changes
+
+- Doge observation extractor
+
 ## 5.0.10
 
 ### Patch Changes
