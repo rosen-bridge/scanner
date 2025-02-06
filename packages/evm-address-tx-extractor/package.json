@@ -33,8 +33,8 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-logger": "^1.0.0",
     "@rosen-bridge/abstract-extractor": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner": "^5.0.1",
     "ethers": "^6.11.0",
     "typeorm": "^0.3.20"
