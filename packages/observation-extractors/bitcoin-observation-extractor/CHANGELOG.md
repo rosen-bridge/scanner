@@ -1,24 +1,5 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
-## 5.0.0
-
-### Major Changes
-
-- Change RosenTokens to TokenMap
-
-### Minor Changes
-
-- Add Doge extractor
-- Add Doge
-- Add Doge rpc observation extractor
-
-### Patch Changes
-
-- Updated dependencies
-  - @rosen-bridge/bitcoin-esplora-scanner@1.1.0
-  - @rosen-bridge/observation-extractor@6.0.0
-  - @rosen-bridge/bitcoin-rpc-scanner@1.1.0
-
 ## 4.0.10
 
 ### Patch Changes
