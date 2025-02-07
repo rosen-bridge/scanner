@@ -19,10 +19,10 @@
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/scanner": "^5.0.1",
     "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^2.0.1",
+    "@rosen-bridge/scanner": "^5.0.1",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.20"
   },
@@ -31,7 +31,7 @@
     "@babel/preset-env": "^7.19.0",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
-    "@types/node": "^18.0.6",
+    "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.26.0",
     "eslint": "^8.16.0",
@@ -41,5 +41,8 @@
     "prettier": "2.7.1",
     "ts-jest": "^28.0.7",
     "typescript": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=20.11.0"
   }
 }
