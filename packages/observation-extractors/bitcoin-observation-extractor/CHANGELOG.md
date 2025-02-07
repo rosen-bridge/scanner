@@ -10,13 +10,10 @@
 
 - Add Doge extractor
 - Add Doge
-- Add doge rpc observation extractor
+- Add Doge rpc observation extractor
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
   - @rosen-bridge/bitcoin-esplora-scanner@1.1.0
   - @rosen-bridge/observation-extractor@6.0.0

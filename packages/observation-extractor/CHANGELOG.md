@@ -8,7 +8,7 @@
 
 ### Minor Changes
 
-- Doge observation extractor
+- Add Doge observation extractor
 
 ## 5.0.10
 

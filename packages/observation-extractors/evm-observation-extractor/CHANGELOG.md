@@ -9,7 +9,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
   - @rosen-bridge/observation-extractor@6.0.0
 
 ## 3.1.2
