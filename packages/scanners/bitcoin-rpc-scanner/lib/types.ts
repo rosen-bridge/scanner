@@ -78,19 +78,12 @@ export interface BitcoinRpcTransaction {
   hex: string;
 }
 
-export interface DogeBlockHeader {
+export interface DogeBlockSummary {
   hash: string;
   height: number;
   time: number;
   previousblockhash: string;
-}
-
-export interface DogeBlockInfo {
-  hash: string;
-  height: number;
-  time: number;
-  previousblockhash: string;
-  tx: Array<DogeRpcTransaction>;
+  tx: Array<string>;
 }
 
 export interface DogeRpcTxInput {

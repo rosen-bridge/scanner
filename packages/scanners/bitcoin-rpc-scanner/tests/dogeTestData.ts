@@ -6,15 +6,29 @@ export const getBlockHashResponse = {
   error: null,
   id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
-export const getBlockHeaderResponse = {
+export const getBlockSummaryResponse = {
   result: {
     hash: 'e8c2b0a40f67b0de222d77f3d7e272dae520094be454d91caf800fc4839926b3',
-    confirmations: 45163,
+    confirmations: 48874,
+    strippedsize: 3315,
+    size: 3315,
+    weight: 13260,
     height: 5528932,
     version: 6422788,
     versionHex: '00620104',
     merkleroot:
       '22e3f6191d1ccf7cd22556a2999a50fa15f5cabcfc55f80bf32a5bd142791a9f',
+    tx: [
+      '124574656fa0d7e7bfa5e7e36322eda846c3489ae393f412c2c4be0b126cc77f',
+      '19ca04fbf7b27fb3b29de25e667df819632cf704933e6d310031d979e67d22e6',
+      '87eb043a4e55643dbbf4bc692736b45e4cd6d3463381334a96df16ecd38e210b',
+      '07995fb1c84a21d8e965435da2a783f8d7e56652b925f0162687fc6e70e8f70d',
+      'fa59c17641306c2fac09cc9ace80f78178a8c9f864f4700c46ad8e2a822989be',
+      'b68286c9825b9cee62256f6b23f868d78f74c641e91d7543edb3a48a2999987e',
+      '9a6d06c932883b042a234dc8f28ef91bbb76718c5ecee42267d116ec8c1b5f5a',
+      'f6cd071cecd5994cb35f17cce27d47f13401d2f03107bda8b3ad025e240a9762',
+      'f2a0679917f45178ca91b6fa1584006c245c2fb9bd47bdd66cd78c6035a513a0',
+    ],
     time: 1735857631,
     mediantime: 1735857527,
     nonce: 0,
@@ -22,6 +36,68 @@ export const getBlockHeaderResponse = {
     difficulty: 18700482.19338379,
     chainwork:
       '000000000000000000000000000000000000000000001614e32f32d20852c8de',
+    auxpow: {
+      tx: {
+        hex: '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff6403b6092b2cfabe6d6d8f959125a0950d8f51bd5d4a41d47288f6dd331814569cc280df5345dab6559a20000000f09f909f092f4632506f6f6c2f61000000000000000000000000000000000000000000000000000000000000000000000005005e0000000000000002f4764625000000001976a914f2910ecaf7bb8d18ed71f0904e0e7456f29ce18288ac0000000000000000266a24aa21a9edf3e67b2f6842953f8fe1ba9f17fb892db3159455019d4847f7b05843dd16f613a102d743',
+        txid: 'cda30a8601eefc853ef4a4f22014dec5192a37bf659d91585c13cdfcccf635dc',
+        hash: 'cda30a8601eefc853ef4a4f22014dec5192a37bf659d91585c13cdfcccf635dc',
+        size: 232,
+        vsize: 232,
+        version: 1,
+        locktime: 1138164385,
+        vin: [
+          {
+            coinbase:
+              '03b6092b2cfabe6d6d8f959125a0950d8f51bd5d4a41d47288f6dd331814569cc280df5345dab6559a20000000f09f909f092f4632506f6f6c2f61000000000000000000000000000000000000000000000000000000000000000000000005005e000000',
+            sequence: 0,
+          },
+        ],
+        vout: [
+          {
+            value: 6.25374964,
+            n: 0,
+            scriptPubKey: {
+              asm: 'OP_DUP OP_HASH160 f2910ecaf7bb8d18ed71f0904e0e7456f29ce182 OP_EQUALVERIFY OP_CHECKSIG',
+              hex: '76a914f2910ecaf7bb8d18ed71f0904e0e7456f29ce18288ac',
+              reqSigs: 1,
+              type: 'pubkeyhash',
+              addresses: ['DTFfqUPJctvKQuGCXkpL2sW99EXftxgPsF'],
+            },
+          },
+          {
+            value: 0,
+            n: 1,
+            scriptPubKey: {
+              asm: 'OP_RETURN aa21a9edf3e67b2f6842953f8fe1ba9f17fb892db3159455019d4847f7b05843dd16f613',
+              hex: '6a24aa21a9edf3e67b2f6842953f8fe1ba9f17fb892db3159455019d4847f7b05843dd16f613',
+              type: 'nulldata',
+            },
+          },
+        ],
+        blockhash:
+          '93f363c09e438af0855e7d399dc1434647cf98f1feb56b05131d31caeafc7b43',
+      },
+      index: 0,
+      chainindex: 8,
+      merklebranch: [
+        'f015eaa267a6e751cea3392ee523117344481e7e8f576269533587b60a7d1333',
+        '22421c7b8bcdb0a7bd8432cdfa39b08fa398aa1fe533d5cc881c23c0fedb4f3e',
+        '94f86bfb6a5ec98b906b09cc06eb2a9cadec9cef22bea3bb4e3c2963178d4ae5',
+        'cc8e639d00eb1527b2e3e38e58005bfd89b9ac1b5940d9bfa68db9bd7bb62ab1',
+        'b6253efdb1b9a7af1edb9c0d5d8cb8c05e4844913753dd42c1b94624a147c2dc',
+        '39063698a757d1a34a8fb8b2203bebe38c79db2258df52d8d4db3d633d7252bf',
+        '95db1c3bccec7f96103e6c225eb691c14bb4c9c4a023ac1a0a321c86d2e83733',
+      ],
+      chainmerklebranch: [
+        '0000000000000000000000000000000000000000000000000000000000000009',
+        'c8a756a6441def5a7734cba02852a3c8d97545452183dd00a207f42d3f1b0b71',
+        '531690260d4fcfd5bcc147e79a9abcea1a42f6032f95700c000ba4e7262a3b11',
+        '1fccc93fca131d59b7e5a82cbc7837120c59c1902a69087f8e1b2be3b4d0591a',
+        'd17949634a7a60dc5c4efbf96b37eafbb165bff6216b66d817441dd2de9c38a0',
+      ],
+      parentblock:
+        '140000208f8e26c74a82f88238233a7c7e18b33b604062d85c906c22787f6501f1fa61a331093105d96001c5dc0c0b634fc4580b2eaaa5045290332ba23ce7bf0cccda0edb15776724474219b566476a',
+    },
     previousblockhash:
       '4e4ac76b241d37f1826d0e95c50d10ec1e557573985d637989ed8b6b74ff9b1b',
     nextblockhash:
@@ -30,12 +106,14 @@ export const getBlockHeaderResponse = {
   error: null,
   id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
+
 export const block = {
   parentHash:
     '4e4ac76b241d37f1826d0e95c50d10ec1e557573985d637989ed8b6b74ff9b1b',
   hash: 'e8c2b0a40f67b0de222d77f3d7e272dae520094be454d91caf800fc4839926b3',
   blockHeight: 5528932,
   timestamp: 1735857631,
+  txCount: 9,
 };
 
 export const currentBlockHeight = 5574105;

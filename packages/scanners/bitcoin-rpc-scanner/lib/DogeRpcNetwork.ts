@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
-import { DogeRpcTransaction, DogeBlockHeader, JsonRpcResult } from './types';
+import { DogeRpcTransaction, JsonRpcResult, DogeBlockSummary } from './types';
 
 import { randomBytes } from 'crypto';
 
@@ -49,20 +49,21 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
 
     const randomId2 = this.generateRandomId();
     // get block headers using block hash
-    const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblockheader',
+    const blockSummaryResponse = await this.client.post<JsonRpcResult>('', {
+      method: 'getblock',
       id: randomId2,
-      params: [blockHash, true],
+      params: [blockHash, 1],
     });
-    if (blockHeaderResponse.data.id !== randomId2)
+    if (blockSummaryResponse.data.id !== randomId2)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockHeader: DogeBlockHeader = blockHeaderResponse.data.result;
+    const blockSummary: DogeBlockSummary = blockSummaryResponse.data.result;
 
     return {
-      parentHash: blockHeader.previousblockhash,
-      hash: blockHeader.hash,
-      blockHeight: blockHeader.height,
-      timestamp: blockHeader.time,
+      parentHash: blockSummary.previousblockhash,
+      hash: blockSummary.hash,
+      blockHeight: blockSummary.height,
+      timestamp: blockSummary.time,
+      txCount: blockSummary.tx.length,
     };
   };
 

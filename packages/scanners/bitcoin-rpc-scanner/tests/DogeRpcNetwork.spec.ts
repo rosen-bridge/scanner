@@ -34,7 +34,7 @@ describe('DogeRpcNetwork', () => {
      */
     it('should return block info successfully', async () => {
       mockAxiosPost(testData.getBlockHashResponse);
-      mockAxiosPost(testData.getBlockHeaderResponse);
+      mockAxiosPost(testData.getBlockSummaryResponse);
 
       const result = await network.getBlockAtHeight(testData.blockHeight);
 
@@ -46,8 +46,8 @@ describe('DogeRpcNetwork', () => {
         id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getblockheader',
-        params: [testData.blockHash, true],
+        method: 'getblock',
+        params: [testData.blockHash, 1],
         id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });
