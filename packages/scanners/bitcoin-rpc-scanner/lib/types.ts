@@ -31,15 +31,6 @@ export interface BlockHeader {
   previousblockhash: string;
 }
 
-export interface BlockInfo {
-  hash: string;
-  height: number;
-  time: number;
-  nTx: number;
-  previousblockhash: string;
-  tx: Array<BitcoinRpcTransaction>;
-}
-
 export interface BlockChainInfo {
   blocks: number;
   bestblockhash: string;
