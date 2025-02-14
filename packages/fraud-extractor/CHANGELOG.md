@@ -1,5 +1,16 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.0.12
+
+### Patch Changes
+
+- Update node version to 20
+- Update logger package
+- Updated dependencies
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.1
+  - @rosen-bridge/scanner@5.0.2
+
 ## 2.0.11
 
 ### Patch Changes

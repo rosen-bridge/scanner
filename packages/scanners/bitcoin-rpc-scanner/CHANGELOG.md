@@ -1,5 +1,18 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
+## 1.1.0
+
+### Minor Changes
+
+- Add Doge RPC to the bitcoin-rpc-scanner package
+- Add Doge RPC scanner and observation extractor
+
+### Patch Changes
+
+- Update node version to 20
+- Updated dependencies
+  - @rosen-bridge/scanner@5.0.2
+
 ## 1.0.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-extractor
 
+## 1.0.1
+
+### Patch Changes
+
+- Update node version to 20
+- Update logger package
+
 ## 1.0.0
 
 ### Major Changes
