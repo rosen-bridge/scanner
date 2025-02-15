@@ -8,10 +8,7 @@
 
 ### Minor Changes
 
-- Add Doge extractor
-- Add Doge
-- Add Doge RPC to the bitcoin-observation-extractor package
-- Add Doge RPC scanner and observation extractor
+- Add Doge RPC and Esplora observation extractor
 
 ### Patch Changes
 
