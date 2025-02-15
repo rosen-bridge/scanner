@@ -24,7 +24,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     addresses: Array<string>,
     RWTId: string,
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     logger?: AbstractLogger
   ) {
     super();
@@ -36,7 +36,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     this.RWTId = RWTId;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new CommitmentAction(dataSource, this.logger);
-    this.tokenMap = new TokenMap(tokens);
+    this.tokenMap = tokens;
   }
 
   /**
