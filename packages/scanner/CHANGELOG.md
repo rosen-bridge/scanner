@@ -1,5 +1,13 @@
 # @rosen-bridge/scanner
 
+## 5.0.2
+
+### Patch Changes
+
+- Update node version to 20
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.1
+
 ## 5.0.1
 
 ### Patch Changes
