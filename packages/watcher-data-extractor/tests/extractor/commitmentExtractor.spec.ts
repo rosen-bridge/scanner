@@ -29,7 +29,7 @@ describe('CommitmentExtractor', () => {
   describe('getId', () => {
     it('should return id of the extractor', async () => {
       const tokenMap = new TokenMap();
-      tokenMap.updateConfigByJson([]);
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
@@ -51,7 +51,7 @@ describe('CommitmentExtractor', () => {
      */
     it('should save 2 commitments', async () => {
       const tokenMap = new TokenMap();
-      tokenMap.updateConfigByJson([]);
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
@@ -121,7 +121,7 @@ describe('CommitmentExtractor', () => {
      */
     it('should remove only block with specific block id and extractor id', async () => {
       const tokenMap = new TokenMap();
-      tokenMap.updateConfigByJson([]);
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
