@@ -4,8 +4,7 @@
 
 ### Minor Changes
 
-- Add Doge RPC to the bitcoin-rpc-scanner package
-- Add Doge RPC scanner and observation extractor
+- Add Doge
 
 ### Patch Changes
 
