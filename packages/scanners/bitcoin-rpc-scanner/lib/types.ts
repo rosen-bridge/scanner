@@ -31,15 +31,6 @@ export interface BlockHeader {
   previousblockhash: string;
 }
 
-export interface BlockInfo {
-  hash: string;
-  height: number;
-  time: number;
-  nTx: number;
-  previousblockhash: string;
-  tx: Array<BitcoinRpcTransaction>;
-}
-
 export interface BlockChainInfo {
   blocks: number;
   bestblockhash: string;
@@ -76,4 +67,43 @@ export interface BitcoinRpcTransaction {
   vin: Array<BitcoinRpcTxInput>;
   vout: Array<BitcoinRpcTxOutput>;
   hex: string;
+}
+
+export interface DogeBlockSummary {
+  hash: string;
+  height: number;
+  time: number;
+  previousblockhash: string;
+  tx: Array<string>;
+}
+
+export interface DogeRpcTxInput {
+  txid: string;
+  vout: number;
+  scriptSig: {
+    asm: string;
+    hex: string;
+  };
+  sequence: number;
+}
+
+export interface DogeRpcTxOutput {
+  value: number;
+  n: number;
+  scriptPubKey: {
+    asm: string;
+    hex: string;
+    type: string;
+  };
+}
+
+export interface DogeRpcTransaction {
+  txid: string;
+  hash: string;
+  version: number;
+  size: number;
+  vsize: number;
+  locktime: number;
+  vin: Array<DogeRpcTxInput>;
+  vout: Array<DogeRpcTxOutput>;
 }
