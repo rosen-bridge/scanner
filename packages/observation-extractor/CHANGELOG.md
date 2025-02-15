@@ -6,10 +6,6 @@
 
 - Change RosenTokens to TokenMap
 
-### Minor Changes
-
-- Doge observation extractor
-
 ### Patch Changes
 
 - Update node version to 20
