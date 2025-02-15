@@ -17,11 +17,6 @@
 
 - Update node version to 20
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
   - @rosen-bridge/bitcoin-rpc-scanner@1.1.0
   - @rosen-bridge/observation-extractor@6.0.0
   - @rosen-bridge/bitcoin-esplora-scanner@1.1.0

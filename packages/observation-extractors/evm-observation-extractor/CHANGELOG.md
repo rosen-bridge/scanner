@@ -10,8 +10,6 @@
 
 - Update node version to 20
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
   - @rosen-bridge/observation-extractor@6.0.0
   - @rosen-bridge/evm-rpc-scanner@2.0.2
 

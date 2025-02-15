@@ -6,7 +6,6 @@
 
 - Update node version to 20
 - Updated dependencies
-- Updated dependencies
   - @rosen-bridge/abstract-extractor@1.0.1
 
 ## 5.0.1

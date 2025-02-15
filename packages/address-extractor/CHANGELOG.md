@@ -7,7 +7,6 @@
 - Update node version to 20
 - Update logger package
 - Updated dependencies
-- Updated dependencies
   - @rosen-bridge/abstract-extractor@1.0.1
 
 ## 6.0.0
