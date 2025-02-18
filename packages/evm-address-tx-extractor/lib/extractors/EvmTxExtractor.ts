@@ -42,8 +42,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
     block: Block
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = [];
-    for (const txRes of txs) {
-      const tx = Transaction.from(txRes);
+    for (const tx of txs) {
       if (tx.from === null) {
         throw Error('ImpossibleBehavior: RPC transactions must have `from`.');
       }
@@ -53,18 +52,18 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
       if (tx.from.toLowerCase() === this.address) {
         let status: EvmTxStatus;
         try {
-          const result = await txRes.wait(0);
+          const result = await tx.wait(0);
           if (result) status = EvmTxStatus.succeed;
           else
             throw Error(
-              `Impossible behavior: Evm Tx [${txRes.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`
+              `Impossible behavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`
             );
         } catch (e) {
           if (isCallException(e)) status = EvmTxStatus.failed;
           else throw e;
         }
         extractedTxs.push({
-          unsignedHash: tx.unsignedHash,
+          unsignedHash: Transaction.from(tx).unsignedHash,
           signedHash: tx.hash,
           nonce: tx.nonce,
           address: tx.from.toLowerCase(),
