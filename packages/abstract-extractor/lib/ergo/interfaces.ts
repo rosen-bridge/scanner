@@ -3,8 +3,13 @@ export enum ErgoNetworkType {
   Node = 'node',
 }
 
+export type InputExtension = {
+  [key: string]: string;
+};
+
 export type InputBox = {
   boxId: string;
+  extension?: InputExtension;
 };
 
 export type DataInput = {

@@ -37,6 +37,7 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.id,
         })) ?? [],
+      // TODO: Add input extension to explorer local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs?.map((input) => ({ boxId: input.id })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({

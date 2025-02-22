@@ -3,8 +3,13 @@ export type NodeBlock = {
   transactions: Array<Transaction>;
 };
 
+export type InputExtension = {
+  [key: string]: string;
+};
+
 export type InputBox = {
   boxId: string;
+  extension?: InputExtension;
 };
 
 export type DataInput = {

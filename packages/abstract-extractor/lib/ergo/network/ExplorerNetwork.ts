@@ -82,6 +82,7 @@ export class ExplorerNetwork extends AbstractNetwork {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.boxId,
         })) ?? [],
+      // TODO: Add input extension to explorer local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs?.map((input) => ({ boxId: input.boxId })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({
@@ -113,6 +114,7 @@ export class ExplorerNetwork extends AbstractNetwork {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.id,
         })) ?? [],
+      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs?.map((input) => ({ boxId: input.id })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({
