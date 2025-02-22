@@ -1240,7 +1240,7 @@ export const nodeTx = {
   timestamp: 1722500537020n,
   index: 3,
   globalIndex: 7582283n,
-  numConfirmations: 0,
+  numConfirmations: 146428,
   inputs: [
     {
       globalIndex: 41863807n,
@@ -1264,17 +1264,11 @@ export const nodeTx = {
       additionalRegisters: {
         R4: '05a686a9ad09',
         R5: '04a299a101',
-      },
+      } as Registers,
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       index: 0,
-      spendingProof: {
-        proofBytes:
-          '4ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd1173ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd1173ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117',
-        extension: {
-          '1': 'a2aed72ff1b139f35d1ad2938cb44c9848a34d4dcfd6d8ab717ebde40a7304f2541cf628ffc8b5c496e6161eba3f169c6dd440704b1719e0',
-        },
-      },
+      spendingHeight: null,
     },
     {
       globalIndex: 41863813n,
@@ -1292,13 +1286,7 @@ export const nodeTx = {
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       index: 6,
-      spendingProof: {
-        proofBytes:
-          '4ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd1173ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd1173ab9da11fc216660e974842cc3b7705e62ebb9e0bf5ff78e53f9cd40abadd117',
-        extension: {
-          '1': 'a2aed72ff1b139f35d1ad2938cb44c9848a34d4dcfd6d8ab717ebde40a7304f2541cf628ffc8b5c496e6161eba3f169c6dd440704b1719e0',
-        },
-      },
+      spendingHeight: null,
     },
   ],
   dataInputs: [],
@@ -1308,7 +1296,8 @@ export const nodeTx = {
       inclusionHeight: 1320528,
       address:
         'NTkuk55NdwCXkF1e2nCABxq7bHjtinX3wH13zYPZ6qYT71dCoZBe1gZkh9FAr7GeHo2EpFoibzpNQmoi89atUjKRrhZEYrTapdtXrWU4kq319oY7BEWmtmRU9cMohX69XMuxJjJP5hRM8WQLfFnffbjshhEP3ck9CKVEkFRw1JDYkqVke2JVqoMED5yxLVkScbBUiJJLWq9BSbE1JJmmreNVskmWNxWE6V7ksKPxFMoqh1SVePh3UWAaBgGQRZ7TWf4dTBF5KMVHmRXzmQqEu2Fz2yeSLy23sM3pfqa78VuvoFHnTFXYFFxn3DNttxwq3EU3Zv25SmgrWjLKiZjFcEcqGgH6DJ9FZ1DfucVtTXwyDJutY3ksUBaEStRxoUQyRu4EhDobixL3PUWRcxaRJ8JKA9b64ALErGepRHkAoVmS8DaE6VbroskyMuhkTo7LbrzhTyJbqKurEzoEfhYxus7bMpLTePgKcktgRRyB7MjVxjSpxWzZedvzbjzZaHLZLkWZESk1WtdM25My33wtVLNXiTvficEUbjA23sNd24pv1YQ72nY1aqUHa2',
-      spentTransactionId: null,
+      spentTransactionId:
+        '0ad32fd0423a4d2e551f0ae9be28a650bef4b9420791bd5208c6f35c1b234322',
       boxId: '3729892f2fcd5b05761ab2994bb418947a5e7d6aaeae5c46351b2e6cf29afc34',
       value: 5810250000n,
       ergoTree:
@@ -1329,6 +1318,7 @@ export const nodeTx = {
       transactionId:
         '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
       index: 0,
+      spendingHeight: null,
     },
     {
       globalIndex: 41864032n,
@@ -1347,12 +1337,14 @@ export const nodeTx = {
       transactionId:
         '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
       index: 1,
+      spendingHeight: null,
     },
     {
       globalIndex: 41864033n,
       inclusionHeight: 1320528,
       address: '9fzRcctiWfzoJyqGtPWqoXPuxSmFw6zpnjtsQ1B6jSN514XqH4q',
-      spentTransactionId: null,
+      spentTransactionId:
+        'fc362346389ebad8252c19a6489a5c55eb3afbca4b9e21cc1c8aa4583d1aefd3',
       boxId: '918c7a92bf9ab9ba45cb96df067129f3fc0c24b62bf91d7f8c7f1d3062e52426',
       value: 23324978571n,
       ergoTree:
@@ -1363,6 +1355,7 @@ export const nodeTx = {
       transactionId:
         '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
       index: 2,
+      spendingHeight: null,
     },
   ],
   size: 789,
