@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "@apollo/client": "^3.8.7",
-    "@blockfrost/blockfrost-js": "^5.4.0",
+    "@blockfrost/blockfrost-js": "^6.0.0",
     "@cardano-ogmios/client": "^6.6.1",
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.0",
