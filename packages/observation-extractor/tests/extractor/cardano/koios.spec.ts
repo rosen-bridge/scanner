@@ -11,6 +11,7 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 import { DataSource } from 'typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
@@ -32,9 +33,11 @@ describe('cardanoKoiosObservationExtractor', () => {
      *  field should fulfill expected values
      */
     it('should returns true valid rosen transaction', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       const extractor = new CardanoKoiosExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         bankAddress
       );
       const Tx: KoiosTransaction = cardanoTxValid;
@@ -78,9 +81,11 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('database row count should be zero because of invalid bankAddress', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       const extractor = new CardanoKoiosExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'
       );
       const Tx: KoiosTransaction = cardanoTxValid;
@@ -101,9 +106,11 @@ describe('cardanoKoiosObservationExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 0
      */
     it('should returns false invalid rosen metadata', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       const extractor = new CardanoKoiosExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         bankAddress
       );
       const Tx: KoiosTransaction = {

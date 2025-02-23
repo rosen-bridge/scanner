@@ -1,4 +1,5 @@
 import { Block } from '../lib';
+import { TestEntity } from './testUtils';
 
 export const tx = {
   id: '3b91fbd2b6f4f3f971098655ffa320841001b071908de057cdf8c425cd3b3e61',
@@ -107,3 +108,40 @@ export const block: Block = {
   height: 100,
   parentHash: 'parentHash',
 } as Block;
+
+export const block2: Block = {
+  hash: 'hash2',
+  height: 101,
+  parentHash: 'parentHash2',
+} as Block;
+
+export const sampleEntities: Omit<TestEntity, 'id'>[] = [
+  {
+    extractor: 'extractor',
+    boxId: '1',
+    serialized: 'serialized1',
+    block: 'blockId1',
+    height: 100,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '2',
+    serialized: 'serialized2',
+    block: 'blockId2',
+    height: 200,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '3',
+    serialized: 'serialized3',
+    block: 'blockId3',
+    height: 300,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '4',
+    serialized: 'serialized4',
+    block: 'blockId4',
+    height: 400,
+  },
+];

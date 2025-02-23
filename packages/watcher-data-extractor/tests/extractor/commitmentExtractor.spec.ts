@@ -11,6 +11,7 @@ import {
   testTokenMap,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 let dataSource: DataSource;
 
@@ -27,12 +28,14 @@ describe('CommitmentExtractor', () => {
    */
   describe('getId', () => {
     it('should return id of the extractor', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
         RWTId,
         dataSource,
-        testTokenMap
+        tokenMap
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -47,12 +50,14 @@ describe('CommitmentExtractor', () => {
      * Expected: processTransactions should returns true and database row count should be 2
      */
     it('should save 2 commitments', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
         RWTId,
         dataSource,
-        testTokenMap
+        tokenMap
       );
       const tx1 = commitmentTxGenerator(true, 'f1', '11', 'd1');
       const tx2 = commitmentTxGenerator(true, 'f2', '22', 'd2');
@@ -115,12 +120,14 @@ describe('CommitmentExtractor', () => {
      * Expected: afterCalling forkBlock database row count should be 0
      */
     it('should remove only block with specific block id and extractor id', async () => {
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson([]);
       const extractor = new CommitmentExtractor(
         'extractorId',
         [commitmentAddress],
         RWTId,
         dataSource,
-        testTokenMap
+        tokenMap
       );
       const tx1 = commitmentTxGenerator(true, 'wid1', '1', 'digest1');
       const tx2 = commitmentTxGenerator(true, 'wid2', '2', 'digest2');

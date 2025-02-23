@@ -1,7 +1,7 @@
 import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
 import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-esplora-scanner';
 import { BitcoinEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { RosenTokens } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from 'typeorm';
 
@@ -11,7 +11,7 @@ export class BitcoinEsploraObservationExtractor extends AbstractObservationExtra
   constructor(
     lockAddress: string,
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     logger?: AbstractLogger
   ) {
     super(

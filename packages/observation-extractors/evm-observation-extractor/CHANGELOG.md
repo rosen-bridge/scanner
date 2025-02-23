@@ -1,5 +1,18 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- Change RosenTokens to TokenMap
+
+### Patch Changes
+
+- Update node version to 20
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@6.0.0
+  - @rosen-bridge/evm-rpc-scanner@2.0.2
+
 ## 3.1.2
 
 ### Patch Changes

@@ -3,12 +3,19 @@ import {
   AbstractErgoExtractor,
   BlockInfo,
   OutputBox,
-  ErgoExtractedData,
+  AbstractBoxData,
   AbstractErgoExtractorAction,
+  AbstractErgoExtractorEntity,
 } from '../lib';
 
-export class MockedErgoExtractor extends AbstractErgoExtractor<ErgoExtractedData> {
-  actions: AbstractErgoExtractorAction<ErgoExtractedData>;
+export class MockedErgoExtractor extends AbstractErgoExtractor<
+  AbstractBoxData,
+  AbstractErgoExtractorEntity
+> {
+  actions: AbstractErgoExtractorAction<
+    AbstractBoxData,
+    AbstractErgoExtractorEntity
+  >;
 
   getId = () => 'Test';
 
@@ -18,7 +25,7 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<ErgoExtractedData
 
   extractBoxData = (
     box: V1.OutputInfo | OutputBox
-  ): ErgoExtractedData | undefined => {
+  ): AbstractBoxData | undefined => {
     return undefined;
   };
 }

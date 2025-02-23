@@ -1,31 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { AbstractErgoExtractorEntity } from '@rosen-bridge/abstract-extractor';
+import { Column, Entity } from 'typeorm';
 
 @Entity('event_trigger_entity')
-@Unique(['boxId', 'extractor'])
-class EventTriggerEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+class EventTriggerEntity extends AbstractErgoExtractorEntity {
   @Column({ default: 'Not-set' })
   eventId: string;
 
   @Column()
   txId: string;
-
-  @Column()
-  extractor: string;
-
-  @Column()
-  boxId: string;
-
-  @Column()
-  boxSerialized: string;
-
-  @Column()
-  block: string;
-
-  @Column()
-  height: number;
 
   @Column()
   fromChain: string;
@@ -68,12 +50,6 @@ class EventTriggerEntity {
 
   @Column()
   WIDsHash: string;
-
-  @Column({ nullable: true, type: 'text' })
-  spendBlock?: string | null;
-
-  @Column({ nullable: true, type: 'int' })
-  spendHeight?: number | null;
 
   @Column({ nullable: true, type: 'text' })
   spendTxId?: string | null;

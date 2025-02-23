@@ -5,6 +5,7 @@ import { ObservationEntity } from '@rosen-bridge/observation-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
@@ -22,16 +23,9 @@ describe('EvmRpcObservationExtractor', () => {
 
   beforeEach(async () => {
     dataSource = await createDatabase();
-    extractor = new TestEvmRpcObservationExtractor(
-      dataSource,
-      {
-        idKeys: {},
-        tokens: [],
-      },
-      {
-        get: vi.fn(),
-      } as any
-    );
+    extractor = new TestEvmRpcObservationExtractor(dataSource, new TokenMap(), {
+      get: vi.fn(),
+    } as any);
   });
 
   describe('processTransactions', () => {

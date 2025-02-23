@@ -1,6 +1,7 @@
-import { DataSource } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
+import { Mutex } from 'await-semaphore';
+import { v4 as uuidv4 } from 'uuid';
 
 import { AbstractExtractor } from '../AbstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
@@ -8,20 +9,91 @@ import { BlockInfo } from '../interfaces';
 import {
   Transaction,
   OutputBox,
-  ErgoExtractedData,
+  AbstractBoxData,
   SpendInfo,
+  CallbackType,
+  CallbackMap,
+  CallbackDataMap,
 } from './interfaces';
+import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractor<
-  ExtractedData extends ErgoExtractedData
+  ExtractedData extends AbstractBoxData,
+  ExtractorEntity extends AbstractErgoExtractorEntity
 > extends AbstractExtractor<Transaction> {
-  protected readonly dataSource: DataSource;
-  protected abstract actions: AbstractErgoExtractorAction<ExtractedData>;
+  protected abstract actions: AbstractErgoExtractorAction<
+    ExtractedData,
+    ExtractorEntity
+  >;
   protected logger: AbstractLogger;
+  protected callbacks: {
+    [K in CallbackType]: Map<string, CallbackMap<ExtractedData>[K]>;
+  } = {
+    [CallbackType.Update]: new Map(),
+    [CallbackType.Insert]: new Map(),
+    [CallbackType.Delete]: new Map(),
+    [CallbackType.Spend]: new Map(),
+  };
+  private callbackMutex = new Mutex();
 
   constructor(logger = new DummyLogger()) {
     super();
     this.logger = logger;
+  }
+
+  /**
+   * hook a new callback on a callback type
+   * @param type
+   * @param id
+   * @param callback
+   * @returns callback registered id
+   */
+  hook = async <T extends CallbackType>(
+    type: T,
+    callback: CallbackMap<ExtractedData>[T]
+  ): Promise<string> => {
+    const release = await this.callbackMutex.acquire();
+    const callbackMap = this.callbacks[type];
+    const id = uuidv4();
+    callbackMap.set(id, callback);
+    release();
+    return id;
+  };
+
+  /**
+   * unhook a callback on a type
+   * returns false if there is no registered callback with the id
+   * @param type
+   * @param id
+   * @returns success status
+   */
+  unhook = async (type: CallbackType, id: string): Promise<boolean> => {
+    const release = await this.callbackMutex.acquire();
+    const callbackMap = this.callbacks[type];
+    if (!callbackMap.has(id)) {
+      this.logger.warn(
+        `Callback with Id [${id}] is not registered for type [${type}].`
+      );
+      return false;
+    }
+    callbackMap.delete(id);
+    release();
+    return true;
+  };
+
+  /**
+   * trigger all callbacks registered on a specific type with the provided data
+   * @param type
+   * @param data
+   */
+  protected triggerCallbacks<T extends CallbackType>(
+    type: T,
+    data: CallbackDataMap<ExtractedData>[T]
+  ): void {
+    const callbackMap = this.callbacks[type];
+    callbackMap.forEach((callback) => {
+      callback(data);
+    });
   }
 
   /**
@@ -64,7 +136,7 @@ export abstract class AbstractErgoExtractor<
                 output.boxId
               }`
             );
-            boxes.push(extractedData as ExtractedData);
+            boxes.push(extractedData);
           }
         }
         let boxIndex = 1;
@@ -75,7 +147,7 @@ export abstract class AbstractErgoExtractor<
       }
 
       if (boxes.length > 0) {
-        if (!(await this.actions.insertBoxes(boxes, block, this.getId()))) {
+        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
@@ -83,8 +155,16 @@ export abstract class AbstractErgoExtractor<
           );
           return false;
         }
+        this.triggerCallbacks(CallbackType.Insert, boxes);
       }
-      await this.actions.spendBoxes(spentInfos, block, this.getId());
+      const spentData = await this.actions.spendBoxes(
+        spentInfos,
+        block,
+        this.getId()
+      );
+      if (spentData.length > 0) {
+        this.triggerCallbacks(CallbackType.Spend, spentData);
+      }
     } catch (e) {
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
@@ -93,7 +173,6 @@ export abstract class AbstractErgoExtractor<
       );
       return false;
     }
-
     return true;
   };
 
@@ -102,6 +181,10 @@ export abstract class AbstractErgoExtractor<
    * @param hash block hash
    */
   forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockBoxes(hash, this.getId());
+    const result = await this.actions.deleteBlockBoxes(hash, this.getId());
+    if (result.deletedData.length > 0)
+      this.triggerCallbacks(CallbackType.Delete, result.deletedData);
+    if (result.updatedData.length > 0)
+      this.triggerCallbacks(CallbackType.Update, result.updatedData);
   };
 }

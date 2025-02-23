@@ -1,5 +1,20 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 2.0.2
+
+### Patch Changes
+
+- Update node version to 20
+- Updated dependencies
+  - @rosen-bridge/scanner@5.0.2
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@5.0.1
+
 ## 2.0.0
 
 ### Major Changes
