@@ -32,9 +32,10 @@ export abstract class AbstractInitializableErgoExtractor<
     url: string,
     address: string,
     logger?: AbstractLogger,
-    initialize = true
+    initialize = true,
+    trackInputExtension = false
   ) {
-    super(logger);
+    super(logger, trackInputExtension);
     this.address = address;
     this.initialize = initialize;
     if (type == ErgoNetworkType.Explorer) {

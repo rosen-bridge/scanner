@@ -14,6 +14,7 @@ import {
   CallbackType,
   CallbackMap,
   CallbackDataMap,
+  InputExtension,
 } from './interfaces';
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
@@ -36,7 +37,7 @@ export abstract class AbstractErgoExtractor<
   };
   private callbackMutex = new Mutex();
 
-  constructor(logger = new DummyLogger()) {
+  constructor(logger = new DummyLogger(), private inputExtensionTrack = false) {
     super();
     this.logger = logger;
   }
@@ -99,9 +100,13 @@ export abstract class AbstractErgoExtractor<
   /**
    * extract box data to proper format (not including spending information)
    * @param box
+   * @param inputExtensions all input box extensions in transaction
    * @return extracted data in proper format
    */
-  abstract extractBoxData: (box: OutputBox) => ExtractedData | undefined;
+  abstract extractBoxData: (
+    box: OutputBox,
+    inputExtensions?: InputExtension[]
+  ) => ExtractedData | undefined;
 
   /**
    * check proper data format in the box
@@ -124,12 +129,15 @@ export abstract class AbstractErgoExtractor<
       const boxes: Array<ExtractedData> = [];
       const spentInfos: Array<SpendInfo> = [];
       for (const tx of txs) {
+        let inputExtensions;
         for (const output of tx.outputs) {
           if (!this.hasData(output)) {
             continue;
           }
+          if (this.inputExtensionTrack && !inputExtensions)
+            inputExtensions = tx.inputs.map((input) => input.extension || {});
           this.logger.debug(`Trying to extract data from box ${output.boxId}`);
-          const extractedData = this.extractBoxData(output);
+          const extractedData = this.extractBoxData(output, inputExtensions);
           if (extractedData) {
             this.logger.debug(
               `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${

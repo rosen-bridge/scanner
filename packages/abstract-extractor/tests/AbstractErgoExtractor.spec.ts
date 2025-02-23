@@ -49,7 +49,7 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx.outputs[0]);
+      expect(extractSpy).toBeCalledWith(tx.outputs[0], undefined);
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Insert, [
