@@ -17,10 +17,6 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<
     AbstractErgoExtractorEntity
   >;
 
-  constructor(trackInputExtension = false) {
-    super(undefined, trackInputExtension);
-  }
-
   getId = () => 'Test';
 
   initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;

@@ -37,7 +37,7 @@ export abstract class AbstractErgoExtractor<
   };
   private callbackMutex = new Mutex();
 
-  constructor(logger = new DummyLogger(), private inputExtensionTrack = false) {
+  constructor(logger = new DummyLogger()) {
     super();
     this.logger = logger;
   }
@@ -105,7 +105,7 @@ export abstract class AbstractErgoExtractor<
    */
   abstract extractBoxData: (
     box: OutputBox,
-    inputExtensions?: InputExtension[]
+    inputExtensions: InputExtension[]
   ) => ExtractedData | undefined;
 
   /**
@@ -129,13 +129,11 @@ export abstract class AbstractErgoExtractor<
       const boxes: Array<ExtractedData> = [];
       const spentInfos: Array<SpendInfo> = [];
       for (const tx of txs) {
-        let inputExtensions;
+        const inputExtensions = tx.inputs.map((input) => input.extension || {});
         for (const output of tx.outputs) {
           if (!this.hasData(output)) {
             continue;
           }
-          if (this.inputExtensionTrack && !inputExtensions)
-            inputExtensions = tx.inputs.map((input) => input.extension || {});
           this.logger.debug(`Trying to extract data from box ${output.boxId}`);
           const extractedData = this.extractBoxData(output, inputExtensions);
           if (extractedData) {

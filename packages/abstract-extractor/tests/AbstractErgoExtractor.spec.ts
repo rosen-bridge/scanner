@@ -22,7 +22,7 @@ describe('AbstractErgoExtractor', () => {
      * - spy `extractBoxData` and `storeBoxes`
      * - run test (call `processTransactions`)
      * @expected
-     * - to call `extractBoxData` for the specific box and undefined (without input extension)
+     * - to call `extractBoxData` for the specific box and all input extensions
      * - to insert the extracted box to database
      * - to return true when total procedure is successful
      * - to trigger `INSERT` callbacks with correct data
@@ -49,7 +49,10 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx.outputs[0], undefined);
+      expect(extractSpy).toBeCalledWith(tx.outputs[0], [
+        tx.inputs[0].extension,
+        {},
+      ]);
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Insert, [
@@ -106,43 +109,6 @@ describe('AbstractErgoExtractor', () => {
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Spend, [
         { boxId: tx.inputs[0].boxId },
         { boxId: tx.inputs[1].boxId },
-      ]);
-    });
-
-    /**
-     * @target processTransactions should extract input extensions and use in `extractBoxData`
-     * @dependencies
-     * @scenario
-     * - mock extractor with track input extensions
-     * - mock `hasData` to return true for one box
-     * - spy `extractBoxData`, `storeBoxes` and `spendBoxes`
-     * - run test (call `processTransactions`)
-     * @expected
-     * - to call `extractBoxData` for the specific box with all input extensions
-     */
-    it('should extract input extensions and use in `extractBoxData`', async () => {
-      const extractor = new MockedErgoExtractor(true);
-      const triggerCallbacks = vitest.fn();
-      extractor['triggerCallbacks'] = triggerCallbacks;
-      extractor.hasData = (box: V1.OutputInfo | OutputBox) => {
-        if (box.boxId == tx.outputs[0].boxId) return true;
-        return false;
-      };
-      const extractSpy = vitest.fn().mockReturnValue(extractedData);
-      extractor.extractBoxData = extractSpy;
-      extractor['actions'] = {
-        storeBoxes: vitest.fn().mockResolvedValue(true),
-        spendBoxes: vitest.fn().mockResolvedValue([]),
-      } as unknown as AbstractErgoExtractorAction<
-        AbstractBoxData,
-        AbstractErgoExtractorEntity
-      >;
-      await extractor.processTransactions([tx], block);
-
-      expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx.outputs[0], [
-        tx.inputs[0].extension,
-        {},
       ]);
     });
 
