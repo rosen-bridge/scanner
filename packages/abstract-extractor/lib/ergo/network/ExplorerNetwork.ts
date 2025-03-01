@@ -59,7 +59,8 @@ export class ExplorerNetwork extends AbstractNetwork {
         box.additionalRegisters,
         'serializedValue'
       ),
-      assets: box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])),
+      assets:
+        box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
       spentHeight: spendInfo?.height,
       spentBlockId: spendInfo?.hash,
       spentTransactionId: box.spentTransactionId,
@@ -82,6 +83,7 @@ export class ExplorerNetwork extends AbstractNetwork {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.boxId,
         })) ?? [],
+      // TODO: Add input extension to explorer local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs?.map((input) => ({ boxId: input.boxId })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({
@@ -91,9 +93,9 @@ export class ExplorerNetwork extends AbstractNetwork {
             output.additionalRegisters,
             'serializedValue'
           ),
-          assets: output.assets?.map((asset) =>
-            pick(asset, ['tokenId', 'amount'])
-          ),
+          assets:
+            output.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ??
+            [],
           ergoTree: output.ergoTree,
           creationHeight: output.creationHeight,
           index: output.index,
@@ -113,15 +115,16 @@ export class ExplorerNetwork extends AbstractNetwork {
         tx.dataInputs?.map((dataInput) => ({
           boxId: dataInput.id,
         })) ?? [],
+      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs?.map((input) => ({ boxId: input.id })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({
           boxId: output.id,
           transactionId: output.txId,
           additionalRegisters: output.additionalRegisters,
-          assets: output.assets?.map((asset) =>
-            pick(asset, ['tokenId', 'amount'])
-          ),
+          assets:
+            output.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ??
+            [],
           ergoTree: output.ergoTree,
           creationHeight: output.creationHeight,
           index: output.index,

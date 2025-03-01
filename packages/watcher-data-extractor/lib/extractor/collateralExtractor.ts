@@ -96,7 +96,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @return {boolean}
    * @memberof CollateralExtractor
    */
-  private isCollateralBox = (outputBox: OutputBox): boolean => {
+  private isCollateralBox = (outputBox: V1.OutputInfo | OutputBox): boolean => {
     const awcNft = outputBox.assets?.at(0)?.tokenId;
     return (
       awcNft != undefined &&

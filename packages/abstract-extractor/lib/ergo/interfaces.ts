@@ -3,8 +3,13 @@ export enum ErgoNetworkType {
   Node = 'node',
 }
 
+export type InputExtension = {
+  [key: string]: string;
+};
+
 export type InputBox = {
   boxId: string;
+  extension?: InputExtension;
 };
 
 export type DataInput = {
@@ -30,10 +35,10 @@ export type OutputBox = {
   value: bigint;
   ergoTree: string;
   creationHeight: number;
-  assets?: Array<Asset>;
-  additionalRegisters?: AdditionalRegisters;
+  assets: Array<Asset>;
+  additionalRegisters: AdditionalRegisters;
   transactionId: string;
-  index: bigint | number;
+  index: number;
 };
 
 export interface ErgoBox extends OutputBox {

@@ -22,7 +22,7 @@ describe('AbstractErgoExtractor', () => {
      * - spy `extractBoxData` and `storeBoxes`
      * - run test (call `processTransactions`)
      * @expected
-     * - to call `extractBoxData` for the specific box
+     * - to call `extractBoxData` for the specific box and all input extensions
      * - to insert the extracted box to database
      * - to return true when total procedure is successful
      * - to trigger `INSERT` callbacks with correct data
@@ -49,7 +49,10 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx.outputs[0]);
+      expect(extractSpy).toBeCalledWith(tx.outputs[0], [
+        tx.inputs[0].extension,
+        {},
+      ]);
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Insert, [

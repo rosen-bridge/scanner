@@ -64,7 +64,8 @@ export class NodeNetwork extends AbstractNetwork {
         additionalRegisters: output.additionalRegisters,
         boxId: output.boxId || '',
       })),
-      inputs: tx.inputs.map((input) => ({ boxId: input.boxId })) ?? [],
+      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
+      inputs: tx.inputs.map((input) => ({ boxId: input.boxId! })) ?? [],
       dataInputs: tx.dataInputs,
     };
   };

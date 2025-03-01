@@ -1,4 +1,4 @@
-import { Block } from '../lib';
+import { Block, InputExtension } from '../lib';
 import { TestEntity } from './testUtils';
 
 export const tx = {
@@ -6,19 +6,11 @@ export const tx = {
   inputs: [
     {
       boxId: '3df73b29204ffa2085c38a958d322c86bee0471a5a1296b031f137236e038c6d',
-      spendingProof: {
-        proofBytes:
-          '06fb1e785d12ac74886c0d3fa0e61db0aa4dfaef6b6a42ab7a908625f3721f35bbce8245876ab14113baf41ff7b479863513462a8b438ec3',
-        extension: {},
-      },
+      extension: { '0': '1101d00f' } as InputExtension,
     },
     {
       boxId: '846f3cedf2fc4242898413558e73a69d057edda1df6f274a1eeea219b6dd62dd',
-      spendingProof: {
-        proofBytes:
-          '2c930f70ba11b35f32e3eb9023634e7a394a8714ebe794fd7134ab4cea9da753303f2f56e6bf4d1b0b0466b29fc8ce8c949ca602edf38895',
-        extension: {},
-      },
+      extension: {},
     },
   ],
   dataInputs: [],
