@@ -54,7 +54,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
       try {
         const observations: Array<ExtractedObservation> = [];
         txs.forEach((transaction) => {
-          const data = this.extractor.get(transaction as any);
+          const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
               blake2b(transaction.tx_hash, undefined, 32)
