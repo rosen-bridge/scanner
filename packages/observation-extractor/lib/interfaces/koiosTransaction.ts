@@ -1,33 +1,15 @@
-interface PaymentAddr {
-  bech32: string;
-  cred: string;
-}
+import { TransactionJSON } from '@emurgo/cardano-serialization-lib-nodejs';
 
-interface Asset {
-  policy_id: string;
-  asset_name: string;
-  quantity: string;
-}
-
-interface UTXO {
-  payment_addr: PaymentAddr;
-  stake_addr?: string | null;
-  tx_hash: string;
-  tx_index: number;
-  value: string;
-  asset_list: Array<Asset>;
-}
-
-interface MetaData {
-  [key: string]: Record<string, unknown>;
-}
-
-interface KoiosTransaction {
+interface KoiosCborTx {
   tx_hash: string;
   block_hash: string;
-  inputs: Array<UTXO>;
-  outputs: Array<UTXO>;
-  metadata?: MetaData;
+  block_height: number;
+  epoch_no: number;
+  absolute_slot: number;
+  tx_timestamp: number;
+  cbor: string;
 }
 
-export { KoiosTransaction, MetaData, UTXO };
+type KoiosTransaction = KoiosCborTx & TransactionJSON;
+
+export { KoiosTransaction };
