@@ -1,14 +1,11 @@
 import { DataSource } from 'typeorm';
 import {
   AbstractExtractor,
-  Block as ExtractorBlock,
-} from '@rosen-bridge/abstract-extractor';
-
-import { BlockEntity } from '../../../lib/entities/blockEntity';
-import {
   Block,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
+
+import { BlockEntity } from '../../../lib/entities/blockEntity';
 import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
 import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
@@ -24,7 +21,7 @@ export interface TestTransaction {
 export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   id: string;
   forked: Array<string>;
-  txs: Array<{ txs: Array<TestTransaction>; block: ExtractorBlock }>;
+  txs: Array<{ txs: Array<TestTransaction>; block: Block }>;
 
   constructor(id: string) {
     super();
@@ -35,7 +32,7 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
 
   processTransactions = (
     txs: Array<TestTransaction>,
-    block: ExtractorBlock
+    block: Block
   ): Promise<boolean> => {
     this.txs.push({ txs, block });
     return Promise.resolve(true);
@@ -159,8 +156,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   initializeBoxes = () => Promise.resolve();
 
-  processTransactions = async (
-    txs: Array<{ id: string }>,
-    block: ExtractorBlock
-  ) => false;
+  processTransactions = async (txs: Array<{ id: string }>, block: Block) =>
+    false;
 }
