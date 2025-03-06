@@ -1,5 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
-import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { DogeRpcTransaction, JsonRpcResult, DogeBlockSummary } from './types';
 
 import { randomBytes } from 'crypto';
@@ -61,7 +64,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     return {
       parentHash: blockSummary.previousblockhash,
       hash: blockSummary.hash,
-      blockHeight: blockSummary.height,
+      height: blockSummary.height,
       timestamp: blockSummary.time,
       txCount: blockSummary.tx.length,
     };

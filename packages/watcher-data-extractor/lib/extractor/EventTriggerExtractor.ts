@@ -5,12 +5,12 @@ import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
-  BlockInfo,
   CallbackType,
   ErgoNetworkType,
   OutputBox,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

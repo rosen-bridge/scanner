@@ -7,7 +7,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
 import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { components } from '@blockfrost/openapi';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import { AbstractExtractor, Block } from '@rosen-bridge/scanner-interfaces';
 
 interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];

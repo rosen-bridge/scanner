@@ -2,7 +2,7 @@ import { AddressTxsEntity } from '../entities/AddressTxsEntity';
 import { ExtractedTx } from '../interfaces/types';
 import { DataSource, Repository } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 export class TxAction {
   private readonly repository: Repository<AddressTxsEntity>;

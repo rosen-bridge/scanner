@@ -22,7 +22,7 @@ export const block = {
   parentHash:
     '0000000000000000000236443a3f4784ec904f5c500bd2e82838756b5657bb85',
   hash: '000000000000000000000cde53a239563c5a947d325c526bf140c7663b989b56',
-  blockHeight: 828669,
+  height: 828669,
   timestamp: 1706930825,
   txCount: 27,
 };
