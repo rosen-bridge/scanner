@@ -1,16 +1,4 @@
-interface Block {
-  parentHash: string;
-  hash: string;
-  height: number;
-  timestamp: number;
-  extra?: string;
-  txCount?: number;
-}
-
-interface BlockInfo {
-  height: number;
-  hash: string;
-}
+import { Block } from './block';
 
 abstract class AbstractNetworkConnector<TransactionType> {
   /**
@@ -31,4 +19,4 @@ abstract class AbstractNetworkConnector<TransactionType> {
   abstract getBlockTxs: (blockHash: string) => Promise<Array<TransactionType>>;
 }
 
-export { AbstractNetworkConnector, Block, BlockInfo };
+export { AbstractNetworkConnector };

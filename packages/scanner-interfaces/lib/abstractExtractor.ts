@@ -1,4 +1,4 @@
-import { BlockInfo, Block } from './scanner';
+import { BlockInfo, Block } from './block';
 
 export abstract class AbstractExtractor<TransactionType> {
   /**

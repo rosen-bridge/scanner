@@ -1,6 +1,5 @@
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { Block, InputExtension } from '@rosen-bridge/scanner-interfaces';
 
-import { InputExtension } from '../lib';
 import { TestEntity } from './testUtils';
 
 export const tx = {

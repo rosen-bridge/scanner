@@ -6,11 +6,13 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
   CallbackType,
-  ErgoNetworkType,
-  OutputBox,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import {
+  BlockInfo,
+  ErgoNetworkType,
+  OutputBox,
+} from '@rosen-bridge/scanner-interfaces';
 
 import EventTriggerAction from '../actions/EventTriggerAction';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

@@ -1,5 +1,5 @@
 import { intersection } from 'lodash-es';
-import { OutputBox } from './interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 /**
  * Check box to have specified tokens
