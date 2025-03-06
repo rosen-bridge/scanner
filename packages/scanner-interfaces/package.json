@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Defines all scanner interfaces",
   "repository": "",
   "license": "GPL-3.0",

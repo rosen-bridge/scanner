@@ -5,7 +5,10 @@ import {
 } from '@apollo/client/core';
 import { HttpLink } from '@apollo/client/link/http';
 import fetch from 'cross-fetch';
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import {
   GraphQLNullValueError,
   GraphQLTransaction,
@@ -42,7 +45,7 @@ export class GraphQLNetwork extends AbstractNetworkConnector<GraphQLTransaction>
           throw new GraphQLNullValueError(`Invalid block data`);
         return {
           hash: blocks[0].hash,
-          blockHeight: blocks[0].number,
+          height: blocks[0].number,
           parentHash: blocks[0].previousBlock.hash,
           timestamp: Math.floor(new Date(blocks[0].forgedAt).getTime() / 1000),
         };

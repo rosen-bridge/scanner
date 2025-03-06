@@ -430,7 +430,7 @@ describe('action', () => {
      */
     it('should insert new block into database', async () => {
       const block = {
-        blockHeight: 12,
+        height: 12,
         hash: 'blockhash',
         parentHash: 'parenthash',
         timestamp: 10,
@@ -450,7 +450,7 @@ describe('action', () => {
      */
     it('should update existing block', async () => {
       const block = {
-        blockHeight: 12,
+        height: 12,
         hash: 'blockhash',
         parentHash: 'parenthash',
         timestamp: 10,

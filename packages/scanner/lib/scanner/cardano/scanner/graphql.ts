@@ -1,7 +1,7 @@
 import { CardanoGraphQLConfig } from '../interfaces';
 import { GraphQLNetwork } from '../network/graphql';
 import { GraphQLTransaction } from '../interfaces/graphql';
-import { Block } from '../../../interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';

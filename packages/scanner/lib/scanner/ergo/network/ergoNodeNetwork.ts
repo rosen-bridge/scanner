@@ -1,4 +1,7 @@
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory, {
   ErgoTransaction,
 } from '@rosen-clients/ergo-node';
@@ -23,7 +26,7 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
     const block = blocks[0];
     return {
       hash: block.id,
-      blockHeight: block.height,
+      height: block.height,
       parentHash: block.parentId,
       timestamp: Number(block.timestamp / 1000n),
     };

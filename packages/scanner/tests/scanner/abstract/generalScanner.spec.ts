@@ -7,7 +7,7 @@ import {
   TestTransaction,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
-import { BlockEntity, InitialInfo } from '../../../lib';
+import { BlockEntity } from '../../../lib';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 let dataSource: DataSource;
@@ -44,7 +44,7 @@ describe('generalScanner', () => {
         .mockImplementation()
         .mockImplementation((height: number) =>
           Promise.resolve({
-            blockHeight: 3,
+            height: 3,
             parentHash: '2',
             hash: '5',
             timestamp: 50,
@@ -69,7 +69,7 @@ describe('generalScanner', () => {
         .mockImplementation()
         .mockImplementation((height: number) =>
           Promise.resolve({
-            blockHeight: 3,
+            height: 3,
             parentHash: '2',
             hash: '3',
             timestamp: 50,
@@ -103,13 +103,13 @@ describe('generalScanner', () => {
       const block = {
         hash: '1',
         parentHash: ' ',
-        blockHeight: 1,
+        height: 1,
         timestamp: 50,
       };
       await scanner['processBlock']({
         hash: '1',
         parentHash: ' ',
-        blockHeight: 1,
+        height: 1,
         timestamp: 50,
       });
       expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
@@ -140,7 +140,7 @@ describe('generalScanner', () => {
       const result = await scanner['processBlock']({
         hash: '1',
         parentHash: '2',
-        blockHeight: 1,
+        height: 1,
         timestamp: 50,
         txCount: 10,
       });
@@ -172,7 +172,7 @@ describe('generalScanner', () => {
       const block = {
         hash: '1',
         parentHash: '2',
-        blockHeight: 1,
+        height: 1,
         timestamp: 50,
         txCount: 1,
       };
@@ -203,7 +203,7 @@ describe('generalScanner', () => {
             switch (height) {
               case 1: {
                 resolve({
-                  blockHeight: 1,
+                  height: 1,
                   parentHash: ' ',
                   hash: '1',
                   timestamp: 10,
@@ -212,7 +212,7 @@ describe('generalScanner', () => {
               }
               case 2: {
                 resolve({
-                  blockHeight: 2,
+                  height: 2,
                   parentHash: '1',
                   hash: '2',
                   timestamp: 20,
@@ -221,7 +221,7 @@ describe('generalScanner', () => {
               }
               case 3: {
                 resolve({
-                  blockHeight: 3,
+                  height: 3,
                   parentHash: '2',
                   hash: '3',
                   timestamp: 30,
@@ -230,7 +230,7 @@ describe('generalScanner', () => {
               }
               case 4: {
                 resolve({
-                  blockHeight: 4,
+                  height: 4,
                   parentHash: '3',
                   hash: '4',
                   timestamp: 40,
@@ -271,7 +271,7 @@ describe('generalScanner', () => {
             switch (height) {
               case 1: {
                 resolve({
-                  blockHeight: 1,
+                  height: 1,
                   parentHash: ' ',
                   hash: '1',
                   timestamp: 10,
@@ -280,7 +280,7 @@ describe('generalScanner', () => {
               }
               case 2: {
                 resolve({
-                  blockHeight: 2,
+                  height: 2,
                   parentHash: '1',
                   hash: '32',
                   timestamp: 20,
@@ -289,7 +289,7 @@ describe('generalScanner', () => {
               }
               case 3: {
                 resolve({
-                  blockHeight: 3,
+                  height: 3,
                   parentHash: '32',
                   hash: '42',
                   timestamp: 30,
@@ -351,7 +351,7 @@ describe('generalScanner', () => {
           new Promise((resolve, reject) => {
             scanner.action
               .saveBlock({
-                blockHeight: 2,
+                height: 2,
                 parentHash: 'parent',
                 hash: 'hash',
                 timestamp: 10,
@@ -437,7 +437,7 @@ describe('generalScanner', () => {
             switch (height) {
               case 1: {
                 resolve({
-                  blockHeight: 1,
+                  height: 1,
                   parentHash: ' ',
                   hash: '1',
                   timestamp: 10,
@@ -446,7 +446,7 @@ describe('generalScanner', () => {
               }
               case 2: {
                 resolve({
-                  blockHeight: 2,
+                  height: 2,
                   parentHash: '1',
                   hash: '2',
                   timestamp: 20,
@@ -455,7 +455,7 @@ describe('generalScanner', () => {
               }
               case 3: {
                 resolve({
-                  blockHeight: 3,
+                  height: 3,
                   parentHash: '2',
                   hash: '3',
                   timestamp: 30,
@@ -495,7 +495,7 @@ describe('generalScanner', () => {
             switch (height) {
               case 1: {
                 resolve({
-                  blockHeight: 1,
+                  height: 1,
                   parentHash: ' ',
                   hash: '1',
                   timestamp: 10,
@@ -504,7 +504,7 @@ describe('generalScanner', () => {
               }
               case 2: {
                 resolve({
-                  blockHeight: 2,
+                  height: 2,
                   parentHash: '1',
                   hash: '2',
                   timestamp: 20,
@@ -513,7 +513,7 @@ describe('generalScanner', () => {
               }
               case 3: {
                 resolve({
-                  blockHeight: 3,
+                  height: 3,
                   parentHash: '2',
                   hash: '5',
                   timestamp: 30,

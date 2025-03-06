@@ -8,7 +8,6 @@ export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
 export { ExtractorStatusEntity } from './entities/extractorStatusEntity';
-export { AbstractNetworkConnector, Block, InitialInfo } from './interfaces';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';
 export { WebSocketScanner } from './scanner/abstract/webSocketScanner';
