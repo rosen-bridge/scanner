@@ -7,6 +7,6 @@
   "references": [
     { "path": "../../observation-extractor" },
     { "path": "../../scanners/evm-rpc-scanner" },
-    { "path": "../../scanner-interfaces/tsconfig.build.json" }
+    { "path": "../../scanner-interfaces" }
   ]
 }

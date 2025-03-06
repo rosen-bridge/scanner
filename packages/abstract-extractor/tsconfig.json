@@ -4,5 +4,5 @@
     "outDir": "./dist"
   },
   "include": ["tests", "lib", "vitest.config.ts"],
-  "references": [{ "path": "../scanner-interfaces/tsconfig.build.json" }]
+  "references": [{ "path": "../scanner-interfaces" }]
 }
