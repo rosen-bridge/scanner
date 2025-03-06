@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import { pick } from 'lodash-es';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import {
   AbstractErgoExtractorAction,
   AbstractErgoExtractorEntity,
-  BlockInfo,
   AbstractBoxData,
 } from '../lib';
 import { TestEntity } from './testUtils';

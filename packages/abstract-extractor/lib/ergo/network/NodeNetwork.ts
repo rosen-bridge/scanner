@@ -3,7 +3,7 @@ import ergoNodeClientFactory, {
   IndexedErgoTransaction,
 } from '@rosen-clients/ergo-node';
 
-import { BlockInfo } from '../../interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { ErgoBox, ExtendedTransaction } from '../interfaces';
 import { AbstractNetwork } from './AbstractNetwork';
 

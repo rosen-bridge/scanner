@@ -10,7 +10,7 @@ import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
-import { BlockInfo } from '../interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { AbstractBoxData, BoxInfo, SpendInfo } from './interfaces';
 import { DB_CHUNK_SIZE } from '../constants';
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';

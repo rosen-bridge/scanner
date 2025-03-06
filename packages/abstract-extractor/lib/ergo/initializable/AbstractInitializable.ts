@@ -9,7 +9,7 @@ import {
 import { API_LIMIT, RETRIAL_COUNT } from '../../constants';
 import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
 import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
-import { BlockInfo } from '../../interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { ExplorerNetwork } from '../network/ExplorerNetwork';
 import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';

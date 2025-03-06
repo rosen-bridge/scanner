@@ -2,7 +2,7 @@ import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { AbstractNetwork } from './AbstractNetwork';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
-import { BlockInfo } from '../../interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { ErgoBox, ExtendedTransaction, Transaction } from '../interfaces';
 import { mapValues, pick } from 'lodash-es';
 import { API_LIMIT } from '../../constants';
