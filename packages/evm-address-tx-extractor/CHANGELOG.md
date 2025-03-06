@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 1.0.8
+
+### Patch Changes
+
+- Improve extraction speed by applying the checks on response and transform only the desired transactions
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.2
+
 ## 1.0.7
 
 ### Patch Changes

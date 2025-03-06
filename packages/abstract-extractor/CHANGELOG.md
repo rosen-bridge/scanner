@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 1.0.2
+
+### Patch Changes
+
+- Add input box extension to network api interfaces
+
 ## 1.0.1
 
 ### Patch Changes

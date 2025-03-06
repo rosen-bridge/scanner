@@ -1,5 +1,17 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.0.0
+
+### Major Changes
+
+- Update tokens package to v3.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@7.0.0
+  - @rosen-bridge/evm-rpc-scanner@2.0.3
+
 ## 4.0.0
 
 ### Major Changes

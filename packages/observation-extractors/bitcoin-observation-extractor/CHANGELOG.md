@@ -1,5 +1,18 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.0.0
+
+### Major Changes
+
+- Update tokens package to v3.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/observation-extractor@7.0.0
+  - @rosen-bridge/bitcoin-esplora-scanner@1.1.1
+  - @rosen-bridge/bitcoin-rpc-scanner@1.1.1
+
 ## 5.0.0
 
 ### Major Changes
