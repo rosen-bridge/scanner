@@ -2,10 +2,9 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
+import { AbstractExtractor, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { AbstractExtractor } from '../AbstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import {
   Transaction,
   OutputBox,
