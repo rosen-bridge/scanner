@@ -36,8 +36,8 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/evm-rpc-scanner": "^2.0.2",
     "@rosen-bridge/observation-extractor": "^6.0.0",
-    "@rosen-bridge/rosen-extractor": "^7.2.0",
-    "@rosen-bridge/tokens": "^2.0.0",
+    "@rosen-bridge/rosen-extractor": "^7.2.1",
+    "@rosen-bridge/tokens": "^3.0.0",
     "blakejs": "^1.2.1",
     "ethers": "^6.11.1"
   }
