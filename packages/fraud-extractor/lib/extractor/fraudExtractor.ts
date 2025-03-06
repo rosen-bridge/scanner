@@ -3,7 +3,6 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 import JsonBI from '@rosen-bridge/json-bigint';
@@ -11,6 +10,7 @@ import {
   AbstractExtractor,
   Block,
   BlockInfo,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
 import { FraudAction } from '../actions/fraudAction';

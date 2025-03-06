@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { Transaction } from '@rosen-bridge/scanner';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { migrations } from '../../lib/migrations';
 import PermitEntity from '../../lib/entities/PermitEntity';

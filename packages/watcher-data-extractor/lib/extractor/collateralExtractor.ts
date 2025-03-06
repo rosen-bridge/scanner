@@ -1,5 +1,4 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { OutputBox, Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
@@ -7,6 +6,8 @@ import {
   AbstractExtractor,
   Block,
   BlockInfo,
+  OutputBox,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
 import CollateralAction from '../actions/collateralAction';

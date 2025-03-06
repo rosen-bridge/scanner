@@ -1,11 +1,11 @@
 import {
   AbstractNetworkConnector,
   Block,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory, {
   ErgoTransaction,
 } from '@rosen-clients/ergo-node';
-import { Transaction } from './types';
 
 class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
   private client: ReturnType<typeof ergoNodeClientFactory>;

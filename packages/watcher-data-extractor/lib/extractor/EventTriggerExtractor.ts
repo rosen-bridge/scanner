@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { blake2b } from 'blakejs';
-import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
@@ -12,6 +11,7 @@ import {
   BlockInfo,
   ErgoNetworkType,
   OutputBox,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
 import EventTriggerAction from '../actions/EventTriggerAction';

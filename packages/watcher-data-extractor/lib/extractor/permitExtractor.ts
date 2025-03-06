@@ -3,7 +3,6 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
@@ -11,6 +10,7 @@ import {
   AbstractExtractor,
   Block,
   BlockInfo,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
 import { DefaultApiLimit } from '../constants';

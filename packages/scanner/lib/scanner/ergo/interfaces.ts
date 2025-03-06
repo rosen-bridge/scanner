@@ -1,9 +1,5 @@
+import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
-
-export enum ErgoNetworkType {
-  Explorer = 'explorer',
-  Node = 'node',
-}
 
 export interface ErgoScannerConfig {
   type: ErgoNetworkType;

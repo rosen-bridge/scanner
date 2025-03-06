@@ -1,4 +1,6 @@
-import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/scanner';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
 import { EventTriggerEntity } from '../../lib';
 
 export const permitAddress =

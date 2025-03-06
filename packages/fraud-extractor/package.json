@@ -22,7 +22,6 @@
     "@rosen-bridge/abstract-extractor": "^1.0.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/scanner": "^5.0.2",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.1",
@@ -34,6 +33,7 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
+    "@rosen-bridge/scanner": "^5.0.2",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
     "@types/node": "^20.11.9",

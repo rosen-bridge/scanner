@@ -2,8 +2,8 @@ import { TransactionInfo1 } from '@rosen-clients/ergo-explorer/dist/src/v1/types
 import {
   AbstractNetworkConnector,
   Block,
+  Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import { Transaction } from './types';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
