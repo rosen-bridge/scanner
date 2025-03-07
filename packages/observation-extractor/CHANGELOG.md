@@ -1,5 +1,21 @@
 # @rosen-bridge/observation-extractor
 
+## 7.0.0
+
+### Major Changes
+
+- Update tokens package to v3.0.0
+
+### Minor Changes
+
+- Update koios scanner to use the new serialized APIs
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@5.1.0
+  - @rosen-bridge/abstract-extractor@1.0.2
+
 ## 6.0.0
 
 ### Major Changes

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "description": "A Blockchain scanner. currently supports ergo and cardano",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -29,7 +29,7 @@
     "@cardano-ogmios/client": "^6.6.1",
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
-    "@rosen-bridge/abstract-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-extractor": "^1.0.2",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-clients/ergo-explorer": "^1.1.1",
