@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - Add input box extension to network api interfaces
+- Refactor query logic in abstract ergo extractor actions
 
 ## 1.0.1
 
