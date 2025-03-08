@@ -1,5 +1,12 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@5.1.0
+
 ## 1.1.0
 
 ### Minor Changes

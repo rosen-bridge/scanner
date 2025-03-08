@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/fraud-extractor",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "fraud information extractor for watcher faulty reports",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -19,7 +19,7 @@
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-extractor": "^1.0.2",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
@@ -33,7 +33,7 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
-    "@rosen-bridge/scanner": "^5.0.2",
+    "@rosen-bridge/scanner": "^5.1.0",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
     "@types/node": "^20.11.9",

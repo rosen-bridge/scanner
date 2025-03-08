@@ -5,6 +5,7 @@ import {
   Not,
   EntityTarget,
   FindOptionsWhere,
+  QueryRunner,
 } from 'typeorm';
 import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -38,18 +39,122 @@ export abstract class AbstractErgoExtractorAction<
   /**
    * create the database entity from extracted data and block information
    */
-  protected abstract createEntity: (
+  protected createEntity = (
     data: ExtractedData[],
     block: BlockInfo,
     extractor: string
-  ) => Array<Omit<ExtractorEntity, 'id'>>;
+  ): Array<Omit<ExtractorEntity, 'id'>> => {
+    throw Error(
+      'You must implement `createEntity` or override `insertEntities` and `updateEntities`'
+    );
+  };
 
   /**
    * convert the database entity back to raw data
    */
-  protected abstract convertEntityToData: (
+  protected convertEntityToData = (
     entities: ExtractorEntity[]
-  ) => ExtractedData[];
+  ): ExtractedData[] => {
+    throw Error(
+      'You must implement `convertEntityToData` or override `deleteBlockEntities`'
+    );
+  };
+
+  /**
+   * insert entities extracted from a block to database
+   * @param queryRunner
+   * @param boxesToInsert
+   * @param block
+   * @param extractor
+   */
+  protected insertEntities = async (
+    queryRunner: QueryRunner,
+    boxesToInsert: Array<ExtractedData>,
+    block: BlockInfo,
+    extractor: string
+  ) => {
+    const repository = queryRunner.manager.getRepository(this.repo);
+    await repository.insert(
+      this.createEntity(boxesToInsert, block, extractor) as any
+    );
+  };
+
+  /**
+   * update entities related to a box
+   * @param queryRunner
+   * @param updateBox
+   * @param block
+   * @param extractor
+   */
+  protected updateEntity = async (
+    queryRunner: QueryRunner,
+    updateBox: ExtractedData,
+    block: BlockInfo,
+    extractor: string
+  ) => {
+    const repository = queryRunner.manager.getRepository(this.repo);
+    const box = this.createEntity([updateBox], block, extractor)[0];
+    await repository.update(
+      {
+        boxId: box.boxId,
+        extractor: extractor,
+      } as FindOptionsWhere<ExtractorEntity>,
+      box as any
+    );
+  };
+
+  /**
+   * delete all data extracted from a block
+   * @param queryRunner
+   * @param extractor
+   * @param block
+   * @returns
+   */
+  protected deleteBlockEntities = async (
+    queryRunner: QueryRunner,
+    extractor: string,
+    block: string
+  ): Promise<ExtractedData[]> => {
+    const repository = queryRunner.manager.getRepository(this.repo);
+    const deletedData = await repository.find({
+      where: { extractor: extractor, block: block } as any,
+    });
+    await repository.delete({
+      extractor: extractor,
+      block: block,
+    } as any);
+    return this.convertEntityToData(deletedData);
+  };
+
+  /**
+   * delete all data extracted from a block
+   * @param queryRunner
+   * @param extractor
+   * @param block
+   * @returns
+   */
+  protected updateBlockEntities = async (
+    queryRunner: QueryRunner,
+    extractor: string,
+    block: string
+  ): Promise<ExtractorEntity[]> => {
+    const repository = queryRunner.manager.getRepository(this.repo);
+    const updatedData = await repository.find({
+      where: {
+        extractor: extractor,
+        spendBlock: block,
+        block: Not(block),
+      } as any,
+    });
+    await repository.update(
+      {
+        spendBlock: block,
+        extractor: extractor,
+      } as FindOptionsWhere<ExtractorEntity>,
+      { spendBlock: null, spendHeight: 0 } as any
+    );
+    return updatedData;
+  };
 
   /**
    * insert all extracted box data in an atomic transaction
@@ -65,7 +170,6 @@ export abstract class AbstractErgoExtractorAction<
     block: BlockInfo,
     extractor: string
   ): Promise<boolean> => {
-    let success = true;
     let boxesToInsert: ExtractedData[] = [],
       boxesToUpdate: ExtractedData[] = [];
     const queryRunner = this.datasource.createQueryRunner();
@@ -87,9 +191,7 @@ export abstract class AbstractErgoExtractorAction<
 
       if (boxesToInsert.length > 0) {
         this.logger.debug(`Inserting boxes`);
-        await repository.insert(
-          this.createEntity(boxesToInsert, block, extractor) as any
-        );
+        await this.insertEntities(queryRunner, boxesToInsert, block, extractor);
       }
       if (boxesToUpdate.length > 0)
         this.logger.info(
@@ -97,27 +199,21 @@ export abstract class AbstractErgoExtractorAction<
             .map((col) => col.boxId)
             .join(', ')}]`
         );
-      for (const box of this.createEntity(boxesToUpdate, block, extractor)) {
+      for (const box of boxesToUpdate) {
         this.logger.debug(
           `Updating boxes in database [${JsonBigInt.stringify(box)}]`
         );
-        await repository.update(
-          {
-            boxId: box.boxId,
-            extractor: extractor,
-          } as FindOptionsWhere<ExtractorEntity>,
-          box as any
-        );
+        await this.updateEntity(queryRunner, box, block, extractor);
       }
       await queryRunner.commitTransaction();
+      return true;
     } catch (e) {
       this.logger.error(`An error occurred during store boxes action: ${e}`);
       await queryRunner.rollbackTransaction();
-      success = false;
+      return false;
     } finally {
       await queryRunner.release();
     }
-    return success;
   };
 
   /**
@@ -176,33 +272,37 @@ export abstract class AbstractErgoExtractorAction<
     block: string,
     extractor: string
   ): Promise<{ deletedData: ExtractedData[]; updatedData: BoxInfo[] }> => {
-    this.logger.info(
-      `Deleting boxes in block ${block} and extractor ${extractor}`
-    );
-    const deletedData = await this.repository.find({
-      where: { extractor: extractor, block: block } as any,
-    });
-    const updatedData = await this.repository.find({
-      where: {
-        extractor: extractor,
-        spendBlock: block,
-        block: Not(block),
-      } as any,
-    });
-    await this.repository.delete({
-      extractor: extractor,
-      block: block,
-    } as any);
-    await this.repository.update(
-      {
-        spendBlock: block,
-        extractor: extractor,
-      } as FindOptionsWhere<ExtractorEntity>,
-      { spendBlock: null, spendHeight: 0 } as any
-    );
-    return {
-      deletedData: this.convertEntityToData(deletedData),
-      updatedData: updatedData.map((data) => pick(data, 'boxId')),
-    };
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      this.logger.info(
+        `Deleting boxes in block ${block} and extractor ${extractor}`
+      );
+      const updatedData = await this.updateBlockEntities(
+        queryRunner,
+        extractor,
+        block
+      );
+      const deletedData = await this.deleteBlockEntities(
+        queryRunner,
+        extractor,
+        block
+      );
+      await queryRunner.commitTransaction();
+      return {
+        deletedData,
+        updatedData: updatedData.map((data) => pick(data, 'boxId')),
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(
+        `An error occurred while deleting data extracted from block ${block}`,
+        error
+      );
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   };
 }
