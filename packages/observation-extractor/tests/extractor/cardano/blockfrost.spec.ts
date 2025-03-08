@@ -7,6 +7,7 @@ import { blake2b } from 'blakejs';
 import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
 import { DataSource } from 'typeorm';
 import { validLockTx } from './blockFrostTestData';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 class CardanoBlockFrostExtractor extends CardanoBlockFrostObservationExtractor {}
 
@@ -38,10 +39,12 @@ describe('cardanoBlockFrostObservationExtractor', () => {
       // mock lock tx
       const tx = validLockTx;
 
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       // run test
       const extractor = new CardanoBlockFrostExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         bankAddress
       );
       const res = await extractor.processTransactions(
@@ -98,10 +101,12 @@ describe('cardanoBlockFrostObservationExtractor', () => {
       // mock lock tx
       const tx = validLockTx;
 
+      const tokenMap = new TokenMap();
+      await tokenMap.updateConfigByJson(tokens);
       // run test
       const extractor = new CardanoBlockFrostExtractor(
         dataSource,
-        tokens,
+        tokenMap,
         'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'
       );
       const res = await extractor.processTransactions(

@@ -19,13 +19,13 @@ export class CardanoGraphQLObservationExtractor extends AbstractExtractor<GraphQ
 
   constructor(
     dataSource: DataSource,
-    tokens: RosenTokens,
+    tokens: TokenMap,
     address: string,
     logger?: AbstractLogger
   ) {
     super();
     this.dataSource = dataSource;
-    this.tokens = new TokenMap(tokens);
+    this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
     this.extractor = new CardanoGraphQLRosenExtractor(

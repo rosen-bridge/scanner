@@ -2,7 +2,7 @@ interface ExtractedEventTrigger {
   eventId: string;
   txId: string;
   boxId: string;
-  boxSerialized: string;
+  serialized: string;
   fromChain: string;
   toChain: string;
   fromAddress: string;

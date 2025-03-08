@@ -3,8 +3,13 @@ export enum ErgoNetworkType {
   Node = 'node',
 }
 
+export type InputExtension = {
+  [key: string]: string;
+};
+
 export type InputBox = {
   boxId: string;
+  extension?: InputExtension;
 };
 
 export type DataInput = {
@@ -30,8 +35,8 @@ export type OutputBox = {
   value: bigint;
   ergoTree: string;
   creationHeight: number;
-  assets?: Array<Asset>;
-  additionalRegisters?: AdditionalRegisters;
+  assets: Array<Asset>;
+  additionalRegisters: AdditionalRegisters;
   transactionId: string;
   index: number;
 };
@@ -82,3 +87,29 @@ export interface RangeQuery {
 }
 
 export type RangeList = RangeQuery[];
+export interface AbstractBoxData {
+  boxId: string;
+  serialized: string;
+}
+
+export enum CallbackType {
+  Insert = 'insert',
+  Update = 'update',
+  Spend = 'spend',
+  Delete = 'delete',
+}
+
+export interface BoxInfo {
+  boxId: string;
+}
+
+export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
+  [CallbackType.Update]: BoxInfo[];
+  [CallbackType.Insert]: ExtractedData[];
+  [CallbackType.Delete]: ExtractedData[];
+  [CallbackType.Spend]: BoxInfo[];
+};
+
+export type CallbackMap<ExtractedData extends AbstractBoxData> = {
+  [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
+};

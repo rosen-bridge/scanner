@@ -12,8 +12,12 @@ import {
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';
 import { ExtractedBox } from '../interfaces/types';
+import { BoxEntity } from '../entities/boxEntity';
 
-export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<ExtractedBox> {
+export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
+  ExtractedBox,
+  BoxEntity
+> {
   readonly actions: BoxEntityAction;
   private readonly id: string;
   private readonly networkType: ergoLib.NetworkPrefix;

@@ -1,4 +1,4 @@
-image: node:16.17
+image: node:20.11
 
 stages:
   - installation

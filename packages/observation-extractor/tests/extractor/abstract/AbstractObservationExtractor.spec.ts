@@ -9,14 +9,16 @@ import {
 import { ObservationEntity } from '../../../lib';
 import { rosenData, tx } from './testData';
 import { blake2b } from 'blakejs';
-
+import { TokenMap } from '@rosen-bridge/tokens';
 describe('AbstractObservationExtractor', () => {
   let dataSource: DataSource;
   let extractor: TestAbstractObservationExtractor;
 
   beforeEach(async () => {
     dataSource = await createDatabase();
-    extractor = new TestAbstractObservationExtractor(dataSource, tokens, {
+    const tokenMap = new TokenMap();
+    await tokenMap.updateConfigByJson(tokens);
+    extractor = new TestAbstractObservationExtractor(dataSource, tokenMap, {
       get: jest.fn(),
     } as any);
   });

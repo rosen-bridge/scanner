@@ -48,7 +48,10 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
         additionalRegisters: output.additionalRegisters,
         boxId: output.boxId || '',
       })),
-      inputs: tx.inputs,
+      inputs: tx.inputs.map((input) => ({
+        boxId: input.boxId,
+        extension: input.spendingProof.extension,
+      })),
       dataInputs: tx.dataInputs,
     };
   };

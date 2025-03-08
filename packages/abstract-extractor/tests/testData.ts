@@ -1,23 +1,16 @@
-import { Block } from '../lib';
+import { Block, InputExtension } from '../lib';
+import { TestEntity } from './testUtils';
 
 export const tx = {
   id: '3b91fbd2b6f4f3f971098655ffa320841001b071908de057cdf8c425cd3b3e61',
   inputs: [
     {
       boxId: '3df73b29204ffa2085c38a958d322c86bee0471a5a1296b031f137236e038c6d',
-      spendingProof: {
-        proofBytes:
-          '06fb1e785d12ac74886c0d3fa0e61db0aa4dfaef6b6a42ab7a908625f3721f35bbce8245876ab14113baf41ff7b479863513462a8b438ec3',
-        extension: {},
-      },
+      extension: { '0': '1101d00f' } as InputExtension,
     },
     {
       boxId: '846f3cedf2fc4242898413558e73a69d057edda1df6f274a1eeea219b6dd62dd',
-      spendingProof: {
-        proofBytes:
-          '2c930f70ba11b35f32e3eb9023634e7a394a8714ebe794fd7134ab4cea9da753303f2f56e6bf4d1b0b0466b29fc8ce8c949ca602edf38895',
-        extension: {},
-      },
+      extension: {},
     },
   ],
   dataInputs: [],
@@ -107,3 +100,40 @@ export const block: Block = {
   height: 100,
   parentHash: 'parentHash',
 } as Block;
+
+export const block2: Block = {
+  hash: 'hash2',
+  height: 101,
+  parentHash: 'parentHash2',
+} as Block;
+
+export const sampleEntities: Omit<TestEntity, 'id'>[] = [
+  {
+    extractor: 'extractor',
+    boxId: '1',
+    serialized: 'serialized1',
+    block: 'blockId1',
+    height: 100,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '2',
+    serialized: 'serialized2',
+    block: 'blockId2',
+    height: 200,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '3',
+    serialized: 'serialized3',
+    block: 'blockId3',
+    height: 300,
+  },
+  {
+    extractor: 'extractor',
+    boxId: '4',
+    serialized: 'serialized4',
+    block: 'blockId4',
+    height: 400,
+  },
+];

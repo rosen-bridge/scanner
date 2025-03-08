@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
+import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import { AbstractNetworkConnector, Block } from '../../../interfaces';
-import { KoiosBlock, KoiosTransaction } from '../interfaces/Koios';
-
+import { KoiosBlock, KoiosCborTx, KoiosTransaction } from '../interfaces/Koios';
+import { JsonBI } from '../../ergo/network/parser';
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly url: string;
   private readonly timeout: number;
@@ -75,17 +76,19 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
    */
   getBlockTxs = (blockHash: string): Promise<Array<KoiosTransaction>> => {
     return this.koios
-      .post<Array<KoiosTransaction>>('/block_tx_info', {
+      .post<Array<KoiosCborTx>>('/block_tx_cbor', {
         _block_hashes: [blockHash],
-        _inputs: false,
-        _metadata: true,
-        _assets: true,
-        _withdrawals: true,
-        _certs: false,
-        _scripts: false,
       })
       .then((res) => {
-        return res.data;
+        return res.data.map((tx) => {
+          const serializedTx = Transaction.from_bytes(
+            new Uint8Array(Buffer.from(tx.cbor, 'hex'))
+          );
+          return {
+            ...tx,
+            ...JsonBI.parse(serializedTx.to_json()),
+          };
+        });
       })
       .catch((exp) => {
         throw exp;

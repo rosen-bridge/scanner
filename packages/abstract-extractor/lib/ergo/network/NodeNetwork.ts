@@ -42,6 +42,7 @@ export class NodeNetwork {
       inclusionHeight: tx.inclusionHeight,
       blockId: tx.blockId,
       outputs: tx.outputs.map((output) => this.convertBox(output)),
+      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs.map((input) => this.convertBox(input)),
       dataInputs: tx.dataInputs,
     };

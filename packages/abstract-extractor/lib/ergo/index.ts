@@ -5,3 +5,4 @@ export * from './network/ExplorerNetwork';
 export * from './network/NodeNetwork';
 export * from './initializable';
 export * from './utils';
+export * from './AbstractErgoExtractorEntity';

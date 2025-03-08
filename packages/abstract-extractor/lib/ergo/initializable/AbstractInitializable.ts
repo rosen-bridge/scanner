@@ -1,26 +1,33 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { groupBy, sortBy } from 'lodash-es';
+import { Mutex } from 'await-semaphore';
+
 import {
-  ErgoExtractedData,
+  AbstractBoxData,
   ErgoNetworkType,
   ExtendedSpendInfo,
   ExtendedTransaction,
 } from '../interfaces';
 import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
+import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
 import { BlockInfo } from '../../interfaces';
-import { groupBy, sortBy } from 'lodash-es';
-import { Mutex } from 'await-semaphore';
 import { ExplorerInitializer } from './ExplorerInitializer';
 import { NodeInitializer } from './NodeInitializer';
 import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
 export abstract class AbstractInitializableErgoExtractor<
-  ExtractedData extends ErgoExtractedData
-> extends AbstractErgoExtractor<ExtractedData> {
-  protected abstract actions: AbstractInitializableErgoExtractorAction<ExtractedData>;
+  ExtractedData extends AbstractBoxData,
+  ExtractorEntity extends AbstractErgoExtractorEntity
+> extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
   private dbMutex = new Mutex();
   private spendRecordsMutex = new Mutex();
   private spendRecords: ExtendedSpendInfo[];
+  private address: string;
+  protected abstract actions: AbstractInitializableErgoExtractorAction<
+    ExtractedData,
+    ExtractorEntity
+  >;
 
   private initializer:
     | ExplorerInitializer<ExtractedData>

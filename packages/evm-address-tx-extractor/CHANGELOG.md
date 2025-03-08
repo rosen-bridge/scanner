@@ -1,5 +1,32 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 1.0.8
+
+### Patch Changes
+
+- Improve extraction speed by applying the checks on response and transform only the desired transactions
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.2
+
+## 1.0.7
+
+### Patch Changes
+
+- Update node version to 20
+- Update logger package
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.1
+  - @rosen-bridge/scanner@5.0.2
+
+## 1.0.6
+
+### Patch Changes
+
+- Prevent redundant store function calls
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@1.0.0
+  - @rosen-bridge/scanner@5.0.1
+
 ## 1.0.5
 
 ### Patch Changes

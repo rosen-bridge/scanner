@@ -3,11 +3,22 @@ import {
   AbstractInitializableErgoExtractor,
   AbstractInitializableErgoExtractorAction,
 } from '../../lib/ergo/initializable';
-import { OutputBox, ErgoExtractedData, BlockInfo } from '../../lib';
+import {
+  OutputBox,
+  AbstractBoxData,
+  BlockInfo,
+  AbstractErgoExtractorEntity,
+} from '../../lib';
 import { ergoBoxes } from './testData';
 
-export class MockedInitializableErgoExtractor extends AbstractInitializableErgoExtractor<ErgoExtractedData> {
-  actions: AbstractInitializableErgoExtractorAction<ErgoExtractedData>;
+export class MockedInitializableErgoExtractor extends AbstractInitializableErgoExtractor<
+  AbstractBoxData,
+  AbstractErgoExtractorEntity
+> {
+  actions: AbstractInitializableErgoExtractorAction<
+    AbstractBoxData,
+    AbstractErgoExtractorEntity
+  >;
 
   getId = () => 'Test';
 
