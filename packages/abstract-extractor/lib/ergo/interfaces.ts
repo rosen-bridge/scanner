@@ -18,7 +18,7 @@ export interface SpendInfo {
   boxId: string;
   txId: string;
   index: number;
-  extras?: string[];
+  extras?: { [key: string]: string };
 }
 
 export interface AbstractBoxData {
@@ -47,3 +47,5 @@ export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
 export type CallbackMap<ExtractedData extends AbstractBoxData> = {
   [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
 };
+
+export type TxExtra = { [key: string]: string };
