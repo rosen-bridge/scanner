@@ -112,7 +112,12 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
         const spendInfo = spendInfoChunk.find(
           (info) => info.boxId === spentTrigger.boxId
         );
-        if (!spendInfo || !spendInfo.extras || spendInfo.extras.length < 2) {
+        if (
+          !spendInfo ||
+          !spendInfo.extras ||
+          !spendInfo.extras.result ||
+          !spendInfo.extras.paymentTxId
+        ) {
           throw Error(
             `Impossible case: spending information extras does not contain result or paymentTxId, ${spendInfo}`
           );
@@ -123,8 +128,8 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
             spendBlock: block.hash,
             spendHeight: block.height,
             spendTxId: spendInfo.txId,
-            result: spendInfo.extras[0],
-            paymentTxId: spendInfo.extras[1],
+            result: spendInfo.extras.result,
+            paymentTxId: spendInfo.extras.paymentTxId,
           }
         );
         spentData.push(pick(spendInfo, ['boxId']));

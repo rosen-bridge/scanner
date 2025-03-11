@@ -39,7 +39,7 @@ describe('EventTrigger', () => {
             boxId: 'id',
             txId: 'spendTxId',
             index: 0,
-            extras: [EventResult.fraud, ''],
+            extras: { result: EventResult.fraud, paymentTxId: 'txId' },
           },
         ],
         block,
