@@ -1,4 +1,4 @@
-import { BlockInfo, Block } from './block';
+import { BlockInfo, Block } from '@rosen-bridge/scanner-interfaces';
 
 export abstract class AbstractExtractor<TransactionType> {
   /**

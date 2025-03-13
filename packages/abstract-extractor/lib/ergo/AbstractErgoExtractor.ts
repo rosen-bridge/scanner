@@ -6,10 +6,10 @@ import {
   Transaction,
   OutputBox,
   InputExtension,
-  AbstractExtractor,
   BlockInfo,
 } from '@rosen-bridge/scanner-interfaces';
 
+import { AbstractExtractor } from '../abstractExtractor';
 import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
 import {
   AbstractBoxData,

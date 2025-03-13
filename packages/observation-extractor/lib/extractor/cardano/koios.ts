@@ -1,13 +1,15 @@
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { TokenMap } from '@rosen-bridge/tokens';
+import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
 import { KoiosTransaction } from '../../interfaces/koiosTransaction';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
-import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { AbstractExtractor, Block } from '@rosen-bridge/scanner-interfaces';
 
 export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTransaction> {
   readonly logger: AbstractLogger;

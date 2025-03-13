@@ -7,11 +7,11 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import {
-  AbstractExtractor,
   Block,
   BlockInfo,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import { DefaultApiLimit } from '../constants';
 import { JsonBI } from '../utils';
