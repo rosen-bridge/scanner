@@ -1,9 +1,10 @@
 import { Mutex } from 'await-semaphore';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { BlockDbAction } from '../action';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
-import { AbstractExtractor } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+
+import { BlockDbAction } from '../action';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;

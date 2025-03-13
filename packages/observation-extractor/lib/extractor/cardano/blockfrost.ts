@@ -1,13 +1,15 @@
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ExtractedObservation } from '../../interfaces/extractedObservation';
-import { ObservationEntityAction } from '../../actions/db';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { components } from '@blockfrost/openapi';
-import { AbstractExtractor, Block } from '@rosen-bridge/scanner-interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+
+import { ExtractedObservation } from '../../interfaces/extractedObservation';
+import { ObservationEntityAction } from '../../actions/db';
 
 interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];
