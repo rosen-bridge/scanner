@@ -140,8 +140,8 @@ export abstract class AbstractErgoExtractor<
    * @param tx
    * @returns
    */
-  getTransactionExtraData = (tx: Transaction): TxExtra | undefined => {
-    return undefined;
+  getTransactionExtraData = (tx: Transaction): TxExtra => {
+    return {};
   };
 
   /**
