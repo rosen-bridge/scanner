@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
 import {
-  AbstractExtractor,
   Block,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import { BlockEntity } from '../../../lib/entities/blockEntity';
 import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
