@@ -2,13 +2,16 @@ import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
-import { InitialInfo } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Transaction } from '@rosen-bridge/scanner';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 import JsonBI from '@rosen-bridge/json-bigint';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import {
+  Block,
+  BlockInfo,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import { FraudAction } from '../actions/fraudAction';
 import { DefaultApiLimit } from '../constants';
@@ -141,7 +144,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older frauds
    */
-  initializeBoxes = async (initialBlock: InitialInfo) => {
+  initializeBoxes = async (initialBlock: BlockInfo) => {
     // Getting unspent boxes
     this.logger.debug(
       `Initializing fraud table. storing fraud boxes created bellow height ${initialBlock.height}.`

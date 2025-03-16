@@ -1,14 +1,14 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { DataSource } from 'typeorm';
-import { Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import CommitmentAction from '../actions/commitmentAction';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { JsonBI } from '../utils';
 import { SpendInfo } from '../interfaces/types';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 class CommitmentExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

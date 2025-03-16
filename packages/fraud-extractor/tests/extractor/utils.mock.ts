@@ -1,12 +1,11 @@
 import { DataSource } from 'typeorm';
-import { FraudEntity } from '../../lib';
-import { migrations } from '../../lib';
-import {
-  migrations as scannerMigrations,
-  Transaction,
-} from '@rosen-bridge/scanner';
+import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import JsonBI from '@rosen-bridge/json-bigint';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
+import { FraudEntity } from '../../lib';
+import { migrations } from '../../lib';
 import { last10BlockHeader } from './fraudExtractorTestData';
 
 /**

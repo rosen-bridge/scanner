@@ -1,9 +1,10 @@
 import { Mutex } from 'await-semaphore';
-import { Block, InitialInfo } from '../../interfaces';
-import { BlockDbAction } from '../action';
+import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+
+import { BlockDbAction } from '../action';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -73,7 +74,7 @@ export abstract class AbstractScanner<TransactionType> {
     if (
       success &&
       (await this.action.updateBlockStatus(
-        block.blockHeight,
+        block.height,
         block.hash,
         this.extractors.map((e) => e.getId())
       ))
@@ -133,7 +134,7 @@ export abstract class AbstractScanner<TransactionType> {
    */
   private initializeExtractors = async (
     extractorIds: string[],
-    block: InitialInfo
+    block: BlockInfo
   ) => {
     const allExtractors = [...this.extractors, ...this.newExtractors];
     const initRequiredExtractors = allExtractors.filter((extractor) =>
@@ -156,7 +157,7 @@ export abstract class AbstractScanner<TransactionType> {
    * and update the active extractors list
    * @param block
    */
-  protected verifyExtractorsInitialization = async (block: InitialInfo) => {
+  protected verifyExtractorsInitialization = async (block: BlockInfo) => {
     const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
       return extractors.map((extractor) => extractor.getId());
     };

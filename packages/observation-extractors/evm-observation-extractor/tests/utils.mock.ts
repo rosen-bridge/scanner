@@ -4,8 +4,11 @@ import {
   migrations,
 } from '@rosen-bridge/observation-extractor';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
-import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  migrations as scannerMigrations,
+  BlockEntity,
+} from '@rosen-bridge/scanner';
 import { JsonBI } from '@rosen-bridge/scanner/dist/scanner/ergo/network/parser';
 import { Buffer } from 'buffer';
 

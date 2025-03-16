@@ -1,3 +1,8 @@
+export enum ErgoNetworkType {
+  Explorer = 'explorer',
+  Node = 'node',
+}
+
 export type NodeBlock = {
   headerId: string;
   transactions: Array<Transaction>;

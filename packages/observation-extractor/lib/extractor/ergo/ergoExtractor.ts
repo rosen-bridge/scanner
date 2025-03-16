@@ -1,14 +1,15 @@
 import { DataSource } from 'typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { TokenMap } from '@rosen-bridge/tokens';
+import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+
+import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 import { ExtractedObservation } from '../../interfaces/extractedObservation';
 import { ObservationEntityAction } from '../../actions/db';
-import { Transaction } from '@rosen-bridge/scanner';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { RosenTokens, TokenMap } from '@rosen-bridge/tokens';
-import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;

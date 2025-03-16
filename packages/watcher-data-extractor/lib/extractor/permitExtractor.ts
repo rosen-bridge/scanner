@@ -3,11 +3,15 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { InitialInfo, Transaction } from '@rosen-bridge/scanner';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { AbstractExtractor, Block } from '@rosen-bridge/abstract-extractor';
+import {
+  Block,
+  BlockInfo,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import { DefaultApiLimit } from '../constants';
 import { JsonBI } from '../utils';
@@ -131,7 +135,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older permits related to the address
    */
-  initializeBoxes = async (initialBlock: InitialInfo) => {
+  initializeBoxes = async (initialBlock: BlockInfo) => {
     let allStoredBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
     // Extract unspent permits
     const unspentPermits = await this.getAllUnspentPermits(initialBlock.height);

@@ -2,11 +2,11 @@ import { DataSource, In } from 'typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,
-  BlockInfo,
   BoxInfo,
   DB_CHUNK_SIZE,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';

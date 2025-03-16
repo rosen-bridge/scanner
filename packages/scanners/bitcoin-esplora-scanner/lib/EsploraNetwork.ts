@@ -1,5 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
-import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { BitcoinEsploraTransaction, EsploraBlock } from './types';
 
 export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTransaction> {
@@ -37,7 +40,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
     return {
       parentHash: blockHeader.previousblockhash,
       hash: blockHeader.id,
-      blockHeight: blockHeader.height,
+      height: blockHeader.height,
       timestamp: blockHeader.timestamp,
       txCount: blockHeader.tx_count,
     };

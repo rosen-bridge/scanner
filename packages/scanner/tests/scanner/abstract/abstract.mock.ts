@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
 import {
-  AbstractExtractor,
-  Block as ExtractorBlock,
-} from '@rosen-bridge/abstract-extractor';
+  Block,
+  AbstractNetworkConnector,
+} from '@rosen-bridge/scanner-interfaces';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
 import { BlockEntity } from '../../../lib/entities/blockEntity';
-import { Block, AbstractNetworkConnector } from '../../../lib/interfaces';
 import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
 import { migrations } from '../../../lib/migrations';
 import { BlockDbAction } from '../../../lib/scanner/action';
@@ -21,7 +21,7 @@ export interface TestTransaction {
 export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   id: string;
   forked: Array<string>;
-  txs: Array<{ txs: Array<TestTransaction>; block: ExtractorBlock }>;
+  txs: Array<{ txs: Array<TestTransaction>; block: Block }>;
 
   constructor(id: string) {
     super();
@@ -32,7 +32,7 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
 
   processTransactions = (
     txs: Array<TestTransaction>,
-    block: ExtractorBlock
+    block: Block
   ): Promise<boolean> => {
     this.txs.push({ txs, block });
     return Promise.resolve(true);
@@ -55,7 +55,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
     return Promise.resolve({
       parentHash: '0',
       hash: '1',
-      blockHeight: height,
+      height: height,
       timestamp: 10,
     });
   };
@@ -96,7 +96,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
     network: AbstractNetworkConnector<TestTransaction>;
 
     getFirstBlock = async (): Promise<Block> => {
-      return { blockHeight: 2, hash: '2', parentHash: '1', timestamp: 20 };
+      return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
     };
   };
 };
@@ -124,7 +124,7 @@ export const insertBlocks = async (
     await scanner.action.saveBlock({
       parentHash: parent,
       hash: `${index}`,
-      blockHeight: index,
+      height: index,
       timestamp: 10 * index,
     });
     await scanner.action.updateBlockStatus(index, 'hash', []);
@@ -156,8 +156,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   initializeBoxes = () => Promise.resolve();
 
-  processTransactions = async (
-    txs: Array<{ id: string }>,
-    block: ExtractorBlock
-  ) => false;
+  processTransactions = async (txs: Array<{ id: string }>, block: Block) =>
+    false;
 }

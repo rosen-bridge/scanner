@@ -109,7 +109,7 @@ describe('RPCNetwork', () => {
       // check returned value
       expect(result).toEqual({
         hash: testData.blockInfo.hash,
-        blockHeight: testData.blockInfo.number,
+        height: testData.blockInfo.number,
         parentHash: testData.blockInfo.parentHash,
         timestamp: testData.blockInfo.timestamp,
         txCount: testData.blockInfo.length,

@@ -1,15 +1,11 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { groupBy, sortBy } from 'lodash-es';
+import { BlockInfo, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
-import {
-  AbstractBoxData,
-  ErgoNetworkType,
-  ExtendedTransaction,
-} from '../interfaces';
+import { AbstractBoxData, ExtendedTransaction } from '../interfaces';
 import { API_LIMIT, RETRIAL_COUNT } from '../../constants';
 import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
 import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
-import { BlockInfo } from '../../interfaces';
 import { ExplorerNetwork } from '../network/ExplorerNetwork';
 import { NodeNetwork } from '../network/NodeNetwork';
 import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';

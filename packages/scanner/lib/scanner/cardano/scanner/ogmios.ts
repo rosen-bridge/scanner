@@ -87,7 +87,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     if (savedBlock) {
       const block = {
         hash: savedBlock.hash,
-        blockHeight: savedBlock.height,
+        height: savedBlock.height,
         parentHash: savedBlock.parentHash,
         extra: savedBlock.extra,
         timestamp: savedBlock.timestamp,
@@ -115,7 +115,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
       );
       const block = {
         hash: praosBlock.id,
-        blockHeight: praosBlock.height,
+        height: praosBlock.height,
         parentHash: praosBlock.ancestor,
         extra: `${praosBlock.slot}`,
         // Caution: In case of a hard fork and change in slot duration, this must change!

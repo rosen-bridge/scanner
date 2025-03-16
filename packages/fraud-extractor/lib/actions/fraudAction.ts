@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { chunk } from 'lodash-es';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import { FraudEntity } from '../entities/fraudEntity';
 import { ExtractedFraud } from '../interfaces/types';

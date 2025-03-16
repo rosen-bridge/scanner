@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
+import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
@@ -12,7 +13,6 @@ import {
   spendTriggerTxOldFormat,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
-import { ErgoNetworkType } from '@rosen-bridge/abstract-extractor';
 
 let dataSource: DataSource;
 const sampleEventData = [

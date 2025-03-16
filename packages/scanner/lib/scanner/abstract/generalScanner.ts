@@ -1,5 +1,8 @@
 import { AbstractScanner } from './scanner';
-import { AbstractNetworkConnector, Block } from '../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
 import JsonBI from '@rosen-bridge/json-bigint';
 
@@ -31,9 +34,7 @@ abstract class GeneralScanner<
    */
   protected processBlock = async (block: Block) => {
     this.logger.debug(
-      `Processing block at height [${
-        block.blockHeight
-      }] in scanner ${this.name()}`
+      `Processing block at height [${block.height}] in scanner ${this.name()}`
     );
     const txs = await this.network.getBlockTxs(block.hash);
     if (block.txCount) {
@@ -115,7 +116,7 @@ abstract class GeneralScanner<
   protected initialize = async () => {
     const block = await this.getFirstBlock();
     await this.verifyExtractorsInitialization({
-      height: block.blockHeight - 1,
+      height: block.height - 1,
       hash: block.parentHash,
     });
     await this.processBlock(block);

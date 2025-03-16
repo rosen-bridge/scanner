@@ -1,5 +1,8 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import {
   BlockFrostNullValueError,
   BlockFrostTransaction,
@@ -31,7 +34,7 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
           );
         return {
           hash: res.hash,
-          blockHeight: res.height,
+          height: res.height,
           parentHash: res.previous_block,
           timestamp: res.time,
         };

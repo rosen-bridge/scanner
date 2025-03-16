@@ -1,8 +1,8 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
+import { BlockInfo, OutputBox } from '@rosen-bridge/scanner-interfaces';
+
 import {
   AbstractErgoExtractor,
-  BlockInfo,
-  OutputBox,
   AbstractBoxData,
   AbstractErgoExtractorAction,
   AbstractErgoExtractorEntity,

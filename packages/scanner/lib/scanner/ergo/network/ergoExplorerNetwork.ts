@@ -1,6 +1,9 @@
 import { TransactionInfo1 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
-import { Transaction } from './types';
+import {
+  AbstractNetworkConnector,
+  Block,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
@@ -20,7 +23,7 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     const blockSummary = await this.client.v1.getApiV1BlocksP1(blockIds[0]);
     return {
       parentHash: blockSummary.block.header.parentId,
-      blockHeight: blockSummary.block.header.height,
+      height: blockSummary.block.header.height,
       timestamp: Number(blockSummary.block.header.timestamp / 1000n),
       hash: blockSummary.block.header.id,
     };
