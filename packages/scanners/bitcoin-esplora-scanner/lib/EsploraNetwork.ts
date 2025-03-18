@@ -10,8 +10,9 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
   private readonly timeout: number;
   private readonly ESPLORA_BLOCK_TXS_LIMIT = 25;
   private client: AxiosInstance;
+  private apiPrefix: string;
 
-  constructor(url: string, timeout: number) {
+  constructor(url: string, timeout: number, apiPrefix?: string) {
     super();
     this.url = url;
     this.timeout = timeout;
@@ -20,6 +21,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
       timeout: this.timeout,
       headers: { 'Content-Type': 'application/json' },
     });
+    this.apiPrefix = apiPrefix || '/api';
   }
 
   /**
@@ -30,12 +32,14 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
   getBlockAtHeight = async (height: number): Promise<Block> => {
     // get block hash using block height
     const blockHash = (
-      await this.client.get<string>(`/api/block-height/${height}`)
+      await this.client.get<string>(`${this.apiPrefix}/block-height/${height}`)
     ).data;
 
     // get block headers using block hash
     const blockHeader = (
-      await this.client.get<EsploraBlock>(`/api/block/${blockHash}`)
+      await this.client.get<EsploraBlock>(
+        `${this.apiPrefix}/block/${blockHash}`
+      )
     ).data;
     return {
       parentHash: blockHeader.previousblockhash,
@@ -52,7 +56,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
    */
   getCurrentHeight = (): Promise<number> => {
     return this.client
-      .get<number>(`/api/blocks/tip/height`)
+      .get<number>(`${this.apiPrefix}/blocks/tip/height`)
       .then((res) => res.data);
   };
 
@@ -65,7 +69,9 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
     blockHash: string
   ): Promise<Array<BitcoinEsploraTransaction>> => {
     const txCount = (
-      await this.client.get<EsploraBlock>(`/api/block/${blockHash}`)
+      await this.client.get<EsploraBlock>(
+        `${this.apiPrefix}/block/${blockHash}`
+      )
     ).data.tx_count;
 
     const blockTxs: Array<BitcoinEsploraTransaction> = [];
@@ -74,7 +80,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
     while (offset < txCount) {
       const txs = (
         await this.client.get<Array<BitcoinEsploraTransaction>>(
-          `/api/block/${blockHash}/txs/${offset}`
+          `${this.apiPrefix}/block/${blockHash}/txs/${offset}`
         )
       ).data;
       blockTxs.push(...txs);
