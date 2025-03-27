@@ -52,7 +52,7 @@ describe('AbstractErgoExtractor', () => {
       expect(extractSpy).toBeCalledWith(
         tx.outputs[0],
         [tx.inputs[0].extension, {}],
-        undefined
+        {}
       );
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
