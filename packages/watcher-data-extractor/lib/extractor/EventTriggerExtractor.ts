@@ -206,7 +206,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
             txId: transaction.id,
             boxId: transaction.inputs[index].boxId,
             index: index,
-            extras: [result, paymentTxId],
+            extras: { result, paymentTxId },
           });
       });
       if (boxes.length > 0) {
