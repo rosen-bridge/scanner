@@ -36,7 +36,7 @@ export class BlockcypherNetwork extends AbstractNetworkConnector<BlockCypherTx> 
       parentHash: blockInfo.prev_block,
       hash: blockInfo.hash,
       height: blockInfo.height,
-      timestamp: Date.parse(blockInfo.time) / 1000,
+      timestamp: Math.floor(Date.parse(blockInfo.time) / 1000),
       txCount: blockInfo.n_tx,
     };
   };
