@@ -1,2 +1,2 @@
 export { DogeBlockcypherScanner } from './DogeBlockcypherScanner';
-export { DogeBlockcypherConfig, BlockCypherTx } from './types';
+export { DogeBlockcypherConfig, DogeBlockCypherTransaction } from './types';

@@ -3,9 +3,13 @@ import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
-import { BlockCypherBlock, BlockCypherChain, BlockCypherTx } from './types';
+import {
+  DogeBlockCypherBlock,
+  DogeBlockCypherChain,
+  DogeBlockCypherTransaction,
+} from './types';
 
-export class BlockcypherNetwork extends AbstractNetworkConnector<BlockCypherTx> {
+export class BlockcypherNetwork extends AbstractNetworkConnector<DogeBlockCypherTransaction> {
   private readonly url: string;
   private readonly timeout: number;
   private client: AxiosInstance;
@@ -29,7 +33,9 @@ export class BlockcypherNetwork extends AbstractNetworkConnector<BlockCypherTx> 
   getBlockAtHeight = async (height: number): Promise<Block> => {
     // get block hash using block height
     const blockInfo = (
-      await this.client.get<BlockCypherBlock>(`/v1/doge/main/blocks/${height}`)
+      await this.client.get<DogeBlockCypherBlock>(
+        `/v1/doge/main/blocks/${height}`
+      )
     ).data;
 
     return {
@@ -46,27 +52,32 @@ export class BlockcypherNetwork extends AbstractNetworkConnector<BlockCypherTx> 
    * @returns current height
    */
   getCurrentHeight = async (): Promise<number> => {
-    const chainInfo = (await this.client.get<BlockCypherChain>('/v1/doge/main'))
-      .data;
+    const chainInfo = (
+      await this.client.get<DogeBlockCypherChain>('/v1/doge/main')
+    ).data;
     return chainInfo.height;
   };
 
   /**
    * Return transactions in a block with specified hash
    * @param blockHash
-   * @returns array of BlockCypherTx
+   * @returns array of DogeBlockCypherTx
    */
-  getBlockTxs = async (blockHash: string): Promise<Array<BlockCypherTx>> => {
+  getBlockTxs = async (
+    blockHash: string
+  ): Promise<Array<DogeBlockCypherTransaction>> => {
     const blockInfo = (
-      await this.client.get<BlockCypherBlock>(
+      await this.client.get<DogeBlockCypherBlock>(
         `/v1/doge/main/blocks/${blockHash}`
       )
     ).data;
 
-    const txs: Array<BlockCypherTx> = [];
+    const txs: Array<DogeBlockCypherTransaction> = [];
     for (const txId of blockInfo.txids) {
       const tx = (
-        await this.client.get<BlockCypherTx>(`/v1/doge/main/txs/${txId}`)
+        await this.client.get<DogeBlockCypherTransaction>(
+          `/v1/doge/main/txs/${txId}`
+        )
       ).data;
       txs.push(tx);
     }

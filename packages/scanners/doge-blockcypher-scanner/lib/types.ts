@@ -7,7 +7,7 @@ export interface DogeBlockcypherConfig {
   dataSource: DataSource;
 }
 
-export interface BlockCypherTx {
+export interface DogeBlockCypherTransaction {
   hash: string;
   ver: number;
   vin_sz: number;
@@ -22,15 +22,15 @@ export interface BlockCypherTx {
   confirmed: string;
   received: string;
   double_spend: boolean;
-  inputs: BlockCypherVin[];
-  outputs: BlockCypherVout[];
+  inputs: DogeBlockCypherVin[];
+  outputs: DogeBlockCypherVout[];
   block_height?: number;
   block_hash?: string;
   confirmations: number;
   hex?: string;
 }
 
-export interface BlockCypherVin {
+export interface DogeBlockCypherVin {
   prev_hash: string;
   output_index: number;
   script: string;
@@ -40,7 +40,7 @@ export interface BlockCypherVin {
   script_type: string;
 }
 
-export interface BlockCypherVout {
+export interface DogeBlockCypherVout {
   value: number;
   script: string;
   addresses: string[];
@@ -48,7 +48,7 @@ export interface BlockCypherVout {
   spent_by?: string;
 }
 
-export interface BlockCypherBlock {
+export interface DogeBlockCypherBlock {
   hash: string;
   height: number;
   chain: string;
@@ -69,7 +69,7 @@ export interface BlockCypherBlock {
   depth: number;
 }
 
-export interface BlockCypherChain {
+export interface DogeBlockCypherChain {
   name: string;
   height: number;
   hash: string;

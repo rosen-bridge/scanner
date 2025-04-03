@@ -1,10 +1,10 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
 import { Block } from '@rosen-bridge/scanner-interfaces';
-import { DogeBlockcypherConfig, BlockCypherTx } from './types';
+import { DogeBlockcypherConfig, DogeBlockCypherTransaction } from './types';
 import { BlockcypherNetwork } from './BlockcypherNetwork';
 
-export class DogeBlockcypherScanner extends GeneralScanner<BlockCypherTx> {
+export class DogeBlockcypherScanner extends GeneralScanner<DogeBlockCypherTransaction> {
   readonly initialHeight: number;
   network: BlockcypherNetwork;
 
