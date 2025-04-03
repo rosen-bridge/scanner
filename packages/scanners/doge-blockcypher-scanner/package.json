@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/doge-blockcypher-scanner",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Doge blockchain scanner based on the BlockCypher API",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
