@@ -76,7 +76,7 @@ describe('webSocketScanner', () => {
         {
           hash: 'block 2',
           parentHash: 'block 0',
-          blockHeight: 101,
+          height: 101,
           extra: '',
           timestamp: 10,
         },
@@ -102,7 +102,7 @@ describe('webSocketScanner', () => {
         {
           hash: 'block 2',
           parentHash: 'block 0',
-          blockHeight: 101,
+          height: 101,
           extra: '',
           timestamp: 10,
         },
@@ -124,7 +124,7 @@ describe('webSocketScanner', () => {
         {
           hash: 'block 2',
           parentHash: 'block 1',
-          blockHeight: 101,
+          height: 101,
           extra: '',
           timestamp: 10,
         },
@@ -159,7 +159,7 @@ describe('webSocketScanner', () => {
         timestamp: 2,
       });
       await scanner['stepBackward']({
-        blockHeight: 100,
+        height: 100,
         hash: 'block 1',
         parentHash: 'block 0',
         extra: '',

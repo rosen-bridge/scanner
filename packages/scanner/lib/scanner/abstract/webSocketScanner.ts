@@ -1,5 +1,5 @@
 import { AbstractScanner } from './scanner';
-import { Block } from '../../interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { Mutex } from 'await-semaphore';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
@@ -52,7 +52,7 @@ abstract class WebSocketScanner<
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
       try {
-        await this.forkBlock(block.blockHeight);
+        await this.forkBlock(block.height);
 
         const lastSavedBlock = await this.action.getLastSavedBlock();
         if (lastSavedBlock && block.parentHash !== lastSavedBlock.hash) {
@@ -60,13 +60,13 @@ abstract class WebSocketScanner<
           return false;
         } else {
           await this.verifyExtractorsInitialization({
-            height: block.blockHeight - 1,
+            height: block.height - 1,
             hash: block.parentHash,
           });
           const res = await this.processBlockTransactions(block, transactions);
           if (res === false) {
             this.logger.error(
-              `Can not process block at height ${block.blockHeight}`
+              `Can not process block at height ${block.height}`
             );
           } else {
             return true;
@@ -77,7 +77,7 @@ abstract class WebSocketScanner<
         this.logger.warn(e.stack);
       }
       return false;
-    }, `Block at height ${block.blockHeight}`);
+    }, `Block at height ${block.height}`);
     release();
   };
 
@@ -89,14 +89,14 @@ abstract class WebSocketScanner<
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
       try {
-        await this.forkBlock(block.blockHeight + 1);
+        await this.forkBlock(block.height + 1);
         return true;
       } catch (e: any) {
         this.logger.error(`unknown error occurred ${e}`);
         this.logger.error(e.stack);
       }
       return false;
-    }, `Forking block at height ${block.blockHeight}`);
+    }, `Forking block at height ${block.height}`);
     release();
   };
 }

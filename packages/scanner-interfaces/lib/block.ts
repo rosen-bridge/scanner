@@ -4,6 +4,7 @@ export interface Block {
   height: number;
   timestamp: number;
   extra?: string;
+  txCount?: number;
 }
 
 export interface BlockInfo {

@@ -2,8 +2,9 @@ import ergoNodeClientFactory, {
   IndexedErgoBox,
   IndexedErgoTransaction,
 } from '@rosen-clients/ergo-node';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-import { ExtendedTransaction, OutputBox } from '../interfaces';
+import { ExtendedTransaction } from '../interfaces';
 
 export class NodeNetwork {
   private api;

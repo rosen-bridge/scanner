@@ -1,11 +1,13 @@
 import { DataSource } from 'typeorm';
-import { ObservationEntity } from '../../lib';
-import { migrations } from '../../lib';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { BlockEntity, Transaction } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
 import { JsonBI } from '@rosen-bridge/scanner/dist/scanner/ergo/network/parser';
 import { Buffer } from 'buffer';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
+import { ObservationEntity } from '../../lib';
+import { migrations } from '../../lib';
 
 export const last10BlockHeader = [
   {

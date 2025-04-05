@@ -1,5 +1,6 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { Block, BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
+import { BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { BitcoinEsploraConfig, BitcoinEsploraTransaction } from './types';
 import { EsploraNetwork } from './EsploraNetwork';
 

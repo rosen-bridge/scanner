@@ -1,8 +1,9 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
-
-import { ExtendedTransaction, OutputBox, Transaction } from '../interfaces';
+import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { mapValues, pick } from 'lodash-es';
+
+import { ExtendedTransaction } from '../interfaces';
 import { API_LIMIT } from '../../constants';
 
 export class ExplorerNetwork {

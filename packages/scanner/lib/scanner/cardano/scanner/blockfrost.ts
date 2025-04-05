@@ -1,7 +1,7 @@
 import { CardanoBlockFrostConfig } from '../interfaces';
 import { BlockFrostNetwork } from '../network/blockfrost';
 import { BlockFrostTransaction } from '../interfaces/BlockFrost';
-import { Block } from '../../../interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';

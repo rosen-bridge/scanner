@@ -4,10 +4,9 @@ import { Buffer } from 'buffer';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractor,
-  OutputBox,
   boxHasToken,
-  ErgoNetworkType,
 } from '@rosen-bridge/abstract-extractor';
+import { OutputBox, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import { BoxEntityAction } from '../actions/boxAction';
 import { JsonBI } from '../utils';

@@ -1,6 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
-import { AbstractNetworkConnector, Block } from '../../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { KoiosBlock, KoiosCborTx, KoiosTransaction } from '../interfaces/Koios';
 import { JsonBI } from '../../ergo/network/parser';
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
@@ -43,7 +46,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
         const parentBlock = res.data[1];
         return {
           hash: block.hash,
-          blockHeight: block.block_height,
+          height: block.block_height,
           parentHash: parentBlock.hash,
           timestamp: block.block_time,
           txCount: block.tx_count,

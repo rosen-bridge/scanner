@@ -1,8 +1,8 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
 import { describe, it, expect, vitest } from 'vitest';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import {
-  OutputBox,
   AbstractBoxData,
   AbstractErgoExtractorAction,
   CallbackType,
@@ -49,10 +49,11 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx.outputs[0], [
-        tx.inputs[0].extension,
-        {},
-      ]);
+      expect(extractSpy).toBeCalledWith(
+        tx.outputs[0],
+        [tx.inputs[0].extension, {}],
+        {}
+      );
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Insert, [

@@ -1,45 +1,4 @@
-export enum ErgoNetworkType {
-  Explorer = 'explorer',
-  Node = 'node',
-}
-
-export type InputExtension = {
-  [key: string]: string;
-};
-
-export type InputBox = {
-  boxId: string;
-  extension?: InputExtension;
-};
-
-export type DataInput = {
-  boxId: string;
-};
-
-export type Asset = {
-  tokenId: string;
-  amount: bigint;
-};
-
-export type AdditionalRegisters = {
-  R4?: string;
-  R5?: string;
-  R6?: string;
-  R7?: string;
-  R8?: string;
-  R9?: string;
-};
-
-export type OutputBox = {
-  boxId: string;
-  value: bigint;
-  ergoTree: string;
-  creationHeight: number;
-  assets: Array<Asset>;
-  additionalRegisters: AdditionalRegisters;
-  transactionId: string;
-  index: number;
-};
+import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 export interface ErgoBox extends OutputBox {
   blockId: string;
@@ -49,14 +8,6 @@ export interface ErgoBox extends OutputBox {
   spentTransactionId?: string;
   spentIndex?: number;
 }
-
-export type Transaction = {
-  id: string;
-  inputs: Array<InputBox>;
-  dataInputs: Array<DataInput>;
-  outputs: Array<OutputBox>;
-  size?: bigint;
-};
 
 export interface ExtendedTransaction extends Transaction {
   inclusionHeight: number;
@@ -68,7 +19,7 @@ export interface SpendInfo {
   boxId: string;
   txId: string;
   index: number;
-  extras?: string[];
+  extras?: { [key: string]: string };
 }
 
 export interface ExtendedSpendInfo extends SpendInfo {
@@ -113,3 +64,5 @@ export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
 export type CallbackMap<ExtractedData extends AbstractBoxData> = {
   [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
 };
+
+export type TxExtra = { [key: string]: string };

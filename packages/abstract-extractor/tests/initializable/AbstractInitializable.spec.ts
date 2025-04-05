@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, vitest } from 'vitest';
+import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import {
-  ErgoNetworkType,
   NodeNetwork,
   AbstractBoxData,
   ExplorerNetwork,

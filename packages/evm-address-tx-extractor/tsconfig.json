@@ -4,5 +4,8 @@
     "outDir": "./dist"
   },
   "include": ["tests", "lib", "vitest.config.ts"],
-  "references": []
+  "references": [
+    { "path": "../abstract-extractor" },
+    { "path": "../scanner-interfaces" }
+  ]
 }

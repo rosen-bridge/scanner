@@ -111,7 +111,7 @@ export const block = {
   parentHash:
     '4e4ac76b241d37f1826d0e95c50d10ec1e557573985d637989ed8b6b74ff9b1b',
   hash: 'e8c2b0a40f67b0de222d77f3d7e272dae520094be454d91caf800fc4839926b3',
-  blockHeight: 5528932,
+  height: 5528932,
   timestamp: 1735857631,
   txCount: 9,
 };

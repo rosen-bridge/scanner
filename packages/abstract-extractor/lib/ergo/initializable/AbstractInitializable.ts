@@ -1,17 +1,16 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { groupBy, sortBy } from 'lodash-es';
 import { Mutex } from 'await-semaphore';
+import { BlockInfo, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import {
   AbstractBoxData,
-  ErgoNetworkType,
   ExtendedSpendInfo,
   ExtendedTransaction,
 } from '../interfaces';
 import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
 import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
-import { BlockInfo } from '../../interfaces';
 import { ExplorerInitializer } from './ExplorerInitializer';
 import { NodeInitializer } from './NodeInitializer';
 import { MAX_PARALLEL_REQUESTS } from '../../constants';

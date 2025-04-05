@@ -4,7 +4,8 @@ import {
   insertBlocks,
   createDatabase,
 } from './abstract.mock';
-import { BlockEntity, ExtractorStatusEntity, InitialInfo } from '../../../lib';
+import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
@@ -151,7 +152,7 @@ describe('AbstractScanner', () => {
     it('should insert block into database', async () => {
       const scanner = new firstScanner(dataSource);
       await scanner['processBlockTransactions'](
-        { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
+        { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         []
       );
       const instances = await dataSource.getRepository(BlockEntity).find();
@@ -176,7 +177,7 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
-        { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
+        { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [{ height: 1, blockHash: '1' }]
       );
       expect(extractor.txs.length).toEqual(1);
@@ -197,7 +198,7 @@ describe('AbstractScanner', () => {
       scanner.extractors.push(extractor);
       await expect(() => {
         return scanner['processBlockTransactions'](
-          { blockHeight: 1, parentHash: ' ', hash: '1', timestamp: 10 },
+          { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
           [{ height: 1, blockHash: '1' }]
         );
       }).rejects.toBeTruthy();
@@ -224,7 +225,7 @@ describe('AbstractScanner', () => {
       scanner.registerExtractor(extractor);
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
-      const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
+      const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
       expect(scanner.extractors[0]).toBe(extractor);
@@ -255,7 +256,7 @@ describe('AbstractScanner', () => {
       scanner.registerExtractor(extractor);
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
-      const initInfo = { height: 100, hash: 'hash' } as InitialInfo;
+      const initInfo = { height: 100, hash: 'hash' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).not.toHaveBeenCalled();
     });
@@ -284,7 +285,7 @@ describe('AbstractScanner', () => {
       scanner.registerExtractor(extractor);
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
-      const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
+      const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
     });
@@ -313,7 +314,7 @@ describe('AbstractScanner', () => {
       scanner['extractors'] = [extractor];
       const mockedInitFn = jest.fn();
       scanner['initializeExtractors'] = mockedInitFn;
-      const initInfo = { height: 100, hash: 'hash2' } as InitialInfo;
+      const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
     });
@@ -345,7 +346,7 @@ describe('AbstractScanner', () => {
       await scanner['verifyExtractorsInitialization']({
         height: 100,
         hash: 'hash',
-      } as InitialInfo);
+      } as BlockInfo);
       expect(mockedInitFn).not.toHaveBeenCalled();
     });
   });

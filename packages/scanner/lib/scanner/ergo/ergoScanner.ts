@@ -1,11 +1,16 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractNetworkConnector, Block } from '../../interfaces';
+import {
+  AbstractNetworkConnector,
+  Block,
+  ErgoNetworkType,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
+
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';
-import { ErgoNetworkType, ErgoScannerConfig } from './interfaces';
+import { ErgoScannerConfig } from './interfaces';
 import ErgoExplorerNetwork from './network/ergoExplorerNetwork';
 import ErgoNodeNetwork from './network/ergoNodeNetwork';
-import { Transaction } from './network/types';
 
 class ErgoScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;

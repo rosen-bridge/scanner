@@ -2,7 +2,7 @@ import { ObservationEntity } from '../entities/observationEntity';
 import { DataSource, In, Repository } from 'typeorm';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 export class ObservationEntityAction {
   readonly logger: AbstractLogger;

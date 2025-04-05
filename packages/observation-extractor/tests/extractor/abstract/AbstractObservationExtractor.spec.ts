@@ -1,11 +1,7 @@
 import { DataSource } from 'typeorm';
-import { RosenData } from '@rosen-bridge/rosen-extractor';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { tokens } from '../tokens.mock';
-import {
-  TestAbstractObservationExtractor,
-  TestTransactionType,
-} from './TestAbstractObservationExtractor';
+import { TestAbstractObservationExtractor } from './TestAbstractObservationExtractor';
 import { ObservationEntity } from '../../../lib';
 import { rosenData, tx } from './testData';
 import { blake2b } from 'blakejs';

@@ -2,19 +2,22 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
-
-import { AbstractExtractor } from '../AbstractExtractor';
-import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
-import { BlockInfo } from '../interfaces';
 import {
   Transaction,
   OutputBox,
+  InputExtension,
+  BlockInfo,
+} from '@rosen-bridge/scanner-interfaces';
+
+import { AbstractExtractor } from '../abstractExtractor';
+import { AbstractErgoExtractorAction } from './AbstractErgoExtractorAction';
+import {
   AbstractBoxData,
   SpendInfo,
   CallbackType,
   CallbackMap,
   CallbackDataMap,
-  InputExtension,
+  TxExtra,
 } from './interfaces';
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
@@ -105,7 +108,8 @@ export abstract class AbstractErgoExtractor<
    */
   abstract extractBoxData: (
     box: OutputBox,
-    inputExtensions: InputExtension[]
+    inputExtensions: InputExtension[],
+    txExtra?: TxExtra
   ) => ExtractedData | undefined;
 
   /**
@@ -114,6 +118,31 @@ export abstract class AbstractErgoExtractor<
    * @return true if the box has the required data and false otherwise
    */
   abstract hasData: (box: OutputBox) => boolean;
+
+  /**
+   * create spend info array for the transaction
+   * @param tx
+   * @returns spend info array of the transaction
+   */
+  getTransactionSpendInfo = (tx: Transaction) => {
+    let boxIndex = 1;
+    const spendInfoArray = [];
+    for (const input of tx.inputs) {
+      spendInfoArray.push({ txId: tx.id, boxId: input.boxId, index: boxIndex });
+      boxIndex += 1;
+    }
+    return spendInfoArray;
+  };
+
+  /**
+   * extract transaction extra information
+   * override this function if there is extra needed information
+   * @param tx
+   * @returns
+   */
+  getTransactionExtraData = (tx: Transaction): TxExtra => {
+    return {};
+  };
 
   /**
    * process a list of transactions in a block and store required information
@@ -135,7 +164,11 @@ export abstract class AbstractErgoExtractor<
             continue;
           }
           this.logger.debug(`Trying to extract data from box ${output.boxId}`);
-          const extractedData = this.extractBoxData(output, inputExtensions);
+          const extractedData = this.extractBoxData(
+            output,
+            inputExtensions,
+            this.getTransactionExtraData(tx)
+          );
           if (extractedData) {
             this.logger.debug(
               `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${
@@ -145,11 +178,7 @@ export abstract class AbstractErgoExtractor<
             boxes.push(extractedData);
           }
         }
-        let boxIndex = 1;
-        for (const input of tx.inputs) {
-          spentInfos.push({ txId: tx.id, boxId: input.boxId, index: boxIndex });
-          boxIndex += 1;
-        }
+        spentInfos.push(...this.getTransactionSpendInfo(tx));
       }
 
       if (boxes.length > 0) {

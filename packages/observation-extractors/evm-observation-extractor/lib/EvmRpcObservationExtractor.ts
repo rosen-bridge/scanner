@@ -4,7 +4,7 @@ import {
 } from '@rosen-bridge/observation-extractor';
 import { isCallException, TransactionResponse } from 'ethers';
 import { blake2b } from 'blakejs';
-import { Block } from '@rosen-bridge/abstract-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 export abstract class EvmRpcObservationExtractor extends AbstractObservationExtractor<TransactionResponse> {
   /**

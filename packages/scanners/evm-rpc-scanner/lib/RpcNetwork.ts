@@ -1,4 +1,7 @@
-import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { BlockNotFound } from './types';
 import { JsonRpcProvider, TransactionResponse } from 'ethers';
 
@@ -31,7 +34,7 @@ export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
 
       return {
         hash: block.hash,
-        blockHeight: block.number,
+        height: block.number,
         parentHash: block.parentHash,
         timestamp: block.timestamp,
         txCount: block.length,

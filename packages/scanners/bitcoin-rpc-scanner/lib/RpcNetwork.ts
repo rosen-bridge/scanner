@@ -1,5 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
-import { AbstractNetworkConnector, Block } from '@rosen-bridge/scanner';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 import { BitcoinRpcTransaction, BlockHeader, JsonRpcResult } from './types';
 
 import { randomBytes } from 'crypto';
@@ -60,7 +63,7 @@ export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> 
     return {
       parentHash: blockHeader.previousblockhash,
       hash: blockHeader.hash,
-      blockHeight: blockHeader.height,
+      height: blockHeader.height,
       timestamp: blockHeader.time,
       txCount: blockHeader.nTx,
     };

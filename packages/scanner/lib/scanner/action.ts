@@ -6,7 +6,7 @@ import {
   Repository,
   In,
 } from 'typeorm';
-import { Block } from '../interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ExtractorStatusEntity } from '../entities/extractorStatusEntity';
 
@@ -139,12 +139,12 @@ export class BlockDbAction {
   saveBlock = async (block: Block): Promise<BlockEntity | boolean> => {
     try {
       const instance = await this.blockRepository.findOneBy({
-        height: block.blockHeight,
+        height: block.height,
         scanner: this.name(),
       });
       const date = new Date(block.timestamp * 1000);
       const blockInfo = {
-        height: block.blockHeight,
+        height: block.height,
         hash: block.hash,
         parentHash: block.parentHash,
         status: PROCESSING,
@@ -165,12 +165,12 @@ export class BlockDbAction {
           `Updating block with info: ${JSON.stringify(blockInfo)}`
         );
         await this.blockRepository.update(
-          { height: block.blockHeight, scanner: this.name() },
+          { height: block.height, scanner: this.name() },
           blockInfo
         );
       }
       const res = await this.blockRepository.findOneBy({
-        height: block.blockHeight,
+        height: block.height,
         scanner: this.name(),
       });
       return res ? res : false;
@@ -182,16 +182,16 @@ export class BlockDbAction {
 
   /**
    * Update status of a block to proceed
-   * @param blockHeight: height of expected block
+   * @param height: height of expected block
    */
   updateBlockStatus = async (
-    blockHeight: number,
+    height: number,
     blockHash: string,
     extractorIds: string[]
   ): Promise<boolean> => {
     let success = true;
     this.logger.debug(
-      `Block at height ${blockHeight} has been proceed in scanner ${this.name()}, updating status`
+      `Block at height ${height} has been proceed in scanner ${this.name()}, updating status`
     );
     const runner = this.dataSource.createQueryRunner();
     await runner.connect();
@@ -199,7 +199,7 @@ export class BlockDbAction {
     try {
       await runner.manager.getRepository(BlockEntity).update(
         {
-          height: blockHeight,
+          height: height,
           status: PROCESSING,
           scanner: this.name(),
         },
@@ -215,7 +215,7 @@ export class BlockDbAction {
         .getRepository(ExtractorStatusEntity)
         .update(
           { extractorId: In(extractorIds), scannerId: this.name() },
-          { updateHeight: blockHeight, updateBlockHash: blockHash }
+          { updateHeight: height, updateBlockHash: blockHash }
         );
       await runner.commitTransaction();
     } catch (e) {
@@ -229,10 +229,10 @@ export class BlockDbAction {
 
   /**
    * Update status of a block to processing in case of fork
-   * @param blockHeight: height of expected block
+   * @param height: height of expected block
    */
   revertBlockStatus = async (
-    blockHeight: number,
+    height: number,
     parentHash: string,
     extractorIds: string[]
   ): Promise<boolean> => {
@@ -241,10 +241,10 @@ export class BlockDbAction {
     await runner.connect();
     await runner.startTransaction();
     try {
-      this.logger.debug(`Reverting block status at height ${blockHeight}`);
+      this.logger.debug(`Reverting block status at height ${height}`);
       await runner.manager.getRepository(BlockEntity).update(
         {
-          height: blockHeight,
+          height: height,
           status: PROCEED,
           scanner: this.name(),
         },
@@ -255,14 +255,14 @@ export class BlockDbAction {
 
       this.logger.debug(
         `Reverting extractors update height to previous block at height ${
-          blockHeight - 1
+          height - 1
         }`
       );
       await runner.manager
         .getRepository(ExtractorStatusEntity)
         .update(
           { extractorId: In(extractorIds), scannerId: this.name() },
-          { updateHeight: blockHeight - 1, updateBlockHash: parentHash }
+          { updateHeight: height - 1, updateBlockHash: parentHash }
         );
       await runner.commitTransaction();
     } catch (e) {
