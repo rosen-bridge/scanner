@@ -1,5 +1,17 @@
 # @rosen-bridge/observation-extractor
 
+## 7.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.0
+
 ## 7.0.0
 
 ### Major Changes

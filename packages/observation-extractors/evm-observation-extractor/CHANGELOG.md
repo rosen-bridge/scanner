@@ -1,5 +1,17 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/evm-rpc-scanner@2.1.0
+  - @rosen-bridge/observation-extractor@7.1.0
+
 ## 5.0.0
 
 ### Major Changes

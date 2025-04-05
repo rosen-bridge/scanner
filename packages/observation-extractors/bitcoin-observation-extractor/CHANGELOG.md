@@ -1,5 +1,19 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@1.2.0
+  - @rosen-bridge/bitcoin-rpc-scanner@1.2.0
+  - @rosen-bridge/observation-extractor@7.1.0
+
 ## 6.0.0
 
 ### Major Changes
