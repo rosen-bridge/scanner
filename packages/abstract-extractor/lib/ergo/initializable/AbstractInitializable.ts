@@ -94,7 +94,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * Extracts spending information of all related boxes in the transaction
    * Note: override this function if the extractor needs extra spending info
    * @param tx
-   * @returns
+   * @returns transaction spend info
    */
   protected extractTxSpendInfo = (
     tx: ExtendedTransaction
@@ -134,6 +134,10 @@ export abstract class AbstractInitializableErgoExtractor<
 
   /**
    * Apply stored spend records into extractor database
+   * Note: As transactions are processed out of order (due to parallel
+   * processing), some box spend information may be invalid after the first pass
+   * To avoid processing everything twice, we keep all spend records in the
+   * first pass and reapply them at the end
    */
   private applySpendRecords = async () => {
     const sortedRecords = sortBy(this.spendRecords, (record) => record.height);

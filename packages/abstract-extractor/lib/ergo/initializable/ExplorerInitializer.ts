@@ -6,19 +6,18 @@ import { requestWithRetrial } from '../utils';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import PQueue from 'p-queue';
-import { Mutex } from 'await-semaphore';
+import { WorkerManager } from './WorkerManager';
 
 export class ExplorerInitializer {
   private network: ExplorerNetwork;
-  private rangeLists: RangeList[];
   private extraLargeBlocks: BlockInfo[];
   private promiseQueue: PQueue;
-  private mutex = new Mutex();
+  private workerManager: WorkerManager;
 
   constructor(
     url: string,
     private address: string,
-    private maxParallelRequests: number,
+    private maxWorkers: number,
     private processTransactions: (
       txs: Transaction[],
       block: BlockInfo
@@ -30,9 +29,15 @@ export class ExplorerInitializer {
   ) {
     this.network = new ExplorerNetwork(url);
     this.extraLargeBlocks = [];
-    this.promiseQueue = new PQueue({ concurrency: maxParallelRequests });
+    this.promiseQueue = new PQueue({ concurrency: maxWorkers });
   }
 
+  /**
+   * Get height range transaction count
+   * @param fromHeight
+   * @param toHeight
+   * @returns transaction count
+   */
   getRangeTxCount = async (fromHeight: number, toHeight: number) => {
     return (
       await requestWithRetrial(
@@ -48,6 +53,14 @@ export class ExplorerInitializer {
     ).total;
   };
 
+  /**
+   * Get height range transactions and process them
+   * retry the request to avoid failure in case of accidental network issues
+   * @param start
+   * @param end
+   * @param count
+   * @returns
+   */
   processRange = async (start: number, end: number, count?: number) => {
     if (count != undefined && count == 0) {
       this.logger.debug(`skipping range [${start}, ${end}] with 0 txs`);
@@ -74,14 +87,27 @@ export class ExplorerInitializer {
     return txs.total;
   };
 
+  /**
+   * Get block id in the specified height and process the block
+   * add the block to extra large blocks
+   * @param height
+   */
   processBlockAtHeight = async (height: number) => {
     const blockId = await requestWithRetrial(
       () => this.network.getBlockIdAtHeight(height),
       this.logger
     );
-    await this.processBlock({ hash: blockId, height: height });
+    const block = { hash: blockId, height: height };
+    await this.processBlock(block);
+    this.extraLargeBlocks.push(block);
+    this.logger.debug(`Added block at height ${height} to extra large blocks`);
   };
 
+  /**
+   * Get block transactions and process them
+   * retry the request to avoid failure in case of accidental network issues
+   * @param block
+   */
   processBlock = async (block: BlockInfo) => {
     const blockTxs = await requestWithRetrial(
       () => this.network.getBlockTxs(block.hash),
@@ -91,73 +117,38 @@ export class ExplorerInitializer {
       `Found ${blockTxs.length} transactions at height ${block.height}`
     );
     await this.processTransactions(blockTxs, block);
-    this.extraLargeBlocks.push(block);
   };
 
-  updateRangeList = (
-    rangeIndex: number,
-    start: number,
-    processedTxs: number
-  ) => {
-    this.rangeLists[rangeIndex].map((rangeQuery) => {
-      rangeQuery.count -= processedTxs;
-      rangeQuery.start = start;
-    });
-  };
-
-  searchRange = async (rangeIndex: number) => {
-    const rangeList = this.rangeLists[rangeIndex];
-    while (rangeList.length > 0) {
-      this.logger.debug(
-        `Search range list ${rangeIndex} is ${JSON.stringify(rangeList)}`
+  /**
+   * Start the worker on the assigned range
+   * - worker process the range and split it to smaller ones if it's not processable
+   * - a range is processable if:
+   *    1- has less than or equal to API_LIMIT transactions (Uses processRange)
+   *    2- contains a single block (uses processBlockAtHeight)
+   * - after processing a range, all older ranges are updated accordingly
+   * - to optimize the workflow, the worker selects the biggest processable
+   *    range from top of the range list
+   * @param workerIndex
+   */
+  startWorker = async (workerIndex: number) => {
+    while (this.workerManager.isWorkerActive(workerIndex)) {
+      const lastRangeQuery = await this.workerManager.getLastRange(
+        workerIndex,
+        API_LIMIT
       );
-      let lastRangeQuery = rangeList.at(-1)!;
-      const release = await this.mutex.acquire();
-      while (
-        rangeList.length > 1 &&
-        (rangeList.at(-2)!.count <= API_LIMIT || lastRangeQuery.count == 0)
-      ) {
-        rangeList.pop()!;
-        lastRangeQuery = rangeList.at(-1)!;
-      }
-      release();
       this.logger.debug(
-        `Checking range query ${JSON.stringify(lastRangeQuery)}`
+        `Worker-${workerIndex} is checking range query ${JSON.stringify(
+          lastRangeQuery
+        )}`
       );
       if (
         lastRangeQuery.count > API_LIMIT &&
         lastRangeQuery.start != lastRangeQuery.end
       ) {
-        const newQueryEnd =
-          Math.floor((lastRangeQuery.end - lastRangeQuery.start) / 2) +
-          lastRangeQuery.start;
-        const newQueryCount = await this.processRange(
-          lastRangeQuery.start,
-          newQueryEnd
-        );
-        if (newQueryCount > API_LIMIT) {
-          const newRangeQuery = {
-            start: lastRangeQuery.start,
-            end: newQueryEnd,
-            count: newQueryCount,
-          };
-          this.logger.debug(
-            `Limiting the range by adding a new range query ${JSON.stringify(
-              newRangeQuery
-            )}`
-          );
-          const release = await this.mutex.acquire();
-          rangeList.push(newRangeQuery);
-          release();
-        } else {
-          this.logger.debug(
-            `Processed range [${lastRangeQuery.start}, ${newQueryEnd}] with ${newQueryCount} txs in first round`
-          );
-          const release = await this.mutex.acquire();
-          this.updateRangeList(rangeIndex, newQueryEnd + 1, newQueryCount);
-          release();
-        }
+        // range is not processable
+        await this.workerManager.limitLastRange(workerIndex);
       } else {
+        // range is processable
         if (lastRangeQuery.count <= API_LIMIT) {
           this.logger.debug(`Processing transactions in range query`);
           await this.processRange(
@@ -171,71 +162,9 @@ export class ExplorerInitializer {
           );
           await this.processBlockAtHeight(lastRangeQuery.start);
         }
-        const release = await this.mutex.acquire();
-        rangeList.pop();
-        this.updateRangeList(
-          rangeIndex,
-          lastRangeQuery.end + 1,
-          lastRangeQuery.count
-        );
-        release();
+        await this.workerManager.popLastRangeQuery(workerIndex);
       }
     }
-  };
-
-  getBiggestIncompleteRangeIndex = (): number | undefined => {
-    let biggestRange = 0,
-      biggestRangeIndex = undefined;
-    for (let i = 0; i < this.rangeLists.length; i++) {
-      const rangeList = this.rangeLists[i];
-      if (rangeList.length > 1 && rangeList[0].count > biggestRange) {
-        biggestRange = rangeList[0].count;
-        biggestRangeIndex = i;
-      }
-    }
-    return biggestRangeIndex;
-  };
-
-  splitRanges = async (): Promise<number | undefined> => {
-    const release = await this.mutex.acquire();
-    this.logger.debug(
-      `Range lists before splitting ${JSON.stringify(this.rangeLists)}`
-    );
-    const biggestIncompleteRangeIndex = this.getBiggestIncompleteRangeIndex();
-    if (biggestIncompleteRangeIndex == undefined) {
-      this.logger.debug(`there is no incomplete range to reassign`);
-      release();
-      return;
-    }
-    this.logger.debug(
-      `biggest incomplete range is ${JSON.stringify(
-        this.rangeLists[biggestIncompleteRangeIndex]
-      )}`
-    );
-    const firstEmptySlot = this.rangeLists.findIndex(
-      (rangeList) => rangeList.length == 0
-    );
-    if (firstEmptySlot == -1) {
-      this.logger.debug(`There is no empty slot to reassign`);
-      release();
-      return;
-    }
-    this.logger.debug(`first empty slot is ${firstEmptySlot}`);
-    const removedRangeQuery =
-      this.rangeLists[biggestIncompleteRangeIndex].shift()!;
-    const head = this.rangeLists[biggestIncompleteRangeIndex][0];
-    this.rangeLists[firstEmptySlot] = [
-      {
-        start: head.end + 1,
-        end: removedRangeQuery.end,
-        count: removedRangeQuery.count - head.count,
-      },
-    ];
-    release();
-    this.logger.debug(
-      `Range lists after splitting ${JSON.stringify(this.rangeLists)}`
-    );
-    return firstEmptySlot;
   };
 
   /**
@@ -243,36 +172,23 @@ export class ExplorerInitializer {
    * @param initialBlock
    */
   initialize = async (initialBlock: BlockInfo) => {
-    this.rangeLists = [];
-    const segmentSize = Math.ceil(
-      initialBlock.height / this.maxParallelRequests
+    this.workerManager = new WorkerManager(
+      initialBlock.height,
+      this.maxWorkers,
+      this.getRangeTxCount,
+      this.logger
     );
-    const startSearch = (i: number) =>
-      this.promiseQueue.add(() => this.searchRange(i));
+    const addWorkerJob = (i: number) =>
+      this.promiseQueue.add(() => this.startWorker(i));
+    // Split the biggest incomplete range and reassign a range to the idle worker
     this.promiseQueue.on('completed', async () => {
-      this.logger.debug(
-        `########################################### ${JSON.stringify(
-          this.rangeLists
-        )}`
-      );
-      const newRangeIndex = await this.splitRanges();
-      this.logger.debug(
-        `&&&&&&&&&&&&&&&&&&&&&& reassigned range ${newRangeIndex}`
-      );
-      if (newRangeIndex != undefined) startSearch(newRangeIndex);
+      const newWorkerIndex = await this.workerManager.reassignIdleWorker();
+      this.logger.debug(`Reassigned worker ${newWorkerIndex}`);
+      if (newWorkerIndex != undefined) addWorkerJob(newWorkerIndex);
     });
-    for (let i = this.maxParallelRequests; i > 0; i--) {
-      const start = (i - 1) * segmentSize;
-      const end = Math.min(i * segmentSize - 1, initialBlock.height);
-      this.rangeLists.push([
-        {
-          start: start,
-          end: end,
-          count: await this.getRangeTxCount(start, end),
-        },
-      ]);
-      this.logger.debug('&&&&&&&&&&&&& ' + JSON.stringify(this.rangeLists));
-      startSearch(this.maxParallelRequests - i);
+    for (let i = this.maxWorkers; i > 0; i--) {
+      await this.workerManager.initializeWorker(i);
+      addWorkerJob(i);
     }
     await this.promiseQueue.onIdle();
     for (const block of this.extraLargeBlocks) {
