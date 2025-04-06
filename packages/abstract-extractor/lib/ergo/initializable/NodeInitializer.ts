@@ -1,12 +1,13 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ErgoExtractedData, ExtendedTransaction } from '../interfaces';
 import { NodeNetwork } from '../network/NodeNetwork';
-import { BlockInfo } from '../../interfaces';
-import PQueue from 'p-queue';
 import { API_LIMIT } from '../../constants';
 import { delay, requestWithRetrial } from '../utils';
 
-export class NodeInitializer<ExtractedData extends ErgoExtractedData> {
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import PQueue from 'p-queue';
+
+export class NodeInitializer {
   private network: NodeNetwork;
 
   constructor(

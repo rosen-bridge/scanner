@@ -22,15 +22,12 @@ export abstract class AbstractInitializableErgoExtractor<
   private dbMutex = new Mutex();
   private spendRecordsMutex = new Mutex();
   private spendRecords: ExtendedSpendInfo[];
-  private address: string;
   protected abstract actions: AbstractInitializableErgoExtractorAction<
     ExtractedData,
     ExtractorEntity
   >;
 
-  private initializer:
-    | ExplorerInitializer<ExtractedData>
-    | NodeInitializer<ExtractedData>;
+  private initializer: ExplorerInitializer | NodeInitializer;
 
   constructor(
     type: ErgoNetworkType,
@@ -43,10 +40,10 @@ export abstract class AbstractInitializableErgoExtractor<
     super(logger);
     if (type == ErgoNetworkType.Explorer) {
       this.initializer = new ExplorerInitializer(
-        this,
         url,
         address,
         maxParallelRequests,
+        this.processTransactions,
         this.processTransactionBatch,
         logger
       );
@@ -157,9 +154,10 @@ export abstract class AbstractInitializableErgoExtractor<
   };
 
   /**
-   * initialize extractor database with data created below the initial height
+   * remove all old data and initialize extractor database with data created
+   * below the initial height and finally apply the stored spend records to make
+   * sure all stored data is valid
    * ignore initialization if this feature is off
-   * try to get data multiple times to pass accidental network problems
    * @param initialBlock
    */
   initializeBoxes = async (initialBlock: BlockInfo) => {

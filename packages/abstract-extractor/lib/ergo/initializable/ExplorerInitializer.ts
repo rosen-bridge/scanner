@@ -1,18 +1,14 @@
-import { AbstractInitializableErgoExtractor } from './AbstractInitializable';
-import {
-  ErgoExtractedData,
-  ExtendedTransaction,
-  RangeList,
-} from '../interfaces';
-import { BlockInfo } from '../../interfaces';
+import { ExtendedTransaction, RangeList } from '../interfaces';
 import { ExplorerNetwork } from '../network/ExplorerNetwork';
 import { API_LIMIT } from '../../constants';
-import { delay, requestWithRetrial } from '../utils';
+import { requestWithRetrial } from '../utils';
+
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import PQueue from 'p-queue';
 import { Mutex } from 'await-semaphore';
 
-export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
+export class ExplorerInitializer {
   private network: ExplorerNetwork;
   private rangeLists: RangeList[];
   private extraLargeBlocks: BlockInfo[];
@@ -20,10 +16,13 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
   private mutex = new Mutex();
 
   constructor(
-    private extractor: AbstractInitializableErgoExtractor<ExtractedData>,
     url: string,
     private address: string,
     private maxParallelRequests: number,
+    private processTransactions: (
+      txs: Transaction[],
+      block: BlockInfo
+    ) => Promise<boolean>,
     private processTransactionBatch: (
       txs: ExtendedTransaction[]
     ) => Promise<void>,
@@ -91,7 +90,7 @@ export class ExplorerInitializer<ExtractedData extends ErgoExtractedData> {
     this.logger.debug(
       `Found ${blockTxs.length} transactions at height ${block.height}`
     );
-    await this.extractor.processTransactions(blockTxs, block);
+    await this.processTransactions(blockTxs, block);
     this.extraLargeBlocks.push(block);
   };
 
