@@ -34,6 +34,7 @@ export class ExplorerInitializer {
 
   /**
    * Get height range transaction count
+   * retry the request to avoid failure in case of accidental network issues
    * @param fromHeight
    * @param toHeight
    * @returns transaction count
@@ -180,17 +181,25 @@ export class ExplorerInitializer {
     );
     const addWorkerJob = (i: number) =>
       this.promiseQueue.add(() => this.startWorker(i));
-    // Split the biggest incomplete range and reassign a range to the idle worker
-    this.promiseQueue.on('completed', async () => {
-      const newWorkerIndex = await this.workerManager.reassignIdleWorker();
-      this.logger.debug(`Reassigned worker ${newWorkerIndex}`);
-      if (newWorkerIndex != undefined) addWorkerJob(newWorkerIndex);
-    });
-    for (let i = this.maxWorkers; i > 0; i--) {
-      await this.workerManager.initializeWorker(i);
-      addWorkerJob(i);
-    }
+    // Initialize the workers
+    await Promise.all(
+      Array.from({ length: this.maxWorkers }, async (_, i) => {
+        await this.workerManager.registerWorker(i);
+        addWorkerJob(i);
+      })
+    );
+    // Periodically check for idle workers and reassign a new range to them
+    const reassignWorker = setInterval(async () => {
+      const newWorkers = await this.workerManager.reassignIdleWorkers();
+      if (newWorkers.length > 0) {
+        this.logger.debug(`Reassigned workers ${newWorkers}`);
+        newWorkers.forEach((workerIndex) => addWorkerJob(workerIndex));
+      }
+    }, 5000);
+    // Wait for all workers to finish their jobs
     await this.promiseQueue.onIdle();
+    // Stop reassigning interval
+    clearInterval(reassignWorker);
     for (const block of this.extraLargeBlocks) {
       await this.processBlock(block);
     }

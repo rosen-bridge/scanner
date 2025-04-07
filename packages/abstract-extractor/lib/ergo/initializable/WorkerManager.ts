@@ -16,13 +16,16 @@ export class WorkerManager {
     this.initialSegmentSize = Math.ceil(this.maxHeight / this.workerCount);
   }
 
-  initializeWorker = async (workerIndex: number) => {
-    const start = (workerIndex - 1) * this.initialSegmentSize;
+  registerWorker = async (workerIndex: number) => {
+    const start = workerIndex * this.initialSegmentSize;
     const end = Math.min(
-      workerIndex * this.initialSegmentSize - 1,
+      (workerIndex + 1) * this.initialSegmentSize - 1,
       this.maxHeight
     );
     await this.addWorkerRange(workerIndex, start, end);
+    this.logger.debug(
+      `Worker-${workerIndex} is initialized with range [${start}, ${end}]`
+    );
   };
 
   private addWorkerRange = async (
@@ -62,7 +65,7 @@ export class WorkerManager {
       throw Error('Impossible case, worker does not have any range query');
     this.workersRangeList[workerIndex].map((rangeQuery) => {
       rangeQuery.count -= lastRangeQuery.count;
-      rangeQuery.start = lastRangeQuery.start;
+      rangeQuery.start = lastRangeQuery.end + 1;
     });
     release();
   };
@@ -80,55 +83,78 @@ export class WorkerManager {
     return biggestRangeIndex;
   };
 
-  reassignIdleWorker = async (): Promise<number | undefined> => {
+  /**
+   *
+   * @returns
+   */
+  reassignIdleWorkers = async (): Promise<number[]> => {
+    this.logger.debug('Checking idle workers to reassign');
     const release = await this.mutex.acquire();
-    this.logger.debug(
-      `Range lists before splitting ${JSON.stringify(this.workersRangeList)}`
-    );
-    const biggestIncompleteRangeIndex = this.getBiggestIncompleteRangeIndex();
-    if (biggestIncompleteRangeIndex == undefined) {
-      this.logger.debug(`there is no incomplete range to reassign`);
+    const idleWorkerIndexes = this.workersRangeList
+      .map((_, index) => (this.isWorkerActive(index) ? -1 : index))
+      .filter((index) => index !== -1);
+    if (idleWorkerIndexes.length == 0) {
+      this.logger.debug(`There is no idle worker to reassign`);
       release();
-      return;
+      return [];
     }
+    this.logger.debug(`Found idle workers ${idleWorkerIndexes}`);
     this.logger.debug(
-      `biggest incomplete range is ${JSON.stringify(
-        this.workersRangeList[biggestIncompleteRangeIndex]
+      `Workers range lists before splitting ${JSON.stringify(
+        this.workersRangeList
       )}`
     );
-    const firstIdleWorker = this.workersRangeList.findIndex(
-      (rangeList) => rangeList.length == 0
-    );
-    if (firstIdleWorker == -1) {
-      this.logger.debug(`There is no empty slot to reassign`);
-      release();
-      return;
+    const newWorkers: number[] = [];
+    for (const idleWorkerIndex of idleWorkerIndexes) {
+      this.logger.debug(`reassigning job to worker-${idleWorkerIndex}`);
+      const biggestIncompleteRangeIndex = this.getBiggestIncompleteRangeIndex();
+      if (biggestIncompleteRangeIndex == undefined) {
+        this.logger.debug(`there is no incomplete range to reassign`);
+        break;
+      }
+      this.logger.debug(
+        `biggest incomplete range is ${JSON.stringify(
+          this.workersRangeList[biggestIncompleteRangeIndex]
+        )}`
+      );
+      const removedRangeQuery =
+        this.workersRangeList[biggestIncompleteRangeIndex].shift()!;
+      const head = this.workersRangeList[biggestIncompleteRangeIndex][0];
+      this.workersRangeList[idleWorkerIndex] = [
+        {
+          start: head.end + 1,
+          end: removedRangeQuery.end,
+          count: removedRangeQuery.count - head.count,
+        },
+      ];
+      newWorkers.push(idleWorkerIndex);
     }
-    this.logger.debug(`first empty slot is ${firstIdleWorker}`);
-    const removedRangeQuery =
-      this.workersRangeList[biggestIncompleteRangeIndex].shift()!;
-    const head = this.workersRangeList[biggestIncompleteRangeIndex][0];
-    this.workersRangeList[firstIdleWorker] = [
-      {
-        start: head.end + 1,
-        end: removedRangeQuery.end,
-        count: removedRangeQuery.count - head.count,
-      },
-    ];
     release();
     this.logger.debug(
       `Range lists after splitting ${JSON.stringify(this.workersRangeList)}`
     );
-    return firstIdleWorker;
+    return newWorkers;
   };
 
   isWorkerActive = (workerIndex: number): Boolean => {
     return this.workersRangeList[workerIndex].length > 0;
   };
-
+  /**
+   * Get the last (biggest) processable range from the worker's range list
+   *
+   * After the last range is processed, the older ones are updated and usually
+   * become smaller. Some of them might shrink below a certain threshold, which
+   * means they can now be processed too.
+   * This function finds the biggest range that is small enough to be processed,
+   * and removes all of its child ranges from the list.
+   * Returns the last range if none of them is processable.
+   * @param workerIndex
+   * @param rangeThreshold
+   * @returns range query
+   */
   getLastRange = async (
     workerIndex: number,
-    rangeLimit: number
+    rangeThreshold: number
   ): Promise<RangeQuery> => {
     const rangeList = this.workersRangeList[workerIndex];
     this.logger.debug(
@@ -140,7 +166,7 @@ export class WorkerManager {
     // jump over small ranges to select the biggest processable range
     while (
       rangeList.length > 1 &&
-      (rangeList.at(-2)!.count <= rangeLimit || lastRangeQuery.count == 0)
+      (rangeList.at(-2)!.count <= rangeThreshold || lastRangeQuery.count == 0)
     ) {
       rangeList.pop()!;
       lastRangeQuery = rangeList.at(-1)!;

@@ -37,6 +37,10 @@ export interface RangeQuery {
   count: number;
 }
 
+/**
+ * The range list is an array where each new range is a child of the previous
+ * one. So, any range in the list supersedes all the ranges that come after it.
+ * */
 export type RangeList = RangeQuery[];
 export interface AbstractBoxData {
   boxId: string;
