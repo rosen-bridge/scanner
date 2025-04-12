@@ -16,6 +16,20 @@ export class WorkerManager {
     this.initialSegmentSize = Math.ceil(this.maxHeight / this.workerCount);
   }
 
+  /**
+   * Checks if the worker's search range is completed
+   * @param workerIndex
+   * @returns true if worker has an incomplete range to work on
+   */
+  isWorkerActive = (workerIndex: number): Boolean => {
+    return this.workersRangeList[workerIndex].length > 0;
+  };
+
+  /**
+   * Register the worker for the first time
+   * splits the whole range equally between workers
+   * @param workerIndex
+   */
   registerWorker = async (workerIndex: number) => {
     const start = workerIndex * this.initialSegmentSize;
     const end = Math.min(
@@ -28,6 +42,13 @@ export class WorkerManager {
     );
   };
 
+  /**
+   * Add a new range to the workers range list
+   * new range is a subset of all existing ranges
+   * @param workerIndex
+   * @param start
+   * @param end
+   */
   private addWorkerRange = async (
     workerIndex: number,
     start: number,
@@ -43,6 +64,11 @@ export class WorkerManager {
     release();
   };
 
+  /**
+   * Limit the last range by adding a new range query to the workers range list
+   * the new range the first half of the last existing range
+   * @param workerIndex
+   */
   limitLastRange = async (workerIndex: number) => {
     const lastRangeQuery = this.workersRangeList[workerIndex].at(-1);
     if (!lastRangeQuery)
@@ -58,6 +84,11 @@ export class WorkerManager {
     await this.addWorkerRange(workerIndex, lastRangeQuery.start, newQueryEnd);
   };
 
+  /**
+   * Pop the last range query after being processed
+   * also update all older ranges and deduct the processed numbers
+   * @param workerIndex
+   */
   popLastRangeQuery = async (workerIndex: number) => {
     const release = await this.mutex.acquire();
     const lastRangeQuery = this.workersRangeList[workerIndex].pop();
@@ -70,6 +101,12 @@ export class WorkerManager {
     release();
   };
 
+  /**
+   * Find the biggest incomplete range list containing at least 2 ranges
+   * the range list must have at least two range so that it wont become empty
+   * after splitting the range between two workers
+   * @returns biggest incomplete range list index
+   */
   private getBiggestIncompleteRangeIndex = (): number | undefined => {
     let biggestRange = 0,
       biggestRangeIndex = undefined;
@@ -84,7 +121,10 @@ export class WorkerManager {
   };
 
   /**
-   *
+   * Check all workers and reassign incomplete ranges to the idle ones
+   * do nothing if all workers are active
+   * do nothing if there is no incomplete range list
+   * split the biggest range list between the current worker and the idle worker
    * @returns
    */
   reassignIdleWorkers = async (): Promise<number[]> => {
@@ -136,9 +176,6 @@ export class WorkerManager {
     return newWorkers;
   };
 
-  isWorkerActive = (workerIndex: number): Boolean => {
-    return this.workersRangeList[workerIndex].length > 0;
-  };
   /**
    * Get the last (biggest) processable range from the worker's range list
    *
