@@ -80,6 +80,17 @@ export const generateMockScannerClass = (name: string) => {
   };
 };
 
+export const generateMockScannerByBlockRetrieveGapClass = (name: string) => {
+  return class ScannerTest extends AbstractScanner<TestTransaction> {
+    name = (): string => name;
+
+    constructor(dataSource: DataSource) {
+      super(undefined, 1);
+      this.action = new BlockDbAction(dataSource, this.name());
+    }
+  };
+};
+
 export const generateMockGeneralScannerClass = (name: string) => {
   return class ScannerTest extends GeneralScanner<TestTransaction> {
     name = (): string => name;

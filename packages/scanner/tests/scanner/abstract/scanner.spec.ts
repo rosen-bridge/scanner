@@ -3,13 +3,20 @@ import {
   generateMockScannerClass,
   insertBlocks,
   createDatabase,
+  generateMockScannerByBlockRetrieveGapClass,
 } from './abstract.mock';
-import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
+import {
+  AbstractScanner,
+  BlockEntity,
+  ExtractorStatusEntity,
+} from '../../../lib';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
 
 const firstScanner = generateMockScannerClass('first');
 const secondScanner = generateMockScannerClass('second');
+const scannerByBlockRetrieveGapClass =
+  generateMockScannerByBlockRetrieveGapClass('ByBlockRetrieveGapClass');
 let dataSource: DataSource;
 
 describe('AbstractScanner', () => {
@@ -174,6 +181,8 @@ describe('AbstractScanner', () => {
      */
     it('should call extractor processTransactionFunction', async () => {
       const scanner = new firstScanner(dataSource);
+      const delayMock = jest.fn().mockResolvedValue(undefined);
+      Object.assign(scanner, { delayBetweenBlocksProcessing: delayMock });
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
@@ -181,6 +190,27 @@ describe('AbstractScanner', () => {
         [{ height: 1, blockHash: '1' }]
       );
       expect(extractor.txs.length).toEqual(1);
+      expect(delayMock).toBeCalledTimes(0);
+    });
+
+    /**
+     * should a delay occur during test block processing
+     * Dependency: Nothing
+     * Scenario: Create scanner with one extractor registered in it.
+     *           Then call processBlockTransactions
+     * Expected: extractor processTransaction function must be called once
+     */
+    it('should a delay occur during test block processing', async () => {
+      const scanner = new scannerByBlockRetrieveGapClass(dataSource);
+      const delayMock = jest.fn().mockResolvedValue(undefined);
+      Object.assign(scanner, { delayBetweenBlocksProcessing: delayMock });
+
+      await scanner['processBlockTransactions'](
+        { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
+        [{ height: 1, blockHash: '1' }]
+      );
+
+      expect(delayMock).toBeCalledTimes(1);
     });
 
     /**

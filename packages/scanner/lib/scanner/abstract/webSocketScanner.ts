@@ -14,9 +14,10 @@ abstract class WebSocketScanner<
 
   protected constructor(
     logger?: AbstractLogger,
-    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK
+    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
+    blockRetrieveGap = 0
   ) {
-    super(logger);
+    super(logger, blockRetrieveGap);
     this.maxTryBlock = maxTryBlock;
   }
   abstract name: () => string;
