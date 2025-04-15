@@ -13,7 +13,7 @@ export abstract class AbstractScanner<TransactionType> {
   logger: AbstractLogger;
   initializeMutex: Mutex;
 
-  constructor(logger?: AbstractLogger, protected blockRetrieveGap: number = 0) {
+  constructor(logger?: AbstractLogger) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
@@ -51,10 +51,6 @@ export abstract class AbstractScanner<TransactionType> {
     }
   };
 
-  protected delayBetweenBlocksProcessing = async () => {
-    await new Promise((r) => setTimeout(() => null, this.blockRetrieveGap));
-  };
-
   /**
    * process a block and all of its transactions. store any information into database
    * @param block: selected block
@@ -75,9 +71,6 @@ export abstract class AbstractScanner<TransactionType> {
         break;
       }
     }
-
-    // Spending time between block fetches if the setting is enabled
-    if (this.blockRetrieveGap > 0) this.delayBetweenBlocksProcessing();
 
     if (
       success &&

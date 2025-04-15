@@ -9,8 +9,12 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
   readonly initialHeight: number;
   network: GraphQLNetwork;
-  constructor(config: CardanoGraphQLConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: CardanoGraphQLConfig,
+    logger?: AbstractLogger,
+    blockRetrieveGap?: number
+  ) {
+    super(logger, blockRetrieveGap);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config

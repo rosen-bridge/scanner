@@ -18,8 +18,12 @@ class ErgoScanner extends GeneralScanner<Transaction> {
   readonly network: AbstractNetworkConnector<Transaction>;
   readonly logger: AbstractLogger;
 
-  constructor(config: ErgoScannerConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: ErgoScannerConfig,
+    logger?: AbstractLogger,
+    blockRetrieveGap?: number
+  ) {
+    super(logger, blockRetrieveGap);
     this.networkType = config.type;
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
