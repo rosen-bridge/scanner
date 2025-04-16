@@ -7,8 +7,12 @@ import { DogeRpcNetwork } from './DogeRpcNetwork';
 export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
   readonly initialHeight: number;
   network: DogeRpcNetwork;
-  constructor(config: BitcoinRPCConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: BitcoinRPCConfig,
+    blockRetrieveGap = 0,
+    logger?: AbstractLogger
+  ) {
+    super(blockRetrieveGap, logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
