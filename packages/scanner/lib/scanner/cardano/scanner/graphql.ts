@@ -11,7 +11,7 @@ class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
   network: GraphQLNetwork;
   constructor(
     config: CardanoGraphQLConfig,
-    blockRetrieveGap: number,
+    blockRetrieveGap = 0,
     logger?: AbstractLogger
   ) {
     super(blockRetrieveGap, logger);

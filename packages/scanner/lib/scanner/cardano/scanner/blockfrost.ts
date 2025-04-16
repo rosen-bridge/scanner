@@ -11,7 +11,7 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   network: BlockFrostNetwork;
   constructor(
     config: CardanoBlockFrostConfig,
-    blockRetrieveGap: number,
+    blockRetrieveGap = 0,
     logger?: AbstractLogger
   ) {
     super(blockRetrieveGap, logger);

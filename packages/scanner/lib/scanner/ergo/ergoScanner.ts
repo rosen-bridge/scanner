@@ -20,7 +20,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
 
   constructor(
     config: ErgoScannerConfig,
-    blockRetrieveGap: number,
+    blockRetrieveGap = 0,
     logger?: AbstractLogger
   ) {
     super(blockRetrieveGap, logger);
