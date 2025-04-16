@@ -13,7 +13,7 @@ abstract class GeneralScanner<
   abstract network: AbstractNetworkConnector<TransactionType>;
   protected abstract getFirstBlock: () => Promise<Block>;
 
-  constructor(logger?: AbstractLogger, protected blockRetrieveGap?: number) {
+  constructor(protected blockRetrieveGap: number, logger?: AbstractLogger) {
     super(logger);
   }
 
@@ -36,8 +36,11 @@ abstract class GeneralScanner<
   /**
    * This method introduces delay between consecutive block processing operations
    */
-  protected delayBetweenBlocksProcessing = async () => {
-    await new Promise((r) => setTimeout(() => null, this.blockRetrieveGap));
+  protected delayBetweenBlocksProcessing = async (startTime: number) => {
+    const spentTime = new Date().getTime() - startTime;
+    await new Promise(() =>
+      setTimeout(() => null, this.blockRetrieveGap - spentTime)
+    );
   };
 
   /**
@@ -45,6 +48,7 @@ abstract class GeneralScanner<
    * @param block
    */
   protected processBlock = async (block: Block) => {
+    const startTime = new Date().getTime();
     this.logger.debug(
       `Processing block at height [${block.height}] in scanner ${this.name()}`
     );
@@ -55,7 +59,8 @@ abstract class GeneralScanner<
           `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`
         );
         // Spending time between block fetches if the setting is enabled
-        if (this.blockRetrieveGap) await this.delayBetweenBlocksProcessing();
+        if (this.blockRetrieveGap)
+          await this.delayBetweenBlocksProcessing(startTime);
         return false;
       }
       this.logger.debug(
@@ -66,7 +71,8 @@ abstract class GeneralScanner<
     const result = await this.processBlockTransactions(block, txs);
 
     // Spending time between block fetches if the setting is enabled
-    if (this.blockRetrieveGap) await this.delayBetweenBlocksProcessing();
+    if (this.blockRetrieveGap)
+      await this.delayBetweenBlocksProcessing(startTime);
 
     return result;
   };

@@ -20,10 +20,10 @@ class ErgoScanner extends GeneralScanner<Transaction> {
 
   constructor(
     config: ErgoScannerConfig,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
+    blockRetrieveGap: number,
+    logger?: AbstractLogger
   ) {
-    super(logger, blockRetrieveGap);
+    super(blockRetrieveGap, logger);
     this.networkType = config.type;
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
@@ -42,7 +42,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
       default:
         throw Error('invalid network entered');
     }
-    this.logger = logger ? logger : new DummyLogger();
+    this.logger = logger ?? new DummyLogger();
   }
 
   protected getFirstBlock = (): Promise<Block> => {

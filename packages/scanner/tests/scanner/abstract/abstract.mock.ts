@@ -90,7 +90,7 @@ export const generateMockGeneralScannerByBlockRetrieveGapClass = (
       dataSource: DataSource,
       networkConnector: NetworkConnectorTest
     ) {
-      super(undefined, 100);
+      super(100, undefined);
       this.action = new BlockDbAction(dataSource, this.name());
       this.network = networkConnector;
     }
@@ -111,7 +111,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
       dataSource: DataSource,
       networkConnector: NetworkConnectorTest
     ) {
-      super();
+      super(0);
       this.action = new BlockDbAction(dataSource, this.name());
       this.network = networkConnector;
     }
