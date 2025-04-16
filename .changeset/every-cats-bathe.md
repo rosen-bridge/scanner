@@ -4,4 +4,4 @@
 '@rosen-bridge/scanner-interfaces': patch
 ---
 
-Now delay time between processing of blocks supported
+Add delay time between processing of blocks
