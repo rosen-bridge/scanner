@@ -8,10 +8,11 @@
 
 ### Patch Changes
 
-- Update packages @rosen-bridge/tokens @rosen-bridge/rosen-extractor in scanner
 - Updated dependencies
   - @rosen-bridge/evm-rpc-scanner@2.1.0
   - @rosen-bridge/observation-extractor@7.1.0
+  - @rosen-bridge/tokens@3.1.0
+  - @rosen-bridge/rosen-extractor@7.2.2
 
 ## 5.0.0
 

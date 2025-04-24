@@ -8,11 +8,14 @@
 
 ### Patch Changes
 
-- Update packages @rosen-bridge/tokens @rosen-bridge/rosen-extractor in scanner
+scanner
+
 - Updated dependencies
   - @rosen-bridge/bitcoin-esplora-scanner@1.2.0
   - @rosen-bridge/bitcoin-rpc-scanner@1.2.0
   - @rosen-bridge/observation-extractor@7.1.0
+  - @rosen-bridge/tokens@3.1.0
+  - @rosen-bridge/rosen-extractor@7.2.2
 
 ## 6.0.0
 
