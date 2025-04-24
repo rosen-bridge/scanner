@@ -1,5 +1,18 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+- Update extra information interfaces and extraction functions
+
+### Patch Changes
+
+- Update packages @rosen-bridge/tokens @rosen-bridge/rosen-extractor in scanner
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.0
+
 ## 12.0.0
 
 ### Major Changes

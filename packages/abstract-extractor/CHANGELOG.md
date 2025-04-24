@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-extractor
 
+## 2.0.0
+
+### Major Changes
+
+- Unify and move shared interfaces and update all package dependencies
+- Update extra information interfaces and extraction functions
+
 ## 1.0.2
 
 ### Patch Changes

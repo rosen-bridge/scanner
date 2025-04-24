@@ -1,5 +1,16 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 2.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@6.0.0
+
 ## 2.0.3
 
 ### Patch Changes

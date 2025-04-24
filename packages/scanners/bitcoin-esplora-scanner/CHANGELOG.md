@@ -1,5 +1,17 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 1.2.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+- Add optional API prefix for the Esplora network
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@6.0.0
+
 ## 1.1.1
 
 ### Patch Changes
