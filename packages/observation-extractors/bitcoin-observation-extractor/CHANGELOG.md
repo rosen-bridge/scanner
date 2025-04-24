@@ -8,8 +8,6 @@
 
 ### Patch Changes
 
-scanner
-
 - Updated dependencies
   - @rosen-bridge/bitcoin-esplora-scanner@1.2.0
   - @rosen-bridge/bitcoin-rpc-scanner@1.2.0

@@ -9,8 +9,6 @@
 
 ### Patch Changes
 
-scanner
-
 - Updated dependencies
   - @rosen-bridge/abstract-extractor@2.0.0
   - @rosen-bridge/tokens@3.1.0
