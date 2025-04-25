@@ -1,5 +1,16 @@
 # @rosen-bridge/scanner
 
+## 6.0.0
+
+### Major Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.0
+
 ## 5.1.0
 
 ### Minor Changes
