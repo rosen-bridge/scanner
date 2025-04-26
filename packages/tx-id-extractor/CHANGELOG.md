@@ -1,5 +1,11 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.3.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
 ## 2.2.23
 
 ### Patch Changes
