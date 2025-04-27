@@ -174,7 +174,7 @@ describe('AbstractScanner', () => {
      * Dependency: Nothing
      * Scenario: Create scanner with one extractor registered in it.
      *           Then call processBlockTransactions
-     * Expected: extractor processTransaction function must be called once
+     * Expected: extractor processTransaction function must be called once and delayBetweenBlocksProcessing not called
      */
     it('should call extractor processTransactionFunction', async () => {
       const scanner = new firstScanner(dataSource);

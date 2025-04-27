@@ -58,9 +58,6 @@ abstract class GeneralScanner<
         this.logger.debug(
           `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`
         );
-        // Spending time between block fetches if the setting is enabled
-        if (this.blockRetrieveGap)
-          await this.delayBetweenBlocksProcessing(startTime);
         return false;
       }
       this.logger.debug(
