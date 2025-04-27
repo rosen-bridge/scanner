@@ -4,11 +4,7 @@ import {
   insertBlocks,
   createDatabase,
 } from './abstract.mock';
-import {
-  AbstractScanner,
-  BlockEntity,
-  ExtractorStatusEntity,
-} from '../../../lib';
+import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
 
@@ -174,12 +170,10 @@ describe('AbstractScanner', () => {
      * Dependency: Nothing
      * Scenario: Create scanner with one extractor registered in it.
      *           Then call processBlockTransactions
-     * Expected: extractor processTransaction function must be called once and delayBetweenBlocksProcessing not called
+     * Expected: extractor processTransaction function must be called once
      */
     it('should call extractor processTransactionFunction', async () => {
       const scanner = new firstScanner(dataSource);
-      const delayMock = jest.fn().mockResolvedValue(undefined);
-      Object.assign(scanner, { delayBetweenBlocksProcessing: delayMock });
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
@@ -187,7 +181,6 @@ describe('AbstractScanner', () => {
         [{ height: 1, blockHash: '1' }]
       );
       expect(extractor.txs.length).toEqual(1);
-      expect(delayMock).toBeCalledTimes(0);
     });
 
     /**
