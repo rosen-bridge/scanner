@@ -136,7 +136,7 @@ describe('generalScanner', () => {
         parentHash: '2',
         height: 1,
         timestamp: 50,
-        txCount: 10,
+        txCount: 0,
       });
 
       expect(delayMock).toBeCalledTimes(1);
