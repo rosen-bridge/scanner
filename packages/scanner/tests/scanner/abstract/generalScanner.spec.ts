@@ -5,11 +5,14 @@ import {
   NetworkConnectorTest,
   createDatabase,
   TestTransaction,
+  generateMockGeneralScannerByBlockRetrieveGapClass,
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockEntity } from '../../../lib';
 
 const firstScanner = generateMockGeneralScannerClass('first');
+const scannerByBlockRetrieveGapClass =
+  generateMockGeneralScannerByBlockRetrieveGapClass('ByBlockRetrieveGapClass');
 let dataSource: DataSource;
 
 describe('generalScanner', () => {
@@ -113,6 +116,30 @@ describe('generalScanner', () => {
         timestamp: 50,
       });
       expect(mockedProcessBlockTransactions).toBeCalledWith(block, txs);
+    });
+
+    /**
+     * should a delay occur during test block processing
+     * Dependency: Nothing
+     * Scenario: Create scanner with one extractor registered in it.
+     *           Then call processBlockTransactions
+     * Expected: scanner delayBetweenBlocksProcessing method must be called once
+     */
+    it('should a delay occur during test block processing', async () => {
+      const network = new NetworkConnectorTest();
+      const scanner = new scannerByBlockRetrieveGapClass(dataSource, network);
+      const delayMock = jest.fn().mockResolvedValue(undefined);
+      Object.assign(scanner, { delayBetweenBlocksProcessing: delayMock });
+
+      await scanner['processBlock']({
+        hash: '1',
+        parentHash: '2',
+        height: 1,
+        timestamp: 50,
+        txCount: 0,
+      });
+
+      expect(delayMock).toBeCalledTimes(1);
     });
 
     /**

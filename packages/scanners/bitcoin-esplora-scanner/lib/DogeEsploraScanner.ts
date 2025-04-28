@@ -8,8 +8,12 @@ export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction
   readonly initialHeight: number;
   network: EsploraNetwork;
 
-  constructor(config: BitcoinEsploraConfig, logger?: AbstractLogger) {
-    super(logger);
+  constructor(
+    config: BitcoinEsploraConfig,
+    logger?: AbstractLogger,
+    blockRetrieveGap = 0
+  ) {
+    super(blockRetrieveGap, logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config

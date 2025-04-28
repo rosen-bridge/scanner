@@ -71,6 +71,7 @@ export abstract class AbstractScanner<TransactionType> {
         break;
       }
     }
+
     if (
       success &&
       (await this.action.updateBlockStatus(

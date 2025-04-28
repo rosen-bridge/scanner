@@ -5,12 +5,17 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 import { BlockEntity } from '../../entities/blockEntity';
 import JsonBI from '@rosen-bridge/json-bigint';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
   abstract network: AbstractNetworkConnector<TransactionType>;
   protected abstract getFirstBlock: () => Promise<Block>;
+
+  constructor(protected blockRetrieveGap: number, logger?: AbstractLogger) {
+    super(logger);
+  }
 
   /**
    * function that checks if fork is happen in the blockchain or not
@@ -29,10 +34,21 @@ abstract class GeneralScanner<
   };
 
   /**
+   * This method introduces delay between consecutive block processing operations
+   */
+  protected delayBetweenBlocksProcessing = async (startTime: number) => {
+    const spentTime = new Date().getTime() - startTime;
+    await new Promise((resolve) =>
+      setTimeout(() => resolve(null), this.blockRetrieveGap - spentTime)
+    );
+  };
+
+  /**
    * process a block and execute all extractor on it.
    * @param block
    */
   protected processBlock = async (block: Block) => {
+    const startTime = new Date().getTime();
     this.logger.debug(
       `Processing block at height [${block.height}] in scanner ${this.name()}`
     );
@@ -48,7 +64,14 @@ abstract class GeneralScanner<
         `processing ${block.txCount} transactions of block with hash [${block.hash}]`
       );
     }
-    return await this.processBlockTransactions(block, txs);
+
+    const result = await this.processBlockTransactions(block, txs);
+
+    // Spending time between block fetches if the setting is enabled
+    if (this.blockRetrieveGap)
+      await this.delayBetweenBlocksProcessing(startTime);
+
+    return result;
   };
 
   /**

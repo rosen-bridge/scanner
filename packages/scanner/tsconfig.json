@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./lib"
+    "rootDir": "./lib",
+    "composite": true
   },
   "exclude": ["./lib/**/*.spec.ts", "./lib/**/*.test.ts", "./lib/**/*.mock.ts"],
   "include": ["./lib/**/*"],

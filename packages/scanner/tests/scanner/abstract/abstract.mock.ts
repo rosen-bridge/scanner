@@ -80,6 +80,29 @@ export const generateMockScannerClass = (name: string) => {
   };
 };
 
+export const generateMockGeneralScannerByBlockRetrieveGapClass = (
+  name: string
+) => {
+  return class ScannerTest extends GeneralScanner<TestTransaction> {
+    name = (): string => name;
+
+    constructor(
+      dataSource: DataSource,
+      networkConnector: NetworkConnectorTest
+    ) {
+      super(100, undefined);
+      this.action = new BlockDbAction(dataSource, this.name());
+      this.network = networkConnector;
+    }
+
+    network: AbstractNetworkConnector<TestTransaction>;
+
+    getFirstBlock = async (): Promise<Block> => {
+      return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
+    };
+  };
+};
+
 export const generateMockGeneralScannerClass = (name: string) => {
   return class ScannerTest extends GeneralScanner<TestTransaction> {
     name = (): string => name;
@@ -88,7 +111,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
       dataSource: DataSource,
       networkConnector: NetworkConnectorTest
     ) {
-      super();
+      super(0);
       this.action = new BlockDbAction(dataSource, this.name());
       this.network = networkConnector;
     }
