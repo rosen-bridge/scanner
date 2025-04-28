@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 2.1.1
+
+### Patch Changes
+
+- Add delay time between processing of blocks
+- Updated dependencies
+  - @rosen-bridge/scanner@6.1.0
+
 ## 2.1.0
 
 ### Minor Changes
