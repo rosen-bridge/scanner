@@ -11,9 +11,9 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   network: KoiosNetwork;
   constructor(
     config: CardanoKoiosConfig,
-    blockRetrieveGap = 0,
     logger?: AbstractLogger,
-    authToken?: string
+    authToken?: string,
+    blockRetrieveGap = 0
   ) {
     super(blockRetrieveGap, logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);

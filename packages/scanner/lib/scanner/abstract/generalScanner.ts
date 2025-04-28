@@ -38,8 +38,8 @@ abstract class GeneralScanner<
    */
   protected delayBetweenBlocksProcessing = async (startTime: number) => {
     const spentTime = new Date().getTime() - startTime;
-    await new Promise(() =>
-      setTimeout(() => null, this.blockRetrieveGap - spentTime)
+    await new Promise((resolve) =>
+      setTimeout(() => resolve(null), this.blockRetrieveGap - spentTime)
     );
   };
 

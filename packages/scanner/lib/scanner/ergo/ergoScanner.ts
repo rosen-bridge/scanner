@@ -20,8 +20,8 @@ class ErgoScanner extends GeneralScanner<Transaction> {
 
   constructor(
     config: ErgoScannerConfig,
-    blockRetrieveGap = 0,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    blockRetrieveGap = 0
   ) {
     super(blockRetrieveGap, logger);
     this.networkType = config.type;

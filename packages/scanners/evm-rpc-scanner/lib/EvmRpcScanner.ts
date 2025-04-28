@@ -12,9 +12,9 @@ export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
   constructor(
     chain: string,
     config: EvmRpcConfig,
-    blockRetrieveGap = 0,
     logger?: AbstractLogger,
-    authToken?: string
+    authToken?: string,
+    blockRetrieveGap = 0
   ) {
     super(blockRetrieveGap, logger);
     this.chain = `${chain}-evm-rpc`;

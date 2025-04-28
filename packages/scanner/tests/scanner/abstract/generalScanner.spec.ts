@@ -123,7 +123,7 @@ describe('generalScanner', () => {
      * Dependency: Nothing
      * Scenario: Create scanner with one extractor registered in it.
      *           Then call processBlockTransactions
-     * Expected: extractor processTransaction function must be called once
+     * Expected: scanner delayBetweenBlocksProcessing method must be called once
      */
     it('should a delay occur during test block processing', async () => {
       const network = new NetworkConnectorTest();

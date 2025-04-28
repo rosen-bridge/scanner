@@ -9,8 +9,8 @@ export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
   network: DogeRpcNetwork;
   constructor(
     config: BitcoinRPCConfig,
-    blockRetrieveGap = 0,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    blockRetrieveGap = 0
   ) {
     super(blockRetrieveGap, logger);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
