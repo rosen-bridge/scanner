@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner
 
+## 6.1.0
+
+### Minor Changes
+
+- Add delay time between processing of blocks
+
 ## 6.0.0
 
 ### Major Changes

@@ -1,5 +1,13 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 1.2.1
+
+### Patch Changes
+
+- Add delay time between processing of blocks
+- Updated dependencies
+  - @rosen-bridge/scanner@6.1.0
+
 ## 1.2.0
 
 ### Minor Changes
