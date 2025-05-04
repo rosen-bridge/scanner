@@ -5,7 +5,7 @@ import {
 import { BlockNotFound } from './types';
 import { JsonRpcProvider, TransactionResponse } from 'ethers';
 
-export class RpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
+export class EvmRpcNetwork extends AbstractNetworkConnector<TransactionResponse> {
   protected readonly provider: JsonRpcProvider;
 
   constructor(url: string, timeout?: number, authToken?: string) {
