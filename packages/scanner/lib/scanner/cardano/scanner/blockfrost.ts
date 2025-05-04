@@ -1,37 +1,26 @@
-import { CardanoBlockFrostConfig } from '../interfaces';
-import { BlockFrostNetwork } from '../network/blockfrost';
 import { BlockFrostTransaction } from '../interfaces/BlockFrost';
-import { Block } from '@rosen-bridge/scanner-interfaces';
-import { GeneralScanner } from '../../abstract/generalScanner';
-import { BlockDbAction } from '../../action';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { NetworkConnectorManager } from '../../network/NetworkConnectorManager';
+import { AbstractCardanoScanner } from './abstract';
+import { DataSource } from 'typeorm';
 
-class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
-  readonly initialHeight: number;
-  network: BlockFrostNetwork;
+class CardanoBlockFrostScanner extends AbstractCardanoScanner<BlockFrostTransaction> {
   constructor(
-    config: CardanoBlockFrostConfig,
+    dataSource: DataSource,
+    initialHeight: number,
+    network: NetworkConnectorManager<BlockFrostTransaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {
-    super(blockRetrieveGap, logger);
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches how Ogmios scanner currently
-     * works.
-     */
-    this.initialHeight = config.initialHeight + 1;
-    this.network = new BlockFrostNetwork(
-      config.projectId,
-      config.timeout,
-      config.blockFrostUrl
+    super(
+      dataSource,
+      initialHeight,
+      network,
+      'cardano-BlockFrost',
+      logger,
+      blockRetrieveGap
     );
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
 
   name = () => 'cardano-BlockFrost';
 }
