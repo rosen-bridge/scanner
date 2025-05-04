@@ -6,7 +6,7 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
-class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
+export class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
   private client: ReturnType<typeof ergoExplorerClientFactory>;
 
   constructor(explorerUrl: string) {
@@ -74,5 +74,3 @@ class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
     return Number(networkState.height);
   };
 }
-
-export default ErgoExplorerNetwork;

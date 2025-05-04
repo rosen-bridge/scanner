@@ -7,7 +7,7 @@ import ergoNodeClientFactory, {
   ErgoTransaction,
 } from '@rosen-clients/ergo-node';
 
-class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
+export class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
   private client: ReturnType<typeof ergoNodeClientFactory>;
   constructor(nodeUrl: string) {
     super();
@@ -80,5 +80,3 @@ class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
     return info.fullHeight || 0;
   };
 }
-
-export default ErgoNodeNetwork;

@@ -1,47 +1,32 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import {
-  AbstractNetworkConnector,
-  Block,
-  ErgoNetworkType,
-  Transaction,
-} from '@rosen-bridge/scanner-interfaces';
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { DataSource } from 'typeorm';
 
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';
-import { ErgoScannerConfig } from './interfaces';
-import ErgoExplorerNetwork from './network/ergoExplorerNetwork';
-import ErgoNodeNetwork from './network/ergoNodeNetwork';
+import { NetworkConnectorManager } from '../network/NetworkConnectorManager';
 
 class ErgoScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
-  readonly networkType: ErgoNetworkType;
-  readonly network: AbstractNetworkConnector<Transaction>;
+  readonly network: NetworkConnectorManager<Transaction>;
   readonly logger: AbstractLogger;
 
   constructor(
-    config: ErgoScannerConfig,
+    dataSource: DataSource,
+    initialHeight: number,
+    network: NetworkConnectorManager<Transaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {
     super(blockRetrieveGap, logger);
-    this.networkType = config.type;
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
+    this.action = new BlockDbAction(dataSource, this.name(), logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
      * `initialHeight` by one so that it matches how Ogmios scanner currently
      * works.
      */
-    this.initialHeight = config.initialHeight + 1;
-    switch (this.networkType) {
-      case ErgoNetworkType.Explorer:
-        this.network = new ErgoExplorerNetwork(config.url);
-        break;
-      case ErgoNetworkType.Node:
-        this.network = new ErgoNodeNetwork(config.url);
-        break;
-      default:
-        throw Error('invalid network entered');
-    }
+    this.initialHeight = initialHeight + 1;
+    this.network = network;
     this.logger = logger ?? new DummyLogger();
   }
 
@@ -49,6 +34,6 @@ class ErgoScanner extends GeneralScanner<Transaction> {
     return this.network.getBlockAtHeight(this.initialHeight);
   };
 
-  name = () => `ergo-${this.networkType}`;
+  name = () => 'ergo';
 }
 export { ErgoScanner };
