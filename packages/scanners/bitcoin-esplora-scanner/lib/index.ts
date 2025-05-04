@@ -1,3 +1,4 @@
 export { BitcoinEsploraScanner } from './BitcoinEsploraScanner';
-export { BitcoinEsploraConfig, BitcoinEsploraTransaction } from './types';
+export { BitcoinEsploraTransaction } from './types';
 export { DogeEsploraScanner } from './DogeEsploraScanner';
+export { EsploraNetwork } from './EsploraNetwork';
