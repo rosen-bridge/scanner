@@ -2,62 +2,14 @@ import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
+import {
+  ConnectorSelectionStrategy,
+  FailoverStrategy,
+} from './ConnectorSelectionStrategies';
 
 /**
- * Interface for connector selection strategies
- */
-export interface ConnectorSelectionStrategy<TransactionType> {
-  /**
-   * Select the next connector to use
-   * @param connectors Array of available connectors
-   * @param currentIndex Current connector index
-   * @param lastError Error from the last operation, if any
-   * @returns The index of the next connector to use
-   */
-  selectNextConnector(
-    connectors: Array<AbstractNetworkConnector<TransactionType>>,
-    currentIndex: number,
-    lastError?: Error
-  ): number;
-}
-
-/**
- * Failover strategy - switches to next connector only on failure
- */
-export class FailoverStrategy<TransactionType>
-  implements ConnectorSelectionStrategy<TransactionType>
-{
-  selectNextConnector(
-    connectors: Array<AbstractNetworkConnector<TransactionType>>,
-    currentIndex: number,
-    lastError?: Error
-  ): number {
-    // If there was an error, try the next connector
-    if (lastError) {
-      return (currentIndex + 1) % connectors.length;
-    }
-    // Otherwise stay with current connector
-    return currentIndex;
-  }
-}
-
-/**
- * Round-robin strategy - switches to next connector after each operation
- */
-export class RoundRobinStrategy<TransactionType>
-  implements ConnectorSelectionStrategy<TransactionType>
-{
-  selectNextConnector(
-    connectors: Array<AbstractNetworkConnector<TransactionType>>,
-    currentIndex: number
-  ): number {
-    return (currentIndex + 1) % connectors.length;
-  }
-}
-
-/**
- * Network connector manager that handles multiple connectors for the same network type
- * with pluggable selection strategy
+ * Network connector manager that can handle multiple connectors
+ * for a single network with pluggable selection strategy
  */
 export class NetworkConnectorManager<
   TransactionType
@@ -76,7 +28,7 @@ export class NetworkConnectorManager<
   }
 
   /**
-   * Add a network connector to the pool
+   * Add a new connector to the manager
    * @param connector The network connector instance
    */
   public addConnector(
@@ -111,12 +63,13 @@ export class NetworkConnectorManager<
       throw new Error('No connectors available');
     }
 
-    const initialIndex = this.currentConnectorIndex;
     let lastError: Error | undefined;
+    let attempts = 0;
+    const maxAttempts = this.connectors.length;
 
-    do {
+    while (attempts < maxAttempts) {
       try {
-        const connector = this.getCurrentConnector();
+        const connector = this.connectors[this.currentConnectorIndex];
         const result = await operation(connector);
         // Update connector index based on strategy
         this.currentConnectorIndex = this.strategy.selectNextConnector(
@@ -132,14 +85,15 @@ export class NetworkConnectorManager<
           this.currentConnectorIndex,
           lastError
         );
+        attempts++;
       }
-    } while (this.currentConnectorIndex !== initialIndex);
+    }
 
     throw lastError || new Error('All connectors failed');
   }
 
   /**
-   * Set the connector selection strategy
+   * Set the strategy to use for connector selection
    * @param strategy The strategy to use
    */
   public setStrategy(
@@ -149,16 +103,8 @@ export class NetworkConnectorManager<
   }
 
   /**
-   * Get the current selection strategy
-   * @returns The current strategy
-   */
-  public getStrategy(): ConnectorSelectionStrategy<TransactionType> {
-    return this.strategy;
-  }
-
-  /**
-   * Get block at height
-   * @param height The block height
+   * Get a block at a specific height
+   * @param height The height of the block to get
    * @returns The block at the specified height
    */
   getBlockAtHeight = async (height: number): Promise<Block> => {
@@ -168,8 +114,8 @@ export class NetworkConnectorManager<
   };
 
   /**
-   * Get current height
-   * @returns The current block height
+   * Get the current height of the blockchain
+   * @returns The current height
    */
   getCurrentHeight = async (): Promise<number> => {
     return this.executeWithStrategy((connector) =>
@@ -178,8 +124,8 @@ export class NetworkConnectorManager<
   };
 
   /**
-   * Get block transactions
-   * @param blockHash The block hash
+   * Get all transactions in a block
+   * @param blockHash The hash of the block to get transactions from
    * @returns Array of transactions in the block
    */
   getBlockTxs = async (blockHash: string): Promise<Array<TransactionType>> => {

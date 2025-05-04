@@ -11,3 +11,11 @@ export { ExtractorStatusEntity } from './entities/extractorStatusEntity';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';
 export { WebSocketScanner } from './scanner/abstract/webSocketScanner';
+export {
+  ConnectorSelectionStrategy,
+  FailoverStrategy,
+  RoundRobinStrategy,
+} from './scanner/network/ConnectorSelectionStrategies';
+export { NetworkConnectorManager } from './scanner/network/NetworkConnectorManager';
+export { ErgoExplorerNetwork } from './scanner/ergo/network/ergoExplorerNetwork';
+export { ErgoNodeNetwork } from './scanner/ergo/network/ergoNodeNetwork';
