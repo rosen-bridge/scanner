@@ -1,20 +1,22 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  Block,
+  Transaction,
+  AbstractNetworkConnector,
+} from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
 
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';
-import { NetworkConnectorManager } from '../network/NetworkConnectorManager';
-
 class ErgoScanner extends GeneralScanner<Transaction> {
   readonly initialHeight: number;
-  readonly network: NetworkConnectorManager<Transaction>;
+  readonly network: AbstractNetworkConnector<Transaction>;
   readonly logger: AbstractLogger;
 
   constructor(
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<Transaction>,
+    network: AbstractNetworkConnector<Transaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {

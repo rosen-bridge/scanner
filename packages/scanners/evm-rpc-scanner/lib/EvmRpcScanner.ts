@@ -1,23 +1,22 @@
-import {
-  GeneralScanner,
-  BlockDbAction,
-  NetworkConnectorManager,
-} from '@rosen-bridge/scanner';
+import { GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import {
+  Block,
+  AbstractNetworkConnector,
+} from '@rosen-bridge/scanner-interfaces';
 import { TransactionResponse } from 'ethers';
 import { DataSource } from 'typeorm';
 
 export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
   readonly initialHeight: number;
   readonly chain: string;
-  readonly network: NetworkConnectorManager<TransactionResponse>;
+  readonly network: AbstractNetworkConnector<TransactionResponse>;
 
   constructor(
     chain: string,
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<TransactionResponse>,
+    network: AbstractNetworkConnector<TransactionResponse>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {

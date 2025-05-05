@@ -1,6 +1,6 @@
 import { GraphQLTransaction } from '../interfaces/graphql';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { NetworkConnectorManager } from '../../network/NetworkConnectorManager';
+import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 import { AbstractCardanoScanner } from './abstract';
 import { DataSource } from 'typeorm';
 
@@ -8,7 +8,7 @@ class CardanoGraphQLScanner extends AbstractCardanoScanner<GraphQLTransaction> {
   constructor(
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<GraphQLTransaction>,
+    network: AbstractNetworkConnector<GraphQLTransaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {

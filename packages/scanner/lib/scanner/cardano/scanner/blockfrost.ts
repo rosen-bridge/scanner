@@ -1,6 +1,6 @@
 import { BlockFrostTransaction } from '../interfaces/BlockFrost';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { NetworkConnectorManager } from '../../network/NetworkConnectorManager';
+import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 import { AbstractCardanoScanner } from './abstract';
 import { DataSource } from 'typeorm';
 
@@ -8,7 +8,7 @@ class CardanoBlockFrostScanner extends AbstractCardanoScanner<BlockFrostTransact
   constructor(
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<BlockFrostTransaction>,
+    network: AbstractNetworkConnector<BlockFrostTransaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {

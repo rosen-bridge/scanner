@@ -1,8 +1,10 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import {
+  Block,
+  AbstractNetworkConnector,
+} from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
-import { NetworkConnectorManager } from '../../network/NetworkConnectorManager';
 import { DataSource } from 'typeorm';
 
 /**
@@ -13,13 +15,13 @@ export abstract class AbstractCardanoScanner<
   TransactionType
 > extends GeneralScanner<TransactionType> {
   readonly initialHeight: number;
-  readonly network: NetworkConnectorManager<TransactionType>;
+  readonly network: AbstractNetworkConnector<TransactionType>;
   readonly logger: AbstractLogger;
 
   constructor(
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<TransactionType>,
+    network: AbstractNetworkConnector<TransactionType>,
     scannerName: string,
     logger?: AbstractLogger,
     blockRetrieveGap = 0

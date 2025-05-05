@@ -1,19 +1,21 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
-import { Block } from '@rosen-bridge/scanner-interfaces';
-import { NetworkConnectorManager } from '@rosen-bridge/scanner';
+import {
+  Block,
+  AbstractNetworkConnector,
+} from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from 'typeorm';
 
 import { DogeRpcTransaction } from './types';
 
 export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
   readonly initialHeight: number;
-  readonly network: NetworkConnectorManager<DogeRpcTransaction>;
+  readonly network: AbstractNetworkConnector<DogeRpcTransaction>;
 
   constructor(
     dataSource: DataSource,
     initialHeight: number,
-    network: NetworkConnectorManager<DogeRpcTransaction>,
+    network: AbstractNetworkConnector<DogeRpcTransaction>,
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {
