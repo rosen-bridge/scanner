@@ -226,7 +226,9 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       this.triggerCallbacks(CallbackType.Spend, spentData);
     } catch (e) {
       this.logger.error(
-        `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
+        `Error in storing data in ${this.getId()} of the block ${
+          block.height
+        }: ${e}`
       );
       return false;
     }
