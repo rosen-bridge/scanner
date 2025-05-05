@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { BlockEntity } from '@rosen-bridge/scanner';
 import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
-import { JsonBI } from '@rosen-bridge/scanner/dist/scanner/ergo/network/parser';
+import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
@@ -540,7 +540,7 @@ export const observationTxGenerator = (
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
-  return JsonBI.parse(signed.to_json()) as Transaction;
+  return JsonBigint.parse(signed.to_json()) as Transaction;
 };
 
 export const generateBlockEntity = (
