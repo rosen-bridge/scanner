@@ -226,7 +226,9 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       this.triggerCallbacks(CallbackType.Spend, spentData);
     } catch (e) {
       this.logger.error(
-        `Error in storing data in ${this.getId()} of the block ${block}: ${e}`
+        `Error in storing data in ${this.getId()} of the block ${
+          block.height
+        }: ${e}`
       );
       return false;
     }
@@ -255,7 +257,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
           const R4Serialized = outputParsed
             .register_value(wasm.NonMandatoryRegisterId.R4)
             ?.to_byte_array();
-          if (R4Serialized !== undefined && R4Serialized.length > 0) {
+          if (R4Serialized !== undefined) {
             let txId = Buffer.from(R4Serialized).toString();
             // we assumed txId only includes these characters
             if (!txId.match(/^[0-9a-zA-Z\-_.]+$/)) {
