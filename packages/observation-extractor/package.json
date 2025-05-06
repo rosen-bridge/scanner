@@ -22,7 +22,7 @@
     "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^2.0.0",
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/rosen-extractor": "7.2.2",
+    "@rosen-bridge/rosen-extractor": "^7.2.2-f4cdb6ba",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/tokens": "^3.1.0",
     "blakejs": "^1.2.1",
@@ -34,8 +34,8 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
-    "@rosen-bridge/scanner": "^6.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
+    "@rosen-bridge/scanner": "^6.1.0",
     "@types/jest": "^28.1.6",
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
