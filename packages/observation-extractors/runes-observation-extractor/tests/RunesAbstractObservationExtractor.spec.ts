@@ -51,26 +51,13 @@ describe('RunesAbstractObservationExtractor', () => {
         chain: string,
         condition: Partial<RosenChainToken>
       ): RosenTokens => {
-        const tokens = mockTokens[chain] || [];
-
-        const result = tokens.filter((token) =>
-          Object.keys(condition).every(
-            (key) =>
-              token[key as keyof RosenChainToken] ===
-              condition[key as keyof RosenChainToken]
-          )
-        );
-
-        return result.map((token) => ({ [token.tokenId || 'unknown']: token }));
+        return [];
       },
 
       getID: (
         token: { [key: string]: RosenChainToken },
         chain: string
       ): string => {
-        if (token[chain] && token[chain].tokenId) {
-          return token[chain].tokenId as string;
-        }
         return '';
       },
 
