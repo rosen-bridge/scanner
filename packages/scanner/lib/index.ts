@@ -22,3 +22,6 @@ export { ErgoNodeNetwork } from './scanner/ergo/network/ergoNodeNetwork';
 export { BlockFrostNetwork } from './scanner/cardano/network/blockfrost';
 export { KoiosNetwork } from './scanner/cardano/network/koios';
 export { GraphQLNetwork } from './scanner/cardano/network/graphql';
+export { BlockFrostTransaction } from './scanner/cardano/interfaces/BlockFrost';
+export { KoiosTransaction } from './scanner/cardano/interfaces/Koios';
+export { GraphQLTransaction } from './scanner/cardano/interfaces/graphql';

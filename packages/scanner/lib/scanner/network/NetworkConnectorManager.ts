@@ -42,7 +42,7 @@ export class NetworkConnectorManager<
    * @returns The current network connector instance
    * @throws Error if no connectors are available
    */
-  private getCurrentConnector(): AbstractNetworkConnector<TransactionType> {
+  getCurrentConnector(): AbstractNetworkConnector<TransactionType> {
     if (this.connectors.length === 0) {
       throw new Error('No connectors available');
     }
