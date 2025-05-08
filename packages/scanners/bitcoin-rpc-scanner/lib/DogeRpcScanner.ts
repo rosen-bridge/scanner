@@ -4,7 +4,7 @@ import {
   Block,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { DogeRpcTransaction } from './types';
 

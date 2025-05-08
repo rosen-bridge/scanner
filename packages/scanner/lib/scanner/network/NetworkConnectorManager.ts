@@ -6,6 +6,7 @@ import {
   ConnectorSelectionStrategy,
   FailoverStrategy,
 } from './ConnectorSelectionStrategies';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 /**
  * Network connector manager that can handle multiple connectors
@@ -16,15 +17,16 @@ export class NetworkConnectorManager<
 > extends AbstractNetworkConnector<TransactionType> {
   private connectors: Array<AbstractNetworkConnector<TransactionType>>;
   private currentConnectorIndex: number;
-  private strategy: ConnectorSelectionStrategy<TransactionType>;
 
   constructor(
-    strategy: ConnectorSelectionStrategy<TransactionType> = new FailoverStrategy<TransactionType>()
+    private strategy: ConnectorSelectionStrategy<TransactionType> = new FailoverStrategy<TransactionType>(),
+    private logger: AbstractLogger = new DummyLogger()
   ) {
     super();
     this.connectors = [];
     this.currentConnectorIndex = 0;
     this.strategy = strategy;
+    this.logger.info('NetworkConnectorManager initialized');
   }
 
   /**
@@ -34,7 +36,9 @@ export class NetworkConnectorManager<
   public addConnector(
     connector: AbstractNetworkConnector<TransactionType>
   ): void {
+    this.logger.info('Adding new connector');
     this.connectors.push(connector);
+    this.logger.info(`Total connectors: ${this.connectors.length}`);
   }
 
   /**
@@ -46,6 +50,7 @@ export class NetworkConnectorManager<
     if (this.connectors.length === 0) {
       throw new Error('No connectors available');
     }
+    this.logger.debug(`Using connector at index ${this.currentConnectorIndex}`);
     return this.connectors[this.currentConnectorIndex];
   }
 
@@ -60,7 +65,7 @@ export class NetworkConnectorManager<
     ) => Promise<T>
   ): Promise<T> {
     if (this.connectors.length === 0) {
-      throw new Error('No connectors available');
+      throw new Error('No connectors available for operation');
     }
 
     let lastError: Error | undefined;
@@ -70,16 +75,25 @@ export class NetworkConnectorManager<
     while (attempts < maxAttempts) {
       try {
         const connector = this.connectors[this.currentConnectorIndex];
+        this.logger.debug(
+          `Attempt ${attempts + 1}/${maxAttempts} with connector at index ${
+            this.currentConnectorIndex
+          }`
+        );
         const result = await operation(connector);
-        // Update connector index based on strategy
         this.currentConnectorIndex = this.strategy.selectNextConnector(
           this.connectors,
           this.currentConnectorIndex
         );
+        this.logger.debug(
+          `Operation successful, next connector index: ${this.currentConnectorIndex}`
+        );
         return result;
       } catch (error) {
         lastError = error as Error;
-        // Update connector index based on strategy and error
+        this.logger.warn(
+          `Operation failed with connector at index ${this.currentConnectorIndex}: ${lastError.message}`
+        );
         this.currentConnectorIndex = this.strategy.selectNextConnector(
           this.connectors,
           this.currentConnectorIndex,
@@ -88,7 +102,6 @@ export class NetworkConnectorManager<
         attempts++;
       }
     }
-
     throw lastError || new Error('All connectors failed');
   }
 
@@ -99,6 +112,7 @@ export class NetworkConnectorManager<
   public setStrategy(
     strategy: ConnectorSelectionStrategy<TransactionType>
   ): void {
+    this.logger.info('Setting new connector selection strategy');
     this.strategy = strategy;
   }
 
@@ -139,7 +153,9 @@ export class NetworkConnectorManager<
    * @returns The number of connectors
    */
   public getConnectorCount(): number {
-    return this.connectors.length;
+    const count = this.connectors.length;
+    this.logger.debug(`Current connector count: ${count}`);
+    return count;
   }
 
   /**
@@ -150,6 +166,7 @@ export class NetworkConnectorManager<
     if (index < 0 || index >= this.connectors.length) {
       throw new Error('Invalid connector index');
     }
+    this.logger.info(`Removing connector at index ${index}`);
     this.connectors.splice(index, 1);
     if (this.currentConnectorIndex >= this.connectors.length) {
       this.currentConnectorIndex = 0;

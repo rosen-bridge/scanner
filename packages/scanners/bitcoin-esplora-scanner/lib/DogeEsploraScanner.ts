@@ -5,7 +5,7 @@ import {
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
 import { BitcoinEsploraTransaction } from './types';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   readonly initialHeight: number;

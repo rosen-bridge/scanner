@@ -4,7 +4,7 @@ import {
   Transaction,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { GeneralScanner } from '../abstract/generalScanner';
 import { BlockDbAction } from '../action';

@@ -21,8 +21,6 @@ class CardanoGraphQLScanner extends AbstractCardanoScanner<GraphQLTransaction> {
       blockRetrieveGap
     );
   }
-
-  name = () => 'cardano-GraphQL';
 }
 
 export { CardanoGraphQLScanner };

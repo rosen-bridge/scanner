@@ -5,7 +5,7 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { BlockDbAction } from '../../action';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 /**
  * Abstract base class for all Cardano scanners
@@ -17,6 +17,7 @@ export abstract class AbstractCardanoScanner<
   readonly initialHeight: number;
   readonly network: AbstractNetworkConnector<TransactionType>;
   readonly logger: AbstractLogger;
+  protected readonly scannerName: string;
 
   constructor(
     dataSource: DataSource,
@@ -34,6 +35,7 @@ export abstract class AbstractCardanoScanner<
     this.initialHeight = initialHeight + 1;
     this.network = network;
     this.logger = logger ?? new DummyLogger();
+    this.scannerName = scannerName;
     this.action = new BlockDbAction(dataSource, scannerName, this.logger);
   }
 
@@ -49,5 +51,5 @@ export abstract class AbstractCardanoScanner<
    * Get the name of the scanner
    * @returns The scanner name
    */
-  abstract name: () => string;
+  name = () => this.scannerName;
 }

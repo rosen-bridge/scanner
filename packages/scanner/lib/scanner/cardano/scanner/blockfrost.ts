@@ -21,8 +21,6 @@ class CardanoBlockFrostScanner extends AbstractCardanoScanner<BlockFrostTransact
       blockRetrieveGap
     );
   }
-
-  name = () => 'cardano-BlockFrost';
 }
 
 export { CardanoBlockFrostScanner };

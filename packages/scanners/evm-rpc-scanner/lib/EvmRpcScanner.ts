@@ -5,7 +5,7 @@ import {
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
 import { TransactionResponse } from 'ethers';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
   readonly initialHeight: number;

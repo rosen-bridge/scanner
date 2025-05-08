@@ -21,8 +21,6 @@ class CardanoKoiosScanner extends AbstractCardanoScanner<KoiosTransaction> {
       blockRetrieveGap
     );
   }
-
-  name = () => 'cardano-Koios';
 }
 
 export { CardanoKoiosScanner };
