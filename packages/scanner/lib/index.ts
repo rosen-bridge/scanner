@@ -25,3 +25,4 @@ export { GraphQLNetwork } from './scanner/cardano/network/graphql';
 export { BlockFrostTransaction } from './scanner/cardano/interfaces/BlockFrost';
 export { KoiosTransaction } from './scanner/cardano/interfaces/Koios';
 export { GraphQLTransaction } from './scanner/cardano/interfaces/graphql';
+export { ScannerConfig } from './scanner/interfaces';

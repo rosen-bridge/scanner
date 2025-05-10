@@ -1,21 +1,23 @@
 import { KoiosTransaction } from '../interfaces/Koios';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { ScannerConfig } from '../../interfaces';
 
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   constructor(
-    dataSource: DataSource,
-    initialHeight: number,
-    network: AbstractNetworkConnector<KoiosTransaction>,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
+    config: ScannerConfig<KoiosTransaction>,
+    logger?: AbstractLogger
   ) {
-    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
+    super(
+      'cardano-Koios',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap || 0,
+      logger,
+      config.suffix
+    );
   }
-
-  name = () => `cardano-Koios`;
 }
 
 export { CardanoKoiosScanner };

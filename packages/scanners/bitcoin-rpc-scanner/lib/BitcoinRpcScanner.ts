@@ -1,20 +1,21 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { GeneralScanner } from '@rosen-bridge/scanner';
-import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
 
 import { BitcoinRpcTransaction } from './types';
 
 export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
   constructor(
-    dataSource: DataSource,
-    initialHeight: number,
-    network: AbstractNetworkConnector<BitcoinRpcTransaction>,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
+    config: ScannerConfig<BitcoinRpcTransaction>,
+    logger?: AbstractLogger
   ) {
-    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
+    super(
+      'bitcoin-rpc',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap || 0,
+      logger,
+      config.suffix
+    );
   }
-
-  name = () => 'bitcoin-rpc';
 }

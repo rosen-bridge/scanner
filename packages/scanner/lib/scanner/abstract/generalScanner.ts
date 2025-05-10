@@ -15,12 +15,16 @@ abstract class GeneralScanner<
   readonly network: AbstractNetworkConnector<TransactionType>;
   readonly initialHeight: number;
 
+  name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
+
   constructor(
+    private scannerName: string,
     private dataSource: DataSource,
     initialHeight: number,
     network: AbstractNetworkConnector<TransactionType>,
     protected blockRetrieveGap: number,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
+    private suffix?: string
   ) {
     super(logger);
     /**
@@ -29,15 +33,12 @@ abstract class GeneralScanner<
      */
     this.initialHeight = initialHeight + 1;
     this.network = network;
-    this.initAction();
+    this.action = new BlockDbAction(
+      this.dataSource,
+      this.scannerName,
+      this.logger
+    );
   }
-
-  /**
-   * Initialize the action for the scanner
-   */
-  protected initAction = () => {
-    this.action = new BlockDbAction(this.dataSource, this.name(), this.logger);
-  };
 
   /**
    * Get the first block to process

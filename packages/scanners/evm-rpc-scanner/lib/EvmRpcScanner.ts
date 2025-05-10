@@ -1,25 +1,23 @@
-import { GeneralScanner } from '@rosen-bridge/scanner';
+import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 import { TransactionResponse } from 'ethers';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
   readonly chain: string;
 
   constructor(
     chain: string,
-    dataSource: DataSource,
-    initialHeight: number,
-    network: AbstractNetworkConnector<TransactionResponse>,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
+    config: ScannerConfig<TransactionResponse>,
+    logger?: AbstractLogger
   ) {
-    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
-    this.chain = `${chain}-evm-rpc`;
+    super(
+      `${chain}-evm-rpc`,
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap || 0,
+      logger,
+      config.suffix
+    );
   }
-
-  name = (): string => {
-    return this.chain;
-  };
 }

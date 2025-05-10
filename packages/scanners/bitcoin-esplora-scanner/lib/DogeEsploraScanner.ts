@@ -1,19 +1,20 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { GeneralScanner } from '@rosen-bridge/scanner';
-import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
+import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
 import { BitcoinEsploraTransaction } from './types';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   constructor(
-    dataSource: DataSource,
-    initialHeight: number,
-    network: AbstractNetworkConnector<BitcoinEsploraTransaction>,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
+    config: ScannerConfig<BitcoinEsploraTransaction>,
+    logger?: AbstractLogger
   ) {
-    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
+    super(
+      'doge-esplora',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap || 0,
+      logger,
+      config.suffix
+    );
   }
-
-  name = () => 'doge-esplora';
 }
