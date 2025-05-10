@@ -12,9 +12,9 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
  * Network connector manager that can handle multiple connectors
  * for a single network with pluggable selection strategy
  */
-export class NetworkConnectorManager<
-  TransactionType
-> extends AbstractNetworkConnector<TransactionType> {
+export class NetworkConnectorManager<TransactionType>
+  implements AbstractNetworkConnector<TransactionType>
+{
   private connectors: Array<AbstractNetworkConnector<TransactionType>>;
   private currentConnectorIndex: number;
 
@@ -22,7 +22,6 @@ export class NetworkConnectorManager<
     private strategy: ConnectorSelectionStrategy<TransactionType> = new FailoverStrategy<TransactionType>(),
     private logger: AbstractLogger = new DummyLogger()
   ) {
-    super();
     this.connectors = [];
     this.currentConnectorIndex = 0;
     this.strategy = strategy;

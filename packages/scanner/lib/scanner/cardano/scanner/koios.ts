@@ -4,17 +4,14 @@ import { GeneralScanner } from '../../abstract/generalScanner';
 import { ScannerConfig } from '../../interfaces';
 
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
-  constructor(
-    config: ScannerConfig<KoiosTransaction>,
-    logger?: AbstractLogger
-  ) {
+  constructor(config: ScannerConfig<KoiosTransaction>) {
     super(
       'cardano-koios',
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
-      logger,
+      config.logger,
       config.suffix
     );
   }

@@ -4,14 +4,14 @@ import { ScannerConfig } from '../interfaces';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 class ErgoScanner extends GeneralScanner<Transaction> {
-  constructor(config: ScannerConfig<Transaction>, logger?: AbstractLogger) {
+  constructor(config: ScannerConfig<Transaction>) {
     super(
       'ergo',
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
-      logger,
+      config.logger,
       config.suffix
     );
   }
