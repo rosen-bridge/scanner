@@ -1,16 +1,10 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
-import {
-  Block,
-  AbstractNetworkConnector,
-} from '@rosen-bridge/scanner-interfaces';
+import { GeneralScanner } from '@rosen-bridge/scanner';
+import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 import { BitcoinEsploraTransaction } from './types';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
-  readonly initialHeight: number;
-  readonly network: AbstractNetworkConnector<BitcoinEsploraTransaction>;
-
   constructor(
     dataSource: DataSource,
     initialHeight: number,
@@ -18,19 +12,8 @@ export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransact
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {
-    super(blockRetrieveGap, logger);
-    this.action = new BlockDbAction(dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches all other rosen-bridge scanners
-     */
-    this.initialHeight = initialHeight + 1;
-    this.network = network;
+    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
 
   name = () => 'bitcoin-esplora';
 }

@@ -1,10 +1,10 @@
 import { BlockFrostTransaction } from '../interfaces/BlockFrost';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
-import { AbstractCardanoScanner } from './abstract';
 import { DataSource } from 'typeorm';
+import { GeneralScanner } from '../../abstract/generalScanner';
 
-class CardanoBlockFrostScanner extends AbstractCardanoScanner<BlockFrostTransaction> {
+class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   constructor(
     dataSource: DataSource,
     initialHeight: number,
@@ -12,15 +12,10 @@ class CardanoBlockFrostScanner extends AbstractCardanoScanner<BlockFrostTransact
     logger?: AbstractLogger,
     blockRetrieveGap = 0
   ) {
-    super(
-      dataSource,
-      initialHeight,
-      network,
-      'cardano-BlockFrost',
-      logger,
-      blockRetrieveGap
-    );
+    super(dataSource, initialHeight, network, blockRetrieveGap, logger);
   }
+
+  name = () => 'cardano-blockfrost';
 }
 
 export { CardanoBlockFrostScanner };
