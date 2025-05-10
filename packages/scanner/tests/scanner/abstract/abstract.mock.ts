@@ -104,7 +104,6 @@ export const generateMockGeneralScannerClass = (name: string) => {
       dataSource: DataSource,
       networkConnector: NetworkConnectorTest
     ) {
-      console.log(name);
       super(name, dataSource, 0, networkConnector, 100, undefined);
     }
 
