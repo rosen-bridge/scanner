@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "12.1.0",
+  "version": "12.1.0-5cfc7c60",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -39,7 +39,7 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
-    "@rosen-bridge/scanner": "^6.1.0",
+    "@rosen-bridge/scanner": "^6.1.0-5cfc7c60",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
     "@types/node": "^20.11.9",
