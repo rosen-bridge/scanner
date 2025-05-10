@@ -90,10 +90,7 @@ export const generateMockGeneralScannerByBlockRetrieveGapClass = (
     ) {
       super(name, dataSource, 0, networkConnector, 100, undefined);
       this.action = new BlockDbAction(dataSource, this.name());
-      this.network = networkConnector;
     }
-
-    network: AbstractNetworkConnector<TestTransaction>;
 
     getFirstBlock = async (): Promise<Block> => {
       return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };

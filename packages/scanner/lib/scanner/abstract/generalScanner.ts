@@ -12,8 +12,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
-  readonly network: AbstractNetworkConnector<TransactionType>;
-  readonly initialHeight: number;
+  private readonly initialHeight: number;
 
   name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
 
@@ -21,8 +20,8 @@ abstract class GeneralScanner<
     private scannerName: string,
     private dataSource: DataSource,
     initialHeight: number,
-    network: AbstractNetworkConnector<TransactionType>,
-    protected blockRetrieveGap: number,
+    private network: AbstractNetworkConnector<TransactionType>,
+    private blockRetrieveGap: number,
     logger?: AbstractLogger,
     private suffix?: string
   ) {
@@ -32,7 +31,6 @@ abstract class GeneralScanner<
      * `initialHeight` by one so that it matches how other scanners work.
      */
     this.initialHeight = initialHeight + 1;
-    this.network = network;
     this.action = new BlockDbAction(
       this.dataSource,
       this.scannerName,
