@@ -1,5 +1,4 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { TransactionResponse } from 'ethers';
 
 export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {

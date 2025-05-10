@@ -1,4 +1,3 @@
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
 import { BitcoinEsploraTransaction } from './types';
 

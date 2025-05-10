@@ -1,5 +1,4 @@
 import { GraphQLTransaction } from '../interfaces/graphql';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { GeneralScanner } from '../../abstract/generalScanner';
 import { ScannerConfig } from '../../interfaces';
 

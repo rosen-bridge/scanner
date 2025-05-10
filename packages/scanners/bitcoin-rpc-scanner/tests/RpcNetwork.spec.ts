@@ -4,7 +4,7 @@ import {
   resetAxiosMock,
 } from './mocked/axios.mock';
 import * as testData from './testData';
-import { BitcoinRpcNetwork } from '../lib/RpcNetwork';
+import { BitcoinRpcNetwork } from '../lib/BitcoinRpcNetwork';
 
 describe('RpcNetwork', () => {
   let network: BitcoinRpcNetwork;

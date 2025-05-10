@@ -1,4 +1,3 @@
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { GeneralScanner } from '../abstract/generalScanner';
 import { ScannerConfig } from '../interfaces';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
