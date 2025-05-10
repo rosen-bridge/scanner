@@ -9,7 +9,7 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
     logger?: AbstractLogger
   ) {
     super(
-      'cardano-blockfrost',
+      'cardano-BlockFrost',
       config.dataSource,
       config.initialHeight,
       config.network,

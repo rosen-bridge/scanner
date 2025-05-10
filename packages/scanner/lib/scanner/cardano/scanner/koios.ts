@@ -9,7 +9,7 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
     logger?: AbstractLogger
   ) {
     super(
-      'cardano-Koios',
+      'cardano-koios',
       config.dataSource,
       config.initialHeight,
       config.network,

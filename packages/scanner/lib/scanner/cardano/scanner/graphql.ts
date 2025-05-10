@@ -9,7 +9,7 @@ class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
     logger?: AbstractLogger
   ) {
     super(
-      'cardano-GraphQL',
+      'cardano-graphql',
       config.dataSource,
       config.initialHeight,
       config.network,
