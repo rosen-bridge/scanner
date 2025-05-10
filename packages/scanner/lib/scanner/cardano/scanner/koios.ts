@@ -13,7 +13,7 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
       config.dataSource,
       config.initialHeight,
       config.network,
-      config.blockRetrieveGap || 0,
+      config.blockRetrieveGap,
       logger,
       config.suffix
     );

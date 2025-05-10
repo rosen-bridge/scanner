@@ -21,7 +21,7 @@ abstract class GeneralScanner<
     private dataSource: DataSource,
     initialHeight: number,
     private network: AbstractNetworkConnector<TransactionType>,
-    private blockRetrieveGap: number,
+    private blockRetrieveGap = 0,
     logger?: AbstractLogger,
     private suffix?: string
   ) {
