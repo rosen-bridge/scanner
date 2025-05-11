@@ -6,15 +6,16 @@ import { DataSource } from 'typeorm';
 import { RunesAbstractObservationExtractor } from './RunesAbstractObservationExtractor';
 
 export class RunesRpcObservationExtractor extends RunesAbstractObservationExtractor<BitcoinRpcTransaction> {
-  readonly FROM_CHAIN = 'runes';
-
   constructor(
     lockAddress: string,
+    ordiscanApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger
   ) {
     super(
+      lockAddress,
+      ordiscanApiKey,
       dataSource,
       tokens,
       new RunesRpcRosenExtractor(lockAddress, tokens, logger),

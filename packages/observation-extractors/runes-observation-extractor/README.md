@@ -2,10 +2,8 @@
 
 ## Table of contents
 
-- [@rosen-bridge/runes-observation-extractor](#rosen-bridgerunes-observation-extractor)
-  - [Table of contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Installation](#installation)
+- [Introduction](#introduction)
+- [Installation](#installation)
 
 ## Introduction
 

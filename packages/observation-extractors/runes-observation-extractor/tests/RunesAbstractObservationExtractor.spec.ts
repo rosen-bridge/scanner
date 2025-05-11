@@ -8,6 +8,7 @@ import { BitcoinRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import {
   mockLockAddress,
+  mockOrdiscanApiKey,
   mockOrdiscanRunesTransfer,
   rosenData,
   txs,
@@ -20,7 +21,6 @@ describe('RunesAbstractObservationExtractor', () => {
   let mockQueryRunner: any;
   let mockRepository: any;
   let mockTokenMap: any;
-  const mockTokens: { [chain: string]: RosenChainToken[] } = {};
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -75,6 +75,7 @@ describe('RunesAbstractObservationExtractor', () => {
 
     extractor = new RunesRpcObservationExtractor(
       mockLockAddress,
+      mockOrdiscanApiKey,
       mockDataSource,
       mockTokenMap,
       undefined
@@ -83,7 +84,7 @@ describe('RunesAbstractObservationExtractor', () => {
 
   describe('processTransactions', () => {
     /**
-     * @target RunesAbstractObservationExtractor.processTransactions should
+     * @target RunesAbstractObservationExtractor.processTransactions should process transactions successfully
      * @dependencies
      * @scenario
      * - stub getTxRunesTransfer to resolve to a mock transfer
@@ -100,7 +101,7 @@ describe('RunesAbstractObservationExtractor', () => {
      * - actions.storeObservations should have been called once with observations, block, and chain id
      * - processTransactions should have returned true
      */
-    it('should ', async () => {
+    it('should process transactions successfully', async () => {
       // arrange
       const wrappedRune = {
         cardano: {

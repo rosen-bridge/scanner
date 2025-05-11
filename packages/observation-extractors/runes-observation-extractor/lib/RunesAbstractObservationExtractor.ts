@@ -6,9 +6,11 @@ import { Block } from '@rosen-bridge/scanner-interfaces';
 import { blake2b } from 'blakejs';
 import Axios, { AxiosHeaders } from 'axios';
 import { OrdiscanRunesTransfer } from './types';
-
-// TODO: move to configs
-const ordiscanUrl = 'https://api.ordiscan.com';
+import { DataSource } from 'typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
+import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { ordiscanUrl } from './constants';
 
 // TODO: use the type from rosen-extractor updated package (need new release)
 interface TokenTransformation {
@@ -20,12 +22,29 @@ interface TokenTransformation {
 export abstract class RunesAbstractObservationExtractor<
   TransactionType
 > extends AbstractObservationExtractor<TransactionType> {
+  readonly FROM_CHAIN = 'runes';
+  protected readonly lockAddress: string;
+  protected readonly ordiscanApiKey: string;
+
+  constructor(
+    lockAddress: string,
+    ordiscanApiKey: string,
+    dataSource: DataSource,
+    tokens: TokenMap,
+    extractor: AbstractRosenDataExtractor<TransactionType>,
+    logger?: AbstractLogger
+  ) {
+    super(dataSource, tokens, extractor, logger);
+    this.lockAddress = lockAddress;
+    this.ordiscanApiKey = ordiscanApiKey;
+  }
+
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
-   *  transactions and in case of success return true and in case of failure returns false
-   * additionally, it returns false if the transaction is failed
-   * @param block
+   * transactions and in case of success return true and in case of failure returns false
+   * additionally, if it fails due to unexpected reasons such as network issues, it re-throws the error
    * @param txs
+   * @param block
    */
   processTransactions = async (
     txs: Array<TransactionType>,
@@ -45,10 +64,8 @@ export abstract class RunesAbstractObservationExtractor<
         const txRunesTransfer = await this.getTxRunesTransfer(txId);
 
         for (const outRune of txRunesTransfer.outputs) {
-          // TODO: check if its ok to remove line 51 since lock address gets checked in `RunesRpcRosenExtractor.ts` validateLock (but logic differs)
-
           // check if rune is transferred to the lock address
-          // if (outRune.address !== rosenLockAddress) continue;
+          if (outRune.address !== this.lockAddress) continue;
 
           // check if rune is supported by Rosen bridge
           const wrappedRune = this.tokens.search(this.FROM_CHAIN, {
@@ -69,7 +86,7 @@ export abstract class RunesAbstractObservationExtractor<
         }
       } catch (e) {
         this.logger.debug(`Failed to get Runes data from tx [${txId}]: ${e}`);
-        return false;
+        throw e;
       }
 
       if (!runesTransformation) {
@@ -104,9 +121,8 @@ export abstract class RunesAbstractObservationExtractor<
    * @param txId
    */
   getTxRunesTransfer = async (txId: string): Promise<OrdiscanRunesTransfer> => {
-    const apiKey = '';
     const headers: AxiosHeaders = new AxiosHeaders();
-    headers.setAuthorization(`Bearer ${apiKey}`);
+    headers.setAuthorization(`Bearer ${this.ordiscanApiKey}`);
     const res = await Axios.get(`${ordiscanUrl}/v1/tx/${txId}/runes`, {
       headers: headers,
     });
