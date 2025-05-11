@@ -8,6 +8,7 @@ import { RunesAbstractObservationExtractor } from './RunesAbstractObservationExt
 export class RunesRpcObservationExtractor extends RunesAbstractObservationExtractor<BitcoinRpcTransaction> {
   constructor(
     lockAddress: string,
+    ordiscanUrl: string,
     ordiscanApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
@@ -15,6 +16,7 @@ export class RunesRpcObservationExtractor extends RunesAbstractObservationExtrac
   ) {
     super(
       lockAddress,
+      ordiscanUrl,
       ordiscanApiKey,
       dataSource,
       tokens,

@@ -10,6 +10,7 @@ import {
   mockLockAddress,
   mockOrdiscanApiKey,
   mockOrdiscanRunesTransfer,
+  mockOrdiscanUrl,
   rosenData,
   txs,
 } from './testData';
@@ -75,6 +76,7 @@ describe('RunesAbstractObservationExtractor', () => {
 
     extractor = new RunesRpcObservationExtractor(
       mockLockAddress,
+      mockOrdiscanUrl,
       mockOrdiscanApiKey,
       mockDataSource,
       mockTokenMap,

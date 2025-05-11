@@ -3,6 +3,7 @@ import { OrdiscanRunesTransfer } from '../lib/types';
 export const mockLockAddress =
   'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk';
 
+export const mockOrdiscanUrl = '';
 export const mockOrdiscanApiKey = '';
 
 export const baseTx = {

@@ -10,7 +10,6 @@ import { DataSource } from 'typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { ordiscanUrl } from './constants';
 
 // TODO: use the type from rosen-extractor updated package (need new release)
 interface TokenTransformation {
@@ -24,10 +23,12 @@ export abstract class RunesAbstractObservationExtractor<
 > extends AbstractObservationExtractor<TransactionType> {
   readonly FROM_CHAIN = 'runes';
   protected readonly lockAddress: string;
+  protected readonly ordiscanUrl: string;
   protected readonly ordiscanApiKey: string;
 
   constructor(
     lockAddress: string,
+    ordiscanUrl: string,
     ordiscanApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
@@ -36,6 +37,7 @@ export abstract class RunesAbstractObservationExtractor<
   ) {
     super(dataSource, tokens, extractor, logger);
     this.lockAddress = lockAddress;
+    this.ordiscanUrl = ordiscanUrl;
     this.ordiscanApiKey = ordiscanApiKey;
   }
 
@@ -123,7 +125,7 @@ export abstract class RunesAbstractObservationExtractor<
   getTxRunesTransfer = async (txId: string): Promise<OrdiscanRunesTransfer> => {
     const headers: AxiosHeaders = new AxiosHeaders();
     headers.setAuthorization(`Bearer ${this.ordiscanApiKey}`);
-    const res = await Axios.get(`${ordiscanUrl}/v1/tx/${txId}/runes`, {
+    const res = await Axios.get(`${this.ordiscanUrl}/v1/tx/${txId}/runes`, {
       headers: headers,
     });
     return res.data;
