@@ -25,7 +25,7 @@ export class NetworkConnectorManager<TransactionType>
     this.connectors = [];
     this.currentConnectorIndex = 0;
     this.strategy = strategy;
-    this.logger.info('NetworkConnectorManager initialized');
+    this.logger.debug('NetworkConnectorManager initialized');
   }
 
   /**
@@ -35,9 +35,10 @@ export class NetworkConnectorManager<TransactionType>
   public addConnector(
     connector: AbstractNetworkConnector<TransactionType>
   ): void {
-    this.logger.info('Adding new connector');
     this.connectors.push(connector);
-    this.logger.info(`Total connectors: ${this.connectors.length}`);
+    this.logger.info(
+      `Added new connector. Total connectors: ${this.connectors.length}`
+    );
   }
 
   /**
