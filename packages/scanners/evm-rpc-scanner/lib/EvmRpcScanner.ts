@@ -1,37 +1,18 @@
-import { EvmRpcConfig } from './types';
-import { RpcNetwork } from './RpcNetwork';
-import { GeneralScanner, BlockDbAction } from '@rosen-bridge/scanner';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
 import { TransactionResponse } from 'ethers';
 
 export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
-  readonly initialHeight: number;
   readonly chain: string;
-  network: RpcNetwork;
-  constructor(
-    chain: string,
-    config: EvmRpcConfig,
-    logger?: AbstractLogger,
-    authToken?: string,
-    blockRetrieveGap = 0
-  ) {
-    super(blockRetrieveGap, logger);
-    this.chain = `${chain}-evm-rpc`;
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches all other rosen-bridge scanners
-     */
-    this.initialHeight = config.initialHeight + 1;
-    this.network = new RpcNetwork(config.RpcUrl, config.timeout, authToken);
+
+  constructor(chain: string, config: ScannerConfig<TransactionResponse>) {
+    super(
+      `${chain}-evm-rpc`,
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap,
+      config.logger,
+      config.suffix
+    );
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
-
-  name = (): string => {
-    return this.chain;
-  };
 }

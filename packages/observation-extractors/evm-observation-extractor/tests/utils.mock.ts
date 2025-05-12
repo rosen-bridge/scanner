@@ -9,7 +9,7 @@ import {
   migrations as scannerMigrations,
   BlockEntity,
 } from '@rosen-bridge/scanner';
-import { JsonBI } from '@rosen-bridge/scanner/dist/scanner/ergo/network/parser';
+import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
 
 export const last10BlockHeader = [
@@ -545,7 +545,7 @@ export const observationTxGenerator = (
     unspentBoxes,
     wasm.ErgoBoxes.from_boxes_json([])
   );
-  return JsonBI.parse(signed.to_json()) as Transaction;
+  return JsonBigint.parse(signed.to_json()) as Transaction;
 };
 
 export const generateBlockEntity = (

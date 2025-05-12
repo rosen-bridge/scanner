@@ -5,7 +5,8 @@ import {
   Block,
 } from '@rosen-bridge/scanner-interfaces';
 import { KoiosBlock, KoiosCborTx, KoiosTransaction } from '../interfaces/Koios';
-import { JsonBI } from '../../ergo/network/parser';
+import JsonBigint from '@rosen-bridge/json-bigint';
+
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly url: string;
   private readonly timeout: number;
@@ -89,7 +90,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
           );
           return {
             ...tx,
-            ...JsonBI.parse(serializedTx.to_json()),
+            ...JsonBigint.parse(serializedTx.to_json()),
           };
         });
       })

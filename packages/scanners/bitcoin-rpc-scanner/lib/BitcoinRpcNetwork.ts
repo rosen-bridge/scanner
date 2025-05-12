@@ -7,7 +7,7 @@ import { BitcoinRpcTransaction, BlockHeader, JsonRpcResult } from './types';
 
 import { randomBytes } from 'crypto';
 
-export class RpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> {
+export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> {
   private readonly url: string;
   private readonly timeout: number;
   private client: AxiosInstance;

@@ -1,12 +1,3 @@
-import { DataSource } from 'typeorm';
-
-export interface BitcoinEsploraConfig {
-  esploraUrl: string;
-  timeout: number;
-  initialHeight: number;
-  dataSource: DataSource;
-}
-
 export interface EsploraBlock {
   id: string;
   height: number;

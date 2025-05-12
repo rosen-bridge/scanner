@@ -1,36 +1,19 @@
-import { CardanoKoiosConfig } from '../interfaces';
-import { KoiosNetwork } from '../network/koios';
 import { KoiosTransaction } from '../interfaces/Koios';
-import { Block } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
-import { BlockDbAction } from '../../action';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { ScannerConfig } from '../../interfaces';
 
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
-  readonly initialHeight: number;
-  network: KoiosNetwork;
-  constructor(
-    config: CardanoKoiosConfig,
-    logger?: AbstractLogger,
-    authToken?: string,
-    blockRetrieveGap = 0
-  ) {
-    super(blockRetrieveGap, logger);
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches how Ogmios scanner currently
-     * works.
-     */
-    this.initialHeight = config.initialHeight + 1;
-    this.network = new KoiosNetwork(config.koiosUrl, config.timeout, authToken);
+  constructor(config: ScannerConfig<KoiosTransaction>) {
+    super(
+      'cardano-koios',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap,
+      config.logger,
+      config.suffix
+    );
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
-
-  name = () => 'cardano-koios';
 }
 
 export { CardanoKoiosScanner };
