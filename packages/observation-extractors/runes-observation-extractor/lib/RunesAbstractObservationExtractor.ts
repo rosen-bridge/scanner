@@ -78,11 +78,19 @@ export abstract class RunesAbstractObservationExtractor<
             wrappedRune.length > 0 &&
             Object.hasOwn(wrappedRune[0], data.toChain)
           ) {
+            const wrappedAmount = this.tokens
+              .wrapAmount(
+                outRune.rune,
+                BigInt(outRune.rune_amount),
+                this.FROM_CHAIN
+              )
+              .amount.toString();
             runesTransformation = {
               from: outRune.rune,
               to: this.tokens.getID(wrappedRune[0], data.toChain),
-              amount: outRune.rune_amount,
+              amount: wrappedAmount,
             };
+
             break;
           }
         }
