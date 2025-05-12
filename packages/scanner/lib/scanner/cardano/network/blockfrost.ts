@@ -11,7 +11,7 @@ import {
 export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransaction> {
   private client: BlockFrostAPI;
 
-  constructor(projectId: string, timeout: number, url?: string) {
+  constructor(projectId: string, url?: string) {
     super();
     this.client = new BlockFrostAPI({
       projectId: projectId,

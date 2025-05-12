@@ -1,5 +1,5 @@
-import { RpcNetwork } from '../lib/RpcNetwork';
+import { EvmRpcNetwork } from '../lib/EvmRpcNetwork';
 
-export class TestEvmRpcNetwork extends RpcNetwork {
+export class TestEvmRpcNetwork extends EvmRpcNetwork {
   getProvider = () => this.provider;
 }

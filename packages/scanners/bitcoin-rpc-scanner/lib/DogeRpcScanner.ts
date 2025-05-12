@@ -1,34 +1,17 @@
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { BlockDbAction, GeneralScanner } from '@rosen-bridge/scanner';
-import { Block } from '@rosen-bridge/scanner-interfaces';
-import { BitcoinRPCConfig, DogeRpcTransaction } from './types';
-import { DogeRpcNetwork } from './DogeRpcNetwork';
+import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
+
+import { DogeRpcTransaction } from './types';
 
 export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
-  readonly initialHeight: number;
-  network: DogeRpcNetwork;
-  constructor(
-    config: BitcoinRPCConfig,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
-  ) {
-    super(blockRetrieveGap, logger);
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches all other rosen-bridge scanners
-     */
-    this.initialHeight = config.initialHeight + 1;
-    const auth =
-      config.username && config.password
-        ? { username: config.username, password: config.password }
-        : undefined;
-    this.network = new DogeRpcNetwork(config.rpcUrl, config.timeout, auth);
+  constructor(config: ScannerConfig<DogeRpcTransaction>) {
+    super(
+      'doge-rpc',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap,
+      config.logger,
+      config.suffix
+    );
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
-
-  name = () => 'doge-rpc';
 }

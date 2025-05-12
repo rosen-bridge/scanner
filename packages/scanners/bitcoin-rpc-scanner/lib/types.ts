@@ -1,14 +1,3 @@
-import { DataSource } from 'typeorm';
-
-export interface BitcoinRPCConfig {
-  rpcUrl: string;
-  timeout: number;
-  initialHeight: number;
-  dataSource: DataSource;
-  username?: string;
-  password?: string;
-}
-
 export type JsonRpcResult = {
   id: string;
   result: any;

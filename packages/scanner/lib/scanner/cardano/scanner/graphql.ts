@@ -1,35 +1,19 @@
-import { CardanoGraphQLConfig } from '../interfaces';
-import { GraphQLNetwork } from '../network/graphql';
 import { GraphQLTransaction } from '../interfaces/graphql';
-import { Block } from '@rosen-bridge/scanner-interfaces';
 import { GeneralScanner } from '../../abstract/generalScanner';
-import { BlockDbAction } from '../../action';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { ScannerConfig } from '../../interfaces';
 
 class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
-  readonly initialHeight: number;
-  network: GraphQLNetwork;
-  constructor(
-    config: CardanoGraphQLConfig,
-    logger?: AbstractLogger,
-    blockRetrieveGap = 0
-  ) {
-    super(blockRetrieveGap, logger);
-    this.action = new BlockDbAction(config.dataSource, this.name(), logger);
-    /**
-     * In order to keep the scanners functionalities consistent, we add config
-     * `initialHeight` by one so that it matches how Ogmios scanner currently
-     * works.
-     */
-    this.initialHeight = config.initialHeight + 1;
-    this.network = new GraphQLNetwork(config.graphQLUri);
+  constructor(config: ScannerConfig<GraphQLTransaction>) {
+    super(
+      'cardano-graphql',
+      config.dataSource,
+      config.initialHeight,
+      config.network,
+      config.blockRetrieveGap,
+      config.logger,
+      config.suffix
+    );
   }
-
-  protected getFirstBlock = (): Promise<Block> => {
-    return this.network.getBlockAtHeight(this.initialHeight);
-  };
-
-  name = () => 'cardano-graphql';
 }
 
 export { CardanoGraphQLScanner };

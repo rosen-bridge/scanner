@@ -1,12 +1,5 @@
 import { DataSource } from 'typeorm';
 
-interface CardanoKoiosConfig {
-  koiosUrl: string;
-  timeout: number;
-  initialHeight: number;
-  dataSource: DataSource;
-}
-
 interface OgmiosReconnectionConfig {
   initialDelay?: number;
   maxDelay?: number;
@@ -24,24 +17,4 @@ interface CardanoOgmiosConfig {
   reconnectionConfig?: OgmiosReconnectionConfig;
 }
 
-interface CardanoBlockFrostConfig {
-  projectId: string;
-  timeout: number;
-  initialHeight: number;
-  dataSource: DataSource;
-  blockFrostUrl?: string;
-}
-
-interface CardanoGraphQLConfig {
-  graphQLUri: string;
-  initialHeight: number;
-  dataSource: DataSource;
-}
-
-export {
-  CardanoKoiosConfig,
-  OgmiosReconnectionConfig,
-  CardanoOgmiosConfig,
-  CardanoBlockFrostConfig,
-  CardanoGraphQLConfig,
-};
+export { OgmiosReconnectionConfig, CardanoOgmiosConfig };
