@@ -564,12 +564,11 @@ describe('generalScanner', () => {
     });
 
     /**
-     * should update block-chain last height if a newer height is available
-     * Dependency: Nothing
-     * Scenario: The update method is called when a newer block
-     *           height is available.
-     * Expected: blockChainLastHeight should be updated to 150
-     *           stepForward should be called with 140
+     * @target should update block-chain last height if a newer height is available
+     * @scenario
+     * - The update method is called when a newer block height is available.
+     * @expected
+     * - blockChainLastHeight should be updated to 150
      */
     it('should update block-chain last height if a newer height is available', async () => {
       const network = new NetworkConnectorTest();
@@ -584,11 +583,11 @@ describe('generalScanner', () => {
     });
 
     /**
-     * should not update block-chain last height if the new height is not greater
-     * Dependency: Nothing
-     * Scenario: The update method is called when the new block height
-     *           is less than the current one.
-     * Expected: blockChainLastHeight should remain unchanged
+     * @target should not update block-chain last height if the new height is not greater
+     * @scenario
+     * - The update method is called when the new block height is less than the current one.
+     * @Expected
+     * - blockChainLastHeight should remain unchanged
      */
     it('should not update block-chain last height if the new height is not greater', async () => {
       const network = new NetworkConnectorTest();
