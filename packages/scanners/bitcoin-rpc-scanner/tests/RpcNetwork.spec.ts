@@ -4,14 +4,14 @@ import {
   resetAxiosMock,
 } from './mocked/axios.mock';
 import * as testData from './testData';
-import { RpcNetwork } from '../lib/RpcNetwork';
+import { BitcoinRpcNetwork } from '../lib/BitcoinRpcNetwork';
 
 describe('RpcNetwork', () => {
-  let network: RpcNetwork;
+  let network: BitcoinRpcNetwork;
 
   beforeEach(() => {
     resetAxiosMock();
-    network = new RpcNetwork('', 1);
+    network = new BitcoinRpcNetwork('', 1);
     network['generateRandomId'] = () =>
       '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e';
   });

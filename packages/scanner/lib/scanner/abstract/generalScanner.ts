@@ -6,17 +6,46 @@ import {
 import { BlockEntity } from '../../entities/blockEntity';
 import JsonBI from '@rosen-bridge/json-bigint';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { BlockDbAction } from '../action';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
-  abstract network: AbstractNetworkConnector<TransactionType>;
-  protected abstract getFirstBlock: () => Promise<Block>;
+  private readonly initialHeight: number;
   protected blockChainLastHeight: number | undefined = undefined;
 
-  constructor(protected blockRetrieveGap: number, logger?: AbstractLogger) {
+  name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
+
+  constructor(
+    private scannerName: string,
+    private dataSource: DataSource,
+    initialHeight: number,
+    private network: AbstractNetworkConnector<TransactionType>,
+    private blockRetrieveGap = 0,
+    logger?: AbstractLogger,
+    private suffix?: string
+  ) {
     super(logger);
+    /**
+     * In order to keep the scanners functionalities consistent, we add config
+     * `initialHeight` by one so that it matches how other scanners work.
+     */
+    this.initialHeight = initialHeight + 1;
+    this.action = new BlockDbAction(
+      this.dataSource,
+      this.scannerName,
+      this.logger
+    );
   }
+
+  /**
+   * Get the first block to process
+   * @returns The first block at the configured initial height
+   */
+  protected getFirstBlock = (): Promise<Block> => {
+    return this.network.getBlockAtHeight(this.initialHeight);
+  };
 
   /**
    * function that checks if fork is happen in the blockchain or not

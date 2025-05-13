@@ -11,3 +11,18 @@ export { ExtractorStatusEntity } from './entities/extractorStatusEntity';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';
 export { WebSocketScanner } from './scanner/abstract/webSocketScanner';
+export {
+  ConnectorSelectionStrategy,
+  FailoverStrategy,
+  RoundRobinStrategy,
+} from './scanner/network/ConnectorSelectionStrategies';
+export { NetworkConnectorManager } from './scanner/network/NetworkConnectorManager';
+export { ErgoExplorerNetwork } from './scanner/ergo/network/ergoExplorerNetwork';
+export { ErgoNodeNetwork } from './scanner/ergo/network/ergoNodeNetwork';
+export { BlockFrostNetwork } from './scanner/cardano/network/blockfrost';
+export { KoiosNetwork } from './scanner/cardano/network/koios';
+export { GraphQLNetwork } from './scanner/cardano/network/graphql';
+export { BlockFrostTransaction } from './scanner/cardano/interfaces/BlockFrost';
+export { KoiosTransaction } from './scanner/cardano/interfaces/Koios';
+export { GraphQLTransaction } from './scanner/cardano/interfaces/graphql';
+export { ScannerConfig } from './scanner/interfaces';
