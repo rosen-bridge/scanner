@@ -1,5 +1,16 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 2.0.0
+
+### Major Changes
+
+- Update scanner to delegate the network connection creation to the user. User can instantiate multiple network connectors and use a selection strategy via NetworkConnectorManager
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/scanner@7.0.0
+
 ## 1.2.1
 
 ### Patch Changes

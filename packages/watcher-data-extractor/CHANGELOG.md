@@ -1,5 +1,12 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.1.1
+
+### Patch Changes
+
+- Fix event result extraction in EventTriggerExtractor
+- Fix fraud result storage in database
+
 ## 12.1.0
 
 ### Minor Changes

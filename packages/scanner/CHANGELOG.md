@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner
 
+## 7.0.0
+
+### Major Changes
+
+- Update scanner to delegate the network connection creation to the user. User can instantiate multiple network connectors and use a selection strategy via NetworkConnectorManager
+
 ## 6.1.0
 
 ### Minor Changes
