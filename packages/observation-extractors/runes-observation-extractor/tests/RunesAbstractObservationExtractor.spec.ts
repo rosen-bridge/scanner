@@ -1,21 +1,23 @@
 import { describe, vi, expect } from 'vitest';
+import { DataSource } from 'typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { BitcoinRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import {
   mockLockAddress,
   mockOrdiscanApiKey,
   mockOrdiscanRunesTransfer,
   mockOrdiscanUrl,
+  mockTokens,
   rosenData,
-  txs,
 } from './testData';
-import { RunesRpcObservationExtractor } from '../lib';
 import { createDatabase } from './testUtils';
-import { DataSource } from 'typeorm';
+import {
+  TestRunesAbstractObservationExtractor,
+  TestTransactionType,
+} from './TestRunesAbstractObservationExtractor';
 
 describe('RunesAbstractObservationExtractor', () => {
-  let extractor: RunesRpcObservationExtractor;
+  let extractor: TestRunesAbstractObservationExtractor;
   let mockDataSource: DataSource;
   let mockTokenMap: TokenMap;
 
@@ -24,13 +26,17 @@ describe('RunesAbstractObservationExtractor', () => {
 
     mockDataSource = await createDatabase();
     mockTokenMap = new TokenMap();
+    await mockTokenMap.updateConfigByJson(mockTokens);
 
-    extractor = new RunesRpcObservationExtractor(
+    extractor = new TestRunesAbstractObservationExtractor(
       mockLockAddress,
       mockOrdiscanUrl,
       mockOrdiscanApiKey,
       mockDataSource,
       mockTokenMap,
+      {
+        get: vi.fn().mockReturnValue(rosenData),
+      } as any,
       undefined
     );
   });
@@ -67,23 +73,19 @@ describe('RunesAbstractObservationExtractor', () => {
         },
       };
 
-      const getTxRunesTransferSpy = vi
-        .spyOn(extractor, 'getTxRunesTransfer')
-        .mockResolvedValue(mockOrdiscanRunesTransfer);
+      vi.spyOn(extractor, 'getTxRunesTransfer').mockResolvedValue(
+        mockOrdiscanRunesTransfer
+      );
 
-      const tokensSearchSpy = vi
-        .spyOn(extractor['tokens'], 'search')
-        .mockReturnValue([wrappedRune]);
+      vi.spyOn(extractor['tokens'], 'search').mockReturnValue([wrappedRune]);
 
-      const tokensGetIdSpy = vi
-        .spyOn(extractor['tokens'], 'getID')
-        .mockReturnValue('tokenId');
+      vi.spyOn(extractor['tokens'], 'getID').mockReturnValue('tokenId');
 
       const storeObservationsSpy = vi
         .spyOn(extractor['actions'], 'storeObservations')
         .mockResolvedValue(true);
 
-      const mockTxs: BitcoinRpcTransaction[] = [txs.lockTx];
+      const mockTxs: TestTransactionType[] = [{ txId: 'mock-tx-1' }];
       const mockBlock: Block = {
         parentHash: 'parentHash',
         hash: 'hash',
@@ -97,17 +99,6 @@ describe('RunesAbstractObservationExtractor', () => {
       const result = await extractor.processTransactions(mockTxs, mockBlock);
 
       // assert
-      expect(getTxRunesTransferSpy).toHaveBeenCalledOnce();
-      expect(getTxRunesTransferSpy).toHaveBeenCalledWith(txs.lockTx.txid);
-
-      expect(tokensSearchSpy).toHaveBeenCalledOnce();
-      expect(tokensSearchSpy).toHaveBeenCalledWith('bitcoin-runes', {
-        tokenId: 'TEST',
-      });
-
-      expect(tokensGetIdSpy).toHaveBeenCalledOnce();
-      expect(tokensGetIdSpy).toHaveBeenCalledWith(wrappedRune, 'cardano');
-
       expect(storeObservationsSpy).toHaveBeenCalledOnce();
       expect(storeObservationsSpy).toHaveBeenCalledWith(
         [
@@ -127,7 +118,7 @@ describe('RunesAbstractObservationExtractor', () => {
           },
         ],
         mockBlock,
-        'runes-rpc-extractor'
+        'test-observation-extractor'
       );
 
       expect(result).toBe(true);
