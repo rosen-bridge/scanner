@@ -1,9 +1,5 @@
 import { describe, vi, expect } from 'vitest';
-import {
-  RosenAmount,
-  RosenChainToken,
-  RosenTokens,
-} from '@rosen-bridge/tokens';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { BitcoinRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import {
@@ -15,64 +11,19 @@ import {
   txs,
 } from './testData';
 import { RunesRpcObservationExtractor } from '../lib';
+import { createDatabase } from './testUtils';
+import { DataSource } from 'typeorm';
 
 describe('RunesAbstractObservationExtractor', () => {
   let extractor: RunesRpcObservationExtractor;
-  let mockDataSource: any;
-  let mockQueryRunner: any;
-  let mockRepository: any;
-  let mockTokenMap: any;
+  let mockDataSource: DataSource;
+  let mockTokenMap: TokenMap;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
-    mockRepository = {
-      insert: vi.fn().mockResolvedValue({}),
-      update: vi.fn().mockResolvedValue({}),
-    };
-
-    mockQueryRunner = {
-      connect: vi.fn().mockResolvedValue(undefined),
-      startTransaction: vi.fn().mockResolvedValue(undefined),
-      commitTransaction: vi.fn().mockResolvedValue(undefined),
-      rollbackTransaction: vi.fn().mockResolvedValue(undefined),
-      release: vi.fn().mockResolvedValue(undefined),
-      manager: {
-        getRepository: vi.fn().mockResolvedValue(mockRepository),
-      },
-    };
-
-    mockDataSource = {
-      createQueryRunner: vi.fn().mockReturnValue(mockQueryRunner),
-      getRepository: vi.fn().mockResolvedValue(mockRepository),
-    };
-
-    mockTokenMap = {
-      search: (
-        chain: string,
-        condition: Partial<RosenChainToken>
-      ): RosenTokens => {
-        return [];
-      },
-
-      getID: (
-        token: { [key: string]: RosenChainToken },
-        chain: string
-      ): string => {
-        return '';
-      },
-
-      wrapAmount: (
-        tokenId: string,
-        amount: bigint,
-        chain: string
-      ): RosenAmount => {
-        return {
-          amount: amount,
-          decimals: 2,
-        };
-      },
-    };
+    mockDataSource = await createDatabase();
+    mockTokenMap = new TokenMap();
 
     extractor = new RunesRpcObservationExtractor(
       mockLockAddress,
@@ -150,7 +101,7 @@ describe('RunesAbstractObservationExtractor', () => {
       expect(getTxRunesTransferSpy).toHaveBeenCalledWith(txs.lockTx.txid);
 
       expect(tokensSearchSpy).toHaveBeenCalledOnce();
-      expect(tokensSearchSpy).toHaveBeenCalledWith('runes', {
+      expect(tokensSearchSpy).toHaveBeenCalledWith('bitcoin-runes', {
         tokenId: 'TEST',
       });
 
@@ -161,7 +112,7 @@ describe('RunesAbstractObservationExtractor', () => {
       expect(storeObservationsSpy).toHaveBeenCalledWith(
         [
           {
-            fromChain: 'runes',
+            fromChain: 'bitcoin-runes',
             toChain: rosenData.toChain,
             amount: '1200',
             sourceChainTokenId: 'TEST',

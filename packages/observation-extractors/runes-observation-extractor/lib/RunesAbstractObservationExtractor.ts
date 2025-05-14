@@ -21,7 +21,7 @@ interface TokenTransformation {
 export abstract class RunesAbstractObservationExtractor<
   TransactionType
 > extends AbstractObservationExtractor<TransactionType> {
-  readonly FROM_CHAIN = 'runes';
+  readonly FROM_CHAIN = 'bitcoin-runes';
   protected readonly lockAddress: string;
   protected readonly ordiscanUrl: string;
   protected readonly ordiscanApiKey: string;
