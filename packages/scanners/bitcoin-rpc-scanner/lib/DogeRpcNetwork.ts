@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { Axios } from '@rosen-bridge/rate-limited-axios';
 import {
   AbstractNetworkConnector,
   Block,
@@ -10,7 +10,7 @@ import { randomBytes } from 'crypto';
 export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction> {
   private readonly url: string;
   private readonly timeout: number;
-  private client: AxiosInstance;
+  private client: Axios;
 
   constructor(
     url: string,

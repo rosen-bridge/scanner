@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { Axios } from '@rosen-bridge/rate-limited-axios';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import {
   AbstractNetworkConnector,
@@ -10,7 +10,7 @@ import JsonBigint from '@rosen-bridge/json-bigint';
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly url: string;
   private readonly timeout: number;
-  private koios: AxiosInstance;
+  private koios: Axios;
 
   constructor(url: string, timeout: number, authToken?: string) {
     super();
