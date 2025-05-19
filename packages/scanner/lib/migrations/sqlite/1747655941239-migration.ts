@@ -27,7 +27,7 @@ export class migration1747655941239 implements MigrationInterface {
 
     await queryRunner.query(`
       UPDATE block_entity
-      SET scanner = regexp_replace(scanner, '-evm-rpc$', '-evm')
+    SET scanner = substr(scanner, 1, length(scanner) - length('-evm-rpc')) || '-evm'
       WHERE scanner Like '%-evm-rpc'
     `);
 
@@ -63,7 +63,7 @@ export class migration1747655941239 implements MigrationInterface {
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-       SET scannerId = regexp_replace(scannerId, '-evm-rpc$', '-evm')
+  SET scannerId = substr(scannerId, 1, length(scannerId) - length('-evm-rpc')) || '-evm'
       WHERE scannerId LIKE '%-evm-rpc'
     `);
 
@@ -92,7 +92,7 @@ export class migration1747655941239 implements MigrationInterface {
     `);
     await queryRunner.query(`
       UPDATE block_entity
-      SET scanner = regexp_replace(scanner, '-evm$', '-evm-rpc')
+    SET scanner = substr(scanner, 1, length(scanner) - length('-evm')) || '-evm-rpc'
       WHERE scanner LIKE '%-evm'
     `);
 
@@ -117,7 +117,7 @@ export class migration1747655941239 implements MigrationInterface {
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = regexp_replace(scannerId, '-evm$', '-evm-rpc')
+    SET scannerId = substr(scannerId, 1, length(scannerId) - length('-evm')) || '-evm-rpc'
       WHERE scannerId LIKE '%-evm'
     `);
 
