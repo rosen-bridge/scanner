@@ -5,7 +5,7 @@ import { ScannerConfig } from '../../interfaces';
 class CardanoGraphQLScanner extends GeneralScanner<GraphQLTransaction> {
   constructor(config: ScannerConfig<GraphQLTransaction>) {
     super(
-      'cardano-graphql',
+      'cardano',
       config.dataSource,
       config.initialHeight,
       config.network,

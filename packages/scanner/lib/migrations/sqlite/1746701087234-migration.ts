@@ -11,11 +11,35 @@ export class migration1746701087234 implements MigrationInterface {
       WHERE scanner IN ('ergo-node', 'ergo-explorer')
     `);
 
+    // Update block_entity table for cardano
+    await queryRunner.query(`
+      UPDATE block_entity 
+      SET scanner = 'cardano' 
+      WHERE scanner IN (
+        'cardano-BlockFrost',
+        'cardano-graphql',
+        'cardano-koios',
+        'cardano-ogmios'
+      )
+    `);
+
     // Update extractor_status_entity table
     await queryRunner.query(`
       UPDATE extractor_status_entity 
       SET scannerId = 'ergo' 
       WHERE scannerId IN ('ergo-node', 'ergo-explorer')
+    `);
+
+    // Update extractor_status_entity table for cardano
+    await queryRunner.query(`
+      UPDATE extractor_status_entity 
+      SET scannerId = 'cardano' 
+      WHERE scannerId IN (
+        'cardano-BlockFrost',
+        'cardano-graphql',
+        'cardano-koios',
+        'cardano-ogmios'
+      )
     `);
   }
 
@@ -32,6 +56,18 @@ export class migration1746701087234 implements MigrationInterface {
       UPDATE extractor_status_entity 
       SET scannerId = 'ergo-node' 
       WHERE scannerId = 'ergo'
+    `);
+
+    await queryRunner.query(`
+      UPDATE block_entity 
+      SET scanner = 'cardano-koios' 
+      WHERE scanner = 'cardano'
+    `);
+
+    await queryRunner.query(`
+      UPDATE extractor_status_entity 
+      SET scannerId = 'cardano-koios' 
+      WHERE scannerId = 'cardano'
     `);
   }
 }
