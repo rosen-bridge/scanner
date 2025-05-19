@@ -196,7 +196,7 @@ abstract class GeneralScanner<
       const latestHeight = await this.network.getCurrentHeight();
       if (
         !this.blockChainLastHeight ||
-        (this.blockChainLastHeight && this.blockChainLastHeight < latestHeight)
+        this.blockChainLastHeight < latestHeight
       )
         this.blockChainLastHeight = latestHeight;
 
