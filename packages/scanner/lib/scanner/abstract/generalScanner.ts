@@ -13,6 +13,7 @@ abstract class GeneralScanner<
   TransactionType
 > extends AbstractScanner<TransactionType> {
   private readonly initialHeight: number;
+  protected blockChainLastHeight: number | undefined = undefined;
 
   name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
 
@@ -180,11 +181,25 @@ abstract class GeneralScanner<
   };
 
   /**
+   * Return the latest height of the blockchain
+   * @returns { number | undefined }
+   */
+  public getBlockChainLastHeight = (): number | undefined =>
+    this.blockChainLastHeight;
+
+  /**
    * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
    * scenario in the blockchain and invalidate the database till the database synced again.
    */
   update = async () => {
     try {
+      const latestHeight = await this.network.getCurrentHeight();
+      if (
+        !this.blockChainLastHeight ||
+        this.blockChainLastHeight < latestHeight
+      )
+        this.blockChainLastHeight = latestHeight;
+
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();

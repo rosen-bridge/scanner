@@ -562,5 +562,43 @@ describe('generalScanner', () => {
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();
     });
+
+    /**
+     * @target should update block-chain last height if a newer height is available
+     * @scenario
+     * - The update method is called when a newer block height is available.
+     * @expected
+     * - blockChainLastHeight should be updated to 150
+     */
+    it('should update block-chain last height if a newer height is available', async () => {
+      const network = new NetworkConnectorTest();
+      jest
+        .spyOn(network, 'getCurrentHeight')
+        .mockImplementation(async () => 150);
+      const scanner = new firstScanner(dataSource, network);
+      scanner['blockChainLastHeight'] = 100;
+      await scanner.update();
+
+      expect(scanner.getBlockChainLastHeight()).toEqual(150);
+    });
+
+    /**
+     * @target should not update block-chain last height if the new height is not greater
+     * @scenario
+     * - The update method is called when the new block height is less than the current one.
+     * @Expected
+     * - blockChainLastHeight should remain unchanged
+     */
+    it('should not update block-chain last height if the new height is not greater', async () => {
+      const network = new NetworkConnectorTest();
+      jest
+        .spyOn(network, 'getCurrentHeight')
+        .mockImplementation(async () => 180);
+      const scanner = new firstScanner(dataSource, network);
+      scanner['blockChainLastHeight'] = 200;
+      await scanner.update();
+
+      expect(scanner.getBlockChainLastHeight()).toEqual(200);
+    });
   });
 });
