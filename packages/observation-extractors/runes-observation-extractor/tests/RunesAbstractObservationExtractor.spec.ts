@@ -1,5 +1,5 @@
 import { describe, vi, expect } from 'vitest';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import {
@@ -22,8 +22,6 @@ describe('RunesAbstractObservationExtractor', () => {
   let mockTokenMap: TokenMap;
 
   beforeEach(async () => {
-    vi.clearAllMocks();
-
     mockDataSource = await createDatabase();
     mockTokenMap = new TokenMap();
     await mockTokenMap.updateConfigByJson(mockTokens);
@@ -54,9 +52,6 @@ describe('RunesAbstractObservationExtractor', () => {
      * - define a mock block object
      * - call processTransactions using the mock txs and block
      * @expected
-     * - getTxRunesTransfer should have been called once with txId
-     * - tokens.search should have been called with tokenId for each txRunesTransfer output
-     * - tokens.getID should have been called with token and chain for each txRunesTransfer output
      * - actions.storeObservations should have been called once with observations, block, and chain id
      * - processTransactions should have returned true
      */
@@ -73,7 +68,7 @@ describe('RunesAbstractObservationExtractor', () => {
         },
       };
 
-      vi.spyOn(extractor, 'getTxRunesTransfer').mockResolvedValue(
+      vi.spyOn(extractor as any, 'getTxRunesTransfer').mockResolvedValue(
         mockOrdiscanRunesTransfer
       );
 

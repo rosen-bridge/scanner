@@ -6,30 +6,23 @@ import { Block } from '@rosen-bridge/scanner-interfaces';
 import { blake2b } from 'blakejs';
 import Axios, { AxiosHeaders } from 'axios';
 import { OrdiscanRunesTransfer } from './types';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
+import {
+  AbstractRosenDataExtractor,
+  TokenTransformation,
+} from '@rosen-bridge/rosen-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-
-// TODO: use the type from rosen-extractor updated package (need new release)
-interface TokenTransformation {
-  from: string;
-  to: string;
-  amount: string;
-}
 
 export abstract class RunesAbstractObservationExtractor<
   TransactionType
 > extends AbstractObservationExtractor<TransactionType> {
   readonly FROM_CHAIN = 'bitcoin-runes';
-  protected readonly lockAddress: string;
-  protected readonly ordiscanUrl: string;
-  protected readonly ordiscanApiKey: string;
 
   constructor(
-    lockAddress: string,
-    ordiscanUrl: string,
-    ordiscanApiKey: string,
+    protected readonly lockAddress: string,
+    protected readonly ordiscanUrl: string,
+    protected readonly ordiscanApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
@@ -101,7 +94,7 @@ export abstract class RunesAbstractObservationExtractor<
 
       if (!runesTransformation) {
         this.logger.debug(`No supported Rune is locked`);
-        return false;
+        continue;
       }
 
       const requestId = Buffer.from(
@@ -130,7 +123,9 @@ export abstract class RunesAbstractObservationExtractor<
    * returns the Runes transfer of a transaction according to Ordiscan
    * @param txId
    */
-  getTxRunesTransfer = async (txId: string): Promise<OrdiscanRunesTransfer> => {
+  protected getTxRunesTransfer = async (
+    txId: string
+  ): Promise<OrdiscanRunesTransfer> => {
     const headers: AxiosHeaders = new AxiosHeaders();
     headers.setAuthorization(`Bearer ${this.ordiscanApiKey}`);
     const res = await Axios.get(`${this.ordiscanUrl}/v1/tx/${txId}/runes`, {

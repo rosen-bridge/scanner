@@ -2,7 +2,7 @@ import { BitcoinRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
 import { RunesRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { RunesAbstractObservationExtractor } from './RunesAbstractObservationExtractor';
 
 export class RunesRpcObservationExtractor extends RunesAbstractObservationExtractor<BitcoinRpcTransaction> {
