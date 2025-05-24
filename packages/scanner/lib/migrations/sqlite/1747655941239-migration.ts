@@ -24,12 +24,17 @@ export class migration1747655941239 implements MigrationInterface {
         'bitcoin-rpc'
       )
     `);
+    await queryRunner.query(`
+    UPDATE block_entity
+    SET scanner = 'ethereum-evm'
+    WHERE scanner = 'ethereum-evm-rpc';
+  `);
 
     await queryRunner.query(`
-      UPDATE block_entity
-    SET scanner = substr(scanner, 1, length(scanner) - length('-evm-rpc')) || '-evm'
-      WHERE scanner Like '%-evm-rpc'
-    `);
+    UPDATE block_entity
+    SET scanner = 'binance-evm'
+    WHERE scanner = 'binance-evm-rpc';
+  `);
 
     await queryRunner.query(`
       UPDATE block_entity 
@@ -60,11 +65,16 @@ export class migration1747655941239 implements MigrationInterface {
         'bitcoin-rpc'
       )
     `);
+    await queryRunner.query(`
+      UPDATE extractor_status_entity
+      SET scannerId = 'ethereum-evm'
+      WHERE scannerId = 'ethereum-evm-rpc';
+    `);
 
     await queryRunner.query(`
-      UPDATE extractor_status_entity 
-  SET scannerId = substr(scannerId, 1, length(scannerId) - length('-evm-rpc')) || '-evm'
-      WHERE scannerId LIKE '%-evm-rpc'
+      UPDATE extractor_status_entity
+      SET scannerId = 'binance-evm'
+      WHERE scannerId = 'binance-evm-rpc';
     `);
 
     await queryRunner.query(`
@@ -91,10 +101,16 @@ export class migration1747655941239 implements MigrationInterface {
       WHERE scanner = 'bitcoin'
     `);
     await queryRunner.query(`
-      UPDATE block_entity
-    SET scanner = substr(scanner, 1, length(scanner) - length('-evm')) || '-evm-rpc'
-      WHERE scanner LIKE '%-evm'
-    `);
+  UPDATE block_entity
+  SET scanner = 'ethereum-evm-rpc'
+  WHERE scanner = 'ethereum-evm';
+`);
+
+    await queryRunner.query(`
+  UPDATE block_entity
+  SET scanner = 'binance-evm-rpc'
+  WHERE scanner = 'binance-evm';
+`);
 
     await queryRunner.query(`
       UPDATE block_entity 
@@ -116,10 +132,16 @@ export class migration1747655941239 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
-      UPDATE extractor_status_entity 
-    SET scannerId = substr(scannerId, 1, length(scannerId) - length('-evm')) || '-evm-rpc'
-      WHERE scannerId LIKE '%-evm'
-    `);
+  UPDATE extractor_status_entity
+  SET scannerId = 'ethereum-evm-rpc'
+  WHERE scannerId = 'ethereum-evm';
+`);
+
+    await queryRunner.query(`
+  UPDATE extractor_status_entity
+  SET scannerId = 'binance-evm-rpc'
+  WHERE scannerId = 'binance-evm';
+`);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
