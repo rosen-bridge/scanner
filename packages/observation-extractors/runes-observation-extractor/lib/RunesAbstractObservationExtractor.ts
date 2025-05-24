@@ -93,7 +93,7 @@ export abstract class RunesAbstractObservationExtractor<
       }
 
       if (!runesTransformation) {
-        this.logger.debug(`No supported Rune is locked`);
+        this.logger.debug(`No supported Runes is locked`);
         continue;
       }
 
