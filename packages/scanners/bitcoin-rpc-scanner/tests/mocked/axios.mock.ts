@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@rosen-bridge/rate-limited-axios';
 import { vi } from 'vitest';
 
 export const axiosInstance = {
