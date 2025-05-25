@@ -13,7 +13,7 @@ export class migration1747657653564 implements MigrationInterface {
         'cardano-graphql',
         'cardano-koios',
         'cardano-ogmios'
-      )
+      );
     `);
 
     await queryRunner.query(`
@@ -22,20 +22,20 @@ export class migration1747657653564 implements MigrationInterface {
       WHERE scanner IN (
         'bitcoin-esplora',
         'bitcoin-rpc'
-      )
+      );
     `);
 
     await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'ethereum-evm'
-  WHERE scannerId = 'ethereum-evm-rpc';
-`);
+      UPDATE block_entity
+      SET scanner = 'ethereum-evm'
+      WHERE scanner = 'ethereum-evm-rpc';
+    `);
 
     await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'binance-evm'
-  WHERE scannerId = 'binance-evm-rpc';
-`);
+      UPDATE block_entity
+      SET scanner = 'binance-evm'
+      WHERE scanner = 'binance-evm-rpc';
+    `);
 
     await queryRunner.query(`
       UPDATE block_entity 
@@ -43,48 +43,49 @@ export class migration1747657653564 implements MigrationInterface {
       WHERE scanner IN (
         'doge-esplora',
         'doge-rpc'
-      )
+      );
     `);
 
     // extractor_status_entity updates
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'cardano' 
-      WHERE scannerId IN (
+      SET "scannerId" = 'cardano' 
+      WHERE "scannerId" IN (
         'cardano-BlockFrost',
         'cardano-graphql',
         'cardano-koios',
         'cardano-ogmios'
-      )
+      );
     `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'bitcoin' 
-      WHERE scannerId IN (
+      SET "scannerId" = 'bitcoin' 
+      WHERE "scannerId" IN (
         'bitcoin-esplora',
         'bitcoin-rpc'
-      )
+      );
     `);
-    await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'ethereum-evm'
-  WHERE scannerId = 'ethereum-evm-rpc';
-`);
 
     await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'binance-evm'
-  WHERE scannerId = 'binance-evm-rpc';
-`);
+      UPDATE extractor_status_entity
+      SET "scannerId" = 'ethereum-evm'
+      WHERE "scannerId" = 'ethereum-evm-rpc';
+    `);
+
+    await queryRunner.query(`
+      UPDATE extractor_status_entity
+      SET "scannerId" = 'binance-evm'
+      WHERE "scannerId" = 'binance-evm-rpc';
+    `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'doge' 
-      WHERE scannerId IN (
+      SET "scannerId" = 'doge' 
+      WHERE "scannerId" IN (
         'doge-esplora',
         'doge-rpc'
-      )
+      );
     `);
   }
 
@@ -93,62 +94,62 @@ export class migration1747657653564 implements MigrationInterface {
     await queryRunner.query(`
       UPDATE block_entity 
       SET scanner = 'cardano-koios' 
-      WHERE scanner = 'cardano'
+      WHERE scanner = 'cardano';
     `);
 
     await queryRunner.query(`
       UPDATE block_entity 
       SET scanner = 'bitcoin-esplora' 
-      WHERE scanner = 'bitcoin'
+      WHERE scanner = 'bitcoin';
     `);
 
     await queryRunner.query(`
-  UPDATE block_entity
-  SET scanner = 'ethereum-evm-rpc'
-  WHERE scanner = 'ethereum-evm';
-`);
+      UPDATE block_entity
+      SET scanner = 'ethereum-evm-rpc'
+      WHERE scanner = 'ethereum-evm';
+    `);
 
     await queryRunner.query(`
-  UPDATE block_entity
-  SET scanner = 'binance-evm-rpc'
-  WHERE scanner = 'binance-evm';
-`);
+      UPDATE block_entity
+      SET scanner = 'binance-evm-rpc'
+      WHERE scanner = 'binance-evm';
+    `);
 
     await queryRunner.query(`
       UPDATE block_entity 
       SET scanner = 'doge-esplora' 
-      WHERE scanner = 'doge'
+      WHERE scanner = 'doge';
     `);
 
     // Revert extractor_status_entity
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'cardano-koios' 
-      WHERE scannerId = 'cardano'
+      SET "scannerId" = 'cardano-koios' 
+      WHERE "scannerId" = 'cardano';
     `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'bitcoin-esplora' 
-      WHERE scannerId = 'bitcoin'
+      SET "scannerId" = 'bitcoin-esplora' 
+      WHERE "scannerId" = 'bitcoin';
     `);
 
     await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'ethereum-evm-rpc'
-  WHERE scannerId = 'ethereum-evm';
-`);
+      UPDATE extractor_status_entity
+      SET "scannerId" = 'ethereum-evm-rpc'
+      WHERE "scannerId" = 'ethereum-evm';
+    `);
 
     await queryRunner.query(`
-  UPDATE extractor_status_entity
-  SET scannerId = 'binance-evm-rpc'
-  WHERE scannerId = 'binance-evm';
-`);
+      UPDATE extractor_status_entity
+      SET "scannerId" = 'binance-evm-rpc'
+      WHERE "scannerId" = 'binance-evm';
+    `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity 
-      SET scannerId = 'doge-esplora' 
-      WHERE scannerId = 'doge'
+      SET "scannerId" = 'doge-esplora' 
+      WHERE "scannerId" = 'doge';
     `);
   }
 }
