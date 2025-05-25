@@ -39,8 +39,8 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
-    "@rosen-clients/ergo-explorer": "^1.1.2",
-    "@rosen-clients/ergo-node": "^1.2.0",
+    "@rosen-clients/ergo-explorer": "^1.1.4",
+    "@rosen-clients/ergo-node": "^1.2.2",
     "lodash-es": "^4.17.21",
     "typeorm": "^0.3.20",
     "uuid": "^9.0.0"
