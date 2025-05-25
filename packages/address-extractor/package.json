@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "UTXO box extractor for any address or token.",
   "author": "Rosen Team",
   "license": "GPL-3.0",
@@ -19,7 +19,7 @@
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.0.0",
+    "@rosen-bridge/abstract-extractor": "^2.0.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "blakejs": "^1.2.1",

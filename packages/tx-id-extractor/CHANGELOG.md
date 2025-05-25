@@ -1,5 +1,11 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.3.1
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+
 ## 2.3.0
 
 ### Minor Changes
