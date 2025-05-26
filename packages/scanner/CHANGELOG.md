@@ -1,5 +1,17 @@
 # @rosen-bridge/scanner
 
+## 7.1.0
+
+### Minor Changes
+
+- Added latest block height caching in GeneralScanner with a public accessor method
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.1
+
 ## 7.0.0
 
 ### Major Changes

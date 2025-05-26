@@ -1,5 +1,13 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 2.0.1
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+- Updated dependencies
+  - @rosen-bridge/scanner@7.1.0
+
 ## 2.0.0
 
 ### Major Changes

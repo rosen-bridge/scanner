@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { Axios } from '@rosen-bridge/rate-limited-axios';
 import {
   AbstractNetworkConnector,
   Block,
@@ -9,7 +9,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
   private readonly url: string;
   private readonly timeout: number;
   private readonly ESPLORA_BLOCK_TXS_LIMIT = 25;
-  private client: AxiosInstance;
+  private client: Axios;
   private apiPrefix: string;
 
   constructor(url: string, timeout: number, apiPrefix?: string) {
