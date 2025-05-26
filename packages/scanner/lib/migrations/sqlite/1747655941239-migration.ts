@@ -26,13 +26,13 @@ export class migration1747655941239 implements MigrationInterface {
     `);
     await queryRunner.query(`
       UPDATE block_entity
-      SET scanner = 'ethereum-evm'
+      SET scanner = 'ethereum'
       WHERE scanner = 'ethereum-evm-rpc';
     `);
 
     await queryRunner.query(`
       UPDATE block_entity
-      SET scanner = 'binance-evm'
+      SET scanner = 'binance'
       WHERE scanner = 'binance-evm-rpc';
     `);
 
@@ -67,13 +67,13 @@ export class migration1747655941239 implements MigrationInterface {
     `);
     await queryRunner.query(`
       UPDATE extractor_status_entity
-      SET scannerId = 'ethereum-evm'
+      SET scannerId = 'ethereum'
       WHERE scannerId = 'ethereum-evm-rpc';
     `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity
-      SET scannerId = 'binance-evm'
+      SET scannerId = 'binance'
       WHERE scannerId = 'binance-evm-rpc';
     `);
 
@@ -103,13 +103,13 @@ export class migration1747655941239 implements MigrationInterface {
     await queryRunner.query(`
       UPDATE block_entity
       SET scanner = 'ethereum-evm-rpc'
-      WHERE scanner = 'ethereum-evm';
+      WHERE scanner = 'ethereum';
     `);
 
     await queryRunner.query(`
       UPDATE block_entity
       SET scanner = 'binance-evm-rpc'
-      WHERE scanner = 'binance-evm';
+      WHERE scanner = 'binance';
     `);
 
     await queryRunner.query(`
@@ -134,13 +134,13 @@ export class migration1747655941239 implements MigrationInterface {
     await queryRunner.query(`
       UPDATE extractor_status_entity
       SET scannerId = 'ethereum-evm-rpc'
-      WHERE scannerId = 'ethereum-evm';
+      WHERE scannerId = 'ethereum';
     `);
 
     await queryRunner.query(`
       UPDATE extractor_status_entity
       SET scannerId = 'binance-evm-rpc'
-      WHERE scannerId = 'binance-evm';
+      WHERE scannerId = 'binance';
     `);
 
     await queryRunner.query(`
