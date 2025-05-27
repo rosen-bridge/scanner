@@ -8,7 +8,7 @@ import {
 } from './mocked/JsonRpcProvider.mock';
 import { BlockNotFound } from '../lib/types';
 
-describe('RPCNetwork', () => {
+describe('EvmRpcNetwork', () => {
   let network: TestEvmRpcNetwork;
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('RPCNetwork', () => {
 
   describe('getCurrentHeight', () => {
     /**
-     * @target `RPCNetwork.getHeight` should return block height successfully
+     * @target `EvmRpcNetwork.getHeight` should return block height successfully
      * @dependencies
      * @scenario
      * - mock `RPC.getBlockNumber`
@@ -41,7 +41,7 @@ describe('RPCNetwork', () => {
 
   describe('getBlockTxs', () => {
     /**
-     * @target `RPCNetwork.getBlockTxs` should return
+     * @target `EvmRpcNetwork.getBlockTxs` should return
      * transactions of the block
      * @dependencies
      * @scenario
@@ -66,7 +66,7 @@ describe('RPCNetwork', () => {
     });
 
     /**
-     * @target `RPCNetwork.getBlockTxs` should throw
+     * @target `EvmRpcNetwork.getBlockTxs` should throw
      * error if block can not be found.
      * @dependencies
      * @scenario
@@ -90,7 +90,7 @@ describe('RPCNetwork', () => {
 
   describe('getBlockAtHeight', () => {
     /**
-     * @target `RPCNetwork.getBlockInfo` should return block info
+     * @target `EvmRpcNetwork.getBlockInfo` should return block info
      * @dependencies
      * @scenario
      * - mock `RPC.getBlock`
@@ -117,7 +117,7 @@ describe('RPCNetwork', () => {
     });
 
     /**
-     * @target `RPCNetwork.getBlockAtHeight` should throw
+     * @target `EvmRpcNetwork.getBlockAtHeight` should throw
      * error when block height is wrong
      * @dependencies
      * @scenario

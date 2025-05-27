@@ -6,7 +6,7 @@ import {
 import * as testData from './testData';
 import { BitcoinRpcNetwork } from '../lib/BitcoinRpcNetwork';
 
-describe('RpcNetwork', () => {
+describe('BitcoinRpcNetwork', () => {
   let network: BitcoinRpcNetwork;
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('RpcNetwork', () => {
 
   describe('getBlockAtHeight', () => {
     /**
-     * @target `RpcNetwork.getBlockAtHeight` should return block info successfully
+     * @target `BitcoinRpcNetwork.getBlockAtHeight` should return block info successfully
      * @dependencies
      * @scenario
      * - mock axios to return block hash
@@ -55,7 +55,7 @@ describe('RpcNetwork', () => {
 
   describe('getCurrentHeight', () => {
     /**
-     * @target `RpcNetwork.getCurrentHeight` should return current height successfully
+     * @target `BitcoinRpcNetwork.getCurrentHeight` should return current height successfully
      * @dependencies
      * @scenario
      * - mock axios to return blockchain info
@@ -83,7 +83,7 @@ describe('RpcNetwork', () => {
 
   describe('getBlockTxs', () => {
     /**
-     * @target `RpcNetwork.getBlockTxs` should return block transactions successfully
+     * @target `BitcoinRpcNetwork.getBlockTxs` should return block transactions successfully
      * @dependencies
      * @scenario
      * - mock axios to return block header
