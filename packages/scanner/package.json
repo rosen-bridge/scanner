@@ -47,6 +47,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@blockfrost/openapi": "0.1.78",
     "@babel/preset-env": "^7.19.0",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/typescript": "^4.0.1",

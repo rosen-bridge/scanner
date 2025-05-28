@@ -18,6 +18,7 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@rosen-bridge/scanner": "^6.1.0",
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
@@ -40,6 +41,8 @@
     "@rosen-bridge/observation-extractor": "^7.1.1",
     "@rosen-bridge/rosen-extractor": "^7.3.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
-    "@rosen-bridge/tokens": "^3.1.0"
+    "@rosen-bridge/tokens": "^3.1.0",
+    "axios": "1.9.0",
+    "blakejs": "^1.2.1"
   }
 }
