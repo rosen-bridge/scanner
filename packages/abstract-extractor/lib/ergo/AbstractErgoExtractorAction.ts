@@ -41,7 +41,7 @@ export abstract class AbstractErgoExtractorAction<
    * create the database entity from extracted data and block information
    */
   protected createEntity = (
-    boxes: AbstractBoxData[], // eslint-disable-line @typescript-eslint/no-unused-vars
+    data: ExtractedData[], // eslint-disable-line @typescript-eslint/no-unused-vars
     block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
     extractor: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Array<Omit<ExtractorEntity, 'id'>> => {
@@ -54,7 +54,7 @@ export abstract class AbstractErgoExtractorAction<
    * convert the database entity back to raw data
    */
   protected convertEntityToData = (
-    entities: AbstractErgoExtractorEntity[] // eslint-disable-line @typescript-eslint/no-unused-vars
+    entities: ExtractorEntity[] // eslint-disable-line @typescript-eslint/no-unused-vars
   ): ExtractedData[] => {
     throw Error(
       'You must implement `convertEntityToData` or override `deleteBlockEntities`'
