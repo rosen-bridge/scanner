@@ -1,10 +1,10 @@
 import { vi } from 'vitest';
-import { JsonRpcProvider } from 'ethers';
+import { Block, JsonRpcProvider } from 'ethers';
 import * as testData from '../testData';
 
 vi.mock('ethers', () => {
   return {
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return rpcInstance;
     }),
   };
@@ -32,7 +32,7 @@ export const resetRpcMock = () => {
  * mocks `getBlock` function of the provider to return value
  * @param provider
  */
-export const mockGetBlock = (provider: JsonRpcProvider, data: any) => {
+export const mockGetBlock = (provider: JsonRpcProvider, data: Block) => {
   vi.spyOn(provider, 'getBlock').mockResolvedValue(data);
 };
 

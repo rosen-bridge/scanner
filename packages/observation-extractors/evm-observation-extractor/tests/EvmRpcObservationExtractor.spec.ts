@@ -1,17 +1,19 @@
 import { vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { blake2b } from 'blakejs';
 import { ObservationEntity } from '@rosen-bridge/observation-extractor';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
 import { TokenMap } from '@rosen-bridge/tokens';
+import { TransactionReceipt, TransactionResponse } from 'ethers';
 
 vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
   return {
     ...ref,
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return {};
     }),
   };
@@ -25,7 +27,12 @@ describe('EvmRpcObservationExtractor', () => {
     dataSource = await createDatabase();
     extractor = new TestEvmRpcObservationExtractor(dataSource, new TokenMap(), {
       get: vi.fn(),
-    } as any);
+      chain: '',
+      logger: {} as unknown as AbstractLogger,
+      tokens: {} as TokenMap,
+      lockAddress: '',
+      extractRawData: () => undefined,
+    } as unknown as AbstractRosenDataExtractor<TransactionResponse>);
   });
 
   describe('processTransactions', () => {
@@ -46,7 +53,9 @@ describe('EvmRpcObservationExtractor', () => {
     it('should return true and insert observation into database on valid lock tx', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
-      vi.spyOn(txRes, 'wait').mockReturnValue(tx as any);
+      vi.spyOn(txRes, 'wait').mockReturnValue(
+        tx as unknown as Promise<TransactionReceipt | null>
+      );
 
       // run test
       const res = await extractor.processTransactions(
@@ -82,7 +91,7 @@ describe('EvmRpcObservationExtractor', () => {
     it('should return true but insert no tx when transaction is failed', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
-      vi.spyOn(txRes, 'wait').mockImplementation((x: number | undefined) => {
+      vi.spyOn(txRes, 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',
         };
@@ -99,7 +108,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
 
@@ -129,7 +138,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
   });

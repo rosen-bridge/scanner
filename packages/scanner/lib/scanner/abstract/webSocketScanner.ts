@@ -72,9 +72,9 @@ abstract class WebSocketScanner<
             return true;
           }
         }
-      } catch (e: any) {
+      } catch (e) {
         this.logger.warn(`unknown error occurred ${e}`);
-        this.logger.warn(e.stack);
+        this.logger.warn((e as Error).stack ?? '');
       }
       return false;
     }, `Block at height ${block.height}`);
@@ -91,9 +91,9 @@ abstract class WebSocketScanner<
       try {
         await this.forkBlock(block.height + 1);
         return true;
-      } catch (e: any) {
+      } catch (e) {
         this.logger.error(`unknown error occurred ${e}`);
-        this.logger.error(e.stack);
+        this.logger.error((e as Error).stack ?? '');
       }
       return false;
     }, `Forking block at height ${block.height}`);

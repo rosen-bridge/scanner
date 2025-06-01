@@ -86,7 +86,7 @@ describe('fraudExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      } as any);
+      });
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -122,7 +122,7 @@ describe('fraudExtractor', () => {
             total: 120,
           }),
         },
-      } as any);
+      });
       const extractedFraud = {
         boxId: 'boxId',
         wid: 'wid',
@@ -163,7 +163,7 @@ describe('fraudExtractor', () => {
             total: 20,
           }),
         },
-      } as any);
+      });
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -207,7 +207,7 @@ describe('fraudExtractor', () => {
         v1: {
           getApiV1BoxesP1: async () => box,
         },
-      } as any);
+      });
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -242,7 +242,7 @@ describe('fraudExtractor', () => {
             throw new Error('404');
           },
         },
-      } as any);
+      });
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -299,7 +299,7 @@ describe('fraudExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
-        } as any);
+        });
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
       const box = await repository.findOne({ where: { boxId: 'boxId' } });
@@ -326,7 +326,7 @@ describe('fraudExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        } as any);
+        });
 
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');

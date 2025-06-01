@@ -20,6 +20,7 @@ import {
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
+import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -192,7 +193,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      } as any);
+      });
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -201,7 +202,7 @@ describe('permitExtractor', () => {
         'url'
       );
       const boxData = await extractor.extractPermitData([
-        addressBoxes.items[0] as any,
+        addressBoxes.items[0] as unknown as OutputInfo,
       ]);
       expect(boxData[0]).toEqual({
         boxId:
@@ -237,7 +238,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      } as any);
+      });
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -273,7 +274,7 @@ describe('permitExtractor', () => {
             total: 120,
           }),
         },
-      } as any);
+      });
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -315,7 +316,7 @@ describe('permitExtractor', () => {
             total: 20,
           }),
         },
-      } as any);
+      });
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -352,7 +353,7 @@ describe('permitExtractor', () => {
         v1: {
           getApiV1BoxesP1: async () => box,
         },
-      } as any);
+      });
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -423,7 +424,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
-        } as any);
+        });
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
@@ -451,7 +452,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        } as any);
+        });
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
@@ -501,9 +502,7 @@ describe('permitExtractor', () => {
       jest
         .spyOn(extractor, 'getAllUnspentPermits')
         .mockResolvedValue([extractedPermit]);
-      const spy = jest
-        .spyOn(extractor, 'validateOldStoredPermits')
-        .mockImplementation();
+      jest.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
@@ -541,9 +540,7 @@ describe('permitExtractor', () => {
       jest
         .spyOn(extractor, 'getAllUnspentPermits')
         .mockResolvedValue([extractedPermit]);
-      const spy = jest
-        .spyOn(extractor, 'validateOldStoredPermits')
-        .mockImplementation();
+      jest.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
       await insertPermitEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });

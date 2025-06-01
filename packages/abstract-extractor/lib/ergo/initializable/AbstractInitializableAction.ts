@@ -1,4 +1,4 @@
-import { DataSource, EntityTarget } from 'typeorm';
+import { DataSource, EntityTarget, FindOptionsWhere } from 'typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';
@@ -22,6 +22,8 @@ export abstract class AbstractInitializableErgoExtractorAction<
    * @param extractorId
    */
   removeAllData = async (extractorId: string) => {
-    await this.repository.delete({ extractor: extractorId } as any);
+    await this.repository.delete({
+      extractor: extractorId,
+    } as FindOptionsWhere<ExtractorEntity>);
   };
 }

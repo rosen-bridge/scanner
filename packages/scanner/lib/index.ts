@@ -3,7 +3,6 @@ export { ErgoScanner } from './scanner/ergo/ergoScanner';
 export { CardanoKoiosScanner } from './scanner/cardano/scanner/koios';
 export { CardanoOgmiosScanner } from './scanner/cardano/scanner/ogmios';
 export { CardanoBlockFrostScanner } from './scanner/cardano/scanner/blockfrost';
-export { CardanoGraphQLScanner } from './scanner/cardano/scanner/graphql';
 export { migrations } from './migrations';
 export { PROCEED } from './entities/blockEntity';
 export { BlockEntity } from './entities/blockEntity';
@@ -21,8 +20,6 @@ export { ErgoExplorerNetwork } from './scanner/ergo/network/ergoExplorerNetwork'
 export { ErgoNodeNetwork } from './scanner/ergo/network/ergoNodeNetwork';
 export { BlockFrostNetwork } from './scanner/cardano/network/blockfrost';
 export { KoiosNetwork } from './scanner/cardano/network/koios';
-export { GraphQLNetwork } from './scanner/cardano/network/graphql';
 export { BlockFrostTransaction } from './scanner/cardano/interfaces/BlockFrost';
 export { KoiosTransaction } from './scanner/cardano/interfaces/Koios';
-export { GraphQLTransaction } from './scanner/cardano/interfaces/graphql';
 export { ScannerConfig } from './scanner/interfaces';

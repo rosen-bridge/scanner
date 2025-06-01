@@ -15,6 +15,7 @@ import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { AbstractBoxData, BoxInfo, SpendInfo } from './interfaces';
 import { DB_CHUNK_SIZE } from '../constants';
 import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export abstract class AbstractErgoExtractorAction<
   ExtractedData extends AbstractBoxData,
@@ -40,9 +41,9 @@ export abstract class AbstractErgoExtractorAction<
    * create the database entity from extracted data and block information
    */
   protected createEntity = (
-    data: ExtractedData[],
-    block: BlockInfo,
-    extractor: string
+    boxes: AbstractBoxData[], // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
+    extractor: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Array<Omit<ExtractorEntity, 'id'>> => {
     throw Error(
       'You must implement `createEntity` or override `insertEntities` and `updateEntities`'
@@ -53,7 +54,7 @@ export abstract class AbstractErgoExtractorAction<
    * convert the database entity back to raw data
    */
   protected convertEntityToData = (
-    entities: ExtractorEntity[]
+    entities: AbstractErgoExtractorEntity[] // eslint-disable-line @typescript-eslint/no-unused-vars
   ): ExtractedData[] => {
     throw Error(
       'You must implement `convertEntityToData` or override `deleteBlockEntities`'
@@ -75,7 +76,11 @@ export abstract class AbstractErgoExtractorAction<
   ) => {
     const repository = queryRunner.manager.getRepository(this.repo);
     await repository.insert(
-      this.createEntity(boxesToInsert, block, extractor) as any
+      this.createEntity(
+        boxesToInsert,
+        block,
+        extractor
+      ) as unknown as QueryDeepPartialEntity<ExtractorEntity>[]
     );
   };
 
@@ -88,8 +93,8 @@ export abstract class AbstractErgoExtractorAction<
    */
   protected updateEntity = async (
     queryRunner: QueryRunner,
-    updateBox: ExtractedData,
-    block: BlockInfo,
+    updateBox: ExtractedData, // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
     extractor: string
   ) => {
     const repository = queryRunner.manager.getRepository(this.repo);
@@ -99,7 +104,7 @@ export abstract class AbstractErgoExtractorAction<
         boxId: box.boxId,
         extractor: extractor,
       } as FindOptionsWhere<ExtractorEntity>,
-      box as any
+      box as unknown as QueryDeepPartialEntity<ExtractorEntity>
     );
   };
 
@@ -117,12 +122,15 @@ export abstract class AbstractErgoExtractorAction<
   ): Promise<ExtractedData[]> => {
     const repository = queryRunner.manager.getRepository(this.repo);
     const deletedData = await repository.find({
-      where: { extractor: extractor, block: block } as any,
+      where: {
+        extractor: extractor,
+        block: block,
+      } as FindOptionsWhere<ExtractorEntity>,
     });
     await repository.delete({
       extractor: extractor,
       block: block,
-    } as any);
+    } as unknown as FindOptionsWhere<ExtractorEntity>);
     return this.convertEntityToData(deletedData);
   };
 
@@ -134,26 +142,31 @@ export abstract class AbstractErgoExtractorAction<
    * @returns
    */
   protected updateBlockEntities = async (
-    queryRunner: QueryRunner,
+    queryRunner: QueryRunner, // eslint-disable-line @typescript-eslint/no-unused-vars
     extractor: string,
     block: string
   ): Promise<ExtractorEntity[]> => {
-    const repository = queryRunner.manager.getRepository(this.repo);
+    const repository = this.datasource.getRepository(
+      this.repo as EntityTarget<new () => ExtractorEntity>
+    );
     const updatedData = await repository.find({
       where: {
         extractor: extractor,
         spendBlock: block,
         block: Not(block),
-      } as any,
+      } as unknown as FindOptionsWhere<ExtractorEntity>,
     });
     await repository.update(
       {
         spendBlock: block,
         extractor: extractor,
-      } as FindOptionsWhere<ExtractorEntity>,
-      { spendBlock: null, spendHeight: 0 } as any
+      } as unknown as FindOptionsWhere<ExtractorEntity>,
+      {
+        spendBlock: null,
+        spendHeight: 0,
+      }
     );
-    return updatedData;
+    return updatedData as unknown as ExtractorEntity[];
   };
 
   /**
@@ -241,7 +254,10 @@ export abstract class AbstractErgoExtractorAction<
           boxId: In(boxIds),
           extractor: extractor,
         } as FindOptionsWhere<ExtractorEntity>,
-        { spendBlock: block.hash, spendHeight: block.height } as any
+        {
+          spendBlock: block.hash,
+          spendHeight: block.height,
+        } as unknown as QueryDeepPartialEntity<ExtractorEntity>
       );
 
       if (updateResult.affected && updateResult.affected > 0) {

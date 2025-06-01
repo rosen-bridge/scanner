@@ -189,7 +189,9 @@ describe('EventTriggerExtractor', () => {
         fraudAddress
       );
       const spendTriggerSpy = jest.spyOn(
-        (extractor as any).actions,
+        extractor[
+          'actions'
+        ] /* eslint-disable @typescript-eslint/no-explicit-any */,
         'spendBoxes'
       );
       spendTriggerSpy.mockResolvedValue(undefined);
@@ -229,7 +231,8 @@ describe('EventTriggerExtractor', () => {
         fraudAddress
       );
       const spendTriggerSpy = jest.spyOn(
-        (extractor as any).actions,
+        (extractor as any)
+          .actions /* eslint-disable @typescript-eslint/no-explicit-any */,
         'spendBoxes'
       );
       spendTriggerSpy.mockResolvedValue(undefined);

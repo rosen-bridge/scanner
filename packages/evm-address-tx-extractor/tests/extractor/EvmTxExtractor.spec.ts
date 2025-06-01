@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { Transaction } from 'ethers';
+import { Transaction, TransactionReceipt } from 'ethers';
 import { DataSource } from 'typeorm';
 import { createDatabase } from '../testUtils';
 import { EvmTxExtractor, AddressTxsEntity } from '../../lib';
@@ -11,7 +11,7 @@ vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
   return {
     ...ref,
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return {};
     }),
   };
@@ -38,9 +38,15 @@ describe('EvmTxExtractor', () => {
       const extractor = new EvmTxExtractor(dataSource, 'extractor1', address);
       const repository = dataSource.getRepository(AddressTxsEntity);
       await repository.createQueryBuilder().delete().execute();
-      vi.spyOn(txs[0], 'wait').mockReturnValue(Transaction.from(txs[0]) as any);
-      vi.spyOn(txs[1], 'wait').mockReturnValue(Transaction.from(txs[1]) as any);
-      vi.spyOn(txs[2], 'wait').mockImplementation((x: number | undefined) => {
+      vi.spyOn(txs[0], 'wait').mockReturnValue(
+        Transaction.from(
+          txs[0]
+        ) as unknown as Promise<TransactionReceipt | null>
+      );
+      vi.spyOn(txs[1], 'wait').mockReturnValue(
+        Transaction.from(txs[1]) as unknown as Promise<TransactionReceipt>
+      );
+      vi.spyOn(txs[2], 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',
         };

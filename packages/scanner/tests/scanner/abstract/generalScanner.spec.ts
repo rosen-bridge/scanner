@@ -45,7 +45,7 @@ describe('generalScanner', () => {
       jest
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
-        .mockImplementation((height: number) =>
+        .mockImplementation(() =>
           Promise.resolve({
             height: 3,
             parentHash: '2',
@@ -70,7 +70,7 @@ describe('generalScanner', () => {
       jest
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
-        .mockImplementation((height: number) =>
+        .mockImplementation(() =>
           Promise.resolve({
             height: 3,
             parentHash: '2',
@@ -101,7 +101,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(scanner as any, 'processBlockTransactions')
+        .spyOn(scanner, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -161,7 +161,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest.spyOn(
-        scanner as any,
+        scanner,
         'processBlockTransactions'
       );
       const result = await scanner['processBlock']({
@@ -194,7 +194,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(scanner as any, 'processBlockTransactions')
+        .spyOn(scanner, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -372,7 +372,7 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
       const mockedInit = jest
-        .spyOn(scanner as any, 'initialize')
+        .spyOn(scanner, 'initialize')
         .mockImplementation()
         .mockReturnValue(
           new Promise((resolve, reject) => {
@@ -436,10 +436,10 @@ describe('generalScanner', () => {
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const processSpy = jest.spyOn(scanner as any, 'processBlock');
-      jest.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
+      const processSpy = jest.spyOn(scanner, 'processBlock');
+      jest.spyOn(scanner, 'isForkHappen').mockResolvedValue(false);
       jest
-        .spyOn(scanner as any, 'verifyExtractorsInitialization')
+        .spyOn(scanner, 'verifyExtractorsInitialization')
         .mockImplementation(() => {
           throw Error();
         });
@@ -499,7 +499,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
       const mockedStepForward = jest
-        .spyOn(scanner as any, 'stepForward')
+        .spyOn(scanner, 'stepForward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
@@ -557,7 +557,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
       const mockedStepBackward = jest
-        .spyOn(scanner as any, 'stepBackward')
+        .spyOn(scanner, 'stepBackward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();

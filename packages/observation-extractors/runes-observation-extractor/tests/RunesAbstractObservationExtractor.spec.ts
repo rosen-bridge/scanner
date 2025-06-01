@@ -15,6 +15,8 @@ import {
   TestRunesAbstractObservationExtractor,
   TestTransactionType,
 } from './TestRunesAbstractObservationExtractor';
+import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
+import { OrdiscanRunesTransfer } from '../lib/types';
 
 describe('RunesAbstractObservationExtractor', () => {
   let extractor: TestRunesAbstractObservationExtractor;
@@ -34,7 +36,7 @@ describe('RunesAbstractObservationExtractor', () => {
       mockTokenMap,
       {
         get: vi.fn().mockReturnValue(rosenData),
-      } as any,
+      } as unknown as AbstractRosenDataExtractor<TestTransactionType>,
       undefined
     );
   });
@@ -68,9 +70,12 @@ describe('RunesAbstractObservationExtractor', () => {
         },
       };
 
-      vi.spyOn(extractor as any, 'getTxRunesTransfer').mockResolvedValue(
-        mockOrdiscanRunesTransfer
-      );
+      vi.spyOn(
+        extractor as unknown as {
+          getTxRunesTransfer: () => OrdiscanRunesTransfer;
+        } /* eslint-disable @typescript-eslint/no-explicit-any */,
+        'getTxRunesTransfer'
+      ).mockResolvedValue(mockOrdiscanRunesTransfer);
 
       vi.spyOn(extractor['tokens'], 'search').mockReturnValue([wrappedRune]);
 

@@ -197,7 +197,7 @@ describe('CollateralExtractor', () => {
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft
       );
       jest
-        .spyOn(collateralExtractor as any, 'getAllUnspentCollaterals')
+        .spyOn(collateralExtractor, 'getAllUnspentCollaterals')
         .mockResolvedValue(
           collateralBoxes.map((box) =>
             collateralExtractor['toExtractedCollateral'](
@@ -209,7 +209,10 @@ describe('CollateralExtractor', () => {
         );
 
       const tidyUpStoredCollateralsSpy = jest
-        .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
+        .spyOn(
+          collateralExtractor /* eslint-disable @typescript-eslint/no-explicit-any */,
+          'tidyUpStoredCollaterals'
+        )
         .mockImplementation();
 
       await collateralExtractor.initializeBoxes({
@@ -332,7 +335,7 @@ describe('CollateralExtractor', () => {
             return txInfo;
           },
         },
-      } as any;
+      } as any; /* eslint-disable @typescript-eslint/no-explicit-any */
 
       // call tidyUpStoredCollaterals
       await collateralExtractor['tidyUpStoredCollaterals'](
@@ -399,7 +402,7 @@ describe('CollateralExtractor', () => {
             total: testData.tx1.outputs.length,
           }),
         },
-      } as any;
+      } as any; /* eslint-disable @typescript-eslint/no-explicit-any */
 
       const collateralBoxes = testData.tx1.outputs.filter(
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft

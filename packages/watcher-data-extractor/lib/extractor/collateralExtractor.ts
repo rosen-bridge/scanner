@@ -183,13 +183,15 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       let boxInfo: V1.OutputInfo;
       try {
         boxInfo = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
-      } catch (e: any) {
-        if (e?.response?.status === 404) {
+      } catch (e) {
+        if ((e as { response: { status: number } }).response?.status === 404) {
           await this.action.deleteCollateral(boxId, this.getId());
           continue;
         } else {
           throw new Error(
-            `something went wrong when trying to get box=[${boxId}] from Ergo network: ${e?.message}`
+            `something went wrong when trying to get box=[${boxId}] from Ergo network: ${
+              (e as Error).message
+            }`
           );
         }
       }
@@ -216,9 +218,11 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
               this.getId()
             );
           }
-        } catch (e: any) {
+        } catch (e) {
           throw new Error(
-            `something went wrong when trying to get transaction=[${boxInfo.spentTransactionId}] from Ergo network: ${e?.message}`
+            `something went wrong when trying to get transaction=[${
+              boxInfo.spentTransactionId
+            }] from Ergo network: ${(e as Error)?.message}`
           );
         }
       }
