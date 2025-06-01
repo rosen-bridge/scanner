@@ -140,7 +140,9 @@ export abstract class AbstractErgoExtractor<
    * @param tx
    * @returns
    */
-  getTransactionExtraData = (tx: Transaction): TxExtra => {
+  getTransactionExtraData = (
+    tx: Transaction // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): TxExtra => {
     return {};
   };
 

@@ -12,7 +12,7 @@ export class migration1746354253000 implements MigrationInterface {
     `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(): Promise<void> {
     // do nothing
   }
 }

@@ -119,7 +119,7 @@ describe('cardanoBlockFrostObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
   });

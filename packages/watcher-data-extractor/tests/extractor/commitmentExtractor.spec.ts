@@ -4,12 +4,7 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
-import {
-  block,
-  commitmentAddress,
-  RWTId,
-  testTokenMap,
-} from './utilsVariable.mock';
+import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { TokenMap } from '@rosen-bridge/tokens';
 
