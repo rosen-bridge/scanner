@@ -5,7 +5,7 @@ import { BitcoinRpcTransaction } from './types';
 export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
   constructor(config: ScannerConfig<BitcoinRpcTransaction>) {
     super(
-      'bitcoin-rpc',
+      'bitcoin',
       config.dataSource,
       config.initialHeight,
       config.network,

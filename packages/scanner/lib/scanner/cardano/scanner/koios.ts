@@ -5,7 +5,7 @@ import { ScannerConfig } from '../../interfaces';
 class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   constructor(config: ScannerConfig<KoiosTransaction>) {
     super(
-      'cardano-koios',
+      'cardano',
       config.dataSource,
       config.initialHeight,
       config.network,
