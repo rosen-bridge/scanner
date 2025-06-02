@@ -238,7 +238,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,

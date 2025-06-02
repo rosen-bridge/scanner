@@ -8,6 +8,7 @@ import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
 import { uint8ArrayToHex } from '../../lib/utils';
 import { ExtractedCollateral } from '../../lib/interfaces/extractedCollateral';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 describe('CollateralExtractor', () => {
   let dataSource: DataSource;
@@ -346,7 +347,7 @@ describe('CollateralExtractor', () => {
             return txInfo;
           },
         },
-      };
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>;
 
       // call tidyUpStoredCollaterals
       await collateralExtractor['tidyUpStoredCollaterals'](
@@ -413,7 +414,7 @@ describe('CollateralExtractor', () => {
             total: testData.tx1.outputs.length,
           }),
         },
-      };
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>;
 
       const collateralBoxes = testData.tx1.outputs.filter(
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft
