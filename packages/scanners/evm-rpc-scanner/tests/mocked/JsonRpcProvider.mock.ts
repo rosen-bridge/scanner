@@ -32,7 +32,7 @@ export const resetRpcMock = () => {
  * mocks `getBlock` function of the provider to return value
  * @param provider
  */
-export const mockGetBlock = (provider: JsonRpcProvider, data: Block) => {
+export const mockGetBlock = (provider: JsonRpcProvider, data: Block | null) => {
   vi.spyOn(provider, 'getBlock').mockResolvedValue(data);
 };
 

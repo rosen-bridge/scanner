@@ -1,4 +1,4 @@
-import { Block, Transaction } from 'ethers';
+import { Transaction } from 'ethers';
 import * as testData from './testData';
 import { TestEvmRpcNetwork } from './TestRpcNetwork';
 import {
@@ -78,7 +78,7 @@ describe('EvmRpcNetwork', () => {
      */
     it('should throw BlockNotFound', async () => {
       // mock client response
-      mockGetBlock(network.getProvider(), {} as Block);
+      mockGetBlock(network.getProvider(), null);
 
       // run test
       const result = network.getBlockTxs(testData.blockHash);
@@ -129,7 +129,7 @@ describe('EvmRpcNetwork', () => {
      */
     it('should throw error when block height is wrong', async () => {
       // mock client response
-      mockGetBlock(network.getProvider(), {} as Block);
+      mockGetBlock(network.getProvider(), null);
 
       // run test
       const result = network.getBlockAtHeight(testData.wrongBlockHeight);
