@@ -111,7 +111,7 @@ export class migration1706610773176 implements MigrationInterface {
 
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
     for (const event of events) {
-      const { WIDsHash, WIDsCount } = getWidInfo(event.WIDs);
+      const { WIDsHash, WIDsCount } = getWidInfo(event['WIDs']);
       await queryRunner.query(`
               UPDATE "event_trigger_entity"
               SET "WIDsHash" = '${WIDsHash}', "WIDsCount" = '${WIDsCount}'

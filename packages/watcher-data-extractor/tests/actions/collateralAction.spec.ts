@@ -301,6 +301,12 @@ describe('CollateralAction', () => {
      * - right entities should have been saved
      */
     it(`should set spendBlock and spendHeight for a set of collaterals`, async () => {
+      await action.storeCollaterals(
+        testData.sampleCollateralEntities.slice(0, 2),
+        block,
+        'extractor1'
+      );
+
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
       const spendTxId =
         '8c494da0242fd04ecb4efd3d9de11813848c79b38592f29d579836dfbc459f96';
@@ -378,6 +384,11 @@ describe('CollateralAction', () => {
      */
     it(`should delete a the collateral with the specified boxId and extractor
     from DB`, async () => {
+      await action.storeCollaterals(
+        testData.sampleCollateralEntities,
+        block,
+        'extractor1'
+      );
       const boxIdToDelete = testData.sampleCollateralEntities[0].boxId;
       await action.deleteCollateral(boxIdToDelete, 'extractor1');
 

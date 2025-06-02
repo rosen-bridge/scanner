@@ -16,6 +16,7 @@ import {
   extractedFraud,
   fraudApiOutputBoxes,
 } from './fraudExtractorTestData';
+import { TransactionInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -81,12 +82,13 @@ describe('fraudExtractor', () => {
     it('should extract block id and height for a transaction', async () => {
       jest.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
-          getApiV1TransactionsP1: async () => ({
-            blockId: 'blockId',
-            inclusionHeight: 100,
-          }),
+          getApiV1TransactionsP1: async () =>
+            ({
+              blockId: 'blockId',
+              inclusionHeight: 100,
+            } as unknown as TransactionInfo),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -122,7 +124,7 @@ describe('fraudExtractor', () => {
             total: 120,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractedFraud = {
         boxId: 'boxId',
         wid: 'wid',
@@ -163,7 +165,7 @@ describe('fraudExtractor', () => {
             total: 20,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -207,7 +209,7 @@ describe('fraudExtractor', () => {
         v1: {
           getApiV1BoxesP1: async () => box,
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -242,7 +244,7 @@ describe('fraudExtractor', () => {
             throw new Error('404');
           },
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new FraudExtractor(
         dataSource,
         'extractor1',
@@ -295,11 +297,18 @@ describe('fraudExtractor', () => {
     it('should update valid box information when spent bellow the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
       const spy = jest
-        .spyOn(extractor, 'getFraudInfoWithBoxId')
+        .spyOn(
+          extractor as unknown as {
+            getFraudInfoWithBoxId: (
+              boxId: string
+            ) => Promise<ExtractedFraud | undefined>;
+          },
+          'getFraudInfoWithBoxId'
+        )
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
-        });
+        } as unknown as Promise<ExtractedFraud | undefined>);
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
       const box = await repository.findOne({ where: { boxId: 'boxId' } });
@@ -322,11 +331,18 @@ describe('fraudExtractor', () => {
     it('should not change valid fraud information when spent after the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
       const spy = jest
-        .spyOn(extractor, 'getFraudInfoWithBoxId')
+        .spyOn(
+          extractor as unknown as {
+            getFraudInfoWithBoxId: (
+              boxId: string
+            ) => Promise<ExtractedFraud | undefined>;
+          },
+          'getFraudInfoWithBoxId'
+        )
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        });
+        } as unknown as ExtractedFraud);
 
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');

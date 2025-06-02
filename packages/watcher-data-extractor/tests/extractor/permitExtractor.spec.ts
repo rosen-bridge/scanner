@@ -193,7 +193,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -274,7 +274,7 @@ describe('permitExtractor', () => {
             total: 120,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -316,7 +316,7 @@ describe('permitExtractor', () => {
             total: 20,
           }),
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -353,7 +353,7 @@ describe('permitExtractor', () => {
         v1: {
           getApiV1BoxesP1: async () => box,
         },
-      });
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -424,7 +424,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
-        });
+        } as unknown as Promise<ExtractedPermit | undefined>);
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
@@ -452,7 +452,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        });
+        } as unknown as Promise<ExtractedPermit | undefined>);
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
