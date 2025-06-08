@@ -1,12 +1,6 @@
 import axios from '@rosen-bridge/rate-limited-axios';
 import { vi } from 'vitest';
 
-// Initialize rate-limited axios before mocking
-axios.initConfigs({
-  apiLimitRateRangeAsSeconds: 10,
-  apiLimitRules: [],
-});
-
 export const axiosInstance = {
   get: vi.fn(),
   post: vi.fn(),
