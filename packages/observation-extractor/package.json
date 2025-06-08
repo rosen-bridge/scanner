@@ -22,7 +22,7 @@
     "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^2.0.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/rosen-extractor": "^7.3.0",
+    "@rosen-bridge/rosen-extractor": "^7.3.3",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
