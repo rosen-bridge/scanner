@@ -1,5 +1,17 @@
 # @rosen-bridge/scanner
 
+## 8.0.0
+
+### Major Changes
+
+- Standardized scanner names across networks
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.2
+
 ## 7.1.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @rosen-bridge/tx-id-extractor
 
+## 2.3.2
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+
 ## 2.3.1
 
 ### Patch Changes

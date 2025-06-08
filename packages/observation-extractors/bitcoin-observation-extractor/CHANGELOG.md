@@ -1,5 +1,16 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.1.4
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@7.3.3
+  - @rosen-bridge/bitcoin-esplora-scanner@3.0.0
+  - @rosen-bridge/bitcoin-rpc-scanner@3.0.0
+  - @rosen-bridge/observation-extractor@7.1.2
+
 ## 6.1.3
 
 ### Patch Changes

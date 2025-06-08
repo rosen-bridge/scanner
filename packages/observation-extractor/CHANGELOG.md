@@ -1,5 +1,14 @@
 # @rosen-bridge/observation-extractor
 
+## 7.1.2
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@7.3.3
+  - @rosen-bridge/abstract-extractor@2.0.2
+
 ## 7.1.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.1.3
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.2
+
 ## 12.1.2
 
 ### Patch Changes

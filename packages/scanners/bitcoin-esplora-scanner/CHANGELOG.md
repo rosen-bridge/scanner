@@ -1,5 +1,17 @@
 # @rosen-bridge/bitcoin-esplora-scanner
 
+## 3.0.0
+
+### Major Changes
+
+- Standardized scanner names across networks
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/scanner@8.0.0
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.1.4
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@7.3.3
+  - @rosen-bridge/evm-rpc-scanner@4.0.0
+  - @rosen-bridge/observation-extractor@7.1.2
+
 ## 5.1.3
 
 ### Patch Changes
