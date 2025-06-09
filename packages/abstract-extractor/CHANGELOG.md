@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 2.0.2
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+
 ## 2.0.1
 
 ### Patch Changes

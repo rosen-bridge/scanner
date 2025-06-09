@@ -2,20 +2,12 @@ import { createDatabase } from '../utils.mock';
 import { TxAction } from '../../lib/actions/db';
 import { TxIdEntity } from '../../lib';
 import { DataSource, Repository } from 'typeorm';
-import axios from '@rosen-bridge/rate-limited-axios';
 
 let dataSource: DataSource;
 let action: TxAction;
 let repository: Repository<TxIdEntity>;
 
 describe('TxAction', () => {
-  beforeAll(() => {
-    axios.initConfigs({
-      apiLimitRateRangeAsSeconds: 10,
-      apiLimitRules: [],
-    });
-  });
-
   beforeEach(async () => {
     dataSource = await createDatabase();
     action = new TxAction(dataSource);

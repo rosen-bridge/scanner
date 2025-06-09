@@ -115,6 +115,7 @@ export const transactionsList = [
     }),
     accessList: [],
     blobVersionedHashes: null,
+    authorizationList: [],
   },
   {
     provider: new JsonRpcProvider(),
@@ -143,6 +144,7 @@ export const transactionsList = [
       networkV: null,
     }),
     accessList: [],
+    authorizationList: [],
   },
   {
     provider: new JsonRpcProvider(),
@@ -171,6 +173,7 @@ export const transactionsList = [
       networkV: null,
     }),
     accessList: [],
+    authorizationList: [],
   },
   {
     provider: new JsonRpcProvider(),
@@ -199,6 +202,7 @@ export const transactionsList = [
       networkV: null,
     }),
     accessList: [],
+    authorizationList: [],
   },
 ];
 
