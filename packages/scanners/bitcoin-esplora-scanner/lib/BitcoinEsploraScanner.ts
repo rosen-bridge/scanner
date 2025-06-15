@@ -4,7 +4,7 @@ import { BitcoinEsploraTransaction } from './types';
 export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   constructor(config: ScannerConfig<BitcoinEsploraTransaction>) {
     super(
-      'bitcoin-esplora',
+      'bitcoin',
       config.dataSource,
       config.initialHeight,
       config.network,

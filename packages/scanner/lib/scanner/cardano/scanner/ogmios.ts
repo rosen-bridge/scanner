@@ -46,7 +46,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   private connected: boolean;
   private stopped: boolean;
   private reconnectionConfig: OgmiosReconnectionConfig;
-  name = () => 'cardano-ogmios';
+  name = () => 'cardano';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
     super(logger, config.maxTryBlock);

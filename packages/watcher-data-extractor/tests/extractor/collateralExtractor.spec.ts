@@ -1,7 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import axios from '@rosen-bridge/rate-limited-axios';
 
 import { CollateralEntity, CollateralExtractor } from '../../lib';
 import * as testData from './collateralExtractorTestData';
@@ -14,13 +13,6 @@ describe('CollateralExtractor', () => {
   let dataSource: DataSource;
   let repository: Repository<CollateralEntity>;
   let collateralExtractor: CollateralExtractor;
-
-  beforeAll(() => {
-    axios.initConfigs({
-      apiLimitRateRangeAsSeconds: 10,
-      apiLimitRules: [],
-    });
-  });
 
   beforeEach(async () => {
     dataSource = await createDatabase();

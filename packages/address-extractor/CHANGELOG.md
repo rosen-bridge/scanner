@@ -1,5 +1,13 @@
 # @rosen-bridge/address-extractor
 
+## 6.1.2
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.2
+
 ## 6.1.1
 
 ### Patch Changes

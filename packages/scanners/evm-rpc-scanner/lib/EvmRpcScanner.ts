@@ -6,7 +6,7 @@ export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
 
   constructor(chain: string, config: ScannerConfig<TransactionResponse>) {
     super(
-      `${chain}-evm-rpc`,
+      `${chain}`,
       config.dataSource,
       config.initialHeight,
       config.network,

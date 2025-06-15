@@ -1,6 +1,5 @@
-import { beforeAll, describe, expect, it, vi, vitest } from 'vitest';
+import { describe, expect, it, vi, vitest } from 'vitest';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
-import axios from '@rosen-bridge/rate-limited-axios';
 
 import {
   NodeNetwork,
@@ -14,13 +13,6 @@ import { RETRIAL_COUNT } from '../../lib/constants';
 import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializable';
 
 describe('AbstractInitializableErgoExtractor', () => {
-  beforeAll(() => {
-    axios.initConfigs({
-      apiLimitRateRangeAsSeconds: 10,
-      apiLimitRules: [],
-    });
-  });
-
   describe('getTotalTxCount', () => {
     /**
      * @target getTotalTxCount should return the total tx count

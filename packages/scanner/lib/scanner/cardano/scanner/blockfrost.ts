@@ -5,7 +5,7 @@ import { ScannerConfig } from '../../interfaces';
 class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   constructor(config: ScannerConfig<BlockFrostTransaction>) {
     super(
-      'cardano-BlockFrost',
+      'cardano',
       config.dataSource,
       config.initialHeight,
       config.network,

@@ -1,5 +1,17 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 4.0.0
+
+### Major Changes
+
+- Standardized scanner names across networks
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/scanner@8.0.0
+
 ## 3.0.1
 
 ### Patch Changes

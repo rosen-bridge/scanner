@@ -13,7 +13,6 @@ import {
   spendTriggerTxOldFormat,
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
-import axios from '@rosen-bridge/rate-limited-axios';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -36,13 +35,6 @@ const fraudAddress =
   'LFz5FPkW7nPVq2NA5YcZncXBMTAy5KmfaAtw3Xbdkq8Uv8vntZ5gbA8NrCrZvGTXm3A8QG2qeaLQh97w6mFnunMYVN19iXAzC8mhraST6bM2oTqqPP6srsXTwTfNpe4t9p7WXPtrxxe2nbBkjgmbbRyZDwnbhv9KKcD9RgiMjZQ4LEY2eaYv19JKhmbEgXr7QRAniXwvscuFhypNvP3FZtMvUMV7wupeBUEDQV23RciS918eVvBp5';
 
 describe('EventTriggerExtractor', () => {
-  beforeAll(() => {
-    axios.initConfigs({
-      apiLimitRateRangeAsSeconds: 10,
-      apiLimitRules: [],
-    });
-  });
-
   beforeEach(async () => {
     dataSource = await createDatabase();
   });
