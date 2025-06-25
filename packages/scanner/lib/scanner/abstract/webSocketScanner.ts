@@ -74,7 +74,8 @@ abstract class WebSocketScanner<
         }
       } catch (e) {
         this.logger.warn(`unknown error occurred ${e}`);
-        this.logger.warn((e as Error).stack ?? '');
+        if ((e as Error).stack != undefined)
+          this.logger.warn((e as Error).stack!);
       }
       return false;
     }, `Block at height ${block.height}`);
@@ -93,7 +94,8 @@ abstract class WebSocketScanner<
         return true;
       } catch (e) {
         this.logger.error(`unknown error occurred ${e}`);
-        this.logger.error((e as Error).stack ?? '');
+        if ((e as Error).stack != undefined)
+          this.logger.error((e as Error).stack!);
       }
       return false;
     }, `Forking block at height ${block.height}`);

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   ExtractorTest,
   generateMockGeneralScannerClass,
@@ -102,15 +104,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(
-          scanner as unknown as {
-            processBlockTransactions: (
-              block: Block,
-              transactions: Array<unknown>
-            ) => Promise<boolean>;
-          },
-          'processBlockTransactions'
-        )
+        .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -461,12 +455,7 @@ describe('generalScanner', () => {
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const processSpy = jest.spyOn(
-        scanner as unknown as {
-          processBlock: (block: Block) => Promise<boolean>;
-        },
-        'processBlock'
-      );
+      const processSpy = jest.spyOn(scanner as any, 'processBlock');
       jest
         .spyOn(
           scanner as unknown as { isForkHappen: () => Promise<boolean> },

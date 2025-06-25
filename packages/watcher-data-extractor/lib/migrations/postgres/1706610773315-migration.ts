@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { getWidInfo } from '../../utils';
 
@@ -36,7 +38,7 @@ export class migration1706610773315 implements MigrationInterface {
         `);
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
     for (const event of events) {
-      const { WIDsHash, WIDsCount } = getWidInfo(event['WIDs']);
+      const { WIDsHash, WIDsCount } = getWidInfo((event as any).WIDs);
       await queryRunner.query(`
             UPDATE "event_trigger_entity"
             SET "WIDsHash" = '${WIDsHash}', "WIDsCount" = '${WIDsCount}'

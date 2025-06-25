@@ -1,13 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { ObservationEntity } from '@rosen-bridge/observation-extractor';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { TransactionReceipt, TransactionResponse } from 'ethers';
+import { TransactionReceipt } from 'ethers';
 
 vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
@@ -27,12 +27,7 @@ describe('EvmRpcObservationExtractor', () => {
     dataSource = await createDatabase();
     extractor = new TestEvmRpcObservationExtractor(dataSource, new TokenMap(), {
       get: vi.fn(),
-      chain: '',
-      logger: {} as unknown as AbstractLogger,
-      tokens: {} as TokenMap,
-      lockAddress: '',
-      extractRawData: () => undefined,
-    } as unknown as AbstractRosenDataExtractor<TransactionResponse>);
+    } as any);
   });
 
   describe('processTransactions', () => {

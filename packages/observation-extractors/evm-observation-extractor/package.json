@@ -32,7 +32,6 @@
     "prettier": "^3.2.4",
     "typeorm": "^0.3.20",
     "typescript": "^5.3.3",
-    "get-func-name": "^2.0.2",
     "vitest": "^1.2.2"
   },
   "engines": {
@@ -40,13 +39,11 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/evm-rpc-scanner": "^4.0.0",
     "@rosen-bridge/observation-extractor": "^7.1.2",
     "@rosen-bridge/rosen-extractor": "^7.3.3",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-    "ethers": "^6.14.3",
-    "local-pkg": "^0.5.1"
+    "ethers": "^6.14.3"
   }
 }
