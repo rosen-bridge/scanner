@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { vi } from 'vitest';
-import { Transaction, TransactionReceipt } from 'ethers';
+import { Transaction } from 'ethers';
 import { DataSource } from 'typeorm';
 import { createDatabase } from '../testUtils';
 import { EvmTxExtractor, AddressTxsEntity } from '../../lib';
@@ -38,14 +40,8 @@ describe('EvmTxExtractor', () => {
       const extractor = new EvmTxExtractor(dataSource, 'extractor1', address);
       const repository = dataSource.getRepository(AddressTxsEntity);
       await repository.createQueryBuilder().delete().execute();
-      vi.spyOn(txs[0], 'wait').mockReturnValue(
-        Transaction.from(
-          txs[0]
-        ) as unknown as Promise<TransactionReceipt | null>
-      );
-      vi.spyOn(txs[1], 'wait').mockReturnValue(
-        Transaction.from(txs[1]) as unknown as Promise<TransactionReceipt>
-      );
+      vi.spyOn(txs[0], 'wait').mockReturnValue(Transaction.from(txs[0]) as any);
+      vi.spyOn(txs[1], 'wait').mockReturnValue(Transaction.from(txs[1]) as any);
       vi.spyOn(txs[2], 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',

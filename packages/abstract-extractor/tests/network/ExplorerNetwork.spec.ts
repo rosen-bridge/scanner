@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, expect, it, vitest } from 'vitest';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { omit } from 'lodash-es';
@@ -30,7 +32,7 @@ describe('ExplorerNetwork', () => {
         v1: {
           getApiV1TransactionsP1: async () => explorerTxInfo,
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const explorerNetwork = new ExplorerNetwork('explorer_url');
       const ergoBox = await explorerNetwork['convertBox'](explorerBox);
       expect(ergoBox).toEqual(convertedBox);

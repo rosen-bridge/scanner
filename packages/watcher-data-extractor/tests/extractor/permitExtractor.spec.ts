@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataSource, Repository } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
@@ -20,7 +22,6 @@ import {
 } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
-import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 
 jest.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
@@ -193,7 +194,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -202,7 +203,7 @@ describe('permitExtractor', () => {
         'url'
       );
       const boxData = await extractor.extractPermitData([
-        addressBoxes.items[0] as unknown as OutputInfo,
+        addressBoxes.items[0] as any,
       ]);
       expect(boxData[0]).toEqual({
         boxId:
@@ -238,7 +239,7 @@ describe('permitExtractor', () => {
             inclusionHeight: 100,
           }),
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -274,7 +275,7 @@ describe('permitExtractor', () => {
             total: 120,
           }),
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -316,7 +317,7 @@ describe('permitExtractor', () => {
             total: 20,
           }),
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -353,7 +354,7 @@ describe('permitExtractor', () => {
         v1: {
           getApiV1BoxesP1: async () => box,
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      } as any);
       const extractor = new PermitExtractor(
         'extractor1',
         dataSource,
@@ -424,7 +425,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
-        } as unknown as Promise<ExtractedPermit | undefined>);
+        } as any);
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
@@ -452,7 +453,7 @@ describe('permitExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        } as unknown as Promise<ExtractedPermit | undefined>);
+        } as any);
 
       await extractor.validateOldStoredPermits(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');

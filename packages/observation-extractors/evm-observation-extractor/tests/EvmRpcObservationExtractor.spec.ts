@@ -7,7 +7,6 @@ import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { TransactionReceipt } from 'ethers';
 
 vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
@@ -48,9 +47,7 @@ describe('EvmRpcObservationExtractor', () => {
     it('should return true and insert observation into database on valid lock tx', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
-      vi.spyOn(txRes, 'wait').mockReturnValue(
-        tx as unknown as Promise<TransactionReceipt | null>
-      );
+      vi.spyOn(txRes, 'wait').mockReturnValue(tx as any);
 
       // run test
       const res = await extractor.processTransactions(

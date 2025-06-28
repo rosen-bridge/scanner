@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, vi, expect } from 'vitest';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
@@ -15,8 +17,6 @@ import {
   TestRunesAbstractObservationExtractor,
   TestTransactionType,
 } from './TestRunesAbstractObservationExtractor';
-import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
-import { OrdiscanRunesTransfer } from '../lib/types';
 
 describe('RunesAbstractObservationExtractor', () => {
   let extractor: TestRunesAbstractObservationExtractor;
@@ -36,7 +36,7 @@ describe('RunesAbstractObservationExtractor', () => {
       mockTokenMap,
       {
         get: vi.fn().mockReturnValue(rosenData),
-      } as unknown as AbstractRosenDataExtractor<TestTransactionType>,
+      } as any,
       undefined
     );
   });
@@ -70,12 +70,9 @@ describe('RunesAbstractObservationExtractor', () => {
         },
       };
 
-      vi.spyOn(
-        extractor as unknown as {
-          getTxRunesTransfer: () => OrdiscanRunesTransfer;
-        } /* eslint-disable @typescript-eslint/no-explicit-any */,
-        'getTxRunesTransfer'
-      ).mockResolvedValue(mockOrdiscanRunesTransfer);
+      vi.spyOn(extractor as any, 'getTxRunesTransfer').mockResolvedValue(
+        mockOrdiscanRunesTransfer
+      );
 
       vi.spyOn(extractor['tokens'], 'search').mockReturnValue([wrappedRune]);
 

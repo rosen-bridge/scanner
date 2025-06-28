@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataSource, Repository } from 'typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
@@ -7,7 +9,6 @@ import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
 import { uint8ArrayToHex } from '../../lib/utils';
 import { ExtractedCollateral } from '../../lib/interfaces/extractedCollateral';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 describe('CollateralExtractor', () => {
   let dataSource: DataSource;
@@ -191,12 +192,7 @@ describe('CollateralExtractor', () => {
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft
       );
       jest
-        .spyOn(
-          collateralExtractor as unknown as {
-            getAllUnspentCollaterals: () => Promise<Array<ExtractedCollateral>>;
-          },
-          'getAllUnspentCollaterals'
-        )
+        .spyOn(collateralExtractor as any, 'getAllUnspentCollaterals')
         .mockImplementation(async (): Promise<Array<ExtractedCollateral>> => {
           return collateralBoxes.map((box) =>
             collateralExtractor['toExtractedCollateral'](
@@ -204,19 +200,11 @@ describe('CollateralExtractor', () => {
               testData.block1.hash,
               testData.block1.height
             )
-          ) as unknown as Promise<Array<ExtractedCollateral>>;
+          ) as any;
         });
 
       const tidyUpStoredCollateralsSpy = jest
-        .spyOn(
-          collateralExtractor as unknown as {
-            tidyUpStoredCollaterals: (
-              initialHeight: number,
-              collateralBoxIds: string[]
-            ) => Promise<void>;
-          },
-          'tidyUpStoredCollaterals'
-        )
+        .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
         .mockImplementation();
 
       await collateralExtractor.initializeBoxes({
@@ -339,7 +327,7 @@ describe('CollateralExtractor', () => {
             return txInfo;
           },
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>;
+      } as any;
 
       // call tidyUpStoredCollaterals
       await collateralExtractor['tidyUpStoredCollaterals'](
@@ -406,7 +394,7 @@ describe('CollateralExtractor', () => {
             total: testData.tx1.outputs.length,
           }),
         },
-      } as unknown as ReturnType<typeof ergoExplorerClientFactory>;
+      } as any;
 
       const collateralBoxes = testData.tx1.outputs.filter(
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft

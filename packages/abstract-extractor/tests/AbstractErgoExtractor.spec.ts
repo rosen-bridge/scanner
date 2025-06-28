@@ -1,13 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { V1 } from '@rosen-clients/ergo-explorer';
 import { describe, it, expect, vitest } from 'vitest';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-import {
-  AbstractBoxData,
-  AbstractErgoExtractorAction,
-  CallbackType,
-  AbstractErgoExtractorEntity,
-} from '../lib';
+import { CallbackType } from '../lib';
 import { block, extractedData, tx } from './testData';
 import { MockedErgoExtractor } from './AbstractErgoExtractor.mock';
 
@@ -42,10 +39,7 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         storeBoxes: storeSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<
-        AbstractBoxData,
-        AbstractErgoExtractorEntity
-      >;
+      } as any;
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
@@ -90,10 +84,7 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         storeBoxes: storeSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<
-        AbstractBoxData,
-        AbstractErgoExtractorEntity
-      >;
+      } as any;
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).not.toBeCalled();
@@ -138,10 +129,7 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         storeBoxes: storeSpy,
         spendBoxes: spendSpy,
-      } as unknown as AbstractErgoExtractorAction<
-        AbstractBoxData,
-        AbstractErgoExtractorEntity
-      >;
+      } as any;
       const result = await extractor.processTransactions([tx], block);
 
       expect(result).toEqual(false);
@@ -170,10 +158,7 @@ describe('AbstractErgoExtractor', () => {
       });
       extractor['actions'] = {
         deleteBlockBoxes: removeSpy,
-      } as unknown as AbstractErgoExtractorAction<
-        AbstractBoxData,
-        AbstractErgoExtractorEntity
-      >;
+      } as any;
       const triggerCallbackSpy = vitest.fn().mockClear();
       extractor['triggerCallbacks'] = triggerCallbackSpy;
       await extractor.forkBlock(block.hash);

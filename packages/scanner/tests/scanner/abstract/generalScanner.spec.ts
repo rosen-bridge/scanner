@@ -11,7 +11,6 @@ import {
 } from './abstract.mock';
 import { DataSource } from 'typeorm';
 import { BlockEntity } from '../../../lib';
-import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 const scannerByBlockRetrieveGapClass =
@@ -164,12 +163,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest.spyOn(
-        scanner as unknown as {
-          processBlockTransactions: (
-            block: Block,
-            transactions: Array<unknown>
-          ) => Promise<boolean>;
-        },
+        scanner as any,
         'processBlockTransactions'
       );
       const result = await scanner['processBlock']({
@@ -202,15 +196,7 @@ describe('generalScanner', () => {
         .mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest
-        .spyOn(
-          scanner as unknown as {
-            processBlockTransactions: (
-              block: Block,
-              transactions: Array<unknown>
-            ) => Promise<boolean>;
-          },
-          'processBlockTransactions'
-        )
+        .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation();
       const block = {
         hash: '1',
@@ -388,10 +374,7 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
       const mockedInit = jest
-        .spyOn(
-          scanner as unknown as { initialize: () => Promise<BlockEntity> },
-          'initialize'
-        )
+        .spyOn(scanner as any, 'initialize')
         .mockImplementation()
         .mockReturnValue(
           new Promise((resolve, reject) => {
@@ -456,19 +439,9 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
       const processSpy = jest.spyOn(scanner as any, 'processBlock');
+      jest.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
       jest
-        .spyOn(
-          scanner as unknown as { isForkHappen: () => Promise<boolean> },
-          'isForkHappen'
-        )
-        .mockResolvedValue(false);
-      jest
-        .spyOn(
-          scanner as unknown as {
-            verifyExtractorsInitialization: (block: BlockInfo) => Promise<void>;
-          },
-          'verifyExtractorsInitialization'
-        )
+        .spyOn(scanner as any, 'verifyExtractorsInitialization')
         .mockImplementation(() => {
           throw Error();
         });
@@ -528,12 +501,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
       const mockedStepForward = jest
-        .spyOn(
-          scanner as unknown as {
-            stepForward: (lastSavedBlock: BlockEntity) => Promise<void>;
-          },
-          'stepForward'
-        )
+        .spyOn(scanner as any, 'stepForward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
@@ -591,10 +559,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
       const mockedStepBackward = jest
-        .spyOn(
-          scanner as unknown as { stepBackward: () => Promise<void> },
-          'stepBackward'
-        )
+        .spyOn(scanner as any, 'stepBackward')
         .mockImplementation();
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();

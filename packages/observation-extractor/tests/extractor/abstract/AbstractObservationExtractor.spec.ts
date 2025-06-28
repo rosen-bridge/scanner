@@ -1,15 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataSource } from 'typeorm';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { tokens } from '../tokens.mock';
-import {
-  TestAbstractObservationExtractor,
-  TestTransactionType,
-} from './TestAbstractObservationExtractor';
+import { TestAbstractObservationExtractor } from './TestAbstractObservationExtractor';
 import { ObservationEntity } from '../../../lib';
 import { rosenData, tx } from './testData';
 import { blake2b } from 'blakejs';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
+
 describe('AbstractObservationExtractor', () => {
   let dataSource: DataSource;
   let extractor: TestAbstractObservationExtractor;
@@ -20,7 +19,7 @@ describe('AbstractObservationExtractor', () => {
     await tokenMap.updateConfigByJson(tokens);
     extractor = new TestAbstractObservationExtractor(dataSource, tokenMap, {
       get: jest.fn(),
-    } as unknown as AbstractRosenDataExtractor<TestTransactionType>);
+    } as any);
   });
 
   describe('processTransactions', () => {

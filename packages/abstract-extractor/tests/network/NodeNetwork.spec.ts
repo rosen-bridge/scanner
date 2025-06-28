@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, expect, it, vitest } from 'vitest';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
 
@@ -30,7 +32,7 @@ describe('NodeNetwork', () => {
           if (txId == nodeSpendingTxInfo.id) return nodeSpendingTxInfo;
           else return nodeCreationTxInfo;
         },
-      } as unknown as ReturnType<typeof ergoNodeClientFactory>);
+      } as any);
       const nodeNetwork = new NodeNetwork('node_url');
       const ergoBox = await nodeNetwork['convertBox'](nodeBox);
       expect(ergoBox).toEqual(convertedBox);
