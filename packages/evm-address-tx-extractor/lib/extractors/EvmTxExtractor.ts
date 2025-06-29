@@ -45,6 +45,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = [];
     for (const tx of txs) {
+      if (tx.type === 4) continue;
       if (tx.from === null) {
         throw Error('ImpossibleBehavior: RPC transactions must have `from`.');
       }
