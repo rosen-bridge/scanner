@@ -22,7 +22,7 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
         'binance',
         'bnb',
         logger
-      ),
+      ) as any,
       logger
     );
   }

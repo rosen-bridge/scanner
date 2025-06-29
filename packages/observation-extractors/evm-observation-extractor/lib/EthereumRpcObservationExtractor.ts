@@ -22,7 +22,7 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
         'ethereum',
         'eth',
         logger
-      ),
+      ) as any,
       logger
     );
   }
