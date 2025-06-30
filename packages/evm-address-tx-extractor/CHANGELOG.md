@@ -1,5 +1,11 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 1.1.3
+
+### Patch Changes
+
+- Downgrade ethers version
+
 ## 1.1.2
 
 ### Patch Changes
