@@ -4,7 +4,8 @@
 
 ### Patch Changes
 
-- Downgrade ethers version
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@8.0.1
 
 ## 7.1.2
 
