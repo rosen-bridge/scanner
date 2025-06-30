@@ -83,11 +83,10 @@ describe('fraudExtractor', () => {
     it('should extract block id and height for a transaction', async () => {
       jest.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
-          getApiV1TransactionsP1: async () =>
-            ({
-              blockId: 'blockId',
-              inclusionHeight: 100,
-            } as any),
+          getApiV1TransactionsP1: async () => ({
+            blockId: 'blockId',
+            inclusionHeight: 100,
+          }),
         },
       } as any);
       const extractor = new FraudExtractor(
