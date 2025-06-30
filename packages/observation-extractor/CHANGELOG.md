@@ -1,5 +1,11 @@
 # @rosen-bridge/observation-extractor
 
+## 7.1.3
+
+### Patch Changes
+
+- Downgrade ethers version
+
 ## 7.1.2
 
 ### Patch Changes

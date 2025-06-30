@@ -1,5 +1,13 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.1.5
+
+### Patch Changes
+
+- Downgrade ethers version
+- Update dependencies
+  - @rosen-bridge/observation-extractor@7.1.3
+
 ## 6.1.4
 
 ### Patch Changes
