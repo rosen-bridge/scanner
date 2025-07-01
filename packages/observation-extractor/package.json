@@ -19,8 +19,8 @@
     "dist"
   ],
   "dependencies": {
-    "@cardano-ogmios/schema": "^6.6.1",
     "@blockfrost/openapi": "0.1.78",
+    "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^2.0.2",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/rosen-extractor": "^8.0.1",

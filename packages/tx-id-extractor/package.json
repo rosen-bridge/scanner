@@ -19,8 +19,8 @@
     "release": "npm run test && npm run build && npm publish --access public"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.0.0",
     "@cardano-ogmios/schema": "^6.6.1",
+    "@rosen-bridge/abstract-extractor": "^2.0.0",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "sqlite3": "^5.0.9",
