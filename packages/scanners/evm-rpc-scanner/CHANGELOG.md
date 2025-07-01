@@ -1,5 +1,11 @@
 # @rosen-bridge/evm-rpc-scanner
 
+## 4.0.1
+
+### Patch Changes
+
+- Downgrade ethers version
+
 ## 4.0.0
 
 ### Major Changes

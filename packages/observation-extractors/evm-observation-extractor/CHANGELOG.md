@@ -1,5 +1,14 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.1.5
+
+### Patch Changes
+
+- Downgrade ethers version
+- Update dependencies
+  - @rosen-bridge/evm-rpc-scanner@4.0.1
+  - @rosen-bridge/observation-extractor@7.1.3
+
 ## 5.1.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @rosen-bridge/observation-extractor
 
+## 7.1.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@8.0.1
+
 ## 7.1.2
 
 ### Patch Changes
