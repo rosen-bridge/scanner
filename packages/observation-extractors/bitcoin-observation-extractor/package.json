@@ -39,8 +39,6 @@
     "@rosen-bridge/observation-extractor": "^7.1.2",
     "@rosen-bridge/rosen-extractor": "^7.3.3",
     "@rosen-bridge/tokens": "^3.1.1",
-    "estree-walker": "^3.0.3",
-    "local-pkg": "^0.5.1",
     "typeorm": "^0.3.20"
   }
 }

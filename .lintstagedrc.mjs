@@ -2,13 +2,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const perPackage = (resolver) => (files) => {
+  fs.appendFileSync(
+    '/tmp/ls.log',
+    `${JSON.stringify(files, undefined, 4)} <<<<<<<< 0\n\n`
+  );
   return Array.from(
     files.reduce((packages, file) => {
       let directory = path.dirname(file);
+
       while (directory && directory !== process.cwd()) {
         if (fs.existsSync(path.join(directory, 'package.json'))) {
           packages.add(resolver(directory, file));
-          break;
+          fs.appendFileSync(
+            '/tmp/ls.log',
+            `${JSON.stringify(packages, undefined, 4)} <<<<<<<< 1\n\n`
+          );
         }
         const parent = path.dirname(directory);
         if (parent === directory) break;
@@ -23,7 +31,7 @@ export default {
   '*': 'prettier --ignore-unknown --write',
   '*.ts': () => 'npm run type-check --workspaces',
   '*.{js,ts}': 'eslint --fix',
-  '**/*.ts': perPackage((directory) => {
+  '**/{*.ts,package.json}': perPackage((directory) => {
     const packages = [
       'tsx',
       '@vitest/coverage-istanbul',
@@ -40,21 +48,11 @@ export default {
 
     const paths = ['vitest.config.ts.timestamp-*'];
 
-    fs.appendFileSync(
-      '/tmp/ls.log',
-      `npx depcheck --ignores="${packages.join(
-        ', '
-      )}" --ignore-patterns="${paths.join(', ')}" ${path.relative(
-        process.cwd(),
-        directory
-      )}`
-    );
-
     return `npx depcheck ${path.relative(
       process.cwd(),
       directory
     )} --ignores="${packages.join(', ')}" --ignore-patterns="${paths.join(
-      ', '
+      ','
     )}"`;
   }),
 };

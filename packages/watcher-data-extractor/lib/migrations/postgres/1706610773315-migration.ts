@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { getWidInfo } from '../../utils';
 
