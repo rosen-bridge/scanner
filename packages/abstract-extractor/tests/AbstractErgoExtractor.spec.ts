@@ -4,7 +4,12 @@ import { V1 } from '@rosen-clients/ergo-explorer';
 import { describe, it, expect, vitest } from 'vitest';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-import { CallbackType } from '../lib';
+import {
+  AbstractBoxData,
+  AbstractErgoExtractorAction,
+  AbstractErgoExtractorEntity,
+  CallbackType,
+} from '../lib';
 import { block, extractedData, tx } from './testData';
 import { MockedErgoExtractor } from './AbstractErgoExtractor.mock';
 
@@ -39,7 +44,10 @@ describe('AbstractErgoExtractor', () => {
       extractor['actions'] = {
         storeBoxes: storeSpy,
         spendBoxes: spendSpy,
-      } as any;
+      } as unknown as AbstractErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);

@@ -32,7 +32,7 @@ describe('ExplorerNetwork', () => {
         v1: {
           getApiV1TransactionsP1: async () => explorerTxInfo,
         },
-      } as any);
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const explorerNetwork = new ExplorerNetwork('explorer_url');
       const ergoBox = await explorerNetwork['convertBox'](explorerBox);
       expect(ergoBox).toEqual(convertedBox);

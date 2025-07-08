@@ -328,7 +328,7 @@ describe('fraudExtractor', () => {
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        } as any);
+        });
 
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');

@@ -32,7 +32,7 @@ describe('NodeNetwork', () => {
           if (txId == nodeSpendingTxInfo.id) return nodeSpendingTxInfo;
           else return nodeCreationTxInfo;
         },
-      } as any);
+      } as unknown as ReturnType<typeof ergoNodeClientFactory>);
       const nodeNetwork = new NodeNetwork('node_url');
       const ergoBox = await nodeNetwork['convertBox'](nodeBox);
       expect(ergoBox).toEqual(convertedBox);

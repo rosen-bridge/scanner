@@ -3,7 +3,13 @@
 import { describe, expect, it, vi, vitest } from 'vitest';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
-import { NodeNetwork, ExplorerNetwork } from '../../lib';
+import {
+  NodeNetwork,
+  ExplorerNetwork,
+  AbstractInitializableErgoExtractorAction,
+  AbstractErgoExtractorEntity,
+  AbstractBoxData,
+} from '../../lib';
 import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { transactionBatch } from './testData';
 import { RETRIAL_COUNT } from '../../lib/constants';
@@ -121,7 +127,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as any;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn();
       await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).not.toHaveBeenCalled();
