@@ -2,10 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const perPackage = (resolver) => (files) => {
-  fs.appendFileSync(
-    '/tmp/ls.log',
-    `${JSON.stringify(files, undefined, 4)} <<<<<<<< 0\n\n`
-  );
   return Array.from(
     files.reduce((packages, file) => {
       let directory = path.dirname(file);
@@ -13,10 +9,6 @@ const perPackage = (resolver) => (files) => {
       while (directory && directory !== process.cwd()) {
         if (fs.existsSync(path.join(directory, 'package.json'))) {
           packages.add(resolver(directory, file));
-          fs.appendFileSync(
-            '/tmp/ls.log',
-            `${JSON.stringify(packages, undefined, 4)} <<<<<<<< 1\n\n`
-          );
         }
         const parent = path.dirname(directory);
         if (parent === directory) break;
