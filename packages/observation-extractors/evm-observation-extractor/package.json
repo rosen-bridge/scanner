@@ -43,6 +43,6 @@
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
     "typeorm": "^0.3.20",
-    "ethers": "^6.14.3"
+    "ethers": "6.13.2"
   }
 }
