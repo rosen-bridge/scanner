@@ -9,6 +9,7 @@ const perPackage = (resolver) => (files) => {
       while (directory && directory !== process.cwd()) {
         if (fs.existsSync(path.join(directory, 'package.json'))) {
           packages.add(resolver(directory, file));
+          break;
         }
         const parent = path.dirname(directory);
         if (parent === directory) break;

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { describe, expect, it, vitest } from 'vitest';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { omit } from 'lodash-es';

@@ -8,7 +8,6 @@ import { CollateralEntity, CollateralExtractor } from '../../lib';
 import * as testData from './collateralExtractorTestData';
 import { createDatabase } from './utilsFunctions.mock';
 import { uint8ArrayToHex } from '../../lib/utils';
-import { ExtractedCollateral } from '../../lib/interfaces/extractedCollateral';
 
 describe('CollateralExtractor', () => {
   let dataSource: DataSource;
@@ -193,15 +192,15 @@ describe('CollateralExtractor', () => {
       );
       jest
         .spyOn(collateralExtractor as any, 'getAllUnspentCollaterals')
-        .mockImplementation(async (): Promise<Array<ExtractedCollateral>> => {
-          return collateralBoxes.map((box) =>
+        .mockResolvedValue(
+          collateralBoxes.map((box) =>
             collateralExtractor['toExtractedCollateral'](
               box,
               testData.block1.hash,
               testData.block1.height
             )
-          ) as any;
-        });
+          )
+        );
 
       const tidyUpStoredCollateralsSpy = jest
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')

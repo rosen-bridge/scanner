@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { describe, expect, it, vitest } from 'vitest';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
 
