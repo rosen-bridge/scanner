@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { vi } from 'vitest';
 import { Transaction } from 'ethers';
 import { DataSource } from 'typeorm';
@@ -11,7 +13,7 @@ vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
   return {
     ...ref,
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return {};
     }),
   };
@@ -40,7 +42,7 @@ describe('EvmTxExtractor', () => {
       await repository.createQueryBuilder().delete().execute();
       vi.spyOn(txs[0], 'wait').mockReturnValue(Transaction.from(txs[0]) as any);
       vi.spyOn(txs[1], 'wait').mockReturnValue(Transaction.from(txs[1]) as any);
-      vi.spyOn(txs[2], 'wait').mockImplementation((x: number | undefined) => {
+      vi.spyOn(txs[2], 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',
         };

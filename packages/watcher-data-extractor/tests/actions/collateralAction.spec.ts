@@ -301,7 +301,7 @@ describe('CollateralAction', () => {
      * - right entities should have been saved
      */
     it(`should set spendBlock and spendHeight for a set of collaterals`, async () => {
-      const success = await action.storeCollaterals(
+      await action.storeCollaterals(
         testData.sampleCollateralEntities.slice(0, 2),
         block,
         'extractor1'
@@ -384,12 +384,11 @@ describe('CollateralAction', () => {
      */
     it(`should delete a the collateral with the specified boxId and extractor
     from DB`, async () => {
-      const success = await action.storeCollaterals(
+      await action.storeCollaterals(
         testData.sampleCollateralEntities,
         block,
         'extractor1'
       );
-
       const boxIdToDelete = testData.sampleCollateralEntities[0].boxId;
       await action.deleteCollateral(boxIdToDelete, 'extractor1');
 

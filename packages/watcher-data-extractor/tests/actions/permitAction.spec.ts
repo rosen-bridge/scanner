@@ -308,10 +308,10 @@ describe('PermitEntityAction', () => {
      * - it should remove one permit within the removed block
      */
     it('should remove the permit existed on the removed block', async () => {
-      let [_, rowsCount] = await repository.findAndCount();
+      let [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(2);
       await action.deleteBlock('hash', 'extractor1');
-      [_, rowsCount] = await repository.findAndCount();
+      [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
     });
 

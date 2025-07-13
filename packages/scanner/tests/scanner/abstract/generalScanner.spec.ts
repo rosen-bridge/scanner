@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   ExtractorTest,
   generateMockGeneralScannerClass,
@@ -45,7 +47,7 @@ describe('generalScanner', () => {
       jest
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
-        .mockImplementation((height: number) =>
+        .mockImplementation(() =>
           Promise.resolve({
             height: 3,
             parentHash: '2',
@@ -70,7 +72,7 @@ describe('generalScanner', () => {
       jest
         .spyOn(network, 'getBlockAtHeight')
         .mockImplementation()
-        .mockImplementation((height: number) =>
+        .mockImplementation(() =>
           Promise.resolve({
             height: 3,
             parentHash: '2',

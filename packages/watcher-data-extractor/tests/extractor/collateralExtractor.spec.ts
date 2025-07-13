@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataSource, Repository } from 'typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';

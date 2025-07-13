@@ -1,3 +1,4 @@
+import RateLimitedAxios from '@rosen-bridge/rate-limited-axios';
 import axios from '@rosen-bridge/rate-limited-axios';
 import { vi } from 'vitest';
 
@@ -10,7 +11,7 @@ export const axiosInstance = {
  * mocks axios.get function
  * @param result
  */
-export const mockAxiosGet = (result: any) => {
+export const mockAxiosGet = (result: unknown) => {
   axiosInstance.get.mockResolvedValueOnce({
     data: result,
   });
@@ -21,5 +22,7 @@ export const mockAxiosGet = (result: any) => {
  */
 export const resetAxiosMock = () => {
   axiosInstance.get.mockReset();
-  vi.spyOn(axios, 'create').mockReturnValue(axiosInstance as any);
+  vi.spyOn(axios, 'create').mockReturnValue(
+    axiosInstance as unknown as RateLimitedAxios
+  );
 };

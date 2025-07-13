@@ -59,7 +59,8 @@ export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransa
     });
     if (blockHeaderResponse.data.id !== randomId2)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockHeader: BlockHeader = blockHeaderResponse.data.result;
+    const blockHeader: BlockHeader = blockHeaderResponse.data
+      .result as BlockHeader;
     return {
       parentHash: blockHeader.previousblockhash,
       hash: blockHeader.hash,
@@ -82,7 +83,7 @@ export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransa
     });
     if (result.data.id !== randomId)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    return result.data.result.blocks;
+    return (result.data.result as { blocks: number }).blocks;
   };
 
   /**
@@ -101,7 +102,9 @@ export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransa
     });
     if (blockHashResponse.data.id !== randomId)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockTxs = blockHashResponse.data.result.tx;
+    const blockTxs = (
+      blockHashResponse.data.result as { tx: Array<BitcoinRpcTransaction> }
+    ).tx;
 
     return blockTxs;
   };

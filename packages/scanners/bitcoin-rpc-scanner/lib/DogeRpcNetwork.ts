@@ -59,7 +59,8 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     });
     if (blockSummaryResponse.data.id !== randomId2)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockSummary: DogeBlockSummary = blockSummaryResponse.data.result;
+    const blockSummary: DogeBlockSummary = blockSummaryResponse.data
+      .result as DogeBlockSummary;
 
     return {
       parentHash: blockSummary.previousblockhash,
@@ -83,7 +84,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     });
     if (result.data.id !== randomId)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    return result.data.result.blocks;
+    return (result.data.result as { blocks: number }).blocks;
   };
 
   /**
@@ -102,7 +103,9 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     });
     if (blockHashResponse.data.id !== randomId)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockTxs = blockHashResponse.data.result.tx;
+    const blockTxs = (
+      blockHashResponse.data.result as { tx: Array<DogeRpcTransaction> }
+    ).tx;
 
     return blockTxs;
   };

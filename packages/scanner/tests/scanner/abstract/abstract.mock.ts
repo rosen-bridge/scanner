@@ -160,7 +160,9 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
 }
 
 export class FailExtractor extends AbstractExtractor<{ id: string }> {
-  forkBlock = async (hash: string) => {
+  forkBlock = async (
+    hash: string // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => {
     /* empty */
   };
 
@@ -168,6 +170,8 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   initializeBoxes = () => Promise.resolve();
 
-  processTransactions = async (txs: Array<{ id: string }>, block: Block) =>
-    false;
+  processTransactions = async (
+    txs: Array<{ id: string }>, // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: Block // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => false;
 }

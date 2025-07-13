@@ -19,6 +19,7 @@
     "dist"
   ],
   "dependencies": {
+    "@blockfrost/openapi": "0.1.78",
     "@cardano-ogmios/schema": "^6.6.1",
     "@rosen-bridge/abstract-extractor": "^2.0.2",
     "@rosen-bridge/abstract-logger": "^2.0.1",
@@ -26,7 +27,6 @@
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-    "lodash-es": "^4.17.21",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.9",
     "typeorm": "^0.3.20"

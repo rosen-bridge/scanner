@@ -1,6 +1,6 @@
 export type JsonRpcResult = {
   id: string;
-  result: any;
+  result: unknown;
 };
 
 export type JsonRpcError = {
@@ -8,7 +8,7 @@ export type JsonRpcError = {
   error: {
     code: number;
     message?: string;
-    data?: any;
+    data?: unknown;
   };
 };
 

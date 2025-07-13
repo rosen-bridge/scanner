@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { blake2b } from 'blakejs';
 import { ObservationEntity } from '@rosen-bridge/observation-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
@@ -11,7 +12,7 @@ vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
   return {
     ...ref,
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return {};
     }),
   };
@@ -82,7 +83,7 @@ describe('EvmRpcObservationExtractor', () => {
     it('should return true but insert no tx when transaction is failed', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
-      vi.spyOn(txRes, 'wait').mockImplementation((x: number | undefined) => {
+      vi.spyOn(txRes, 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',
         };
@@ -99,7 +100,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
 
@@ -129,7 +130,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
   });

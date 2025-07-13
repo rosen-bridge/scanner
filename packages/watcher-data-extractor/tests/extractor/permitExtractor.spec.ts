@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataSource, Repository } from 'typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
@@ -501,9 +503,7 @@ describe('permitExtractor', () => {
       jest
         .spyOn(extractor, 'getAllUnspentPermits')
         .mockResolvedValue([extractedPermit]);
-      const spy = jest
-        .spyOn(extractor, 'validateOldStoredPermits')
-        .mockImplementation();
+      jest.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
@@ -541,9 +541,7 @@ describe('permitExtractor', () => {
       jest
         .spyOn(extractor, 'getAllUnspentPermits')
         .mockResolvedValue([extractedPermit]);
-      const spy = jest
-        .spyOn(extractor, 'validateOldStoredPermits')
-        .mockImplementation();
+      jest.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
       await insertPermitEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });
