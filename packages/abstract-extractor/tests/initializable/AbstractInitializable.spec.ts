@@ -1,18 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { describe, expect, it, vi, vitest } from 'vitest';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import {
   NodeNetwork,
-  ExplorerNetwork,
-  AbstractInitializableErgoExtractorAction,
-  AbstractErgoExtractorEntity,
   AbstractBoxData,
+  ExplorerNetwork,
+  AbstractErgoExtractorEntity,
 } from '../../lib';
 import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { transactionBatch } from './testData';
 import { RETRIAL_COUNT } from '../../lib/constants';
+import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializable';
 
 describe('AbstractInitializableErgoExtractor', () => {
   describe('getTotalTxCount', () => {
@@ -159,7 +157,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as any;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn();
       await extractor['initWithRetrial'](initSpy);
       expect(removeSpy).toHaveBeenCalledOnce();
@@ -189,7 +190,10 @@ describe('AbstractInitializableErgoExtractor', () => {
       const removeSpy = vitest.fn();
       extractor['actions'] = {
         removeAllData: removeSpy,
-      } as any;
+      } as unknown as AbstractInitializableErgoExtractorAction<
+        AbstractBoxData,
+        AbstractErgoExtractorEntity
+      >;
       const initSpy = vitest.fn().mockRejectedValue(0);
       await expect(
         async () => await extractor['initWithRetrial'](initSpy)

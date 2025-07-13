@@ -297,7 +297,7 @@ describe('fraudExtractor', () => {
     it('should update valid box information when spent bellow the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
       const spy = jest
-        .spyOn(extractor as any, 'getFraudInfoWithBoxId')
+        .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 99,
@@ -324,11 +324,11 @@ describe('fraudExtractor', () => {
     it('should not change valid fraud information when spent after the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
       const spy = jest
-        .spyOn(extractor as any, 'getFraudInfoWithBoxId')
+        .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
           spendHeight: 120,
-        });
+        } as any);
 
       await extractor.validateOldStoredFrauds(['boxId'], 100);
       expect(spy).toHaveBeenCalledWith('boxId');
