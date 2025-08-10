@@ -74,7 +74,8 @@ abstract class WebSocketScanner<
         }
       } catch (e) {
         this.logger.warn(`unknown error occurred ${e}`);
-        if (e instanceof Error) this.logger.warn(e.stack!);
+        if (e instanceof Error)
+          this.logger.warn(e.stack ?? 'No stack trace available');
       }
       return false;
     }, `Block at height ${block.height}`);
@@ -93,7 +94,8 @@ abstract class WebSocketScanner<
         return true;
       } catch (e) {
         this.logger.error(`unknown error occurred ${e}`);
-        if (e instanceof Error) this.logger.error(e.stack!);
+        if (e instanceof Error)
+          this.logger.warn(e.stack ?? 'No stack trace available');
       }
       return false;
     }, `Forking block at height ${block.height}`);

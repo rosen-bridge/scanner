@@ -1,5 +1,5 @@
-import { GeneralScanner } from '../abstract/generalScanner';
-import { ScannerConfig } from '../interfaces';
+import { GeneralScanner } from '@rosen-bridge/scanner';
+import { ScannerConfig } from '@rosen-bridge/scanner';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 class ErgoScanner extends GeneralScanner<Transaction> {
@@ -11,7 +11,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
       config.network,
       config.blockRetrieveGap,
       config.logger,
-      config.suffix
+      config.suffix,
     );
   }
 }
