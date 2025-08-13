@@ -33,6 +33,7 @@
     "@rosen-bridge/abstract-scanner": "^8.0.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/rate-limited-axios": "^0.2.1",
+    "cockatiel": "^3.2.1",
     "@blockfrost/blockfrost-js": "^6.0.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@cardano-ogmios/client": "^6.6.1",

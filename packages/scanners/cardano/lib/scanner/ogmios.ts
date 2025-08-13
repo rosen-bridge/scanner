@@ -16,7 +16,7 @@ import {
   ChainSynchronizationClient,
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { BlockDbAction } from '@rosen-bridge/scanner';
+import { BlockDbAction } from '@rosen-bridge/abstract-scanner';
 import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {

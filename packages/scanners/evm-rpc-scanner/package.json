@@ -30,7 +30,7 @@
     "vitest": "^1.2.2"
   },
   "dependencies": {
-    "@rosen-bridge/scanner": "^8.0.0",
+    "@rosen-bridge/abstract-scanner": "^8.0.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "ethers": "6.13.2"
   },
