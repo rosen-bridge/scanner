@@ -1,10 +1,10 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/scanner';
-import { BitcoinEsploraTransaction } from './types';
+import { BitcoinEsploraTransaction } from '../types';
 
-export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
+export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   constructor(config: ScannerConfig<BitcoinEsploraTransaction>) {
     super(
-      'bitcoin',
+      'doge',
       config.dataSource,
       config.initialHeight,
       config.network,

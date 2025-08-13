@@ -11,6 +11,16 @@ export const axiosInstance = {
  * mocks axios.get function
  * @param result
  */
+export const mockAxiosGet = (result: unknown) => {
+  axiosInstance.get.mockResolvedValueOnce({
+    data: result,
+  });
+};
+
+/**
+ * mocks axios.get function
+ * @param result
+ */
 export const mockAxiosPost = (result: unknown) => {
   axiosInstance.post.mockResolvedValueOnce({
     data: result,
@@ -21,7 +31,7 @@ export const mockAxiosPost = (result: unknown) => {
  * resets axios functions mocks and call counts
  */
 export const resetAxiosMock = () => {
-  axiosInstance.post.mockReset();
+  axiosInstance.get.mockReset();
   vi.spyOn(axios, 'create').mockReturnValue(
     axiosInstance as unknown as RateLimitedAxios
   );

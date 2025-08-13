@@ -1,4 +1,4 @@
-import { WebSocketScanner } from '@rosen-bridge/scanner';
+import { WebSocketScanner } from '@rosen-bridge/abstract-scanner';
 import {
   Block,
   BlockPraos,

@@ -4,7 +4,7 @@ import {
   resetAxiosMock,
 } from './mocked/axios.mock';
 import * as testData from './dogeTestData';
-import { DogeRpcNetwork } from '../lib/DogeRpcNetwork';
+import { DogeRpcNetwork } from '../lib/network/DogeRpcNetwork';
 
 describe('DogeRpcNetwork', () => {
   let network: DogeRpcNetwork;

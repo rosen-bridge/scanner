@@ -1,5 +1,5 @@
-import { GeneralScanner } from '@rosen-bridge/scanner';
-import { ScannerConfig } from '@rosen-bridge/scanner';
+import { GeneralScanner } from '@rosen-bridge/abstract-scanner';
+import { ScannerConfig } from '@rosen-bridge/abstract-scanner';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 class ErgoScanner extends GeneralScanner<Transaction> {

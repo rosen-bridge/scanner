@@ -4,7 +4,7 @@ import {
   resetAxiosMock,
 } from './mocked/axios.mock';
 import * as testData from './testData';
-import { EsploraNetwork } from '../lib/EsploraNetwork';
+import { EsploraNetwork } from '../lib/network/EsploraNetwork';
 
 describe('EsploraNetwork', () => {
   let network: EsploraNetwork;

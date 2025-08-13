@@ -1,6 +1,6 @@
 import { BlockFrostTransaction } from '../interfaces/BlockFrost';
-import { GeneralScanner } from '@rosen-bridge/scanner';
-import { ScannerConfig } from '@rosen-bridge/scanner';
+import { GeneralScanner } from '@rosen-bridge/abstract-scanner';
+import { ScannerConfig } from '@rosen-bridge/abstract-scanner';
 
 class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   constructor(config: ScannerConfig<BlockFrostTransaction>) {
