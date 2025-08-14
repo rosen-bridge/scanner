@@ -1,5 +1,15 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.1.6
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@3.0.1
+  - @rosen-bridge/bitcoin-rpc-scanner@3.0.1
+  - @rosen-bridge/observation-extractor@7.1.4
+
 ## 6.1.5
 
 ### Patch Changes

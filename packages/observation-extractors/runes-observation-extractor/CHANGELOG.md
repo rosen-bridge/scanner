@@ -1,5 +1,16 @@
 # @rosen-bridge/runes-observation-extractor
 
+## 0.1.4
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@3.0.1
+  - @rosen-bridge/bitcoin-rpc-scanner@3.0.1
+  - @rosen-bridge/observation-extractor@7.1.4
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
 ## 0.1.3
 
 ### Patch Changes

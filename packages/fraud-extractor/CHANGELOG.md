@@ -1,5 +1,14 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.1.3
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.3
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
 ## 2.1.2
 
 ### Patch Changes
