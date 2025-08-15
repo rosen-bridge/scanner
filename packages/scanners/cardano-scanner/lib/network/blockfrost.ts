@@ -30,7 +30,7 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
       .then((res) => {
         if (!res.height || !res.previous_block)
           throw new BlockFrostNullValueError(
-            `Block height or previous_block is null`,
+            `Block height or previous_block is null`
           );
         return {
           hash: res.hash,
@@ -79,7 +79,7 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
    * @param blockId
    */
   getBlockTxs = async (
-    blockId: string,
+    blockId: string
   ): Promise<Array<BlockFrostTransaction>> => {
     const blockTxIds = await this.client.blocksTxsAll(blockId);
 

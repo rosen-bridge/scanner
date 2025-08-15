@@ -5,7 +5,9 @@
     "packages": [
       "packages/*",
       "packages/observation-extractors/*",
-      "packages/scanners/*"
+      "packages/scanners/*",
+      "packages/scanners/cardano1/*",
+      "packages/scanners/ergo1/*"
     ]
   },
   "scripts": {
