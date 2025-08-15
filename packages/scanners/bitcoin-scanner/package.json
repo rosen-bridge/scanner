@@ -1,6 +1,7 @@
 {
-  "name": "@rosen-bridge/ergo",
-  "version": "8.0.0",
+  "name": "@rosen-bridge/bitcoin-scanner",
+  "version": "3.0.0",
+  "description": "A Bitcoin blockchain scanner based on bitcoin core JSON RPC API",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
   "author": "Rosen Team",
@@ -12,7 +13,7 @@
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run build && npm publish --access public",
+    "release": "npm run test -- --run && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS=--loader=extensionless vitest",
     "type-check": "tsc --noEmit"
   },
@@ -28,14 +29,12 @@
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
   },
-  "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^8.0.0",
-    "@rosen-bridge/scanner-interfaces": "^0.1.0",
-    "@rosen-bridge/rate-limited-axios": "^0.2.1",
-    "@rosen-clients/ergo-explorer": "^1.1.5",
-    "@rosen-clients/ergo-node": "^1.2.3"
-  },
   "engines": {
     "node": ">=20.11.0"
+  },
+  "dependencies": {
+    "@rosen-bridge/rate-limited-axios": "^0.2.1",
+    "@rosen-bridge/abstract-scanner": "^8.0.0",
+    "@rosen-bridge/scanner-interfaces": "^0.1.0"
   }
 }

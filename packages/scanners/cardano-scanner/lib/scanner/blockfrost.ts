@@ -1,18 +1,18 @@
+import { BlockFrostTransaction } from '../interfaces/BlockFrost';
 import { GeneralScanner } from '@rosen-bridge/abstract-scanner';
 import { ScannerConfig } from '@rosen-bridge/abstract-scanner';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
-class ErgoScanner extends GeneralScanner<Transaction> {
-  constructor(config: ScannerConfig<Transaction>) {
+class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
+  constructor(config: ScannerConfig<BlockFrostTransaction>) {
     super(
-      'ergo',
+      'cardano',
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
       config.logger,
-      config.suffix,
+      config.suffix
     );
   }
 }
-export { ErgoScanner };
+export { CardanoBlockFrostScanner };

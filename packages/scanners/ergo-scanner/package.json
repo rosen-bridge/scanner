@@ -1,13 +1,17 @@
 {
-  "name": "@rosen-bridge/bitcoin",
-  "version": "3.0.0",
-  "description": "A Bitcoin blockchain scanner based on Esplora or Rpc Block Explorer API",
+  "name": "@rosen-bridge/ergo-scanner",
+  "version": "8.0.0",
+  "description": "An Ergo chain scanner based on RPC.",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "GPL-3.0",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "coverage": "npm run test -- --coverage",
@@ -21,20 +25,22 @@
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "@vitest/coverage-istanbul": "^1.2.2",
+    "@vitest/coverage-istanbul": "^3.1.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "extensionless": "^1.9.6",
     "prettier": "^3.2.4",
+    "extensionless": "^1.9.6",
+    "tsx": "^4.19.4",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/abstract-scanner": "^8.0.0",
-    "@rosen-bridge/scanner-interfaces": "^0.1.0"
+    "@rosen-bridge/scanner-interfaces": "^0.1.0",
+    "@rosen-clients/ergo-explorer": "^1.1.5",
+    "@rosen-clients/ergo-node": "^1.2.3"
   }
 }

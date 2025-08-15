@@ -1,9 +1,9 @@
-import { BlockFrostTransaction } from '../interfaces/BlockFrost';
+import { KoiosTransaction } from '../interfaces/Koios';
 import { GeneralScanner } from '@rosen-bridge/abstract-scanner';
 import { ScannerConfig } from '@rosen-bridge/abstract-scanner';
 
-class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
-  constructor(config: ScannerConfig<BlockFrostTransaction>) {
+class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
+  constructor(config: ScannerConfig<KoiosTransaction>) {
     super(
       'cardano',
       config.dataSource,
@@ -11,8 +11,9 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
       config.network,
       config.blockRetrieveGap,
       config.logger,
-      config.suffix,
+      config.suffix
     );
   }
 }
-export { CardanoBlockFrostScanner };
+
+export { CardanoKoiosScanner };

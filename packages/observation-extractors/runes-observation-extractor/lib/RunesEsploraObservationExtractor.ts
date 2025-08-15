@@ -1,4 +1,4 @@
-import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin';
+import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-scanner';
 import { RunesEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';

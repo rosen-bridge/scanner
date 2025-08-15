@@ -22,8 +22,9 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       headers: { 'Content-Type': 'application/json' },
     });
     if (authToken) {
-      this.koios.defaults.headers.common['Authorization'] =
-        `Bearer ${authToken}`;
+      this.koios.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${authToken}`;
     }
   }
 
@@ -85,7 +86,7 @@ export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
       .then((res) => {
         return res.data.map((tx) => {
           const serializedTx = Transaction.from_bytes(
-            new Uint8Array(Buffer.from(tx.cbor, 'hex')),
+            new Uint8Array(Buffer.from(tx.cbor, 'hex'))
           );
           return {
             ...tx,
