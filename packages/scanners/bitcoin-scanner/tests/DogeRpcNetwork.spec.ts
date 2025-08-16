@@ -2,7 +2,7 @@ import {
   axiosInstance,
   mockAxiosPost,
   resetAxiosMock,
-} from './mocked/axios.mock';
+} from './mocked/axiosRpc.mock';
 import * as testData from './dogeTestData';
 import { DogeRpcNetwork } from '../lib/network/DogeRpcNetwork';
 
