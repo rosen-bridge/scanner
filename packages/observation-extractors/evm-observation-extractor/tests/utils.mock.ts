@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import {
   ObservationEntity,
   migrations,
-} from '@rosen-bridge/observation-extractor';
+} from '@rosen-bridge/abstract-observation-extractor';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 import {

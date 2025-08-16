@@ -1,5 +1,5 @@
 {
-  "name": "@rosen-bridge/observation-extractor",
+  "name": "@rosen-bridge/abstract-observation-extractor",
   "version": "7.1.3",
   "description": "Event observation data extractor for different chains",
   "author": "Rosen Team",

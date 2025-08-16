@@ -2,7 +2,7 @@
 
 import { vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { ObservationEntity } from '@rosen-bridge/observation-extractor';
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';

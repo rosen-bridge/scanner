@@ -1,7 +1,7 @@
 import {
   AbstractObservationExtractor,
   ExtractedObservation,
-} from '@rosen-bridge/observation-extractor';
+} from '@rosen-bridge/abstract-observation-extractor';
 import { isCallException, TransactionResponse } from 'ethers';
 import { blake2b } from 'blakejs';
 import { Block } from '@rosen-bridge/scanner-interfaces';

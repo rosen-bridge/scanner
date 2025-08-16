@@ -1,4 +1,4 @@
-import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
+import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DogeEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';

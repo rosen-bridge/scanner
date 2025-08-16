@@ -1,7 +1,7 @@
 import {
   AbstractObservationExtractor,
   ExtractedObservation,
-} from '@rosen-bridge/observation-extractor';
+} from '@rosen-bridge/abstract-observation-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { blake2b } from 'blakejs';
 import Axios, { AxiosHeaders } from 'axios';
