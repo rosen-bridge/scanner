@@ -1,5 +1,14 @@
 # @rosen-bridge/scanner
 
+## 8.0.1
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.3
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
 ## 8.0.0
 
 ### Major Changes

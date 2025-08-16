@@ -1,9 +1,9 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Defines all scanner interfaces",
   "repository": "",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
