@@ -13,13 +13,15 @@ abstract class WebSocketScanner<
   protected mutex = new Mutex();
 
   protected constructor(
+    protected scannerName: string,
     logger?: AbstractLogger,
-    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK
+    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
+    protected suffix?: string
   ) {
     super(logger);
     this.maxTryBlock = maxTryBlock;
   }
-  abstract name: () => string;
+  name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
 
   abstract start: () => Promise<void>;
   abstract stop: () => Promise<void>;
