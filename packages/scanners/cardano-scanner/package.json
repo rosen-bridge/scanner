@@ -1,9 +1,9 @@
 {
   "name": "@rosen-bridge/cardano-scanner",
-  "version": "8.0.0",
+  "version": "0.1.0",
   "description": "A cardano chain scanner based on RPC.",
   "repository": "https://github.com/rosen-bridge/scanner",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
@@ -18,7 +18,7 @@
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS=--loader=extensionless vitest",
+    "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
-    "@rosen-bridge/scanner": "^8.0.0",
+    "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",

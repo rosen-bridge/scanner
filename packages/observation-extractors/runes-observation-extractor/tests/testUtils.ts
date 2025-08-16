@@ -2,7 +2,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
   migrations as scannerMigrations,
   BlockEntity,
-} from '@rosen-bridge/scanner';
+} from '@rosen-bridge/abstract-scanner';
 import {
   ObservationEntity,
   migrations,

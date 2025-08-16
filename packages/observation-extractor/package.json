@@ -36,7 +36,7 @@
     "@babel/preset-env": "^7.19.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/scanner": "^8.0.1",
+    "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@types/jest": "^28.1.6",
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^5.30.7",

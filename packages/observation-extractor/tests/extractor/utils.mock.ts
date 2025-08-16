@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { BlockEntity } from '@rosen-bridge/scanner';
-import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
+import { migrations as scannerMigrations } from '@rosen-bridge/abstract-scanner';
 import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
