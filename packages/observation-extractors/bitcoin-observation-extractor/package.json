@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/bitcoin-scanner": "^3.0.1",
+    "@rosen-bridge/bitcoin-scanner": "^0.1.0",
     "@rosen-bridge/observation-extractor": "^7.1.4",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
     "@rosen-bridge/tokens": "^3.1.1",
