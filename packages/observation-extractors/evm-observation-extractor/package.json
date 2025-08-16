@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/abstract-scanner": "^8.0.1",
+    "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",

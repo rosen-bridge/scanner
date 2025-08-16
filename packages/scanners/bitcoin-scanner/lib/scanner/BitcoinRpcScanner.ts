@@ -1,6 +1,5 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
 import { BitcoinRpcTransaction } from '../types';
-
 export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
   constructor(config: ScannerConfig<BitcoinRpcTransaction>) {
     super(

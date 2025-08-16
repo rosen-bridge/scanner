@@ -1,6 +1,6 @@
-# @rosen-bridge/<abstract-scanner>
+# @rosen-bridge/ergo-scanner
 
-> This package was **renamed** from `@rosen-bridge/scanner`.
+> This package was **independent** from `@rosen-bridge/scanner`.
 > You can follow the previous history in the old package’s changelog.
 >
 > **Last changelog update in the old package:**  
