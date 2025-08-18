@@ -7,7 +7,7 @@
 
 ## Introduction
 
-A ergo blockchain scanner based on Node or Explorer API
+An ergo blockchain scanner based on Node or Explorer API.
 
 ## Installation
 
