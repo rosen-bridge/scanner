@@ -2,4 +2,4 @@
 '@rosen-bridge/bitcoin-scanner': minor
 ---
 
-Rename and merge scanner scanners bitcoins packages to bitcoin-scanner
+Unify Bitcoin scanner packages by renaming/merging to @rosen-bridge/bitcoin-scanner
