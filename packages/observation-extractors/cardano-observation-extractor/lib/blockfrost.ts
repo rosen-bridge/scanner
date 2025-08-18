@@ -3,20 +3,25 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { components } from '@blockfrost/openapi';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
-import { ExtractedObservation } from '../../interfaces/extractedObservation';
-import { ObservationEntityAction } from '../../actions/db';
-import { KoiosTransaction } from '../../interfaces/koiosTransaction';
+import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
+import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
 
-export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTransaction> {
+interface BlockFrostTransaction {
+  utxos: components['schemas']['tx_content_utxo'];
+  metadata: components['schemas']['tx_content_metadata'];
+}
+
+export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<BlockFrostTransaction> {
   readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
-  private readonly extractor: CardanoKoiosRosenExtractor;
+  private readonly extractor: CardanoBlockFrostRosenExtractor;
   static readonly FROM_CHAIN: string = 'cardano';
 
   constructor(
@@ -30,7 +35,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
     this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new CardanoKoiosRosenExtractor(
+    this.extractor = new CardanoBlockFrostRosenExtractor(
       address,
       tokens,
       this.logger
@@ -40,7 +45,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
   /**
    * get Id for current extractor
    */
-  getId = () => 'cardano-koios-extractor';
+  getId = () => 'cardano-blockfrost-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
@@ -49,7 +54,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
    * @param txs
    */
   processTransactions = (
-    txs: Array<KoiosTransaction>,
+    txs: Array<BlockFrostTransaction>,
     block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -59,10 +64,10 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
-              blake2b(transaction.tx_hash, undefined, 32)
+              blake2b(transaction.utxos.hash, undefined, 32)
             ).toString('hex');
             observations.push({
-              fromChain: CardanoKoiosObservationExtractor.FROM_CHAIN,
+              fromChain: CardanoBlockFrostObservationExtractor.FROM_CHAIN,
               toChain: data.toChain,
               amount: data.amount,
               sourceChainTokenId: data.sourceChainTokenId,

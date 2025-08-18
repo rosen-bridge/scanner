@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-observation-extractor",
-  "version": "7.1.4",
+  "version": "0.1.0",
   "description": "Event observation data extractor for different chains",
   "author": "Rosen Team",
   "license": "MIT",

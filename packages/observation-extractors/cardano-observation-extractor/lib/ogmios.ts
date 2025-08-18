@@ -1,23 +1,23 @@
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Transaction } from '@cardano-ogmios/schema';
 import { DataSource } from 'typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { TokenMap } from '@rosen-bridge/tokens';
-import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
-import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
-import { ExtractedObservation } from '../../interfaces/extractedObservation';
-import { ObservationEntityAction } from '../../actions/db';
+import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
+import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
 
-export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
+export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
-  private readonly extractor: ErgoNodeRosenExtractor;
-  static readonly FROM_CHAIN: string = 'ergo';
+  private readonly extractor: CardanoOgmiosRosenExtractor;
+  static readonly FROM_CHAIN: string = 'cardano';
 
   constructor(
     dataSource: DataSource,
@@ -30,19 +30,23 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new ErgoNodeRosenExtractor(address, tokens, this.logger);
+    this.extractor = new CardanoOgmiosRosenExtractor(
+      address,
+      tokens,
+      this.logger
+    );
   }
 
   /**
    * get Id for current extractor
    */
-  getId = () => 'ergo-observation-extractor';
+  getId = () => 'cardano-ogmios-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
    *  transactions and in case of success return true and in case of failure returns false
-   * @param txs
    * @param block
+   * @param txs
    */
   processTransactions = (
     txs: Array<Transaction>,
@@ -51,40 +55,28 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     return new Promise((resolve, reject) => {
       try {
         const observations: Array<ExtractedObservation> = [];
-        txs.forEach((transaction) => {
-          for (let i = 0; i < transaction.outputs.length; i++) {
-            const box = transaction.outputs[i];
-            if (
-              block.height - Number(box.creationHeight) >
-              NUMBER_OF_BLOCKS_PER_YEAR
-            ) {
-              this.logger.debug(
-                `Skipping tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
-              );
-              return;
-            }
-          }
+        for (const transaction of txs) {
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
               blake2b(transaction.id, undefined, 32)
             ).toString('hex');
             observations.push({
-              fromChain: ErgoObservationExtractor.FROM_CHAIN,
+              fromChain: CardanoOgmiosObservationExtractor.FROM_CHAIN,
               toChain: data.toChain,
-              networkFee: data.networkFee,
-              bridgeFee: data.bridgeFee,
               amount: data.amount,
               sourceChainTokenId: data.sourceChainTokenId,
               targetChainTokenId: data.targetChainTokenId,
               sourceTxId: data.sourceTxId,
+              bridgeFee: data.bridgeFee,
+              networkFee: data.networkFee,
               sourceBlockId: block.hash,
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
             });
           }
-        });
+        }
         this.actions
           .storeObservations(observations, block, this.getId())
           .then((status) => {
@@ -92,14 +84,11 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
           })
           .catch((e) => {
             this.logger.error(
-              `An error uncached exception occurred during store ergo observation: ${e}`
+              `An error occurred during store observations: ${e}`
             );
             reject(e);
           });
       } catch (e) {
-        this.logger.error(
-          `An error occurred while saving block ${block}: [${e}]`
-        );
         reject(e);
       }
     });
