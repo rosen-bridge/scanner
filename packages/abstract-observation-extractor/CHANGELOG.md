@@ -1,5 +1,14 @@
 # @rosen-bridge/observation-extractor
 
+## 7.1.4
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.3
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
 ## 7.1.3
 
 ### Patch Changes

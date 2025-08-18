@@ -1,4 +1,4 @@
-# ergo1
+# @rosen-bridge/ergo-scanner
 
 ## Table of contents
 
@@ -12,11 +12,11 @@
 npm:
 
 ```sh
-npm i ergo1
+npm i @rosen-bridge/ergo-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add ergo1
+yarn add @rosen-bridge/ergo-scanner
 ```

@@ -1,4 +1,4 @@
-# cardano1
+# @rosen-bridge/cardano-scanner
 
 ## Table of contents
 
@@ -12,11 +12,11 @@
 npm:
 
 ```sh
-npm i cardano1
+npm i @rosen-bridge/cardano-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add cardano1
+yarn add @rosen-bridge/cardano-scanner
 ```
