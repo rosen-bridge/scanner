@@ -7,6 +7,8 @@
 
 ## Introduction
 
+An ergo blockchain scanner based on Node or Explorer API.
+
 ## Installation
 
 npm:
@@ -19,4 +21,18 @@ yarn:
 
 ```sh
 yarn add @rosen-bridge/ergo-scanner
+```
+
+### Usage
+
+Ergo Scanner:
+
+```javascript
+const ergoScannerConfig = {
+    nodeUrl: <node_url>,
+    timeout: <node_timeout>,
+    initialHeight: <ergo_initial_height>,
+    dataSource: dataSource,
+}
+scanner = new ErgoScanner(ergoScannerConfig);
 ```
