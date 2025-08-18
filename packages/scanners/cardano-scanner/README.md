@@ -7,7 +7,7 @@
 
 ## Introduction
 
-A Cardano blockchain scanner based on blackfrost , koios and ogmios API
+A Cardano blockchain scanner based on blackfrost , koios and ogmios API.
 
 ## Installation
 
