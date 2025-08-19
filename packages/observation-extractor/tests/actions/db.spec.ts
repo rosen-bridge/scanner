@@ -1,7 +1,7 @@
 import { ObservationEntityAction } from '../../lib/actions/db';
 import { ObservationEntity } from '../../lib';
 import { createDatabase, generateBlockEntity } from '../extractor/utils.mock';
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import {
   firstObservations,
   secondObservations,

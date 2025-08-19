@@ -1,5 +1,14 @@
 # @rosen-bridge/bitcoin-rpc-scanner
 
+## 3.0.1
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.1.1
+  - @rosen-bridge/scanner@8.0.1
+
 ## 3.0.0
 
 ### Major Changes

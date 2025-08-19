@@ -1,4 +1,4 @@
-# cardano1
+# @rosen-bridge/cardano-scanner
 
 ## Table of contents
 
@@ -7,16 +7,32 @@
 
 ## Introduction
 
+A Cardano blockchain scanner based on blackfrost , koios and ogmios API.
+
 ## Installation
 
 npm:
 
 ```sh
-npm i cardano1
+npm i @rosen-bridge/cardano-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add cardano1
+yarn add @rosen-bridge/cardano-scanner
+```
+
+### Usage
+
+Cardano Scanner:
+
+```javascript
+const cardanoScannerConfig = {
+    koiosUrl: <koios_url>,
+    timeout: <api_timeout>,
+    initialHeight: <cardano_initial_height>,
+    dataSource: dataSource,
+}
+cardanoScanner = new CardanoKoiosScanner(cardanoScannerConfig)
 ```

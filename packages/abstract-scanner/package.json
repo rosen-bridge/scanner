@@ -1,9 +1,9 @@
 {
   "name": "@rosen-bridge/abstract-scanner",
-  "version": "8.0.0",
+  "version": "0.1.0",
   "description": "Abstract scanner toolkit for blockchain scanning with logging.",
   "author": "Rosen Team",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

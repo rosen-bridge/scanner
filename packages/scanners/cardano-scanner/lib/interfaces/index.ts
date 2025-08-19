@@ -15,6 +15,7 @@ interface CardanoOgmiosConfig {
   dataSource: DataSource;
   useTls?: boolean;
   reconnectionConfig?: OgmiosReconnectionConfig;
+  suffix?: string;
 }
 
 export { OgmiosReconnectionConfig, CardanoOgmiosConfig };
