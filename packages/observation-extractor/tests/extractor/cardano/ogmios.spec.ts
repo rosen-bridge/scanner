@@ -3,7 +3,7 @@ import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosObservationExtractor } from '../../../lib';
 import { tokens } from '../tokens.mock';
 import { Transactions } from './ogmios.mock';
-import { BlockEntity, PROCEED } from '@rosen-bridge/scanner';
+import { BlockEntity, PROCEED } from '@rosen-bridge/abstract-scanner';
 import { ObservationEntity } from '../../../lib';
 import { TokenMap } from '@rosen-bridge/tokens';
 

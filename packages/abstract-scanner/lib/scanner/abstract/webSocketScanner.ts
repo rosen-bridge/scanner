@@ -13,13 +13,15 @@ abstract class WebSocketScanner<
   protected mutex = new Mutex();
 
   protected constructor(
+    protected scannerName: string,
     logger?: AbstractLogger,
-    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK
+    maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
+    protected suffix?: string
   ) {
     super(logger);
     this.maxTryBlock = maxTryBlock;
   }
-  abstract name: () => string;
+  name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
 
   abstract start: () => Promise<void>;
   abstract stop: () => Promise<void>;
@@ -74,8 +76,9 @@ abstract class WebSocketScanner<
         }
       } catch (e) {
         this.logger.warn(`unknown error occurred ${e}`);
-        if (e instanceof Error)
-          this.logger.warn(e.stack ?? 'No stack trace available');
+        if (e instanceof Error && e.stack) {
+          this.logger.warn(e.stack);
+        }
       }
       return false;
     }, `Block at height ${block.height}`);
@@ -94,8 +97,9 @@ abstract class WebSocketScanner<
         return true;
       } catch (e) {
         this.logger.error(`unknown error occurred ${e}`);
-        if (e instanceof Error)
-          this.logger.warn(e.stack ?? 'No stack trace available');
+        if (e instanceof Error && e.stack) {
+          this.logger.warn(e.stack);
+        }
       }
       return false;
     }, `Forking block at height ${block.height}`);

@@ -1,4 +1,4 @@
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
