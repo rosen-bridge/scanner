@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist"
   },
-  "include": ["tests", "lib", "vitest.config.ts"],
+  "include": ["lib"],
   "references": [
     { "path": "../../abstract-scanner" },
     { "path": "../../scanner-interfaces" }
