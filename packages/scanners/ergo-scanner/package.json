@@ -1,7 +1,7 @@
 {
   "name": "@rosen-bridge/ergo-scanner",
   "version": "0.1.0",
-  "description": "An Ergo chain scanner based on RPC.",
+  "description": "An Ergo chain scanner.",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "MIT",
   "author": "Rosen Team",
@@ -18,7 +18,6 @@
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
@@ -29,10 +28,8 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",
-    "extensionless": "^1.9.6",
     "tsx": "^4.19.4",
-    "typescript": "^5.3.3",
-    "vitest": "^3.1.4"
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=20.11.0"
