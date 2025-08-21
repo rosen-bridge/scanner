@@ -7,8 +7,8 @@
   "exclude": ["lib/**/*.spec.ts", "lib/**/*.test.ts", "lib/**/*.mock.ts"],
   "include": ["lib/**/*"],
   "references": [
-    { "path": "../abstract-scanner" },
-    { "path": "../abstract-extractor/tsconfig.build.json" },
-    { "path": "../scanner-interfaces/tsconfig.build.json" }
+    { "path": "../abstract-scanner/" },
+    { "path": "../abstract-extractor" },
+    { "path": "../scanner-interfaces" }
   ]
 }

@@ -7,7 +7,7 @@
 
 ## Introduction
 
-A Bitcoin blockchain scanner based on Esplora Block Explorer API
+A Bitcoin blockchain scanner based on Rpc and Esplora Block Explorer API.
 
 ## Installation
 

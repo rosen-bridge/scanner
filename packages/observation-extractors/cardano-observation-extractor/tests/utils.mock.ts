@@ -7,7 +7,10 @@ import {
 import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
-import { migrations, ObservationEntity } from '../../lib';
+import {
+  migrations,
+  ObservationEntity,
+} from '@rosen-bridge/abstract-observation-extractor';
 
 export const last10BlockHeader = [
   {

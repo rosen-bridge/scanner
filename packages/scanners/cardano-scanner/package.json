@@ -1,7 +1,7 @@
 {
   "name": "@rosen-bridge/cardano-scanner",
   "version": "0.1.0",
-  "description": "A cardano chain scanner based on RPC.",
+  "description": "A Cardano chain scanner.",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "MIT",
   "author": "Rosen Team",
@@ -18,7 +18,6 @@
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
@@ -27,12 +26,10 @@
     "@typescript-eslint/parser": "^6.19.1",
     "@vitest/coverage-istanbul": "^3.1.4",
     "eslint": "^8.56.0",
-    "extensionless": "^1.9.6",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",
     "tsx": "^4.19.4",
     "typescript": "^5.3.3",
-    "vitest": "^3.1.4",
     "typeorm": "^0.3.20"
   },
   "engines": {
@@ -42,9 +39,9 @@
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.0",
     "@rosen-bridge/rate-limited-axios": "^0.2.1",
-    "cockatiel": "^3.2.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@blockfrost/blockfrost-js": "^6.0.0",
+    "cockatiel": "^3.2.1",
     "@blockfrost/openapi": "0.1.78",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@cardano-ogmios/client": "^6.6.1",

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "npm run build --workspaces",
-    "coverage": "npm run coverage --workspaces --if-present",
+    "coverage": "npm run coverage --workspaces",
     "lint": "npm run lint --workspaces",
     "prepare": "husky install",
     "release": "npm run release --workspaces",

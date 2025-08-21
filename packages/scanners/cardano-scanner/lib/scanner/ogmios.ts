@@ -1,4 +1,3 @@
-import { WebSocketScanner } from '@rosen-bridge/abstract-scanner';
 import {
   Block,
   BlockPraos,
@@ -16,7 +15,10 @@ import {
   ChainSynchronizationClient,
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { BlockDbAction } from '@rosen-bridge/abstract-scanner';
+import {
+  BlockDbAction,
+  WebSocketScanner,
+} from '@rosen-bridge/abstract-scanner';
 import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
@@ -46,10 +48,9 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   private connected: boolean;
   private stopped: boolean;
   private reconnectionConfig: OgmiosReconnectionConfig;
-  name = () => 'cardano';
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
-    super(logger, config.maxTryBlock);
+    super('cardano', logger, config.maxTryBlock, config.suffix);
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     this.host = config.nodeHostOrIp;
     this.port = config.nodePort;

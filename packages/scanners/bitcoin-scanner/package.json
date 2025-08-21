@@ -1,7 +1,7 @@
 {
   "name": "@rosen-bridge/bitcoin-scanner",
   "version": "0.1.0",
-  "description": "A Bitcoin blockchain scanner based on bitcoin core JSON RPC API",
+  "description": "A Bitcoin blockchain scanner based on Esplora or Rpc Block Explorer API",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "MIT",
   "author": "Rosen Team",

@@ -1,14 +1,14 @@
-import { ErgoObservationExtractor } from '../../../lib';
+import { ErgoObservationExtractor } from '../lib';
 import {
   generateBlockEntity,
   createDatabase,
   observationTxGenerator,
-} from '../utils.mock';
-import { ObservationEntity } from '../../../lib';
-import { tokens } from '../tokens.mock';
+} from './utils.mock';
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { tokens } from './tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { CARDANO_NATIVE_TOKEN } from '../../../lib/extractor/const';
+import { CARDANO_NATIVE_TOKEN } from '../lib/const';
 import { DataSource } from 'typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 

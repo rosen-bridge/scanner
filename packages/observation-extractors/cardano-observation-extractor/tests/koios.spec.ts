@@ -1,15 +1,15 @@
-import { CardanoKoiosObservationExtractor } from '../../../lib';
-import { KoiosTransaction } from '../../../lib/interfaces/koiosTransaction';
+import { CardanoKoiosObservationExtractor } from '../lib';
+import { KoiosTransaction } from '@rosen-bridge/abstract-observation-extractor';
 import {
   cardanoTxValid,
   generateBlockEntity,
   createDatabase,
-} from '../utils.mock';
-import { ObservationEntity } from '../../../lib';
-import { tokens } from '../tokens.mock';
+} from './utils.mock';
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { tokens } from './tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ERGO_NATIVE_TOKEN } from '../../../lib/extractor/const';
+import { ERGO_NATIVE_TOKEN } from '../lib/const';
 import { DataSource } from 'typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 

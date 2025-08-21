@@ -144,10 +144,8 @@ export const insertBlocks = async (
 };
 
 export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
-  name = () => 'test scanner';
-
   constructor(dataSource: DataSource) {
-    super();
+    super('test scanner');
     this.action = new BlockDbAction(dataSource, this.name());
   }
 

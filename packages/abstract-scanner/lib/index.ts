@@ -1,7 +1,6 @@
 export { BlockDbAction } from './scanner/action';
 export { migrations } from './migrations';
-export { PROCEED } from './entities/blockEntity';
-export { BlockEntity } from './entities/blockEntity';
+export { PROCEED, BlockEntity } from './entities/blockEntity';
 export { ExtractorStatusEntity } from './entities/extractorStatusEntity';
 export { AbstractScanner } from './scanner/abstract/scanner';
 export { GeneralScanner } from './scanner/abstract/generalScanner';

@@ -2,7 +2,7 @@
 
 A monorepo containing all the packages related to Rosen Bridge Scanner. It contains the following packages:
 
-1. [abstract-scanner](./packages/scanner/README.md): A Blockchain scanner.
+1. [abstract-scanner](./packages/scanner/README.md): Abstract scanner toolkit for blockchain scanning.
 2. [address-extractor](./packages/address-extractor/README.md): UTXO box extractor for any address or token.
 3. [observation-extractor](./packages/observation-extractor/README.md): Extractor for observing user payments in the networks.
 4. [watcher-data-extractor](./packages/watcher-data-extractor/README.md): Extractor for Rosen specific boxes on Ergo blockchain.

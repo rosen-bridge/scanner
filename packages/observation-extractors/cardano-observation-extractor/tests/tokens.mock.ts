@@ -1,8 +1,6 @@
+import { CardanoKoiosObservationExtractor } from '../lib';
 import { RosenTokens } from '@rosen-bridge/tokens';
-import {
-  CARDANO_NATIVE_TOKEN,
-  ERGO_NATIVE_TOKEN,
-} from '../../lib/extractor/const';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../lib/const';
 
 export const tokens: RosenTokens = [
   {
@@ -14,7 +12,7 @@ export const tokens: RosenTokens = [
       residency: 'wrapped',
       extra: {},
     },
-    ['cardano']: {
+    [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
       tokenId:
         'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
       name: 'wrapped erg',
@@ -37,7 +35,7 @@ export const tokens: RosenTokens = [
       type: 'EIP-004',
       extra: {},
     },
-    ['cardano']: {
+    [CardanoKoiosObservationExtractor.FROM_CHAIN]: {
       tokenId: CARDANO_NATIVE_TOKEN,
       name: 'ada',
       decimals: 6,

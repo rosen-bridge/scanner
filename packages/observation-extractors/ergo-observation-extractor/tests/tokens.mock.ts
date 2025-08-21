@@ -1,12 +1,10 @@
+import { ErgoObservationExtractor } from '../lib';
 import { RosenTokens } from '@rosen-bridge/tokens';
-import {
-  CARDANO_NATIVE_TOKEN,
-  ERGO_NATIVE_TOKEN,
-} from '../../lib/extractor/const';
+import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../lib/const';
 
 export const tokens: RosenTokens = [
   {
-    ['ergo']: {
+    [ErgoObservationExtractor.FROM_CHAIN]: {
       tokenId: ERGO_NATIVE_TOKEN,
       name: ERGO_NATIVE_TOKEN,
       decimals: 9,
@@ -28,7 +26,7 @@ export const tokens: RosenTokens = [
     },
   },
   {
-    ['ergo']: {
+    [ErgoObservationExtractor.FROM_CHAIN]: {
       tokenId:
         'f6a69529b12a7e2326acffee8383e0c44408f87a872886fadf410fe8498006d3',
       name: 'wrapped ada',
