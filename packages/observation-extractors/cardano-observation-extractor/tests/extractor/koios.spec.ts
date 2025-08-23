@@ -1,17 +1,16 @@
-import { CardanoKoiosObservationExtractor } from '../lib';
-import { KoiosTransaction } from '@rosen-bridge/abstract-observation-extractor';
+import { CardanoKoiosObservationExtractor } from '../../lib';
 import {
   cardanoTxValid,
   generateBlockEntity,
   createDatabase,
-} from './utils.mock';
+} from '../utils.mock';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
-import { tokens } from './tokens.mock';
+import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { ERGO_NATIVE_TOKEN } from '../lib/const';
 import { DataSource } from 'typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
+import { KoiosTransaction } from '../../lib/interfaces/koiosTransaction';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
@@ -65,7 +64,7 @@ describe('cardanoKoiosObservationExtractor', () => {
         bridgeFee: '10376749',
         sourceChainTokenId:
           'ace7bcc2ce705679149746620de3a84660ce57573df54b5a096e39a2.7369676d61',
-        targetChainTokenId: ERGO_NATIVE_TOKEN,
+        targetChainTokenId: 'erg',
         sourceBlockId: '1',
         sourceTxId: txHash,
         block: '1',

@@ -18,16 +18,6 @@ export const mockAxiosGet = (result: unknown) => {
 };
 
 /**
- * mocks axios.get function
- * @param result
- */
-export const mockAxiosPost = (result: unknown) => {
-  axiosInstance.post.mockResolvedValueOnce({
-    data: result,
-  });
-};
-
-/**
  * resets axios functions mocks and call counts
  */
 export const resetAxiosMock = () => {

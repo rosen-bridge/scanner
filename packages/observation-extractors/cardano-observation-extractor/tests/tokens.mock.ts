@@ -1,12 +1,12 @@
 import { CardanoKoiosObservationExtractor } from '../lib';
 import { RosenTokens } from '@rosen-bridge/tokens';
-import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../lib/const';
+import { CARDANO_NATIVE_TOKEN } from '../lib/const';
 
 export const tokens: RosenTokens = [
   {
     ['ergo']: {
-      tokenId: ERGO_NATIVE_TOKEN,
-      name: ERGO_NATIVE_TOKEN,
+      tokenId: 'erg',
+      name: 'erg',
       decimals: 9,
       type: 'EIP004',
       residency: 'wrapped',

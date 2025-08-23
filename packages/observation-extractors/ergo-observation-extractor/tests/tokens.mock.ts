@@ -1,6 +1,6 @@
 import { ErgoObservationExtractor } from '../lib';
 import { RosenTokens } from '@rosen-bridge/tokens';
-import { CARDANO_NATIVE_TOKEN, ERGO_NATIVE_TOKEN } from '../lib/const';
+import { ERGO_NATIVE_TOKEN } from '../lib/const';
 
 export const tokens: RosenTokens = [
   {
@@ -36,7 +36,7 @@ export const tokens: RosenTokens = [
       extra: {},
     },
     ['cardano']: {
-      tokenId: CARDANO_NATIVE_TOKEN,
+      tokenId: 'ada',
       name: 'ada',
       decimals: 6,
       residency: 'native',

@@ -1,4 +1,4 @@
-import { AbstractObservationExtractor } from '../../../lib';
+import { AbstractObservationExtractor } from '../../lib';
 
 export interface TestTransactionType {
   txId: string;

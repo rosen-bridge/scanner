@@ -3,21 +3,21 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
+import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
 import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
-import { KoiosTransaction } from '@rosen-bridge/abstract-observation-extractor';
 
-export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTransaction> {
+export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
   private readonly dataSource: DataSource;
   private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
-  private readonly extractor: CardanoKoiosRosenExtractor;
-  static readonly FROM_CHAIN: string = 'cardano';
+  private readonly extractor: ErgoNodeRosenExtractor;
+  static readonly FROM_CHAIN: string = 'ergo';
 
   constructor(
     dataSource: DataSource,
@@ -30,46 +30,54 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
     this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new CardanoKoiosRosenExtractor(
-      address,
-      tokens,
-      this.logger
-    );
+    this.extractor = new ErgoNodeRosenExtractor(address, tokens, this.logger);
   }
 
   /**
    * get Id for current extractor
    */
-  getId = () => 'cardano-koios-extractor';
+  getId = () => 'ergo-observation-extractor';
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
    *  transactions and in case of success return true and in case of failure returns false
-   * @param block
    * @param txs
+   * @param block
    */
   processTransactions = (
-    txs: Array<KoiosTransaction>,
+    txs: Array<Transaction>,
     block: Block
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
         const observations: Array<ExtractedObservation> = [];
         txs.forEach((transaction) => {
+          for (let i = 0; i < transaction.outputs.length; i++) {
+            const box = transaction.outputs[i];
+            if (
+              block.height - Number(box.creationHeight) >
+              NUMBER_OF_BLOCKS_PER_YEAR
+            ) {
+              this.logger.debug(
+                `Skipping tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
+              );
+              return;
+            }
+          }
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
-              blake2b(transaction.tx_hash, undefined, 32)
+              blake2b(transaction.id, undefined, 32)
             ).toString('hex');
             observations.push({
-              fromChain: CardanoKoiosObservationExtractor.FROM_CHAIN,
+              fromChain: ErgoObservationExtractor.FROM_CHAIN,
               toChain: data.toChain,
+              networkFee: data.networkFee,
+              bridgeFee: data.bridgeFee,
               amount: data.amount,
               sourceChainTokenId: data.sourceChainTokenId,
               targetChainTokenId: data.targetChainTokenId,
               sourceTxId: data.sourceTxId,
-              bridgeFee: data.bridgeFee,
-              networkFee: data.networkFee,
               sourceBlockId: block.hash,
               requestId: requestId,
               toAddress: data.toAddress,
@@ -84,11 +92,14 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
           })
           .catch((e) => {
             this.logger.error(
-              `An error occurred during store observations: ${e}`
+              `An error uncached exception occurred during store ergo observation: ${e}`
             );
             reject(e);
           });
       } catch (e) {
+        this.logger.error(
+          `An error occurred while saving block ${block}: [${e}]`
+        );
         reject(e);
       }
     });

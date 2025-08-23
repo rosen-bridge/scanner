@@ -6,9 +6,8 @@ import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-
-import { ObservationEntityAction } from '../../actions/db';
-import { ExtractedObservation } from '../../interfaces/extractedObservation';
+import { ObservationEntityAction } from '../actions/db';
+import { ExtractedObservation } from '../interfaces/extractedObservation';
 
 export abstract class AbstractObservationExtractor<
   TransactionType

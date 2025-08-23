@@ -1,4 +1,4 @@
-# Observation Extractor
+# Abstract Observation Extractor
 
 ### Table of Contents
 
@@ -27,7 +27,7 @@ This module is used within the [Scanner](https://github.com/rosen-bridge/scanner
 This project is written in node-js using Esnext module and typeorm database. Extractors are not standalone projects and should be used as scanner modules. You can easily install it using npm with the command:
 
 ```shell
-npm install @rosen-bridge/observation-extractor
+npm install @rosen-bridge/abstract-observation-extractor
 ```
 
 Alternatively, you can build and use it manually by cloning the project and running:

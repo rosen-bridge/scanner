@@ -1,10 +1,10 @@
 {
   "name": "@rosen-bridge/cardano-observation-extractor",
   "version": "0.1.0",
-  "description": "",
-  "repository": "",
-  "license": "GPL-3.0",
-  "author": "",
+  "description": "Event observation data extractor for Cardano chain",
+  "repository": "https://github.com/rosen-bridge/scanner",
+  "license": "MIT",
+  "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,8 +27,6 @@
     "@typescript-eslint/parser": "^6.19.1",
     "@vitest/coverage-istanbul": "^3.1.4",
     "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "ergo-lib-wasm-nodejs": "^0.24.1",
-    "@rosen-bridge/json-bigint": "^0.1.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",
@@ -39,6 +37,7 @@
   "dependencies": {
     "@blockfrost/openapi": "0.1.78",
     "@cardano-ogmios/schema": "^6.6.1",
+    "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-observation-extractor": "^0.1.0",
     "@rosen-bridge/abstract-extractor": "^2.0.3",
     "@rosen-bridge/abstract-logger": "^2.0.1",
@@ -46,8 +45,6 @@
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-    "reflect-metadata": "^0.1.13",
-    "sqlite3": "^5.0.9",
     "typeorm": "^0.3.20"
   },
   "engines": {

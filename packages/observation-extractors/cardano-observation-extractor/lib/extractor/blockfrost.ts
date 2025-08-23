@@ -7,9 +7,10 @@ import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { components } from '@blockfrost/openapi';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-
-import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
-import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
+import {
+  ObservationEntityAction,
+  ExtractedObservation,
+} from '@rosen-bridge/abstract-observation-extractor';
 
 interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];

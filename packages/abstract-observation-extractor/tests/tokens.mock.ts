@@ -1,14 +1,10 @@
 import { RosenTokens } from '@rosen-bridge/tokens';
-import {
-  CARDANO_NATIVE_TOKEN,
-  ERGO_NATIVE_TOKEN,
-} from '../../lib/extractor/const';
 
 export const tokens: RosenTokens = [
   {
     ['ergo']: {
-      tokenId: ERGO_NATIVE_TOKEN,
-      name: ERGO_NATIVE_TOKEN,
+      tokenId: 'erg',
+      name: 'erg',
       decimals: 9,
       type: 'EIP004',
       residency: 'wrapped',
@@ -38,7 +34,7 @@ export const tokens: RosenTokens = [
       extra: {},
     },
     ['cardano']: {
-      tokenId: CARDANO_NATIVE_TOKEN,
+      tokenId: 'ada',
       name: 'ada',
       decimals: 6,
       residency: 'native',

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { createDatabase } from './utils.mock';
-import { CardanoOgmiosObservationExtractor } from '../lib';
-import { tokens } from './tokens.mock';
+import { createDatabase } from '../utils.mock';
+import { CardanoOgmiosObservationExtractor } from '../../lib';
+import { tokens } from '../tokens.mock';
 import { Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/abstract-scanner';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';

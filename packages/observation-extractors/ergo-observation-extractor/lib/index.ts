@@ -1,1 +1,1 @@
-export * from './ergoExtractor';
+export * from './extractor/ergoExtractor';
