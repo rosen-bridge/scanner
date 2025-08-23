@@ -1,4 +1,4 @@
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 
 export const block: BlockEntity = new BlockEntity();
 block.hash = 'block1';

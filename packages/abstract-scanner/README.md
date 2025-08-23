@@ -40,39 +40,6 @@ npm install
 npm run build
 ```
 
-### Usage
-
-Ergo Scanner:
-
-```javascript
-const ergoScannerConfig = {
-    nodeUrl: <node_url>,
-    timeout: <node_timeout>,
-    initialHeight: <ergo_initial_height>,
-    dataSource: dataSource,
-}
-scanner = new ErgoScanner(ergoScannerConfig);
-```
-
-Cardano Scanner:
-
-```javascript
-const cardanoScannerConfig = {
-    koiosUrl: <koios_url>,
-    timeout: <api_timeout>,
-    initialHeight: <cardano_initial_height>,
-    dataSource: dataSource,
-}
-cardanoScanner = new CardanoKoiosScanner(cardanoScannerConfig)
-```
-
-Registering data extractor:
-
-```javascript
-const dataExtractor = new DataExtractor(dataSource, <PARAMETERS>)
-scanner.registerExtractor(dataExtractor)
-```
-
 ## Contributing
 
 TBD

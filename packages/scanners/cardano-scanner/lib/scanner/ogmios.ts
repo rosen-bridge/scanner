@@ -1,4 +1,3 @@
-import { WebSocketScanner } from '../../abstract/webSocketScanner';
 import {
   Block,
   BlockPraos,
@@ -16,7 +15,10 @@ import {
   ChainSynchronizationClient,
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { BlockDbAction } from '../../action';
+import {
+  BlockDbAction,
+  WebSocketScanner,
+} from '@rosen-bridge/abstract-scanner';
 import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
@@ -24,7 +26,7 @@ import {
   RECONNECTION_MAX_DELAY,
   SLOT_SHELLY_NUMBER,
   RECONNECTION_MAX_ATTEMPTS,
-} from '../../../constants';
+} from '../constants';
 import { ExponentialBackoff, handleWhen, retry } from 'cockatiel';
 
 interface BackwardResponse {

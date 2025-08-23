@@ -8,7 +8,7 @@ import { Transaction } from '@rosen-bridge/scanner-interfaces';
 import {
   migrations as scannerMigrations,
   BlockEntity,
-} from '@rosen-bridge/scanner';
+} from '@rosen-bridge/abstract-scanner';
 import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
 
