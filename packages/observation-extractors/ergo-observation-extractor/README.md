@@ -1,4 +1,4 @@
-# ergo-observation-extractor
+# @rosen-bridge/ergo-observation-extractor
 
 ## Table of contents
 
@@ -7,16 +7,18 @@
 
 ## Introduction
 
+Event observation data extractor for Ergo chain.
+
 ## Installation
 
 npm:
 
 ```sh
-npm i ergo-observation-extractor
+npm i @rosen-bridge/ergo-observation-extractor
 ```
 
 yarn:
 
 ```sh
-yarn add ergo-observation-extractor
+yarn add @rosen-bridge/ergo-observation-extractor
 ```

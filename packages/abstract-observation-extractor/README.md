@@ -39,30 +39,6 @@ npm run build
 
 ### Usage
 
-In the first step, you need to create a scanner instance; follow the steps [here](https://github.com/rosen-bridge/scanner) to create a running instance of the scanner. Then you need to instantiate your address extractor and register it to your scanner:
-
-```javascript
-const ergoObsesrvationExtractor = new ErgoObservationExtractor(
-   dataSource,
-   <tokens.json>,
-   <lock_address>
-)
-ergoScanner.registerExtractor(ergoObsesrvationExtractor)
-```
-
-Where the `token.json` is a source-target map of token ids that are exchanged in the bridge.
-
-Or similarly for cardano:
-
-```javascript
-const cardanoObsesrvationExtractor = new CardanoObservationExtractor(
-    dataSource,
-    <tokens.json>,
-    <lock_address>
-)
-cardanoScanner.registerExtractor(cardanoObsesrvationExtractor)
-```
-
 ## Contributing
 
 TBD
