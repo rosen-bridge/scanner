@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/ergo-scanner",
   "version": "0.1.0",
   "description": "An Ergo chain scanner.",
-  "repository": "https://github.com/rosen-bridge/scanner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
@@ -14,7 +17,6 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
@@ -24,7 +26,6 @@
     "@types/node": "^20.11.9",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "@vitest/coverage-istanbul": "^3.1.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",
@@ -36,7 +37,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.1.0",
+    "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "@rosen-clients/ergo-explorer": "^1.1.5",
     "@rosen-clients/ergo-node": "^1.2.3"
   }
