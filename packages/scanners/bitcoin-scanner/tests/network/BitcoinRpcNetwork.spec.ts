@@ -2,23 +2,23 @@ import {
   axiosInstance,
   mockAxiosPost,
   resetAxiosMock,
-} from './mocked/axios.mock';
-import * as testData from './dogeTestData';
-import { DogeRpcNetwork } from '../lib/DogeRpcNetwork';
+} from '../mocked/axiosRpc.mock';
+import * as testData from '../bitcoinRpcTestData';
+import { BitcoinRpcNetwork } from '../../lib/network/BitcoinRpcNetwork';
 
-describe('DogeRpcNetwork', () => {
-  let network: DogeRpcNetwork;
+describe('BitcoinRpcNetwork', () => {
+  let network: BitcoinRpcNetwork;
 
   beforeEach(() => {
     resetAxiosMock();
-    network = new DogeRpcNetwork('', 1);
+    network = new BitcoinRpcNetwork('', 1);
     network['generateRandomId'] = () =>
       '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e';
   });
 
   describe('getBlockAtHeight', () => {
     /**
-     * @target `DogeRpcNetwork.getBlockAtHeight` should return block info successfully
+     * @target `BitcoinRpcNetwork.getBlockAtHeight` should return block info successfully
      * @dependencies
      * @scenario
      * - mock axios to return block hash
@@ -34,7 +34,7 @@ describe('DogeRpcNetwork', () => {
      */
     it('should return block info successfully', async () => {
       mockAxiosPost(testData.getBlockHashResponse);
-      mockAxiosPost(testData.getBlockSummaryResponse);
+      mockAxiosPost(testData.getBlockHeaderResponse);
 
       const result = await network.getBlockAtHeight(testData.blockHeight);
 
@@ -46,8 +46,8 @@ describe('DogeRpcNetwork', () => {
         id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getblock',
-        params: [testData.blockHash, 1],
+        method: 'getblockheader',
+        params: [testData.blockHash, true],
         id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });
@@ -55,7 +55,7 @@ describe('DogeRpcNetwork', () => {
 
   describe('getCurrentHeight', () => {
     /**
-     * @target `DogeRpcNetwork.getCurrentHeight` should return current height successfully
+     * @target `BitcoinRpcNetwork.getCurrentHeight` should return current height successfully
      * @dependencies
      * @scenario
      * - mock axios to return blockchain info
@@ -83,10 +83,11 @@ describe('DogeRpcNetwork', () => {
 
   describe('getBlockTxs', () => {
     /**
-     * @target `DogeRpcNetwork.getBlockTxs` should return block transactions successfully
+     * @target `BitcoinRpcNetwork.getBlockTxs` should return block transactions successfully
      * @dependencies
      * @scenario
-     * - mock axios to return block with transactions
+     * - mock axios to return block header
+     * - mock axios to return block transactions 3 times (3 pages)
      * - run test
      * - check returned value
      * - check if function got called

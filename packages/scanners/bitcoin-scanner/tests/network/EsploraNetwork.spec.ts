@@ -2,9 +2,9 @@ import {
   axiosInstance,
   mockAxiosGet,
   resetAxiosMock,
-} from './mocked/axios.mock';
-import * as testData from './testData';
-import { EsploraNetwork } from '../lib/EsploraNetwork';
+} from '../mocked/axiosEsplora.mock';
+import * as testData from '../bitcoinEsploraTestData';
+import { EsploraNetwork } from '../../lib/network/EsploraNetwork';
 
 describe('EsploraNetwork', () => {
   let network: EsploraNetwork;

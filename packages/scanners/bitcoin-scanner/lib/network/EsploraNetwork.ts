@@ -3,7 +3,7 @@ import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
-import { BitcoinEsploraTransaction, EsploraBlock } from './types';
+import { BitcoinEsploraTransaction, EsploraBlock } from '../types';
 
 export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTransaction> {
   private readonly url: string;

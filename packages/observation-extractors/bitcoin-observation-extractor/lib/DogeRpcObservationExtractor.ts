@@ -1,5 +1,5 @@
 import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
-import { DogeRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
+import { DogeRpcTransaction } from '@rosen-bridge/bitcoin-scanner';
 import { DogeRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';

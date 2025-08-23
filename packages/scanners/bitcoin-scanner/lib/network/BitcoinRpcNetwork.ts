@@ -3,11 +3,11 @@ import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
-import { DogeRpcTransaction, JsonRpcResult, DogeBlockSummary } from './types';
+import { BitcoinRpcTransaction, BlockHeader, JsonRpcResult } from '../types';
 
 import { randomBytes } from 'crypto';
 
-export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction> {
+export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransaction> {
   private readonly url: string;
   private readonly timeout: number;
   private client: Axios;
@@ -52,22 +52,21 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
 
     const randomId2 = this.generateRandomId();
     // get block headers using block hash
-    const blockSummaryResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblock',
+    const blockHeaderResponse = await this.client.post<JsonRpcResult>('', {
+      method: 'getblockheader',
       id: randomId2,
-      params: [blockHash, 1],
+      params: [blockHash, true],
     });
-    if (blockSummaryResponse.data.id !== randomId2)
+    if (blockHeaderResponse.data.id !== randomId2)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockSummary: DogeBlockSummary = blockSummaryResponse.data
-      .result as DogeBlockSummary;
-
+    const blockHeader: BlockHeader = blockHeaderResponse.data
+      .result as BlockHeader;
     return {
-      parentHash: blockSummary.previousblockhash,
-      hash: blockSummary.hash,
-      height: blockSummary.height,
-      timestamp: blockSummary.time,
-      txCount: blockSummary.tx.length,
+      parentHash: blockHeader.previousblockhash,
+      hash: blockHeader.hash,
+      height: blockHeader.height,
+      timestamp: blockHeader.time,
+      txCount: blockHeader.nTx,
     };
   };
 
@@ -94,7 +93,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
    */
   getBlockTxs = async (
     blockHash: string
-  ): Promise<Array<DogeRpcTransaction>> => {
+  ): Promise<Array<BitcoinRpcTransaction>> => {
     const randomId = this.generateRandomId();
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {
       method: 'getblock',
@@ -104,7 +103,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     if (blockHashResponse.data.id !== randomId)
       throw Error(`UnexpectedBehavior: Request and response id are different`);
     const blockTxs = (
-      blockHashResponse.data.result as { tx: Array<DogeRpcTransaction> }
+      blockHashResponse.data.result as { tx: Array<BitcoinRpcTransaction> }
     ).tx;
 
     return blockTxs;
