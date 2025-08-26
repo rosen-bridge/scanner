@@ -14,8 +14,6 @@ import {
 
 export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
-  private readonly dataSource: DataSource;
-  private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
   private readonly extractor: CardanoOgmiosRosenExtractor;
   static readonly FROM_CHAIN: string = 'cardano';
@@ -27,8 +25,6 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
     logger?: AbstractLogger
   ) {
     super();
-    this.dataSource = dataSource;
-    this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
     this.extractor = new CardanoOgmiosRosenExtractor(

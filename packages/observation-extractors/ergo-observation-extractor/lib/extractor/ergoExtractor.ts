@@ -6,15 +6,12 @@ import { TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-
-import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
 import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
+import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 
 export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
-  private readonly dataSource: DataSource;
-  private readonly tokens: TokenMap;
   private readonly actions: ObservationEntityAction;
   private readonly extractor: ErgoNodeRosenExtractor;
   static readonly FROM_CHAIN: string = 'ergo';
@@ -26,8 +23,6 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     logger?: AbstractLogger
   ) {
     super();
-    this.dataSource = dataSource;
-    this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(dataSource, this.logger);
     this.extractor = new ErgoNodeRosenExtractor(address, tokens, this.logger);
