@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/cardano-observation-extractor",
   "version": "0.1.0",
   "description": "Event observation data extractor for Cardano chain",
-  "repository": "https://github.com/rosen-bridge/scanner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
