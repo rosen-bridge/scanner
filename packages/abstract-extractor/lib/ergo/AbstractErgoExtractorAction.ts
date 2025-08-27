@@ -6,7 +6,7 @@ import {
   EntityTarget,
   FindOptionsWhere,
   QueryRunner,
-} from 'typeorm';
+} from '@rosen-bridge/extended-typeorm';
 import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';

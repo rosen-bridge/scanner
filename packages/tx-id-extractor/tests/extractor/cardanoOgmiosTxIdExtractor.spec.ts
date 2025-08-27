@@ -1,7 +1,7 @@
 import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosTxIdExtractor, TxIdEntity } from '../../lib';
 import txs from './data/cardanoOgmiosTxIdExtractor.data';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 let dataSource: DataSource;
 

@@ -1,5 +1,5 @@
 import { createDatabase } from './abstract/abstract.mock';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockDbAction } from '../../lib/scanner/action';
 import {
   BlockEntity,

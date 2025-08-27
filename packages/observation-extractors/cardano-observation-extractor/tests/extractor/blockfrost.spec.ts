@@ -4,7 +4,7 @@ import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor'
 import { tokens } from '../tokens.mock';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { validLockTx } from './blockFrostTestData';
 import { TokenMap } from '@rosen-bridge/tokens';
 

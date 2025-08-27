@@ -1,4 +1,4 @@
-import { DataSource, EntityTarget, FindOptionsWhere } from 'typeorm';
+import { DataSource, EntityTarget, FindOptionsWhere } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';

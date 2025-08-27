@@ -9,7 +9,7 @@ import {
   TestTransaction,
   generateMockGeneralScannerByBlockRetrieveGapClass,
 } from './abstract.mock';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockEntity } from '../../../lib';
 
 const firstScanner = generateMockGeneralScannerClass('first');

@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TxAction } from '../actions/db';
 import { Transaction } from '@cardano-ogmios/schema';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';

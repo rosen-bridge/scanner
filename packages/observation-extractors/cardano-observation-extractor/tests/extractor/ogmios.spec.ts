@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosObservationExtractor } from '../../lib';
 import { tokens } from '../tokens.mock';

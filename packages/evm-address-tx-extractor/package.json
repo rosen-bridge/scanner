@@ -37,6 +37,6 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "ethers": "6.13.2",
-    "typeorm": "^0.3.20"
+  "@rosen-bridge/extended-typeorm": "^0.2.1"
   }
 }

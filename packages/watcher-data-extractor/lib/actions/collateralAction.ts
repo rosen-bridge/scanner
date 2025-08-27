@@ -1,7 +1,7 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
-import { DataSource, DeleteResult, In, IsNull, Repository } from 'typeorm';
+import { DataSource, DeleteResult, In, IsNull, Repository } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import CollateralEntity from '../entities/CollateralEntity';

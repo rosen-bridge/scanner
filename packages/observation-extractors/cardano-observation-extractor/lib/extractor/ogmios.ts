@@ -1,6 +1,6 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Transaction } from '@cardano-ogmios/schema';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';

@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BoxEntity, migrations } from '../../lib';
 
 export const createDatabase = async (): Promise<DataSource> => {
