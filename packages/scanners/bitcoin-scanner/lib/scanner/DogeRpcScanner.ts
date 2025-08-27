@@ -1,5 +1,4 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
-
 import { DogeRpcTransaction } from '../types';
 
 export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {

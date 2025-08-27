@@ -6,7 +6,7 @@ import {
 import {
   ObservationEntity,
   migrations,
-} from '@rosen-bridge/observation-extractor';
+} from '@rosen-bridge/abstract-observation-extractor';
 
 export const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({

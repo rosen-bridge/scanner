@@ -1,4 +1,7 @@
 export * from './scanner/blockfrost';
+export * from './interfaces/BlockFrost';
+export * from './interfaces/index';
+export * from './interfaces/Koios';
 export * from './scanner/koios';
 export * from './scanner/ogmios';
 export * from './constants';

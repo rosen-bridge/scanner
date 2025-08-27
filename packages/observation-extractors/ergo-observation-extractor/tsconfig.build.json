@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib"
+  },
+  "exclude": ["tests", "vitest.config.ts"],
+  "references": [
+    { "path": "../../abstract-observation-extractor" },
+    { "path": "../../abstract-scanner" },
+    { "path": "../../abstract-extractor/tsconfig.build.json" },
+    { "path": "../../scanner-interfaces/tsconfig.build.json" }
+  ]
+}
