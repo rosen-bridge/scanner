@@ -1,4 +1,4 @@
-# @rosen-bridge/evm-rpc-scanner
+# @rosen-bridge/evm-scanner
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ An EVM chain scanner based on RPC.
 npm:
 
 ```sh
-npm i @rosen-bridge/evm-rpc-scanner
+npm i @rosen-bridge/evm-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add @rosen-bridge/evm-rpc-scanner
+yarn add @rosen-bridge/evm-scanner
 ```

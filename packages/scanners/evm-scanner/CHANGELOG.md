@@ -1,4 +1,4 @@
-# @rosen-bridge/evm-rpc-scanner
+# @rosen-bridge/evm-scanner
 
 ## 4.0.2
 

@@ -1,5 +1,5 @@
 {
-  "name": "@rosen-bridge/evm-rpc-scanner",
+  "name": "@rosen-bridge/evm-scanner",
   "version": "4.0.2",
   "description": "An EVM chain scanner based on RPC.",
   "repository": "https://github.com/rosen-bridge/scanner",
