@@ -16,7 +16,7 @@ const perPackage = (resolver) => (files) => {
         directory = parent;
       }
       return packages;
-    }, new Set())
+    }, new Set()),
   );
 };
 
@@ -43,9 +43,9 @@ export default {
 
     return `npx depcheck ${path.relative(
       process.cwd(),
-      directory
+      directory,
     )} --ignores="${packages.join(', ')}" --ignore-patterns="${paths.join(
-      ','
+      ',',
     )}"`;
   }),
 };

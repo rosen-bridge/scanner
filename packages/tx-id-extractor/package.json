@@ -24,14 +24,14 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "sqlite3": "^5.1.7",
-  "@rosen-bridge/extended-typeorm": "^0.2.1"
+    "@rosen-bridge/extended-typeorm": "^0.2.1"
   },
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
-    "@types/node": "^20.11.9",
+    "@types/node": "^22.18.0",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.26.0",
     "eslint": "^8.16.0",
@@ -42,5 +42,6 @@
     "typescript": "^5.0.4"
   },
   "engines": {
-    "node": ">=22.18.0"  }
+    "node": ">=22.18.0"
+  }
 }

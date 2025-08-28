@@ -25,14 +25,9 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^20.11.9",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
+    "@types/node": "^22.18.0",
     "@vitest/coverage-istanbul": "^3.1.4",
     "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.2.4",
     "tsx": "^4.19.4",
     "typescript": "^5.3.3",
     "vitest": "^3.1.4"
@@ -48,8 +43,9 @@
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-  "@rosen-bridge/extended-typeorm": "^0.2.1"
+    "@rosen-bridge/extended-typeorm": "^0.2.1"
   },
   "engines": {
-    "node": ">=22.18.0"  }
+    "node": ">=22.18.0"
+  }
 }
