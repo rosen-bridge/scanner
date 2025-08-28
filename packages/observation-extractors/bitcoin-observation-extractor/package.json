@@ -30,8 +30,7 @@
     "vitest": "^1.2.2"
   },
   "engines": {
-    "node": ">=20.11.0"
-  },
+    "node": ">=22.18.0"  },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/bitcoin-scanner": "^0.1.0",

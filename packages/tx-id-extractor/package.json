@@ -23,7 +23,7 @@
     "@rosen-bridge/abstract-extractor": "^2.0.3",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
-    "sqlite3": "^5.0.9",
+    "sqlite3": "^5.1.7",
   "@rosen-bridge/extended-typeorm": "^0.2.1"
   },
   "type": "module",
@@ -42,6 +42,5 @@
     "typescript": "^5.0.4"
   },
   "engines": {
-    "node": ">=20.11.0"
-  }
+    "node": ">=22.18.0"  }
 }

@@ -33,8 +33,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=20.11.0"
-  },
+    "node": ">=22.18.0"  },
   "dependencies": {
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
