@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "outDir": "./dist",
-    "rootDir": "./lib"
+    "rootDir": "./lib",
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["lib/**/*.spec.ts", "lib/**/*.test.ts", "lib/**/*.mock.ts"],
   "include": ["lib/**/*"],

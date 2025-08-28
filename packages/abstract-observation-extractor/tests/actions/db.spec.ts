@@ -4,6 +4,7 @@ import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import { firstObservations, secondObservations } from '../observations.mock';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 let dataSource: DataSource;
 let action: ObservationEntityAction;
@@ -26,7 +27,7 @@ describe('ObservationEntityAction', () => {
       const res = await action.storeObservations(
         firstObservations,
         generateBlockEntity(dataSource, '1'),
-        'extractor-test'
+        'extractor-test',
       );
       expect(res).toEqual(true);
       const repository = await dataSource.getRepository(ObservationEntity);
@@ -38,7 +39,7 @@ describe('ObservationEntityAction', () => {
           block: '1',
           extractor: 'extractor-test',
           height: 1,
-        })
+        }),
       );
       expect(rows[1]).toEqual(
         expect.objectContaining({
@@ -46,7 +47,7 @@ describe('ObservationEntityAction', () => {
           block: '1',
           extractor: 'extractor-test',
           height: 1,
-        })
+        }),
       );
     });
 
@@ -75,7 +76,7 @@ describe('ObservationEntityAction', () => {
       const res = await action.storeObservations(
         secondObservations,
         generateBlockEntity(dataSource, '1'),
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -87,7 +88,7 @@ describe('ObservationEntityAction', () => {
           block: '1',
           extractor: 'second-extractor',
           height: 1,
-        })
+        }),
       );
       expect(secondInsertRows[3]).toEqual(
         expect.objectContaining({
@@ -95,7 +96,7 @@ describe('ObservationEntityAction', () => {
           block: '1',
           extractor: 'second-extractor',
           height: 1,
-        })
+        }),
       );
     });
 
@@ -125,7 +126,7 @@ describe('ObservationEntityAction', () => {
       const res = await action.storeObservations(
         [{ ...firstObservations[0], toAddress: 'newAddress' }],
         generateBlockEntity(dataSource, '1'),
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -138,7 +139,7 @@ describe('ObservationEntityAction', () => {
           extractor: 'first-extractor',
           height: 1,
           toAddress: 'newAddress',
-        })
+        }),
       );
     });
 
@@ -169,7 +170,7 @@ describe('ObservationEntityAction', () => {
       const res = await action.storeObservations(
         [{ ...firstObservations[0] }],
         generateBlockEntity(dataSource, '1'),
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -181,7 +182,7 @@ describe('ObservationEntityAction', () => {
           block: '1',
           extractor: 'second-extractor',
           height: 1,
-        })
+        }),
       );
     });
 
@@ -212,7 +213,7 @@ describe('ObservationEntityAction', () => {
       const res = await action.storeObservations(
         [{ ...firstObservations[0], requestId: 'reqId1-1' }],
         generateBlockEntity(dataSource, '1'),
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -225,7 +226,7 @@ describe('ObservationEntityAction', () => {
           extractor: 'first-extractor',
           height: 1,
           requestId: 'reqId1-1',
-        })
+        }),
       );
     });
   });
@@ -245,7 +246,7 @@ describe('ObservationEntityAction', () => {
       };
       const insertObservation = async (
         extractor: string,
-        block: BlockEntity
+        block: BlockEntity,
       ) => {
         await action.storeObservations(
           [
@@ -265,7 +266,7 @@ describe('ObservationEntityAction', () => {
             },
           ],
           block,
-          extractor
+          extractor,
         );
       };
       const block1 = generateBlockEntity(dataSource, 'block1');
@@ -275,11 +276,11 @@ describe('ObservationEntityAction', () => {
       await insertObservation('ergo', block1);
       await insertObservation('ergo', block2);
       expect(
-        (await dataSource.getRepository(ObservationEntity).find()).length
+        (await dataSource.getRepository(ObservationEntity).find()).length,
       ).toEqual(4);
       await action.deleteBlockObservation('block1', 'ergo');
       expect(
-        (await dataSource.getRepository(ObservationEntity).find()).length
+        (await dataSource.getRepository(ObservationEntity).find()).length,
       ).toEqual(3);
     });
   });

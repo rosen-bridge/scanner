@@ -5,6 +5,7 @@ import {
 } from './abstract.mock';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let dataSource: DataSource;
 let scanner: TestWebSocketScanner;
@@ -36,7 +37,7 @@ describe('webSocketScanner', () => {
      * - must return true
      */
     it('should call fn once and return true ', async () => {
-      const mockFn = jest.fn();
+      const mockFn = vi.fn();
       mockFn.mockReturnValue(true);
       const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeTruthy();
@@ -52,7 +53,7 @@ describe('webSocketScanner', () => {
      * - must return false
      */
     it('should called fn 10 time if returns false and return false', async () => {
-      const mockFn = jest.fn();
+      const mockFn = vi.fn();
       mockFn.mockReturnValue(false);
       const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeFalsy();
@@ -80,7 +81,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
@@ -106,7 +107,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
@@ -128,7 +129,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       const inserted = await repository.findBy({ height: 101 });
       expect(inserted.length).toBe(1);

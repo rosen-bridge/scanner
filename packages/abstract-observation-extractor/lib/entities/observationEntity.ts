@@ -1,57 +1,57 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('observation_entity')
 @Unique(['requestId', 'extractor'])
 export class ObservationEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({
-    length: 30,
-  })
+  @Column({ type: 'varchar', length: 30 })
   fromChain: string;
 
-  @Column({
-    length: 30,
-  })
+  @Column({ type: 'varchar', length: 30 })
   toChain: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   fromAddress: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   toAddress: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   amount: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   networkFee: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   bridgeFee: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceChainTokenId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   targetChainTokenId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceTxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceBlockId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   requestId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 }

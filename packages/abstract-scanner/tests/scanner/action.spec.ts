@@ -7,6 +7,7 @@ import {
   PROCESSING,
 } from '../../lib/entities/blockEntity';
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 let dataSource: DataSource;
 let action: BlockDbAction;

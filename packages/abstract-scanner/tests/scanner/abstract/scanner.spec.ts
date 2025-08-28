@@ -7,6 +7,7 @@ import {
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const firstScanner = generateMockScannerClass('first');
 const secondScanner = generateMockScannerClass('second');
@@ -113,14 +114,14 @@ describe('AbstractScanner', () => {
           await dataSource
             .getRepository(BlockEntity)
             .findBy({ scanner: scanner1.name() })
-        ).length
+        ).length,
       ).toEqual(2);
       expect(
         (
           await dataSource
             .getRepository(BlockEntity)
             .findBy({ scanner: scanner2.name() })
-        ).length
+        ).length,
       ).toEqual(10);
     });
 
@@ -153,7 +154,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-        []
+        [],
       );
       const instances = await dataSource.getRepository(BlockEntity).find();
       expect(instances.length).toEqual(1);
@@ -178,7 +179,7 @@ describe('AbstractScanner', () => {
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-        [{ height: 1, blockHash: '1' }]
+        [{ height: 1, blockHash: '1' }],
       );
       expect(extractor.txs.length).toEqual(1);
     });
@@ -192,14 +193,14 @@ describe('AbstractScanner', () => {
     it('should rethrow when extractor raise exception', async () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
-      jest
-        .spyOn(extractor, 'processTransactions')
-        .mockImplementation(() => Promise.reject('this is my error on save'));
+      vi.spyOn(extractor, 'processTransactions').mockImplementation(() =>
+        Promise.reject('this is my error on save'),
+      );
       scanner.extractors.push(extractor);
       await expect(() => {
         return scanner['processBlockTransactions'](
           { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-          [{ height: 1, blockHash: '1' }]
+          [{ height: 1, blockHash: '1' }],
         );
       }).rejects.toBeTruthy();
     });
@@ -223,7 +224,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
-      const mockedInitFn = jest.fn();
+      const mockedInitFn = vi.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
@@ -254,7 +255,7 @@ describe('AbstractScanner', () => {
         updateBlockHash: 'hash',
       });
       scanner.registerExtractor(extractor);
-      const mockedInitFn = jest.fn();
+      const mockedInitFn = vi.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
@@ -283,7 +284,7 @@ describe('AbstractScanner', () => {
         updateBlockHash: 'hash',
       });
       scanner.registerExtractor(extractor);
-      const mockedInitFn = jest.fn();
+      const mockedInitFn = vi.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
@@ -312,7 +313,7 @@ describe('AbstractScanner', () => {
         updateBlockHash: 'hash',
       });
       scanner['extractors'] = [extractor];
-      const mockedInitFn = jest.fn();
+      const mockedInitFn = vi.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
@@ -341,7 +342,7 @@ describe('AbstractScanner', () => {
         updateBlockHash: 'hash',
       });
       scanner['extractors'] = [extractor];
-      const mockedInitFn = jest.fn();
+      const mockedInitFn = vi.fn();
       scanner['initializeExtractors'] = mockedInitFn;
       await scanner['verifyExtractorsInitialization']({
         height: 100,
@@ -367,7 +368,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
-      const mockedInit = jest
+      const mockedInit = vi
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
       await scanner['initializeExtractors'](['test'], {
@@ -397,7 +398,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
-      const mockedInit = jest
+      const mockedInit = vi
         .spyOn(extractor, 'initializeBoxes')
         .mockImplementation();
       await scanner['initializeExtractors'](['test2'], {
