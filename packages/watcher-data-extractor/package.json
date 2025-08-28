@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "12.1.4",
+  "version": "12.1.4-52fc0239",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "author": "Rosen Team",
   "license": "MIT",
@@ -19,10 +19,10 @@
     "dist"
   ],
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.0.3",
+    "@rosen-bridge/abstract-extractor": "^2.0.3-52fc0239",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.1.1",
+    "@rosen-bridge/scanner-interfaces": "^0.1.1-52fc0239",
     "@rosen-bridge/tokens": "^3.1.1",
     "@rosen-clients/ergo-explorer": "^1.1.5",
     "@types/lodash-es": "^4.17.6",
@@ -37,7 +37,7 @@
   "type": "module",
   "devDependencies": {
     "@babel/preset-env": "^7.19.0",
-    "@rosen-bridge/abstract-scanner": "^0.1.0",
+    "@rosen-bridge/abstract-scanner": "^0.1.0-52fc0239",
     "@types/jest": "^28.1.6",
     "@types/json-bigint": "^1.0.1",
     "@types/node": "^22.18.0",

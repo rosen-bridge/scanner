@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.1.1",
+  "version": "0.1.1-52fc0239",
   "description": "Defines all scanner interfaces",
   "repository": "",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-scanner",
-  "version": "0.1.0",
+  "version": "0.1.0-52fc0239",
   "description": "A Cardano chain scanner.",
   "repository": {
     "type": "git",
@@ -32,8 +32,8 @@
     "node": ">=22.18.0"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.1.1",
+    "@rosen-bridge/abstract-scanner": "^0.1.0-52fc0239",
+    "@rosen-bridge/scanner-interfaces": "^0.1.1-52fc0239",
     "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@blockfrost/blockfrost-js": "^6.0.0",
