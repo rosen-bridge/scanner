@@ -2,6 +2,7 @@ import { createDatabase, generateRandomId } from '../testUtils';
 import { TxAction } from '../../lib/actions/db';
 import { AddressTxsEntity, EvmTxStatus } from '../../lib';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 let action: TxAction;
@@ -104,13 +105,13 @@ describe('TxAction', () => {
           parentHash: '',
           timestamp: 10,
         },
-        'extractor 1'
+        'extractor 1',
       );
       const records = await repository.find();
       expect(records.length).toEqual(2);
       for (const tx of txs) {
         const element = records.filter(
-          (item) => item.signedHash === tx.signedHash
+          (item) => item.signedHash === tx.signedHash,
         );
         expect(element.length).toEqual(1);
         expect(element[0].unsignedHash).toEqual(tx.unsignedHash);

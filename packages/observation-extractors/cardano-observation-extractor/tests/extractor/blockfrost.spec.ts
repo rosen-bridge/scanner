@@ -7,6 +7,7 @@ import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { validLockTx } from './blockFrostTestData';
 import { TokenMap } from '@rosen-bridge/tokens';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 class CardanoBlockFrostExtractor extends CardanoBlockFrostObservationExtractor {}
 
@@ -44,11 +45,11 @@ describe('cardanoBlockFrostObservationExtractor', () => {
       const extractor = new CardanoBlockFrostExtractor(
         dataSource,
         tokenMap,
-        bankAddress
+        bankAddress,
       );
       const res = await extractor.processTransactions(
         [tx],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
 
       // check returned valid
@@ -106,11 +107,11 @@ describe('cardanoBlockFrostObservationExtractor', () => {
       const extractor = new CardanoBlockFrostExtractor(
         dataSource,
         tokenMap,
-        'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'
+        'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx',
       );
       const res = await extractor.processTransactions(
         [tx],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
 
       // check returned valid

@@ -1,48 +1,53 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('commitment_entity')
 @Unique(['boxId', 'extractor'])
-class CommitmentEntity {
+export class CommitmentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   eventId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   commitment: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   WID: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
-  @Column()
+  @Column({ type: 'text' })
   boxSerialized: string;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendBlock?: string | null;
 
   @Column({ nullable: true, type: 'int' })
   spendHeight?: number | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   rwtCount?: string;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendTxId?: string | null;
 
   @Column({ nullable: true, type: 'int' })

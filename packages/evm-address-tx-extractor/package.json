@@ -10,19 +10,19 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS=--loader=extensionless vitest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "NODE_OPTIONS='--import tsx' vitest",
+    "coverage": "npm run test -- --coverage"
   },
   "devDependencies": {
     "@types/node": "^22.18.0",
-    "@vitest/coverage-istanbul": "^1.2.2",
-    "extensionless": "^1.9.6",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "@vitest/coverage-istanbul": "^3.1.4",
+    "vitest": "^3.1.4",
+    "tsx": "^4.19.4"
   },
   "engines": {
     "node": ">=22.18.0"

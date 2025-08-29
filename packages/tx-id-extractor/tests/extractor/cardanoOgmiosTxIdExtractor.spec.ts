@@ -2,6 +2,7 @@ import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosTxIdExtractor, TxIdEntity } from '../../lib';
 import txs from './data/cardanoOgmiosTxIdExtractor.data';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 
@@ -21,7 +22,7 @@ describe('CardanoOgmiosTxIdExtractor', () => {
     it('should store all transaction ids of block in database', async () => {
       const extractor = new CardanoOgmiosTxIdExtractor(
         dataSource,
-        'extractor1'
+        'extractor1',
       );
       const repository = dataSource.getRepository(TxIdEntity);
       await repository.createQueryBuilder().delete().execute();

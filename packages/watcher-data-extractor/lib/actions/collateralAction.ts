@@ -1,10 +1,15 @@
+import { CollateralEntity } from './../entities/CollateralEntity';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
-import { DataSource, DeleteResult, In, IsNull, Repository } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  DeleteResult,
+  In,
+  IsNull,
+  Repository,
+} from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
-
-import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
 import { SpendInfo } from '../interfaces/types';
 
@@ -13,7 +18,7 @@ class CollateralAction {
 
   constructor(
     private readonly dataSource: DataSource,
-    readonly logger: AbstractLogger = new DummyLogger()
+    readonly logger: AbstractLogger = new DummyLogger(),
   ) {
     this.collateralRepository = this.dataSource.getRepository(CollateralEntity);
   }
@@ -27,7 +32,7 @@ class CollateralAction {
    */
   insertCollateral = async (
     collateral: ExtractedCollateral,
-    extractor: string
+    extractor: string,
   ) => {
     return await this.collateralRepository.insert({
       ...collateral,
@@ -45,14 +50,14 @@ class CollateralAction {
   updateCollateral = async (
     collateral: Partial<ExtractedCollateral> &
       Pick<ExtractedCollateral, 'boxId'>,
-    extractor: string
+    extractor: string,
   ) => {
     return await this.collateralRepository.update(
       {
         extractor,
         boxId: collateral.boxId,
       },
-      collateral
+      collateral,
     );
   };
 
@@ -68,7 +73,7 @@ class CollateralAction {
   storeCollaterals = async (
     collaterals: Array<ExtractedCollateral>,
     block: Block,
-    extractor: string
+    extractor: string,
   ): Promise<boolean> => {
     if (collaterals.length == 0) {
       return true;
@@ -89,9 +94,8 @@ class CollateralAction {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const repository = await queryRunner.manager.getRepository(
-        CollateralEntity
-      );
+      const repository =
+        await queryRunner.manager.getRepository(CollateralEntity);
       const existingBoxIds = (
         await repository.find({
           where: {
@@ -105,24 +109,24 @@ class CollateralAction {
       ).map((col) => col.boxId);
 
       const collateralsToUpdate = collateralEntities.filter((col) =>
-        existingBoxIds.includes(col.boxId)
+        existingBoxIds.includes(col.boxId),
       );
 
       const collateralsToInsert = difference(
         collateralEntities,
-        collateralsToUpdate
+        collateralsToUpdate,
       );
 
       if (collateralsToUpdate.length > 0) {
         this.logger.info(
           `Inserting boxes with following IDs into the database: [${collateralsToInsert
             .map((col) => col.boxId)
-            .join(', ')}]`
+            .join(', ')}]`,
         );
         this.logger.debug(
           `Inserting collateral boxes [${JsonBigInt.stringify(
-            collateralsToInsert
-          )}]`
+            collateralsToInsert,
+          )}]`,
         );
       }
       await repository.insert(collateralsToInsert);
@@ -131,17 +135,17 @@ class CollateralAction {
         this.logger.info(
           `Updating boxes with following IDs in the database: [${collateralsToUpdate
             .map((col) => col.boxId)
-            .join(', ')}]`
+            .join(', ')}]`,
         );
       collateralsToUpdate.forEach(async (collateral) => {
         this.logger.debug(
           `Updating collateral box in database [${JsonBigInt.stringify(
-            collateral
-          )}]`
+            collateral,
+          )}]`,
         );
         await repository.update(
           { boxId: collateral.boxId, extractor: extractor },
-          collateral
+          collateral,
         );
       });
 
@@ -149,7 +153,7 @@ class CollateralAction {
     } catch (e) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
-        `An error occurred during storeCollaterals action: ${e}`
+        `An error occurred during storeCollaterals action: ${e}`,
       );
       return false;
     } finally {
@@ -171,7 +175,7 @@ class CollateralAction {
   spendCollaterals = async (
     spendInfos: Array<SpendInfo>,
     block: Block,
-    extractor: string
+    extractor: string,
   ): Promise<void> => {
     for (const spendInfo of spendInfos) {
       const updateResult = await this.collateralRepository.update(
@@ -183,7 +187,7 @@ class CollateralAction {
           spendBlock: block.hash,
           spendHeight: block.height,
           spendTxId: spendInfo.txId,
-        }
+        },
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
@@ -193,7 +197,7 @@ class CollateralAction {
         });
         for (const row of updatedRows) {
           this.logger.debug(
-            `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wid}] at height ${block.height}`
+            `Spent collateral with boxId [${row.boxId}] belonging to watcher with WID [${row.wid}] at height ${block.height}`,
           );
         }
       }
@@ -208,7 +212,7 @@ class CollateralAction {
    * @memberof CollateralAction
    */
   getUnspentCollateralBoxIds = async (
-    extractor: string
+    extractor: string,
   ): Promise<Array<string>> => {
     const boxIds = await this.collateralRepository.find({
       where: {
@@ -233,7 +237,7 @@ class CollateralAction {
    */
   async deleteBlock(block: string, extractor: string): Promise<void> {
     this.logger.info(
-      `Deleting collaterals in block=[${block}] and extractor=[${extractor}]`
+      `Deleting collaterals in block=[${block}] and extractor=[${extractor}]`,
     );
 
     await this.collateralRepository.delete({
@@ -242,7 +246,7 @@ class CollateralAction {
     });
 
     this.logger.info(
-      `changing spent collaterals in block=[${block}] and extractor=[${extractor}] to unspent status`
+      `changing spent collaterals in block=[${block}] and extractor=[${extractor}] to unspent status`,
     );
 
     await this.collateralRepository.update(
@@ -251,7 +255,7 @@ class CollateralAction {
         spendBlock: null,
         spendHeight: null,
         spendTxId: null,
-      }
+      },
     );
   }
 
@@ -265,7 +269,7 @@ class CollateralAction {
    */
   deleteCollateral = async (
     boxId: string,
-    extractor: string
+    extractor: string,
   ): Promise<DeleteResult> => {
     return await this.collateralRepository.delete({
       boxId: boxId,

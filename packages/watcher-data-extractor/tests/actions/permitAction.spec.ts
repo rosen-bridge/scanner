@@ -1,5 +1,5 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-
+import { describe, it, expect, beforeEach } from 'vitest';
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import { block, block2 } from '../extractor/utilsVariable.mock';
@@ -56,7 +56,7 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [samplePermit1, samplePermit2],
         block,
-        'extractor1'
+        'extractor1',
       );
       expect(res).toEqual(true);
       const [rows, rowsCount] = await repository.findAndCount();
@@ -69,7 +69,7 @@ describe('PermitEntityAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
       expect(rows[1]).toEqual(
         expect.objectContaining({
@@ -79,7 +79,7 @@ describe('PermitEntityAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -107,7 +107,7 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [samplePermit3, samplePermit4],
         block,
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows] = await repository.findAndCount();
@@ -119,7 +119,7 @@ describe('PermitEntityAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
       expect(secondInsertRows[3]).toEqual(
         expect.objectContaining({
@@ -129,7 +129,7 @@ describe('PermitEntityAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -158,7 +158,7 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [{ ...samplePermit1, boxSerialized: 'updatedBoxSerialized' }],
         block,
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -174,7 +174,7 @@ describe('PermitEntityAction', () => {
           spendBlock: null,
           spendHeight: null,
           id: 1,
-        })
+        }),
       );
     });
 
@@ -204,7 +204,7 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [{ ...samplePermit1 }],
         block,
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -219,7 +219,7 @@ describe('PermitEntityAction', () => {
           spendBlock: null,
           spendHeight: null,
           id: 3,
-        })
+        }),
       );
     });
 
@@ -249,7 +249,7 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [{ ...samplePermit3 }],
         block,
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -264,7 +264,7 @@ describe('PermitEntityAction', () => {
           spendBlock: null,
           spendHeight: null,
           id: 3,
-        })
+        }),
       );
     });
   });
@@ -274,15 +274,15 @@ describe('PermitEntityAction', () => {
       const res = await action.storePermits(
         [samplePermit1, samplePermit2],
         block,
-        'extractor1'
+        'extractor1',
       );
       expect(res).toEqual(true);
       expect((await repository.findBy({ spendBlock: 'hash' })).length).toEqual(
-        0
+        0,
       );
       await action.spendPermits(['1', 'boxId10'], block, 'extractor1');
       expect(
-        (await repository.findBy({ boxId: '1', spendBlock: 'hash' })).length
+        (await repository.findBy({ boxId: '1', spendBlock: 'hash' })).length,
       ).toEqual(1);
     });
   });
@@ -293,7 +293,7 @@ describe('PermitEntityAction', () => {
       await action.storePermits(
         [samplePermit2],
         { ...block, hash: 'hash2' },
-        'extractor2'
+        'extractor2',
       );
     });
 
@@ -422,7 +422,7 @@ describe('PermitEntityAction', () => {
       await repository.insert([samplePermit1]);
       const result = await action.removePermit(
         samplePermit1.boxId,
-        samplePermit1.extractor
+        samplePermit1.extractor,
       );
       expect(result.affected).toEqual(1);
     });
@@ -451,7 +451,7 @@ describe('PermitEntityAction', () => {
         samplePermit1.boxId,
         samplePermit1.extractor,
         'spendBlock-new',
-        110
+        110,
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('spendBlock-new');

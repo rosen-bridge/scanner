@@ -1,5 +1,5 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CollateralEntity } from '../../lib';
 import CollateralAction from '../../lib/actions/collateralAction';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
@@ -70,14 +70,14 @@ describe('CollateralAction', () => {
           boxId: updatedCollateral.boxId,
           ...updatedProps,
         },
-        updatedCollateral.extractor
+        updatedCollateral.extractor,
       );
 
       const [rows, rowCount] = await repository.findAndCount();
 
       expect(rowCount).toEqual(2);
       expect(
-        rows.filter((col) => col.boxId === updatedCollateral.boxId)[0]
+        rows.filter((col) => col.boxId === updatedCollateral.boxId)[0],
       ).toMatchObject({
         ...updatedCollateral,
         ...updatedProps,
@@ -100,7 +100,7 @@ describe('CollateralAction', () => {
       const success = await action.storeCollaterals(
         testData.sampleCollateralEntities.slice(0, 2),
         block,
-        'extractor1'
+        'extractor1',
       );
 
       const [rows, rowsCount] = await repository.findAndCount();
@@ -115,7 +115,7 @@ describe('CollateralAction', () => {
           block: block.hash,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
       expect(rows[1]).toEqual(
         expect.objectContaining({
@@ -124,7 +124,7 @@ describe('CollateralAction', () => {
           block: block.hash,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -160,7 +160,7 @@ describe('CollateralAction', () => {
           testData.sampleCollateralEntities[3],
         ],
         block,
-        'second-extractor'
+        'second-extractor',
       );
 
       expect(success).toEqual(true);
@@ -173,7 +173,7 @@ describe('CollateralAction', () => {
           block: 'hash',
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
 
       expect(insertedRows[3]).toEqual(
@@ -183,7 +183,7 @@ describe('CollateralAction', () => {
           block: 'hash',
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -220,7 +220,7 @@ describe('CollateralAction', () => {
           },
         ],
         block,
-        'first-extractor'
+        'first-extractor',
       );
 
       expect(success).toEqual(true);
@@ -236,7 +236,7 @@ describe('CollateralAction', () => {
           block: 'hash',
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -269,7 +269,7 @@ describe('CollateralAction', () => {
       const success = await action.storeCollaterals(
         [testData.sampleCollateralEntities[1]],
         block,
-        'second-extractor'
+        'second-extractor',
       );
 
       expect(success).toEqual(true);
@@ -284,7 +284,7 @@ describe('CollateralAction', () => {
           block: 'hash',
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
   });
@@ -304,7 +304,7 @@ describe('CollateralAction', () => {
       await action.storeCollaterals(
         testData.sampleCollateralEntities.slice(0, 2),
         block,
-        'extractor1'
+        'extractor1',
       );
 
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
@@ -347,7 +347,7 @@ describe('CollateralAction', () => {
       await action.storeCollaterals(
         testData.sampleCollateralEntities,
         block,
-        'extractor1'
+        'extractor1',
       );
 
       const spendBlock = { ...block, hash: 'spendHash', height: 10006016 };
@@ -361,12 +361,11 @@ describe('CollateralAction', () => {
       }));
       await action.spendCollaterals(spendInfos, spendBlock, 'extractor1');
 
-      const unspentCollateralBoxIds = await action.getUnspentCollateralBoxIds(
-        'extractor1'
-      );
+      const unspentCollateralBoxIds =
+        await action.getUnspentCollateralBoxIds('extractor1');
 
       expect(unspentCollateralBoxIds).toEqual(
-        unspentCollaterals.map((col) => col.boxId)
+        unspentCollaterals.map((col) => col.boxId),
       );
     });
   });
@@ -387,7 +386,7 @@ describe('CollateralAction', () => {
       await action.storeCollaterals(
         testData.sampleCollateralEntities,
         block,
-        'extractor1'
+        'extractor1',
       );
       const boxIdToDelete = testData.sampleCollateralEntities[0].boxId;
       await action.deleteCollateral(boxIdToDelete, 'extractor1');

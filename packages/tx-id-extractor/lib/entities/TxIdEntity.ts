@@ -1,16 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('tx_id_entity')
 export class TxIdEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   blockId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 }

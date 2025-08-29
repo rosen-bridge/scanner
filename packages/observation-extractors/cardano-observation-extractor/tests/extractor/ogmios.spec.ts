@@ -6,6 +6,7 @@ import { Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/abstract-scanner';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;
@@ -20,7 +21,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
     extractor = new CardanoOgmiosObservationExtractor(
       dataSource,
       tokenMap,
-      bankAddress
+      bankAddress,
     );
   });
 
@@ -88,7 +89,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions([Transactions.noMetadata], block);
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
 
@@ -102,10 +103,10 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions(
         [Transactions.invalidMetadata],
-        block
+        block,
       );
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
 
@@ -119,7 +120,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions([Transactions.invalidAddress], block);
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
   });

@@ -11,6 +11,7 @@ import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { KoiosTransaction } from '../../lib/interfaces/koiosTransaction';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 
@@ -37,12 +38,12 @@ describe('cardanoKoiosObservationExtractor', () => {
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokenMap,
-        bankAddress
+        bankAddress,
       );
       const Tx: KoiosTransaction = cardanoTxValid;
       const res = await extractor.processTransactions(
         [Tx],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(ObservationEntity);
@@ -85,12 +86,12 @@ describe('cardanoKoiosObservationExtractor', () => {
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokenMap,
-        'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx'
+        'addr_test1qq5qeusgymq8ledv9gltp9fuh5jchetjeafha75n6dghur4gtzcgx',
       );
       const Tx: KoiosTransaction = cardanoTxValid;
       const res = await extractor.processTransactions(
         [Tx],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(ObservationEntity);
@@ -110,7 +111,7 @@ describe('cardanoKoiosObservationExtractor', () => {
       const extractor = new CardanoKoiosExtractor(
         dataSource,
         tokenMap,
-        bankAddress
+        bankAddress,
       );
       const Tx: KoiosTransaction = {
         ...cardanoTxValid,
@@ -123,7 +124,7 @@ describe('cardanoKoiosObservationExtractor', () => {
       };
       const res = await extractor.processTransactions(
         [Tx],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(ObservationEntity);

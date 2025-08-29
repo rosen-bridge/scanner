@@ -1,44 +1,47 @@
 import { BigIntValueTransformer } from '@rosen-bridge/extended-typeorm';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('collateral_entity')
 @Unique(['boxId', 'extractor'])
-class CollateralEntity {
+export class CollateralEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   boxSerialized: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   wid: string;
 
   @Column({ type: 'bigint', transformer: new BigIntValueTransformer() })
   rwtCount: bigint;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
   @Column({ nullable: true, type: 'varchar' })
   spendBlock?: string | null;
 
-  @Column({ nullable: true, type: 'integer' })
+  @Column({ nullable: true, type: 'int' })
   spendHeight?: number | null;
 
   @Column({ nullable: true, type: 'varchar' })
   spendTxId?: string | null;
 }
-
-export default CollateralEntity;

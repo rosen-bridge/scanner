@@ -10,6 +10,7 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
@@ -47,7 +48,7 @@ describe('extractorErgo', () => {
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const Tx2 = observationTxGenerator(
         true,
@@ -58,7 +59,7 @@ describe('extractorErgo', () => {
           '1000',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const Tx3 = observationTxGenerator(
         false,
@@ -70,11 +71,11 @@ describe('extractorErgo', () => {
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const res = await extractor.processTransactions(
         [Tx1, Tx2, Tx3],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(ObservationEntity);
@@ -99,7 +100,7 @@ describe('extractorErgo', () => {
         sourceBlockId: '1',
         sourceTxId: box1.transactionId,
         requestId: Buffer.from(
-          blake2b(box1.transactionId, undefined, 32)
+          blake2b(box1.transactionId, undefined, 32),
         ).toString('hex'),
         block: '1',
         extractor: 'ergo-observation-extractor',
@@ -118,7 +119,7 @@ describe('extractorErgo', () => {
       const extractor = new ExtractorErgo(
         dataSource,
         tokenMap,
-        '9gDQ7emWoxJkAHW8kSwniCkDa43G2w9LCL9voHgfj2AvXfFSQ8i'
+        '9gDQ7emWoxJkAHW8kSwniCkDa43G2w9LCL9voHgfj2AvXfFSQ8i',
       );
       const Tx1 = observationTxGenerator(
         true,
@@ -130,11 +131,11 @@ describe('extractorErgo', () => {
           watcherAddress,
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const res = await extractor.processTransactions(
         [Tx1],
-        generateBlockEntity(dataSource, '1')
+        generateBlockEntity(dataSource, '1'),
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(ObservationEntity);
@@ -170,7 +171,7 @@ describe('extractorErgo', () => {
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const Tx2 = observationTxGenerator(
         true,
@@ -181,7 +182,7 @@ describe('extractorErgo', () => {
           '1000',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const Tx3 = observationTxGenerator(
         false,
@@ -193,11 +194,11 @@ describe('extractorErgo', () => {
           '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
         ],
         bankSK,
-        watcherSK
+        watcherSK,
       );
       const res = await extractor.processTransactions(
         [Tx1, Tx2, Tx3],
-        generateBlockEntity(dataSource, '1', '1', 500000)
+        generateBlockEntity(dataSource, '1', '1', 500000),
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(ObservationEntity);
