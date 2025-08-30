@@ -28,11 +28,8 @@ export default {
     const packages = [
       'tsx',
       '@vitest/coverage-istanbul',
-      'extensionless',
       'reflect-metadata',
       '@types/json-bigint',
-      '@babel/preset-env',
-      '@types/jest',
       '@typescript-eslint/eslint-plugin',
       '@typescript-eslint/parser',
       '@types/node',
