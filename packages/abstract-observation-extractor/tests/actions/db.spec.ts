@@ -4,7 +4,6 @@ import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import { firstObservations, secondObservations } from '../observations.mock';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { beforeEach, describe, expect, it } from 'vitest';
 
 let dataSource: DataSource;
 let action: ObservationEntityAction;

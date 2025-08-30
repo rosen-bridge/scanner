@@ -5,7 +5,6 @@ import {
 } from './abstract.mock';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let dataSource: DataSource;
 let scanner: TestWebSocketScanner;

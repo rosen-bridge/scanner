@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { describe, vi, expect } from 'vitest';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { Block } from '@rosen-bridge/scanner-interfaces';
@@ -37,7 +36,7 @@ describe('RunesAbstractObservationExtractor', () => {
       {
         get: vi.fn().mockReturnValue(rosenData),
       } as any,
-      undefined
+      undefined,
     );
   });
 
@@ -71,7 +70,7 @@ describe('RunesAbstractObservationExtractor', () => {
       };
 
       vi.spyOn(extractor as any, 'getTxRunesTransfer').mockResolvedValue(
-        mockOrdiscanRunesTransfer
+        mockOrdiscanRunesTransfer,
       );
 
       vi.spyOn(extractor['tokens'], 'search').mockReturnValue([wrappedRune]);
@@ -115,7 +114,7 @@ describe('RunesAbstractObservationExtractor', () => {
           },
         ],
         mockBlock,
-        'test-observation-extractor'
+        'test-observation-extractor',
       );
 
       expect(result).toBe(true);
