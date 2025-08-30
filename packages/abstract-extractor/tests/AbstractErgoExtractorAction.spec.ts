@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { pick } from 'lodash-es';
 
 import { TestErgoExtractorAction } from './AbstractErgoExtractorAction.mock';
@@ -31,7 +30,7 @@ describe('AbstractErgoExtractorAction', () => {
       const result = await action.storeBoxes(
         sampleEntities.slice(0, 2),
         block,
-        'extractor1'
+        'extractor1',
       );
 
       const [rows, rowsCount] = await repository.findAndCount();
@@ -85,7 +84,7 @@ describe('AbstractErgoExtractorAction', () => {
       const result = await action.storeBoxes(
         [sampleEntities[0], sampleEntities[1]],
         block,
-        'second-extractor'
+        'second-extractor',
       );
 
       const [insertedRows] = await repository.findAndCount();
@@ -143,7 +142,7 @@ describe('AbstractErgoExtractorAction', () => {
           },
         ],
         block,
-        'extractor'
+        'extractor',
       );
       const [secondInsertRows, secondInsertRowsCount] =
         await repository.findAndCount();
@@ -184,7 +183,7 @@ describe('AbstractErgoExtractorAction', () => {
       const spentBoxIds = await action.spendBoxes(
         spendInfos,
         spendBlock,
-        'extractor1'
+        'extractor1',
       );
 
       const spentBoxes = await repository.findOneBy({
@@ -225,11 +224,11 @@ describe('AbstractErgoExtractorAction', () => {
 
       expect(rowsCount).toEqual(2);
       expect(rows.map((row) => row.boxId)).not.toContain(
-        sampleEntities.slice(2).map((box) => box.boxId)
+        sampleEntities.slice(2).map((box) => box.boxId),
       );
       expect(result).toEqual({
         deletedData: action.convertEntityToData(
-          sampleEntities.slice(2) as TestEntity[]
+          sampleEntities.slice(2) as TestEntity[],
         ),
         updatedData: [],
       });
@@ -258,7 +257,7 @@ describe('AbstractErgoExtractorAction', () => {
 
       expect(rowsCount).toEqual(4);
       expect(rows.map((row) => row.boxId)).not.toContain(
-        sampleEntities.slice(2).map((box) => box.boxId)
+        sampleEntities.slice(2).map((box) => box.boxId),
       );
       expect(result).toEqual({
         deletedData: [],
