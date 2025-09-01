@@ -2,7 +2,7 @@ import { AbstractErgoExtractorEntity } from '@rosen-bridge/abstract-extractor';
 import { Column, Entity } from '@rosen-bridge/extended-typeorm';
 
 @Entity('event_trigger_entity')
-export class EventTriggerEntity extends AbstractErgoExtractorEntity {
+class EventTriggerEntity extends AbstractErgoExtractorEntity {
   @Column({ type: 'varchar', default: 'Not-set' })
   eventId: string;
 

@@ -8,7 +8,7 @@ import {
 
 @Entity('collateral_entity')
 @Unique(['boxId', 'extractor'])
-export class CollateralEntity {
+class CollateralEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -45,3 +45,5 @@ export class CollateralEntity {
   @Column({ nullable: true, type: 'varchar' })
   spendTxId?: string | null;
 }
+
+export default CollateralEntity;

@@ -7,7 +7,7 @@ import {
 
 @Entity('permit_entity')
 @Unique(['boxId', 'extractor'])
-export class PermitEntity {
+class PermitEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

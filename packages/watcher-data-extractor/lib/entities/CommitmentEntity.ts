@@ -7,7 +7,7 @@ import {
 
 @Entity('commitment_entity')
 @Unique(['boxId', 'extractor'])
-export class CommitmentEntity {
+class CommitmentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
