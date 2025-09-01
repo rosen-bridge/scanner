@@ -93,10 +93,9 @@ describe('generalScanner', () => {
       const txs = [{ height: 1, blockHash: '1' }];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
-      const mockedProcessBlockTransactions = vi.spyOn(
-        scanner as any,
-        'processBlockTransactions',
-      );
+      const mockedProcessBlockTransactions = vi
+        .spyOn(scanner as any, 'processBlockTransactions')
+        .mockImplementation(() => {});
       const block = {
         hash: '1',
         parentHash: ' ',
@@ -151,10 +150,9 @@ describe('generalScanner', () => {
       const txs: Array<TestTransaction> = [];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
-      const mockedProcessBlockTransactions = vi.spyOn(
-        scanner as any,
-        'processBlockTransactions',
-      );
+      const mockedProcessBlockTransactions = vi
+        .spyOn(scanner as any, 'processBlockTransactions')
+        .mockImplementation(() => {});
       const result = await scanner['processBlock']({
         hash: '1',
         parentHash: '2',
@@ -181,10 +179,9 @@ describe('generalScanner', () => {
       const txs = [{ height: 1, blockHash: '1' }];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
-      const mockedProcessBlockTransactions = vi.spyOn(
-        scanner as any,
-        'processBlockTransactions',
-      );
+      const mockedProcessBlockTransactions = vi
+        .spyOn(scanner as any, 'processBlockTransactions')
+        .mockImplementation(() => {});
       const block = {
         hash: '1',
         parentHash: '2',
@@ -394,7 +391,9 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
-      const mockedInit = vi.spyOn(extractor, 'initializeBoxes');
+      const mockedInit = vi
+        .spyOn(extractor, 'initializeBoxes')
+        .mockImplementation(async () => {});
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
       expect(scanner.newExtractors.length).toBe(0);
@@ -416,7 +415,9 @@ describe('generalScanner', () => {
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const processSpy = vi.spyOn(scanner as any, 'processBlock');
+      const processSpy = vi
+        .spyOn(scanner as any, 'processBlock')
+        .mockImplementation(async () => {});
       vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
       vi.spyOn(
         scanner as any,
@@ -477,7 +478,9 @@ describe('generalScanner', () => {
       );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
-      const mockedStepForward = vi.spyOn(scanner as any, 'stepForward');
+      const mockedStepForward = vi
+        .spyOn(scanner as any, 'stepForward')
+        .mockImplementation(async () => {});
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
     });
@@ -531,7 +534,9 @@ describe('generalScanner', () => {
       );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
-      const mockedStepBackward = vi.spyOn(scanner as any, 'stepBackward');
+      const mockedStepBackward = vi
+        .spyOn(scanner as any, 'stepBackward')
+        .mockImplementation(async () => {});
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();
     });

@@ -1,4 +1,4 @@
-import { CollateralEntity } from './../entities/CollateralEntity';
+import CollateralEntity from './../entities/CollateralEntity';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
