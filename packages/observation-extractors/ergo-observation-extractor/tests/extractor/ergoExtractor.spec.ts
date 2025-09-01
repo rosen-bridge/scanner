@@ -10,7 +10,6 @@ import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 

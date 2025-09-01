@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventResult, EventTriggerEntity } from '../../lib';
 import EventTriggerAction from '../../lib/actions/EventTriggerAction';

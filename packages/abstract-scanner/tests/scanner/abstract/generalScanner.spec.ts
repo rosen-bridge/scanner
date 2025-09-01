@@ -11,7 +11,6 @@ import {
 } from './abstract.mock';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockEntity } from '../../../lib';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const firstScanner = generateMockGeneralScannerClass('first');
 const scannerByBlockRetrieveGapClass =
@@ -67,16 +66,14 @@ describe('generalScanner', () => {
      */
     it('should return false when network and db block are same', async () => {
       const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getBlockAtHeight')
-        .mockImplementation()
-        .mockImplementation(() =>
-          Promise.resolve({
-            height: 3,
-            parentHash: '2',
-            hash: '3',
-            timestamp: 50,
-          }),
-        );
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(() =>
+        Promise.resolve({
+          height: 3,
+          parentHash: '2',
+          hash: '3',
+          timestamp: 50,
+        }),
+      );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
       expect(await scanner['isForkHappen']()).toBeFalsy();
@@ -94,13 +91,12 @@ describe('generalScanner', () => {
     it('should get transaction for specific block and call processBlockTransactions', async () => {
       const network = new NetworkConnectorTest();
       const txs = [{ height: 1, blockHash: '1' }];
-      vi.spyOn(network, 'getBlockTxs')
-        .mockImplementation()
-        .mockReturnValue(Promise.resolve(txs));
+      vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
-      const mockedProcessBlockTransactions = vi
-        .spyOn(scanner as any, 'processBlockTransactions')
-        .mockImplementation();
+      const mockedProcessBlockTransactions = vi.spyOn(
+        scanner as any,
+        'processBlockTransactions',
+      );
       const block = {
         hash: '1',
         parentHash: ' ',
@@ -153,9 +149,7 @@ describe('generalScanner', () => {
     it('should return false when could not receive the required transactions', async () => {
       const network = new NetworkConnectorTest();
       const txs: Array<TestTransaction> = [];
-      vi.spyOn(network, 'getBlockTxs')
-        .mockImplementation()
-        .mockReturnValue(Promise.resolve(txs));
+      vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = vi.spyOn(
         scanner as any,
@@ -185,13 +179,12 @@ describe('generalScanner', () => {
     it('should call processBlockTransactions when receive the required transactions', async () => {
       const network = new NetworkConnectorTest();
       const txs = [{ height: 1, blockHash: '1' }];
-      vi.spyOn(network, 'getBlockTxs')
-        .mockImplementation()
-        .mockReturnValue(Promise.resolve(txs));
+      vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
       const scanner = new firstScanner(dataSource, network);
-      const mockedProcessBlockTransactions = vi
-        .spyOn(scanner as any, 'processBlockTransactions')
-        .mockImplementation();
+      const mockedProcessBlockTransactions = vi.spyOn(
+        scanner as any,
+        'processBlockTransactions',
+      );
       const block = {
         hash: '1',
         parentHash: '2',
@@ -214,12 +207,11 @@ describe('generalScanner', () => {
      */
     it('should insert block on stepForward', async () => {
       const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getCurrentHeight')
-        .mockImplementation()
-        .mockReturnValue(new Promise((resolve) => resolve(4)));
-      vi.spyOn(network, 'getBlockAtHeight')
-        .mockImplementation()
-        .mockImplementation((height: number) => {
+      vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
+        new Promise((resolve) => resolve(4)),
+      );
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        (height: number) => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
@@ -260,7 +252,8 @@ describe('generalScanner', () => {
               }
             }
           });
-        });
+        },
+      );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
       const lastBlock = await scanner.action.getLastSavedBlock();
@@ -284,9 +277,8 @@ describe('generalScanner', () => {
      */
     it('stepBackward', async () => {
       const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getBlockAtHeight')
-        .mockImplementation()
-        .mockImplementation((height: number) => {
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        (height: number) => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
@@ -318,10 +310,11 @@ describe('generalScanner', () => {
               }
             }
           });
-        });
-      vi.spyOn(network, 'getCurrentHeight')
-        .mockImplementation()
-        .mockReturnValue(new Promise((resolve) => resolve(3)));
+        },
+      );
+      vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
+        new Promise((resolve) => resolve(3)),
+      );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
       await scanner['stepBackward']();
@@ -363,27 +356,24 @@ describe('generalScanner', () => {
     it('should call initialize', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const mockedInit = vi
-        .spyOn(scanner as any, 'initialize')
-        .mockImplementation()
-        .mockReturnValue(
-          new Promise((resolve, reject) => {
-            scanner.action
-              .saveBlock({
-                height: 2,
-                parentHash: 'parent',
-                hash: 'hash',
-                timestamp: 10,
-              })
-              .then((res) => {
-                if (typeof res === 'boolean') {
-                  reject();
-                } else {
-                  resolve(res);
-                }
-              });
-          }),
-        );
+      const mockedInit = vi.spyOn(scanner as any, 'initialize').mockReturnValue(
+        new Promise((resolve, reject) => {
+          scanner.action
+            .saveBlock({
+              height: 2,
+              parentHash: 'parent',
+              hash: 'hash',
+              timestamp: 10,
+            })
+            .then((res) => {
+              if (typeof res === 'boolean') {
+                reject();
+              } else {
+                resolve(res);
+              }
+            });
+        }),
+      );
       await scanner.update();
       expect(mockedInit).toBeCalled();
     });
@@ -404,9 +394,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
-      const mockedInit = vi
-        .spyOn(extractor, 'initializeBoxes')
-        .mockImplementation();
+      const mockedInit = vi.spyOn(extractor, 'initializeBoxes');
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
       expect(scanner.newExtractors.length).toBe(0);
@@ -449,9 +437,8 @@ describe('generalScanner', () => {
      */
     it('should call stepForward', async () => {
       const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getBlockAtHeight')
-        .mockImplementation()
-        .mockImplementation((height: number) => {
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        (height: number) => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
@@ -483,15 +470,14 @@ describe('generalScanner', () => {
               }
             }
           });
-        });
-      vi.spyOn(network, 'getCurrentHeight')
-        .mockImplementation()
-        .mockReturnValue(new Promise((resolve) => resolve(3)));
+        },
+      );
+      vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
+        new Promise((resolve) => resolve(3)),
+      );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 2);
-      const mockedStepForward = vi
-        .spyOn(scanner as any, 'stepForward')
-        .mockImplementation();
+      const mockedStepForward = vi.spyOn(scanner as any, 'stepForward');
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
     });
@@ -505,9 +491,8 @@ describe('generalScanner', () => {
      */
     it('should call stepBackward', async () => {
       const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getBlockAtHeight')
-        .mockImplementation()
-        .mockImplementation((height: number) => {
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        (height: number) => {
           return new Promise((resolve) => {
             switch (height) {
               case 1: {
@@ -539,15 +524,14 @@ describe('generalScanner', () => {
               }
             }
           });
-        });
-      vi.spyOn(network, 'getCurrentHeight')
-        .mockImplementation()
-        .mockReturnValue(new Promise((resolve) => resolve(3)));
+        },
+      );
+      vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
+        new Promise((resolve) => resolve(3)),
+      );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
-      const mockedStepBackward = vi
-        .spyOn(scanner as any, 'stepBackward')
-        .mockImplementation();
+      const mockedStepBackward = vi.spyOn(scanner as any, 'stepBackward');
       await scanner.update();
       expect(mockedStepBackward).toBeCalled();
     });

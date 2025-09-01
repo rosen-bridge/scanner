@@ -1,4 +1,3 @@
-import { describe, expect, it, vi, vitest } from 'vitest';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import {
@@ -29,7 +28,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       (
         extractor['network'] as NodeNetwork
@@ -58,7 +57,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       const processSpy = vitest.fn().mockResolvedValue(true);
       extractor.processTransactions = processSpy;
@@ -73,7 +72,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         {
           hash: 'b861e2134821fcf1fcdad7e6edd56c4e4495b42b2fd72762a4c79ed1db78b44b',
           height: 1320705,
-        }
+        },
       );
     });
 
@@ -91,11 +90,11 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       extractor.processTransactions = vitest.fn().mockResolvedValue(false);
       await expect(() =>
-        extractor['processTransactionBatch'](transactionBatch)
+        extractor['processTransactionBatch'](transactionBatch),
       ).rejects.toThrowError();
     });
   });
@@ -120,7 +119,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         'node_url',
         'address',
         undefined,
-        false
+        false,
       );
       const removeSpy = vitest.fn();
       extractor['actions'] = {
@@ -152,7 +151,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       const removeSpy = vitest.fn();
       extractor['actions'] = {
@@ -185,7 +184,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       const removeSpy = vitest.fn();
       extractor['actions'] = {
@@ -196,7 +195,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       >;
       const initSpy = vitest.fn().mockRejectedValue(0);
       await expect(
-        async () => await extractor['initWithRetrial'](initSpy)
+        async () => await extractor['initWithRetrial'](initSpy),
       ).rejects.toThrowError();
       expect(removeSpy).toHaveBeenCalledOnce();
       expect(initSpy).toHaveBeenCalledTimes(RETRIAL_COUNT);
@@ -222,7 +221,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       (
         extractor['network'] as NodeNetwork
@@ -256,7 +255,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Node,
         'node_url',
-        'address'
+        'address',
       );
       (
         extractor['network'] as NodeNetwork
@@ -271,7 +270,7 @@ describe('AbstractInitializableErgoExtractor', () => {
         .mockResolvedValue(4);
       extractor['processTransactionBatch'] = vitest.fn();
       expect(() =>
-        extractor['initializeWithNode']({ hash: 'hash', height: 1320698 })
+        extractor['initializeWithNode']({ hash: 'hash', height: 1320698 }),
       ).rejects.toThrowError();
     });
   });
@@ -300,7 +299,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Explorer,
         'explorer_url',
-        'address'
+        'address',
       );
       extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
       const addressTxSpy = vitest
@@ -345,7 +344,7 @@ describe('AbstractInitializableErgoExtractor', () => {
       const extractor = new MockedInitializableErgoExtractor(
         ErgoNetworkType.Explorer,
         'explorer_url',
-        'address'
+        'address',
       );
       // mock `initWithRetrial` to run the job once
       extractor['initWithRetrial'] = async (job: () => Promise<void>) => job();
@@ -358,7 +357,7 @@ describe('AbstractInitializableErgoExtractor', () => {
             if (fromHeight <= 1320000 && toHeight >= 1320000)
               return new Array(100).fill(transactionBatch[0]);
             return [];
-          }
+          },
         );
       exNetwork.getAddressTransactionsWithHeight = addressTxSpy;
       // spy all other functions to check the calls

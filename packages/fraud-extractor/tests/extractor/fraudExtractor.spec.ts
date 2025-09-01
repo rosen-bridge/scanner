@@ -3,7 +3,6 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { FraudExtractor } from '../../lib';
 import { FraudEntity } from '../../lib';
 import {

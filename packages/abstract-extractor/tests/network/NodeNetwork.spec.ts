@@ -1,4 +1,3 @@
-import { describe, expect, it, vitest } from 'vitest';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
 
 import { NodeNetwork } from '../../lib';

@@ -1,6 +1,5 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';

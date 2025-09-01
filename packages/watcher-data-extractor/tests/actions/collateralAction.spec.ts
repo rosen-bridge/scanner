@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { CollateralEntity } from '../../lib';
 import CollateralAction from '../../lib/actions/collateralAction';
 import { createDatabase } from '../extractor/utilsFunctions.mock';

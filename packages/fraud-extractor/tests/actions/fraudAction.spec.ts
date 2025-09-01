@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { createDatabase } from '../extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';
 import { FraudEntity } from '../../lib/entities/fraudEntity';

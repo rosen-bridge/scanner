@@ -6,7 +6,6 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { createDatabase } from '../testUtils';
 import { EvmTxExtractor, AddressTxsEntity } from '../../lib';
 import { address, txs, expectedExtractedTxs } from './testData';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 

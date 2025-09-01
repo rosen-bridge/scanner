@@ -10,7 +10,6 @@ import { rosenData, tx } from './testData';
 import { blake2b } from 'blakejs';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('AbstractObservationExtractor', () => {
   let dataSource: DataSource;

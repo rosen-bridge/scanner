@@ -11,7 +11,6 @@ import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { KoiosTransaction } from '../../lib/interfaces/koiosTransaction';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 class CardanoKoiosExtractor extends CardanoKoiosObservationExtractor {}
 

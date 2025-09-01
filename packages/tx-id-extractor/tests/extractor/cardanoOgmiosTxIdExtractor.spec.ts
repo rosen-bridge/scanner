@@ -2,7 +2,6 @@ import { createDatabase } from '../utils.mock';
 import { CardanoOgmiosTxIdExtractor, TxIdEntity } from '../../lib';
 import txs from './data/cardanoOgmiosTxIdExtractor.data';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 

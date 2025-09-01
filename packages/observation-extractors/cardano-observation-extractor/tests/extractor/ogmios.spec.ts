@@ -6,7 +6,6 @@ import { Transactions } from './ogmios.mock';
 import { BlockEntity, PROCEED } from '@rosen-bridge/abstract-scanner';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 let extractor: CardanoOgmiosObservationExtractor;

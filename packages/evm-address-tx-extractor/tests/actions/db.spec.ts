@@ -2,7 +2,6 @@ import { createDatabase, generateRandomId } from '../testUtils';
 import { TxAction } from '../../lib/actions/db';
 import { AddressTxsEntity, EvmTxStatus } from '../../lib';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 let dataSource: DataSource;
 let action: TxAction;
