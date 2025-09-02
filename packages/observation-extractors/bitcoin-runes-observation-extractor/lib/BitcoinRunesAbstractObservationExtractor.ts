@@ -4,8 +4,6 @@ import {
 } from '@rosen-bridge/observation-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { blake2b } from 'blakejs';
-import Axios, { AxiosHeaders } from 'axios';
-import { OrdiscanRunesTransfer } from './types';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 import {
@@ -13,25 +11,37 @@ import {
   TokenTransformation,
 } from '@rosen-bridge/rosen-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import RateLimitedAxios from '@rosen-bridge/rate-limited-axios';
+import JsonBigInt from '@rosen-bridge/json-bigint';
+import { TxOutputRune, UnisatResponse, UnisatTxRunes } from './types';
 
-export abstract class RunesAbstractObservationExtractor<
+export abstract class BitcoinRunesAbstractObservationExtractor<
   TransactionType
 > extends AbstractObservationExtractor<TransactionType> {
   readonly FROM_CHAIN = 'bitcoin-runes';
+  protected unisatClient: RateLimitedAxios;
 
   constructor(
     protected readonly lockAddress: string,
-    protected readonly ordiscanUrl: string,
-    protected readonly ordiscanApiKey: string,
+    protected readonly unisatUrl: string,
+    protected readonly unisatApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
     logger?: AbstractLogger
   ) {
     super(dataSource, tokens, extractor, logger);
-    this.lockAddress = lockAddress;
-    this.ordiscanUrl = ordiscanUrl;
-    this.ordiscanApiKey = ordiscanApiKey;
+
+    // init Unisat client
+    const unisatHeaders = { 'Content-Type': 'application/json' };
+    // Add API key to headers if provided
+    if (unisatApiKey) {
+      Object.assign(unisatHeaders, { 'x-api-key': unisatApiKey });
+    }
+    this.unisatClient = RateLimitedAxios.create({
+      baseURL: unisatUrl,
+      headers: unisatHeaders,
+    });
   }
 
   /**
@@ -48,6 +58,7 @@ export abstract class RunesAbstractObservationExtractor<
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {
       const data = this.extractor.get(transaction);
+
       if (!data) continue;
 
       const txId = this.getTxId(transaction);
@@ -56,15 +67,14 @@ export abstract class RunesAbstractObservationExtractor<
       let runesTransformation: TokenTransformation | undefined;
 
       try {
-        const txRunesTransfer = await this.getTxRunesTransfer(txId);
-
-        for (const outRune of txRunesTransfer.outputs) {
+        const txOutputRunes = await this.getTxOutputRunes(txId);
+        for (const outRune of txOutputRunes) {
           // check if rune is transferred to the lock address
           if (outRune.address !== this.lockAddress) continue;
 
           // check if rune is supported by Rosen bridge
           const wrappedRune = this.tokens.search(this.FROM_CHAIN, {
-            tokenId: outRune.rune,
+            tokenId: outRune.runeId,
           });
 
           if (
@@ -73,13 +83,13 @@ export abstract class RunesAbstractObservationExtractor<
           ) {
             const wrappedAmount = this.tokens
               .wrapAmount(
-                outRune.rune,
-                BigInt(outRune.rune_amount),
+                outRune.runeId,
+                BigInt(outRune.runeAmount),
                 this.FROM_CHAIN
               )
               .amount.toString();
             runesTransformation = {
-              from: outRune.rune,
+              from: outRune.runeId,
               to: this.tokens.getID(wrappedRune[0], data.toChain),
               amount: wrappedAmount,
             };
@@ -120,17 +130,58 @@ export abstract class RunesAbstractObservationExtractor<
   };
 
   /**
-   * returns the Runes transfer of a transaction according to Ordiscan
+   * returns the Runes transfer of a transaction according to unisat
    * @param txId
    */
-  protected getTxRunesTransfer = async (
+  protected getTxOutputRunes = async (
     txId: string
-  ): Promise<OrdiscanRunesTransfer> => {
-    const headers: AxiosHeaders = new AxiosHeaders();
-    headers.setAuthorization(`Bearer ${this.ordiscanApiKey}`);
-    const res = await Axios.get(`${this.ordiscanUrl}/v1/tx/${txId}/runes`, {
-      headers: headers,
-    });
-    return res.data;
+  ): Promise<TxOutputRune[]> => {
+    // Transform the RPC transaction to the expected BitcoinRunesTx format
+    const outputs: TxOutputRune[] = [];
+
+    // get the runes transfers of the transaction from Unisat
+    let txRunes: UnisatTxRunes;
+    try {
+      const response = await this.unisatClient.get<
+        UnisatResponse<UnisatTxRunes>
+      >(`/v1/indexer/runes/event?txid=${txId}`);
+      this.logger.debug(
+        `requested 'indexer/runes/event' filtering txId [${txId}]. Response: ${JsonBigInt.stringify(
+          response.data
+        )}`
+      );
+
+      txRunes = response.data.data;
+      if (txRunes.detail.length !== txRunes.total) {
+        throw Error(
+          `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`
+        );
+      }
+    } catch (e: any) {
+      const baseError = `Failed to get runes event for tx [${txId}] from Unisat: `;
+      if (e.response) {
+        throw new Error(baseError + `${JsonBigInt.stringify(e.response.data)}`);
+      } else if (e.request) {
+        throw new Error(baseError + e.message);
+      }
+      throw new Error(baseError + e.message);
+    }
+
+    for (const transfer of txRunes.detail) {
+      if (transfer.txid !== txId) {
+        throw new Error(
+          `ImpossibleBehavior: Fetched runes event for tx [${txId}] but got a transfer with txId [${transfer.txid}]`
+        );
+      }
+      if (transfer.type === 'send') continue;
+      outputs[transfer.vout] = {
+        address: transfer.address,
+        runeId: transfer.runeId,
+        runeAmount: transfer.amount,
+        vout: transfer.vout,
+      };
+    }
+
+    return outputs;
   };
 }
