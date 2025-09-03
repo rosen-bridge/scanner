@@ -161,8 +161,6 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       const baseError = `Failed to get runes event for tx [${txId}] from Unisat: `;
       if (e.response) {
         throw new Error(baseError + `${JsonBigInt.stringify(e.response.data)}`);
-      } else if (e.request) {
-        throw new Error(baseError + e.message);
       }
       throw new Error(baseError + e.message);
     }
