@@ -38,7 +38,6 @@
     "@rosen-clients/ergo-node": "^1.2.3",
     "lodash-es": "^4.17.21",
     "@rosen-bridge/extended-typeorm": "^0.2.1",
-    "typeorm": "^0.3.24",
     "uuid": "^9.0.0"
   }
 }
