@@ -1,10 +1,9 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "types": ["node", "vitest/globals"]
+    "outDir": "./dist"
   },
-  "include": ["tests", "lib", "vitest.config.ts"],
+  "include": ["tests", "lib"],
   "references": [
     { "path": "../../abstract-observation-extractor" },
     { "path": "../../scanners/bitcoin-scanner" }
