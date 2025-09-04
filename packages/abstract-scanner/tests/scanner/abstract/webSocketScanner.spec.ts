@@ -3,7 +3,7 @@ import {
   FailExtractor,
   TestWebSocketScanner,
 } from './abstract.mock';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { BlockEntity, PROCEED } from '../../../lib';
 
 let dataSource: DataSource;

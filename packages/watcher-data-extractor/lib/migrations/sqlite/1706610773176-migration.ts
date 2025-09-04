@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from '@rosen-bridge/extended-typeorm';
 import { getWidInfo } from '../../utils';
 
 export class migration1706610773176 implements MigrationInterface {

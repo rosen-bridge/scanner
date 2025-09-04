@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import {
   migrations as scannerMigrations,

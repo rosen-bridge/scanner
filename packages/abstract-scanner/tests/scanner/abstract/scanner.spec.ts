@@ -6,7 +6,7 @@ import {
 } from './abstract.mock';
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 const firstScanner = generateMockScannerClass('first');
 const secondScanner = generateMockScannerClass('second');

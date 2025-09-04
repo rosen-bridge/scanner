@@ -5,7 +5,7 @@ import {
   MoreThanOrEqual,
   Repository,
   In,
-} from 'typeorm';
+} from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ExtractorStatusEntity } from '../entities/extractorStatusEntity';

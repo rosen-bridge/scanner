@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from '@rosen-bridge/extended-typeorm';
 
 @Entity('extractor_status_entity')
 export class ExtractorStatusEntity {

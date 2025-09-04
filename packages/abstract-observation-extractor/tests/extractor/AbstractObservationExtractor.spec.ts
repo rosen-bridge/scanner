@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { tokens } from '../tokens.mock';
 import {

@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { createDatabase } from '../extractor/utils.mock';
 import { FraudAction } from '../../lib/actions/fraudAction';

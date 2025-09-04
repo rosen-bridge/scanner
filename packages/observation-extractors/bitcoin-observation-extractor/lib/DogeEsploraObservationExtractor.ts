@@ -2,7 +2,7 @@ import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation
 import { DogeEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-scanner';
 
 export class DogeEsploraObservationExtractor extends AbstractObservationExtractor<BitcoinEsploraTransaction> {

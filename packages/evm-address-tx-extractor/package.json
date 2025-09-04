@@ -18,25 +18,20 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^20.11.9",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
+    "@types/node": "^22.18.0",
     "@vitest/coverage-istanbul": "^1.2.2",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
     "extensionless": "^1.9.6",
-    "prettier": "^3.2.4",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.18.0"
   },
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.0.3",
     "@rosen-bridge/abstract-logger": "^2.0.1",
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
-    "ethers": "6.13.2",
-    "typeorm": "^0.3.20"
+    "ethers": "6.13.2"
   }
 }

@@ -1,4 +1,4 @@
-import { DataSource, In } from 'typeorm';
+import { DataSource, In } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractInitializableErgoExtractorAction,

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from '@rosen-bridge/extended-typeorm';
 
 @Entity('address_txs_entity')
 export class AddressTxsEntity {

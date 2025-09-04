@@ -3,7 +3,7 @@ import { ObservationEntity } from '../../lib';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import { firstObservations, secondObservations } from '../observations.mock';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 let dataSource: DataSource;
 let action: ObservationEntityAction;

@@ -2,7 +2,7 @@
 
 import { vi } from 'vitest';
 import { Transaction } from 'ethers';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { createDatabase } from '../testUtils';
 import { EvmTxExtractor, AddressTxsEntity } from '../../lib';
 import { address, txs, expectedExtractedTxs } from './testData';
