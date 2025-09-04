@@ -7,13 +7,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prettify": "prettier --write . --ignore-path ../../.gitignore",
-    "lint": "eslint --fix . && npm run prettify",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
+    "build": "tsc --build tsconfig.build.json",
     "coverage": "npm run test -- --coverage",
-    "build": "tsc --build",
-    "type-check": "tsc --noEmit",
-    "release": "npm run test && npm run build && npm publish --access public"
+    "lint": "eslint --fix . && npm run prettify",
+    "prettify": "prettier --write . --ignore-path ./.gitignore",
+    "release": "npm run test -- --run && npm run build && npm publish --access public",
+    "test": "NODE_OPTIONS='--import tsx' vitest",
+    "type-check": "tsc --noEmit"
   },
   "files": [
     "dist"
@@ -21,22 +21,21 @@
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.0.3",
     "@rosen-bridge/abstract-logger": "^2.0.1",
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-    "reflect-metadata": "^0.1.13",
-    "sqlite3": "^5.1.7",
-    "@rosen-bridge/extended-typeorm": "^0.2.1"
+    "sqlite3": "^5.1.7"
   },
   "type": "module",
   "devDependencies": {
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@types/node": "^22.18.0",
-    "typescript": "^4.7.4",
     "@vitest/coverage-istanbul": "^3.1.4",
-    "vitest": "^3.1.4",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^5.3.3",
+    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0"

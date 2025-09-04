@@ -29,7 +29,6 @@ export default {
       'tsx',
       '@vitest/coverage-istanbul',
       'extensionless',
-      'reflect-metadata',
       '@types/json-bigint',
       '@babel/preset-env',
       '@types/jest',
