@@ -92,7 +92,8 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
               '7a51950e5f548549ec1aa63ffdc38279505b11e7e803d01bcf8347e0123c8666',
             fromChain: 'bitcoin-runes',
             sourceBlockId: mockBlock.hash,
-            requestId: expect.any(String),
+            requestId:
+              '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',
           },
         ],
         mockBlock,
