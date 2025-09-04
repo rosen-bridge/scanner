@@ -22,7 +22,6 @@
     "@types/node": "^22.18.0",
     "@vitest/coverage-istanbul": "^1.2.2",
     "extensionless": "^1.9.6",
-    "prettier": "^3.2.4",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
   },
@@ -32,11 +31,11 @@
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/abstract-observation-extractor": "^0.1.0",
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
-    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "ethers": "6.13.2"
   }
 }

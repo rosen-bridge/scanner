@@ -28,8 +28,8 @@
     "node": ">=22.18.0"
   },
   "dependencies": {
-    "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/abstract-scanner": "^0.1.0",
+    "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1"
   }
 }
