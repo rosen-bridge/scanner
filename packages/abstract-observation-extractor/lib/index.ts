@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 export { AbstractObservationExtractor } from './extractor/AbstractObservationExtractor';
 export { ObservationEntity } from './entities/observationEntity';
 export { migrations } from './migrations/index';
