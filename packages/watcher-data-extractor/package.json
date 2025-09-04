@@ -7,13 +7,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prettify": "prettier --write . --ignore-path ../../.gitignore",
-    "lint": "eslint --fix . && npm run prettify",
     "build": "tsc --build",
-    "type-check": "tsc --noEmit",
+    "coverage": "npm run test -- --coverage",
+    "lint": "eslint --fix . && npm run prettify",
+    "prettify": "prettier --write . --ignore-path ../../.gitignore",
     "release": "npm run test && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS='--import tsx' vitest",
-    "coverage": "npm run test -- --coverage"
+    "type-check": "tsc --noEmit"
   },
   "files": [
     "dist"
@@ -38,10 +38,10 @@
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@types/json-bigint": "^1.0.1",
     "@types/node": "^22.18.0",
-    "typescript": "^4.7.4",
     "@vitest/coverage-istanbul": "^3.1.4",
-    "vitest": "^3.1.4",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^4.7.4",
+    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0"
