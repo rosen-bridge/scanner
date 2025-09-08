@@ -1,4 +1,7 @@
-import { MigrationInterface, QueryRunner } from '@rosen-bridge/extended-typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+} from '@rosen-bridge/extended-typeorm';
 
 export class Migration1713694799333 implements MigrationInterface {
   name = 'Migration1713694799333';

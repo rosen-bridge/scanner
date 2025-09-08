@@ -54,7 +54,7 @@ class PermitAction {
         txId: permit.txId,
         spendBlock: null,
         spendHeight: null,
-      }
+      },
     );
   };
 
@@ -67,7 +67,7 @@ class PermitAction {
   storePermits = async (
     permits: Array<ExtractedPermit>,
     block: Block,
-    extractor: string
+    extractor: string,
   ) => {
     if (permits.length === 0) return true;
     const boxIds = permits.map((permit) => permit.boxId);
@@ -96,12 +96,12 @@ class PermitAction {
         };
         if (!saved) {
           this.logger.debug(
-            `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
+            `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`,
           );
           await repository.insert(entity);
         } else {
           this.logger.debug(
-            `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`
+            `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`,
           );
           await repository.update({ boxId: permit.boxId }, entity);
         }
@@ -127,13 +127,13 @@ class PermitAction {
   spendPermits = async (
     spendId: Array<string>,
     block: Block,
-    extractor: string
+    extractor: string,
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.permitRepository.update(
         { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height }
+        { spendBlock: block.hash, spendHeight: block.height },
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
@@ -143,7 +143,7 @@ class PermitAction {
         });
         for (const row of spentRows) {
           this.logger.debug(
-            `Spent permit with boxId [${row.boxId}] belonging to watcher with WID [${row.WID}] at height ${block.height}`
+            `Spent permit with boxId [${row.boxId}] belonging to watcher with WID [${row.WID}] at height ${block.height}`,
           );
         }
       }
@@ -158,12 +158,12 @@ class PermitAction {
    */
   deleteBlock = async (block: string, extractor: string): Promise<void> => {
     this.logger.info(
-      `Deleting permits at block ${block} and extractor ${extractor}`
+      `Deleting permits at block ${block} and extractor ${extractor}`,
     );
     await this.permitRepository.delete({ block: block, extractor: extractor });
     await this.permitRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: null }
+      { spendBlock: null, spendHeight: null },
     );
   };
 
@@ -205,11 +205,11 @@ class PermitAction {
     boxId: string,
     extractor: string,
     blockId: string,
-    blockHeight: number
+    blockHeight: number,
   ) => {
     return await this.permitRepository.update(
       { boxId: boxId, extractor: extractor },
-      { spendBlock: blockId, spendHeight: blockHeight }
+      { spendBlock: blockId, spendHeight: blockHeight },
     );
   };
 }

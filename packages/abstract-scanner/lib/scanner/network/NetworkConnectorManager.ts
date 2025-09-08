@@ -20,7 +20,7 @@ export class NetworkConnectorManager<TransactionType>
 
   constructor(
     private strategy: ConnectorSelectionStrategy<TransactionType> = new FailoverStrategy<TransactionType>(),
-    private logger: AbstractLogger = new DummyLogger()
+    private logger: AbstractLogger = new DummyLogger(),
   ) {
     this.connectors = [];
     this.currentConnectorIndex = 0;
@@ -33,11 +33,11 @@ export class NetworkConnectorManager<TransactionType>
    * @param connector The network connector instance
    */
   public addConnector(
-    connector: AbstractNetworkConnector<TransactionType>
+    connector: AbstractNetworkConnector<TransactionType>,
   ): void {
     this.connectors.push(connector);
     this.logger.info(
-      `Added new connector. Total connectors: ${this.connectors.length}`
+      `Added new connector. Total connectors: ${this.connectors.length}`,
     );
   }
 
@@ -61,8 +61,8 @@ export class NetworkConnectorManager<TransactionType>
    */
   private async executeWithStrategy<T>(
     operation: (
-      connector: AbstractNetworkConnector<TransactionType>
-    ) => Promise<T>
+      connector: AbstractNetworkConnector<TransactionType>,
+    ) => Promise<T>,
   ): Promise<T> {
     if (this.connectors.length === 0) {
       throw new Error('No connectors available for operation');
@@ -78,26 +78,26 @@ export class NetworkConnectorManager<TransactionType>
         this.logger.debug(
           `Attempt ${attempts + 1}/${maxAttempts} with connector at index ${
             this.currentConnectorIndex
-          }`
+          }`,
         );
         const result = await operation(connector);
         this.currentConnectorIndex = this.strategy.selectNextConnector(
           this.connectors,
-          this.currentConnectorIndex
+          this.currentConnectorIndex,
         );
         this.logger.debug(
-          `Operation successful, next connector index: ${this.currentConnectorIndex}`
+          `Operation successful, next connector index: ${this.currentConnectorIndex}`,
         );
         return result;
       } catch (error) {
         lastError = error as Error;
         this.logger.warn(
-          `Operation failed with connector at index ${this.currentConnectorIndex}: ${lastError.message}`
+          `Operation failed with connector at index ${this.currentConnectorIndex}: ${lastError.message}`,
         );
         this.currentConnectorIndex = this.strategy.selectNextConnector(
           this.connectors,
           this.currentConnectorIndex,
-          lastError
+          lastError,
         );
         attempts++;
       }
@@ -110,7 +110,7 @@ export class NetworkConnectorManager<TransactionType>
    * @param strategy The strategy to use
    */
   public setStrategy(
-    strategy: ConnectorSelectionStrategy<TransactionType>
+    strategy: ConnectorSelectionStrategy<TransactionType>,
   ): void {
     this.logger.info('Setting new connector selection strategy');
     this.strategy = strategy;
@@ -123,7 +123,7 @@ export class NetworkConnectorManager<TransactionType>
    */
   getBlockAtHeight = async (height: number): Promise<Block> => {
     return this.executeWithStrategy((connector) =>
-      connector.getBlockAtHeight(height)
+      connector.getBlockAtHeight(height),
     );
   };
 
@@ -133,7 +133,7 @@ export class NetworkConnectorManager<TransactionType>
    */
   getCurrentHeight = async (): Promise<number> => {
     return this.executeWithStrategy((connector) =>
-      connector.getCurrentHeight()
+      connector.getCurrentHeight(),
     );
   };
 
@@ -144,7 +144,7 @@ export class NetworkConnectorManager<TransactionType>
    */
   getBlockTxs = async (blockHash: string): Promise<Array<TransactionType>> => {
     return this.executeWithStrategy((connector) =>
-      connector.getBlockTxs(blockHash)
+      connector.getBlockTxs(blockHash),
     );
   };
 

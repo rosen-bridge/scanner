@@ -117,7 +117,7 @@ export const generateBlockEntity = (
   dataSource: DataSource,
   hash: string,
   parent?: string,
-  height?: number
+  height?: number,
 ) => {
   const repository = dataSource.getRepository(BlockEntity);
   return repository.create({

@@ -12,13 +12,13 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
       tokens,
       new BitcoinRpcRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

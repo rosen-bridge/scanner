@@ -27,7 +27,7 @@ export const tx = Transaction.from({
 });
 export const txRes = new TransactionResponse(
   tx as unknown as TransactionResponseParams,
-  new JsonRpcProvider()
+  new JsonRpcProvider(),
 );
 
 export const rosenData = {

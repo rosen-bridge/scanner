@@ -22,7 +22,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
     dataSource: DataSource,
     tokens: TokenMap,
     address: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.logger = logger ? logger : new DummyLogger();
@@ -30,7 +30,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
     this.extractor = new CardanoOgmiosRosenExtractor(
       address,
       tokens,
-      this.logger
+      this.logger,
     );
   }
 
@@ -47,7 +47,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -56,7 +56,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
-              blake2b(transaction.id, undefined, 32)
+              blake2b(transaction.id, undefined, 32),
             ).toString('hex');
             observations.push({
               fromChain: CardanoOgmiosObservationExtractor.FROM_CHAIN,
@@ -81,7 +81,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
           })
           .catch((e) => {
             this.logger.error(
-              `An error occurred during store observations: ${e}`
+              `An error occurred during store observations: ${e}`,
             );
             reject(e);
           });

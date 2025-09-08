@@ -32,7 +32,7 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
 
   processTransactions = (
     txs: Array<TestTransaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     this.txs.push({ txs, block });
     return Promise.resolve(true);
@@ -81,12 +81,12 @@ export const generateMockScannerClass = (name: string) => {
 };
 
 export const generateMockGeneralScannerByBlockRetrieveGapClass = (
-  name: string
+  name: string,
 ) => {
   return class ScannerTest extends GeneralScanner<TestTransaction> {
     constructor(
       dataSource: DataSource,
-      networkConnector: NetworkConnectorTest
+      networkConnector: NetworkConnectorTest,
     ) {
       super(name, dataSource, 0, networkConnector, 100, undefined);
       this.action = new BlockDbAction(dataSource, this.name());
@@ -102,7 +102,7 @@ export const generateMockGeneralScannerClass = (name: string) => {
   return class ScannerTest extends GeneralScanner<TestTransaction> {
     constructor(
       dataSource: DataSource,
-      networkConnector: NetworkConnectorTest
+      networkConnector: NetworkConnectorTest,
     ) {
       super(name, dataSource, 0, networkConnector, 100, undefined);
     }
@@ -129,7 +129,7 @@ export const createDatabase = async () => {
 
 export const insertBlocks = async (
   scanner: AbstractScanner<TestTransaction>,
-  count: number
+  count: number,
 ) => {
   for (let index = 1; index <= count; index++) {
     const parent = index > 1 ? `${index - 1}` : ' ';
@@ -159,7 +159,7 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
 
 export class FailExtractor extends AbstractExtractor<{ id: string }> {
   forkBlock = async (
-    hash: string // eslint-disable-line @typescript-eslint/no-unused-vars
+    hash: string, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => {
     /* empty */
   };
@@ -170,6 +170,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   processTransactions = async (
     txs: Array<{ id: string }>, // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: Block // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: Block, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => false;
 }

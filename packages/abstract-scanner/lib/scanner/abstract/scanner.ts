@@ -30,19 +30,19 @@ export abstract class AbstractScanner<TransactionType> {
     let lastBlock = await this.action.getLastSavedBlock();
     while (lastBlock && lastBlock.height >= height) {
       this.logger.debug(
-        `Reverting block ${lastBlock.hash} at height ${lastBlock.height}`
+        `Reverting block ${lastBlock.hash} at height ${lastBlock.height}`,
       );
       await this.action.revertBlockStatus(
         lastBlock.height,
         lastBlock.parentHash,
-        this.extractors.map((e) => e.getId())
+        this.extractors.map((e) => e.getId()),
       );
       for (const extractor of this.extractors) {
         try {
           await extractor.forkBlock(lastBlock.hash);
         } catch (e) {
           this.logger.error(
-            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`
+            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`,
           );
         }
       }
@@ -58,7 +58,7 @@ export abstract class AbstractScanner<TransactionType> {
    */
   protected processBlockTransactions = async (
     block: Block,
-    transactions: Array<TransactionType>
+    transactions: Array<TransactionType>,
   ) => {
     const savedBlock = await this.action.saveBlock(block);
     if (typeof savedBlock === 'boolean') {
@@ -77,7 +77,7 @@ export abstract class AbstractScanner<TransactionType> {
       (await this.action.updateBlockStatus(
         block.height,
         block.hash,
-        this.extractors.map((e) => e.getId())
+        this.extractors.map((e) => e.getId()),
       ))
     ) {
       return savedBlock;
@@ -90,13 +90,13 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   registerExtractor = async (
-    extractor: AbstractExtractor<TransactionType>
+    extractor: AbstractExtractor<TransactionType>,
   ): Promise<void> => {
     const notRegisteredIn = (
-      extractors: Array<AbstractExtractor<TransactionType>>
+      extractors: Array<AbstractExtractor<TransactionType>>,
     ) =>
       extractors.filter(
-        (extractorItem) => extractorItem.getId() === extractor.getId()
+        (extractorItem) => extractorItem.getId() === extractor.getId(),
       ).length === 0;
     const release = await this.initializeMutex.acquire();
     if (
@@ -106,7 +106,7 @@ export abstract class AbstractScanner<TransactionType> {
       this.newExtractors.push(extractor);
     } else {
       this.logger.warn(
-        `Extractor with id ${extractor.getId()} is already registered`
+        `Extractor with id ${extractor.getId()} is already registered`,
       );
     }
     release();
@@ -117,7 +117,7 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   removeExtractor = async (
-    extractor: AbstractExtractor<TransactionType>
+    extractor: AbstractExtractor<TransactionType>,
   ): Promise<void> => {
     const removeFn = (ex: AbstractExtractor<TransactionType>) =>
       ex.getId() === extractor.getId();
@@ -135,11 +135,11 @@ export abstract class AbstractScanner<TransactionType> {
    */
   private initializeExtractors = async (
     extractorIds: string[],
-    block: BlockInfo
+    block: BlockInfo,
   ) => {
     const allExtractors = [...this.extractors, ...this.newExtractors];
     const initRequiredExtractors = allExtractors.filter((extractor) =>
-      extractorIds.includes(extractor.getId())
+      extractorIds.includes(extractor.getId()),
     );
     for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
@@ -147,7 +147,7 @@ export abstract class AbstractScanner<TransactionType> {
       await this.action.updateOrInsertExtractorStatus(
         extractor.getId(),
         block.height,
-        block.hash
+        block.hash,
       );
       this.logger.debug(`Initialization finished for [${extractor.getId()}]`);
     }
@@ -171,7 +171,7 @@ export abstract class AbstractScanner<TransactionType> {
         ...getIds(this.newExtractors),
       ]);
       this.logger.debug(
-        `Stored extractors status are [${JSON.stringify(extractorsStatus)}]`
+        `Stored extractors status are [${JSON.stringify(extractorsStatus)}]`,
       );
       // Find extractors not synced with the latest height
       const notSyncedExtractorIds = extractorsStatus
@@ -179,17 +179,17 @@ export abstract class AbstractScanner<TransactionType> {
         .map((es) => es.extractorId);
       if (notSyncedExtractorIds.length > 0)
         this.logger.debug(
-          `Old not synced extractors are ${notSyncedExtractorIds}`
+          `Old not synced extractors are ${notSyncedExtractorIds}`,
         );
       // Find new extractors not available in database
       const storedExtractorIds = extractorsStatus.map((es) => es.extractorId);
       const newRegisteredExtractorIds = difference(
         getIds(this.newExtractors),
-        storedExtractorIds
+        storedExtractorIds,
       );
       if (newRegisteredExtractorIds.length > 0)
         this.logger.debug(
-          `New registered extractors are ${newRegisteredExtractorIds}`
+          `New registered extractors are ${newRegisteredExtractorIds}`,
         );
       // Initialize required extractors
       const initRequiredExtractors = [
@@ -201,7 +201,7 @@ export abstract class AbstractScanner<TransactionType> {
           `Initializing ${
             initRequiredExtractors.length
           } extractor(s) for [${this.name()}]`,
-          { initRequiredExtractors }
+          { initRequiredExtractors },
         );
         await this.initializeExtractors(initRequiredExtractors, block);
       }
@@ -215,7 +215,7 @@ export abstract class AbstractScanner<TransactionType> {
     }
     if (!success)
       throw new Error(
-        `Initialization failed for new extractors ${getIds(this.newExtractors)}`
+        `Initialization failed for new extractors ${getIds(this.newExtractors)}`,
       );
   };
 }

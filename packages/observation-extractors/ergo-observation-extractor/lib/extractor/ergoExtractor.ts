@@ -20,7 +20,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
     dataSource: DataSource,
     tokens: TokenMap,
     address: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.logger = logger ? logger : new DummyLogger();
@@ -41,7 +41,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -54,7 +54,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               NUMBER_OF_BLOCKS_PER_YEAR
             ) {
               this.logger.debug(
-                `Skipping tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`
+                `Skipping tx [${transaction.id}], box [${box.boxId}] creation_height [${box.creationHeight}] is more than a year ago [currentHeight: ${block.height}]`,
               );
               return;
             }
@@ -62,7 +62,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
-              blake2b(transaction.id, undefined, 32)
+              blake2b(transaction.id, undefined, 32),
             ).toString('hex');
             observations.push({
               fromChain: ErgoObservationExtractor.FROM_CHAIN,
@@ -87,13 +87,13 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
           })
           .catch((e) => {
             this.logger.error(
-              `An error uncached exception occurred during store ergo observation: ${e}`
+              `An error uncached exception occurred during store ergo observation: ${e}`,
             );
             reject(e);
           });
       } catch (e) {
         this.logger.error(
-          `An error occurred while saving block ${block}: [${e}]`
+          `An error occurred while saving block ${block}: [${e}]`,
         );
         reject(e);
       }

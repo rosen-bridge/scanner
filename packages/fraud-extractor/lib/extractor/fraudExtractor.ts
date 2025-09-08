@@ -31,7 +31,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     explorerUrl: string,
     fraudAddress: string,
     rwt: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     this.id = id;
     this.ergoTree = wasm.Address.from_base58(fraudAddress)
@@ -55,7 +55,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -77,7 +77,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
               ?.to_coll_coll_byte();
             if (!r4) {
               this.logger.debug(
-                `A new fraud box found without correct wid format at height ${block.height}`
+                `A new fraud box found without correct wid format at height ${block.height}`,
               );
               continue;
             }
@@ -89,13 +89,13 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
               rwtCount: output.assets[0].amount.toString(),
               serialized: Buffer.from(
                 wasm.ErgoBox.from_json(
-                  JsonBI.stringify(output)
-                ).sigma_serialize_bytes()
+                  JsonBI.stringify(output),
+                ).sigma_serialize_bytes(),
               ).toString('base64'),
             };
             newFrauds.push(newFraud);
             this.logger.debug(
-              `new fraud found [${newFraud}] at height ${block.height}`
+              `new fraud found [${newFraud}] at height ${block.height}`,
             );
           }
           txSpendIds.push({
@@ -109,21 +109,21 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
             if (status) {
               if (newFrauds.length > 0)
                 this.logger.debug(
-                  `successfully stored new frauds at hight ${block.height}`
+                  `successfully stored new frauds at hight ${block.height}`,
                 );
               for (const spendIds of txSpendIds)
                 await this.actions.spendFrauds(
                   spendIds.spendBoxes,
                   block,
                   this.getId(),
-                  spendIds.txId
+                  spendIds.txId,
                 );
             }
             resolve(status);
           })
           .catch((e) => {
             this.logger.error(
-              `An error occurred in processing frauds in block [${block.hash}]: ${e}`
+              `An error occurred in processing frauds in block [${block.hash}]: ${e}`,
             );
             reject(e);
           });
@@ -147,7 +147,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   initializeBoxes = async (initialBlock: BlockInfo) => {
     // Getting unspent boxes
     this.logger.debug(
-      `Initializing fraud table. storing fraud boxes created bellow height ${initialBlock.height}.`
+      `Initializing fraud table. storing fraud boxes created bellow height ${initialBlock.height}.`,
     );
     const unspentFrauds = await this.getUnspentFrauds(initialBlock.height);
     const unspentBoxIds = unspentFrauds.map((box) => box.boxId);
@@ -159,13 +159,13 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
       if (allStoredBoxIds.includes(fraud.boxId)) {
         await this.actions.updateFraud(fraud, this.getId());
         this.logger.info(
-          `Updated the existing unspent fraud with boxId, [${fraud.boxId}]`
+          `Updated the existing unspent fraud with boxId, [${fraud.boxId}]`,
         );
         this.logger.debug(`Updated fraud: [${JSON.stringify(fraud)}]`);
       } else {
         await this.actions.insertFraud(fraud, this.getId());
         this.logger.info(
-          `Inserted new unspent fraud with boxId, [${fraud.boxId}]`
+          `Inserted new unspent fraud with boxId, [${fraud.boxId}]`,
         );
         this.logger.debug(`Inserted fraud: [${JSON.stringify(fraud)}]`);
       }
@@ -175,7 +175,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     allStoredBoxIds = difference(allStoredBoxIds, unspentBoxIds);
     // Validating remained boxes
     this.logger.debug(
-      `Validating and updating stored fraud boxes with boxIds ${allStoredBoxIds}`
+      `Validating and updating stored fraud boxes with boxIds ${allStoredBoxIds}`,
     );
     await this.validateOldStoredFrauds(allStoredBoxIds, initialBlock.height);
   };
@@ -188,30 +188,30 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    */
   validateOldStoredFrauds = async (
     unchangedStoredBoxIds: Array<string>,
-    initialHeight: number
+    initialHeight: number,
   ) => {
     for (const boxId of unchangedStoredBoxIds) {
       const box = await this.getFraudInfoWithBoxId(boxId);
       if (box && box.spendBlock && box.spendHeight) {
         if (box.spendHeight < initialHeight) {
           this.logger.debug(
-            `updating spending information of fraud with boxId [${box.boxId}] spent at height [${box.spendHeight}]`
+            `updating spending information of fraud with boxId [${box.boxId}] spent at height [${box.spendHeight}]`,
           );
           await this.actions.updateSpendBlock(
             boxId,
             this.getId(),
             box.spendBlock,
-            box.spendHeight
+            box.spendHeight,
           );
         } else {
           this.logger.debug(
-            `fraud with boxId [${box.boxId}] has been spent after the initialization height, updating spending information skipped.`
+            `fraud with boxId [${box.boxId}] has been spent after the initialization height, updating spending information skipped.`,
           );
         }
       } else {
         await this.actions.removeFraud(boxId, this.getId());
         this.logger.info(
-          `Removed invalid fraud [${boxId}] in initialization validation`
+          `Removed invalid fraud [${boxId}] in initialization validation`,
         );
       }
     }
@@ -222,7 +222,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    * @param boxId
    */
   getFraudInfoWithBoxId = async (
-    boxId: string
+    boxId: string,
   ): Promise<ExtractedFraud | undefined> => {
     try {
       const box = await this.api.v1.getApiV1BoxesP1(boxId);
@@ -239,7 +239,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    * @returns
    */
   getUnspentFrauds = async (
-    initialHeight: number
+    initialHeight: number,
   ): Promise<Array<ExtractedFraud>> => {
     let allBoxes: Array<ExtractedFraud> = [];
     let offset = 0,
@@ -251,7 +251,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         {
           offset: offset,
           limit: DefaultApiLimit,
-        }
+        },
       );
       if (!boxes.items) {
         throw new Error('Explorer api output items should not be undefined.');
@@ -263,8 +263,8 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
             (box) =>
               box.creationHeight < initialHeight &&
               box.assets &&
-              box.assets[0].tokenId == this.rwt
-          )
+              box.assets[0].tokenId == this.rwt,
+          ),
         )),
       ];
       total = boxes.total;
@@ -303,7 +303,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     for (const box of boxes) {
       try {
         this.logger.debug(
-          `Extracting box fraud information from box with boxId [${box.boxId}]`
+          `Extracting box fraud information from box with boxId [${box.boxId}]`,
         );
         let spendBlock, spendHeight;
         // Extract spending information
@@ -321,7 +321,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         const triggerBoxId = await this.getTriggerBoxId(box.transactionId);
         if (!r4 || !triggerBoxId) {
           this.logger.warn(
-            `Skipping storing fraud with boxId [${box.boxId}], wid or trigger box id is undefined`
+            `Skipping storing fraud with boxId [${box.boxId}], wid or trigger box id is undefined`,
           );
           continue;
         }
@@ -332,7 +332,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
           wid: Buffer.from(r4[0]).toString('hex'),
           rwtCount: box.assets![0].amount.toString(),
           serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
-            'base64'
+            'base64',
           ),
           blockId: box.blockId,
           height: box.settlementHeight,
@@ -345,7 +345,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
         this.logger.debug(`Extracted fraud: [${extractedFraud}]`);
       } catch (e) {
         this.logger.error(
-          `Extracting fraud information failed for box [${box.boxId}] with error: ${e}`
+          `Extracting fraud information failed for box [${box.boxId}] with error: ${e}`,
         );
       }
     }

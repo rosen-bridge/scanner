@@ -1,4 +1,8 @@
-import { DataSource, EntityTarget, FindOptionsWhere } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  EntityTarget,
+  FindOptionsWhere,
+} from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { AbstractErgoExtractorAction } from '../AbstractErgoExtractorAction';
@@ -7,12 +11,12 @@ import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 
 export abstract class AbstractInitializableErgoExtractorAction<
   ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity
+  ExtractorEntity extends AbstractErgoExtractorEntity,
 > extends AbstractErgoExtractorAction<ExtractedData, ExtractorEntity> {
   constructor(
     dataSource: DataSource,
     repo: EntityTarget<ExtractorEntity>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(dataSource, repo, logger);
   }
