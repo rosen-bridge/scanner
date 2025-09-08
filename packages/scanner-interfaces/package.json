@@ -10,9 +10,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "coverage": "echo \" no test specified\" && exit 0",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run build && npm publish --access public",
+    "test": "echo \" no test specified\" && exit 0",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
