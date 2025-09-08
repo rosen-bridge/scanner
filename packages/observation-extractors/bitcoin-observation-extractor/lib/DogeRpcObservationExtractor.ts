@@ -12,13 +12,13 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
       tokens,
       new DogeRpcRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

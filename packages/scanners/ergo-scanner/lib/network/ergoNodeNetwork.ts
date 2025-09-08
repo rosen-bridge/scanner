@@ -37,7 +37,7 @@ export class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
    * @param tx
    */
   private convertNodeTransactionToTransaction = (
-    tx: ErgoTransaction
+    tx: ErgoTransaction,
   ): Transaction => {
     return {
       id: tx.id || '',
@@ -64,11 +64,10 @@ export class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
    * @param blockHash
    */
   getBlockTxs = async (blockHash: string): Promise<Array<Transaction>> => {
-    const blockTransaction = await this.client.getBlockTransactionsById(
-      blockHash
-    );
+    const blockTransaction =
+      await this.client.getBlockTransactionsById(blockHash);
     return blockTransaction.transactions.map(
-      this.convertNodeTransactionToTransaction
+      this.convertNodeTransactionToTransaction,
     );
   };
 

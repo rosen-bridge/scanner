@@ -7,7 +7,7 @@
 
 ## Introduction
 
-An EVM chain scanner based on RPC.
+An EVM chain scanner.
 
 ## Installation
 

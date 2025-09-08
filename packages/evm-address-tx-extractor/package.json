@@ -10,19 +10,19 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "type-check": "tsc --noEmit",
     "test": "NODE_OPTIONS='--import tsx' vitest",
-    "coverage": "npm run test -- --coverage"
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.18.0",
-    "typescript": "^5.3.3",
     "@vitest/coverage-istanbul": "^3.1.4",
-    "vitest": "^3.1.4",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^5.3.3",
+    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0"
@@ -30,8 +30,8 @@
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.0.3",
     "@rosen-bridge/abstract-logger": "^2.0.1",
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.1.1",
-    "ethers": "6.13.2",
-    "@rosen-bridge/extended-typeorm": "^0.2.1"
+    "ethers": "6.13.2"
   }
 }

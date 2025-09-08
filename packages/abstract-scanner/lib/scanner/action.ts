@@ -20,11 +20,11 @@ export class BlockDbAction {
   constructor(
     dataSource: DataSource,
     scannerName: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     this.blockRepository = dataSource.getRepository(BlockEntity);
     this.extractorStatusRepository = dataSource.getRepository(
-      ExtractorStatusEntity
+      ExtractorStatusEntity,
     );
     this.dataSource = dataSource;
     this.scannerName = scannerName;
@@ -57,7 +57,7 @@ export class BlockDbAction {
    */
   getLastSavedBlocks = async (
     skip: number,
-    count: number
+    count: number,
   ): Promise<Array<BlockEntity>> => {
     return await this.blockRepository.find({
       where: { status: PROCEED, scanner: this.name() },
@@ -92,7 +92,7 @@ export class BlockDbAction {
    */
   getBlockAtHeight = async (
     height: number,
-    status: string = PROCEED
+    status: string = PROCEED,
   ): Promise<BlockEntity | undefined> => {
     const block = await this.blockRepository.findOneBy({
       status: status,
@@ -157,16 +157,16 @@ export class BlockDbAction {
       };
       if (!instance) {
         this.logger.debug(
-          `Inserting block with info: ${JSON.stringify(blockInfo)}`
+          `Inserting block with info: ${JSON.stringify(blockInfo)}`,
         );
         await this.blockRepository.insert(blockInfo);
       } else {
         this.logger.debug(
-          `Updating block with info: ${JSON.stringify(blockInfo)}`
+          `Updating block with info: ${JSON.stringify(blockInfo)}`,
         );
         await this.blockRepository.update(
           { height: block.height, scanner: this.name() },
-          blockInfo
+          blockInfo,
         );
       }
       const res = await this.blockRepository.findOneBy({
@@ -187,11 +187,11 @@ export class BlockDbAction {
   updateBlockStatus = async (
     height: number,
     blockHash: string,
-    extractorIds: string[]
+    extractorIds: string[],
   ): Promise<boolean> => {
     let success = true;
     this.logger.debug(
-      `Block at height ${height} has been proceed in scanner ${this.name()}, updating status`
+      `Block at height ${height} has been proceed in scanner ${this.name()}, updating status`,
     );
     const runner = this.dataSource.createQueryRunner();
     await runner.connect();
@@ -205,7 +205,7 @@ export class BlockDbAction {
         },
         {
           status: PROCEED,
-        }
+        },
       );
 
       this.logger.debug('Updating extractors status', {
@@ -215,7 +215,7 @@ export class BlockDbAction {
         .getRepository(ExtractorStatusEntity)
         .update(
           { extractorId: In(extractorIds), scannerId: this.name() },
-          { updateHeight: height, updateBlockHash: blockHash }
+          { updateHeight: height, updateBlockHash: blockHash },
         );
       await runner.commitTransaction();
     } catch (e) {
@@ -234,7 +234,7 @@ export class BlockDbAction {
   revertBlockStatus = async (
     height: number,
     parentHash: string,
-    extractorIds: string[]
+    extractorIds: string[],
   ): Promise<boolean> => {
     let success = true;
     const runner = this.dataSource.createQueryRunner();
@@ -250,19 +250,19 @@ export class BlockDbAction {
         },
         {
           status: PROCESSING,
-        }
+        },
       );
 
       this.logger.debug(
         `Reverting extractors update height to previous block at height ${
           height - 1
-        }`
+        }`,
       );
       await runner.manager
         .getRepository(ExtractorStatusEntity)
         .update(
           { extractorId: In(extractorIds), scannerId: this.name() },
-          { updateHeight: height - 1, updateBlockHash: parentHash }
+          { updateHeight: height - 1, updateBlockHash: parentHash },
         );
       await runner.commitTransaction();
     } catch (e) {
@@ -284,7 +284,7 @@ export class BlockDbAction {
   updateOrInsertExtractorStatus = async (
     extractorId: string,
     height: number,
-    blockHash: string
+    blockHash: string,
   ) => {
     this.logger.debug(
       'Inserting new extractor status or Updating existing resynced extractor status',
@@ -292,7 +292,7 @@ export class BlockDbAction {
         extractorId,
         height,
         blockHash,
-      }
+      },
     );
     return await this.extractorStatusRepository.save({
       scannerId: this.name(),
@@ -308,7 +308,7 @@ export class BlockDbAction {
    * @returns extractors` status
    */
   getExtractorsStatus = async (
-    extractorIds: string[]
+    extractorIds: string[],
   ): Promise<ExtractorStatusEntity[]> => {
     return await this.extractorStatusRepository.findBy({
       scannerId: this.name(),

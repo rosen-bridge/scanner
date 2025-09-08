@@ -222,5 +222,5 @@ export const blockInfo = new Block(
     baseFeePerGas: 31776327370n,
     transactions: transactionsList,
   },
-  new JsonRpcProvider()
+  new JsonRpcProvider(),
 );

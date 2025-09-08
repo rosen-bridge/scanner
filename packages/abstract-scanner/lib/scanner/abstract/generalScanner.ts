@@ -10,7 +10,7 @@ import { BlockDbAction } from '../action';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 abstract class GeneralScanner<
-  TransactionType
+  TransactionType,
 > extends AbstractScanner<TransactionType> {
   private readonly initialHeight: number;
   protected blockChainLastHeight: number | undefined = undefined;
@@ -24,7 +24,7 @@ abstract class GeneralScanner<
     private network: AbstractNetworkConnector<TransactionType>,
     private blockRetrieveGap = 0,
     logger?: AbstractLogger,
-    private suffix?: string
+    private suffix?: string,
   ) {
     super(logger);
     /**
@@ -35,7 +35,7 @@ abstract class GeneralScanner<
     this.action = new BlockDbAction(
       this.dataSource,
       this.scannerName,
-      this.logger
+      this.logger,
     );
   }
 
@@ -55,7 +55,7 @@ abstract class GeneralScanner<
     const lastSavedBlock = await this.action.getLastSavedBlock();
     if (lastSavedBlock !== undefined) {
       const lastSavedBlockFromNetwork = await this.network.getBlockAtHeight(
-        lastSavedBlock.height
+        lastSavedBlock.height,
       );
       return lastSavedBlockFromNetwork.hash !== lastSavedBlock.hash;
     } else {
@@ -69,7 +69,7 @@ abstract class GeneralScanner<
   protected delayBetweenBlocksProcessing = async (startTime: number) => {
     const spentTime = new Date().getTime() - startTime;
     await new Promise((resolve) =>
-      setTimeout(() => resolve(null), this.blockRetrieveGap - spentTime)
+      setTimeout(() => resolve(null), this.blockRetrieveGap - spentTime),
     );
   };
 
@@ -80,18 +80,18 @@ abstract class GeneralScanner<
   protected processBlock = async (block: Block) => {
     const startTime = new Date().getTime();
     this.logger.debug(
-      `Processing block at height [${block.height}] in scanner ${this.name()}`
+      `Processing block at height [${block.height}] in scanner ${this.name()}`,
     );
     const txs = await this.network.getBlockTxs(block.hash);
     if (block.txCount) {
       if (txs.length != block.txCount) {
         this.logger.debug(
-          `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`
+          `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`,
         );
         return false;
       }
       this.logger.debug(
-        `processing ${block.txCount} transactions of block with hash [${block.hash}]`
+        `processing ${block.txCount} transactions of block with hash [${block.hash}]`,
       );
     }
 
@@ -131,8 +131,8 @@ abstract class GeneralScanner<
         } else {
           this.logger.debug(
             `Invalid block at height ${height}. Block info is [${JsonBI.stringify(
-              block
-            )} and the expected parent hash is [${lastSavedBlock.hash}]`
+              block,
+            )} and the expected parent hash is [${lastSavedBlock.hash}]`,
           );
           break;
         }
@@ -148,7 +148,7 @@ abstract class GeneralScanner<
     let block = await this.action.getLastSavedBlock();
     while (block) {
       const blockFromNetwork = await this.network.getBlockAtHeight(
-        block.height
+        block.height,
       );
       if (
         blockFromNetwork.hash === block.hash &&

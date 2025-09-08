@@ -23,6 +23,6 @@ export const mockAxiosPost = (result: unknown) => {
 export const resetAxiosMock = () => {
   axiosInstance.post.mockReset();
   vi.spyOn(axios, 'create').mockReturnValue(
-    axiosInstance as unknown as RateLimitedAxios
+    axiosInstance as unknown as RateLimitedAxios,
   );
 };

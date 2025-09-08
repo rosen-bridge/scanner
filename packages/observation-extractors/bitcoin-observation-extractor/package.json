@@ -13,26 +13,22 @@
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
-    "coverage": "npm run test -- --coverage",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.18.0",
-    "typescript": "^5.3.3",
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "vitest": "^3.1.4",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=22.18.0"
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/bitcoin-scanner": "^0.1.0",
     "@rosen-bridge/abstract-observation-extractor": "^0.1.0",
+    "@rosen-bridge/bitcoin-scanner": "^0.1.0",
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
-    "@rosen-bridge/tokens": "^3.1.1",
-    "@rosen-bridge/extended-typeorm": "^0.2.1"
+    "@rosen-bridge/tokens": "^3.1.1"
   }
 }

@@ -20,24 +20,24 @@ export class MockedInitializableErgoExtractor extends AbstractInitializableErgoE
   getId = () => 'Test';
 
   hasData = (
-    box: V1.OutputInfo | OutputBox // eslint-disable-line @typescript-eslint/no-unused-vars
+    box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => false;
 
   getTxBlock = async (
-    txId: string // eslint-disable-line @typescript-eslint/no-unused-vars
+    txId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<BlockInfo> => {
     return { hash: 'hash', height: 100 };
   };
 
   getBoxesWithOffsetLimit = (
     offset: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-    limit: number // eslint-disable-line @typescript-eslint/no-unused-vars
+    limit: number, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => {
     return Promise.resolve({ boxes: ergoBoxes, hasNextBatch: true });
   };
 
   extractBoxData = (
-    box: V1.OutputInfo | OutputBox // eslint-disable-line @typescript-eslint/no-unused-vars
+    box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => {
     return undefined;
   };

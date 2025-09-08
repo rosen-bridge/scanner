@@ -21,7 +21,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<
   createEntity = (
     boxes: ExtractedBox[],
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ): Omit<BoxEntity, 'id'>[] => {
     return boxes.map((box) => ({
       address: box.address,
@@ -38,7 +38,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<
    */
   convertEntityToData = (entities: BoxEntity[]): ExtractedBox[] => {
     return entities.map((data) =>
-      pick(data, ['boxId', 'address', 'serialized'])
+      pick(data, ['boxId', 'address', 'serialized']),
     );
   };
 }
