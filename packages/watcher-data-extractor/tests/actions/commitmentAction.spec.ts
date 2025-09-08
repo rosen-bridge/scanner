@@ -54,7 +54,7 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [commitment1, commitment2],
         block,
-        'extractor1'
+        'extractor1',
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(CommitmentEntity);
@@ -86,7 +86,7 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [commitment3, commitment4],
         block,
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows] = await repository.findAndCount();
@@ -98,7 +98,7 @@ describe('commitmentAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
       expect(secondInsertRows[3]).toEqual(
         expect.objectContaining({
@@ -108,7 +108,7 @@ describe('commitmentAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -138,7 +138,7 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [{ ...commitment1, eventId: 'updatedEventId' }],
         block,
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -153,7 +153,7 @@ describe('commitmentAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -184,7 +184,7 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [commitment1],
         block,
-        'second-extractor'
+        'second-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -198,7 +198,7 @@ describe('commitmentAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
 
@@ -229,7 +229,7 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [commitment3],
         block,
-        'first-extractor'
+        'first-extractor',
       );
       expect(res).toEqual(true);
       const [secondInsertRows, secondInsertRowsCount] =
@@ -243,7 +243,7 @@ describe('commitmentAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        })
+        }),
       );
     });
   });
@@ -260,12 +260,12 @@ describe('commitmentAction', () => {
       const res = await action.storeCommitments(
         [commitment1, commitment2],
         block,
-        'extractor1'
+        'extractor1',
       );
       expect(res).toEqual(true);
       const repository = dataSource.getRepository(CommitmentEntity);
       expect((await repository.findBy({ spendBlock: 'hash' })).length).toEqual(
-        0
+        0,
       );
       const spendInfo2 = {
         boxId: 'boxId2',
@@ -280,7 +280,7 @@ describe('commitmentAction', () => {
       await action.spendCommitments(
         [spendInfo2, spendInfo10],
         block,
-        'extractor1'
+        'extractor1',
       );
       const commitments = await repository.findBy({
         boxId: 'boxId2',
@@ -300,7 +300,7 @@ describe('commitmentAction', () => {
       await action.storeCommitments(
         [commitment2],
         { ...block, hash: 'hash2' },
-        'extractor1'
+        'extractor1',
       );
     });
 
@@ -344,7 +344,7 @@ describe('commitmentAction', () => {
           },
         ],
         block2,
-        'extractor1'
+        'extractor1',
       );
       const repository = dataSource.getRepository(CommitmentEntity);
       let storedEntity = await repository.findOne({

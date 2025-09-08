@@ -20,7 +20,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
     extractor = new CardanoOgmiosObservationExtractor(
       dataSource,
       tokenMap,
-      bankAddress
+      bankAddress,
     );
   });
 
@@ -88,7 +88,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions([Transactions.noMetadata], block);
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
 
@@ -102,10 +102,10 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions(
         [Transactions.invalidMetadata],
-        block
+        block,
       );
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
 
@@ -119,7 +119,7 @@ describe('CardanoOgmiosObservationExtractor', () => {
       const block = (await dataSource.getRepository(BlockEntity).find())[0];
       await extractor.processTransactions([Transactions.invalidAddress], block);
       expect(await dataSource.getRepository(ObservationEntity).count()).toEqual(
-        0
+        0,
       );
     });
   });

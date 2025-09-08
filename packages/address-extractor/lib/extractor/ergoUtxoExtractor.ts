@@ -32,7 +32,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
     address: string,
     tokens?: Array<string>,
     logger?: AbstractLogger,
-    initialize = true
+    initialize = true,
   ) {
     super(type, url, address, logger, initialize);
     this.id = id;
@@ -72,11 +72,11 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
       boxId: ergoBox.box_id().to_str(),
       address: ergoLib.Address.recreate_from_ergo_tree(
         ergoLib.ErgoTree.from_base16_bytes(
-          ergoBox.ergo_tree().to_base16_bytes()
-        )
+          ergoBox.ergo_tree().to_base16_bytes(),
+        ),
       ).to_base58(this.networkType),
       serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
-        'base64'
+        'base64',
       ),
     };
   };

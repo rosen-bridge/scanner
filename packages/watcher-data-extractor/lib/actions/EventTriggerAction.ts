@@ -30,7 +30,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
   createEntity = (
     triggerBoxes: ExtractedEventTrigger[],
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ): Omit<EventTriggerEntity, 'id'>[] => {
     return triggerBoxes.map((trigger) => ({
       txId: trigger.txId,
@@ -61,7 +61,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
    * convert the database entity back to raw data
    */
   convertEntityToData = (
-    entities: EventTriggerEntity[]
+    entities: EventTriggerEntity[],
   ): ExtractedEventTrigger[] => {
     return entities.map((data) =>
       pick(data, [
@@ -83,7 +83,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
         'WIDsCount',
         'WIDsHash',
         'sourceChainHeight',
-      ])
+      ]),
     );
   };
 
@@ -99,7 +99,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
   spendBoxes = async (
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
-    extractorId: string
+    extractorId: string,
   ): Promise<BoxInfo[]> => {
     const spentData = [];
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
@@ -110,13 +110,13 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
       });
       for (const spentTrigger of spentTriggers) {
         const spendInfo = spendInfoChunk.find(
-          (info) => info.boxId === spentTrigger.boxId
+          (info) => info.boxId === spentTrigger.boxId,
         );
         if (!spendInfo || !spendInfo.extras || !spendInfo.extras.result) {
           throw Error(
             `Impossible case: spending information extras does not contain result, ${JsonBI.stringify(
-              spendInfo
-            )}`
+              spendInfo,
+            )}`,
           );
         }
         await this.repository.update(
@@ -127,16 +127,16 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
             spendTxId: spendInfo.txId,
             result: spendInfo.extras.result,
             paymentTxId: spendInfo.extras.paymentTxId || '',
-          }
+          },
         );
         spentData.push(pick(spendInfo, ['boxId']));
         this.logger.info(
-          `Spent trigger [${spentTrigger.boxId}] of event [${spentTrigger.eventId}] at height ${block.height}`
+          `Spent trigger [${spentTrigger.boxId}] of event [${spentTrigger.eventId}] at height ${block.height}`,
         );
         this.logger.debug(
           `Spent trigger: [${JSON.stringify(
-            spentTrigger
-          )}] with spending information [${JsonBI.stringify(spendInfo)}]`
+            spentTrigger,
+          )}] with spending information [${JsonBI.stringify(spendInfo)}]`,
         );
       }
     }

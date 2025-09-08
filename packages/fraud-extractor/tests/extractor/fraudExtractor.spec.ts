@@ -33,7 +33,7 @@ describe('fraudExtractor', () => {
       'extractor',
       'explorerUrl',
       '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-      'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+      'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
     );
   });
 
@@ -55,15 +55,15 @@ describe('fraudExtractor', () => {
           generateFraudTx(
             'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
             '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542',
-            '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2'
+            '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
           ),
         ],
-        block
+        block,
       );
       expect(await repository.count()).toEqual(1);
       const fraud = (await repository.find())[0];
       expect(fraud.wid).toEqual(
-        '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542'
+        '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542',
       );
       expect(fraud.creationBlock).toEqual(block.hash);
       expect(fraud.creationHeight).toEqual(block.height);
@@ -94,7 +94,7 @@ describe('fraudExtractor', () => {
         'extractor1',
         'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
       const boxData = await extractor.getTxBlock('txId');
       expect(boxData).toEqual({
@@ -137,7 +137,7 @@ describe('fraudExtractor', () => {
         'extractor1',
         'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
       const spy = jest
         .spyOn(extractor, 'extractBoxData')
@@ -171,7 +171,7 @@ describe('fraudExtractor', () => {
         'extractor1',
         'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
       const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
       await extractor.getUnspentFrauds(110);
@@ -215,7 +215,7 @@ describe('fraudExtractor', () => {
         'extractor1',
         'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
       const spy = jest
         .spyOn(extractor, 'extractBoxData')
@@ -250,7 +250,7 @@ describe('fraudExtractor', () => {
         'extractor1',
         'explorerUrl',
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9'
+        'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
       const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
       const boxData = await extractor.getFraudInfoWithBoxId('boxId');

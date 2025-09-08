@@ -24,7 +24,7 @@ export class ObservationEntityAction {
   storeObservations = async (
     observations: Array<ExtractedObservation>,
     block: Block,
-    extractor: string
+    extractor: string,
   ) => {
     if (observations.length === 0) return true;
     const requestIds = observations.map((item) => item.requestId);
@@ -36,9 +36,8 @@ export class ObservationEntityAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    const repository = await queryRunner.manager.getRepository(
-      ObservationEntity
-    );
+    const repository =
+      await queryRunner.manager.getRepository(ObservationEntity);
     try {
       for (const observation of observations) {
         const saved = savedObservations.some((entity) => {
@@ -63,18 +62,18 @@ export class ObservationEntityAction {
         };
         if (!saved) {
           this.logger.info(
-            `Storing observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+            `Storing observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`,
           );
           await repository.insert(entity);
         } else {
           this.logger.info(
-            `Updating observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`
+            `Updating observation for event ${observation.requestId} in blockHeight ${block.height} and extractor ${extractor}`,
           );
           await repository.update(
             {
               requestId: observation.requestId,
             },
-            entity
+            entity,
           );
         }
         this.logger.debug(`Entity ${JSON.stringify(entity)}`);
@@ -82,7 +81,7 @@ export class ObservationEntityAction {
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(
-        `An error occurred during store observation action: ${e}`
+        `An error occurred during store observation action: ${e}`,
       );
       await queryRunner.rollbackTransaction();
       success = false;
@@ -94,7 +93,7 @@ export class ObservationEntityAction {
 
   deleteBlockObservation = async (block: string, extractor: string) => {
     this.logger.info(
-      `Deleting observations in block ${block} and extractor ${extractor}`
+      `Deleting observations in block ${block} and extractor ${extractor}`,
     );
     await this.observationRepository.delete({
       block: block,

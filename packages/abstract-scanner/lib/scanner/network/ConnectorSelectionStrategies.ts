@@ -14,7 +14,7 @@ export interface ConnectorSelectionStrategy<TransactionType> {
   selectNextConnector(
     connectors: Array<AbstractNetworkConnector<TransactionType>>,
     currentIndex: number,
-    lastError?: Error
+    lastError?: Error,
   ): number;
 }
 
@@ -27,7 +27,7 @@ export class FailoverStrategy<TransactionType>
   selectNextConnector(
     connectors: Array<AbstractNetworkConnector<TransactionType>>,
     currentIndex: number,
-    lastError?: Error
+    lastError?: Error,
   ): number {
     // If there was an error, try the next connector
     if (lastError) {
@@ -46,7 +46,7 @@ export class RoundRobinStrategy<TransactionType>
 {
   selectNextConnector(
     connectors: Array<AbstractNetworkConnector<TransactionType>>,
-    currentIndex: number
+    currentIndex: number,
   ): number {
     return (currentIndex + 1) % connectors.length;
   }

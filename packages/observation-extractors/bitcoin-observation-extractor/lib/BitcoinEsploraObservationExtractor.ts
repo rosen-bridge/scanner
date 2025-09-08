@@ -12,13 +12,13 @@ export class BitcoinEsploraObservationExtractor extends AbstractObservationExtra
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
       tokens,
       new BitcoinEsploraRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

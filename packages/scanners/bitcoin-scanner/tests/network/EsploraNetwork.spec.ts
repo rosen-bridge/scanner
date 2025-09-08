@@ -39,10 +39,10 @@ describe('EsploraNetwork', () => {
       expect(result).toEqual(testData.block);
       expect(axiosInstance.get).toHaveBeenCalledTimes(2);
       expect(axiosInstance.get).toHaveBeenCalledWith(
-        expect.stringContaining(String(testData.blockHeight))
+        expect.stringContaining(String(testData.blockHeight)),
       );
       expect(axiosInstance.get).toHaveBeenCalledWith(
-        expect.stringContaining(testData.blockHash)
+        expect.stringContaining(testData.blockHash),
       );
     });
   });
@@ -96,10 +96,10 @@ describe('EsploraNetwork', () => {
       ]);
       expect(axiosInstance.get).toHaveBeenCalledTimes(3);
       expect(axiosInstance.get).toHaveBeenCalledWith(
-        expect.stringContaining(`${testData.blockHash}/txs/0`)
+        expect.stringContaining(`${testData.blockHash}/txs/0`),
       );
       expect(axiosInstance.get).toHaveBeenCalledWith(
-        expect.stringContaining(`${testData.blockHash}/txs/25`)
+        expect.stringContaining(`${testData.blockHash}/txs/25`),
       );
     });
   });

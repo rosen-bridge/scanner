@@ -12,7 +12,7 @@ export class RunesEsploraObservationExtractor extends RunesAbstractObservationEx
     ordiscanApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       lockAddress,
@@ -21,7 +21,7 @@ export class RunesEsploraObservationExtractor extends RunesAbstractObservationEx
       dataSource,
       tokens,
       new RunesEsploraRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

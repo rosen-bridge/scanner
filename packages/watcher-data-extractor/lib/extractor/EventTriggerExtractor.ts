@@ -41,7 +41,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
     permitAddress: string,
     fraudAddress: string,
     logger?: AbstractLogger,
-    initialize = true
+    initialize = true,
   ) {
     super(type, url, address, logger, initialize);
     this.id = id;
@@ -96,7 +96,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       }
     } catch (e) {
       this.logger.warn(
-        `Unexpected error occurred while checking the proper trigger data format for box ${box.boxId}: ${e}`
+        `Unexpected error occurred while checking the proper trigger data format for box ${box.boxId}: ${e}`,
       );
     }
     return false;
@@ -108,7 +108,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
    * @return extracted data in proper format
    */
   extractBoxData = (
-    box: OutputBox
+    box: OutputBox,
   ): Omit<ExtractedEventTrigger, 'spendBlock' | 'spendHeight'> | undefined => {
     try {
       const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
@@ -125,25 +125,25 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       const WIDsHash = Buffer.from(R4Serialized).toString('hex');
       const sourceTxId = Buffer.from(R5Serialized[0]).toString();
       const eventId = Buffer.from(blake2b(sourceTxId, undefined, 32)).toString(
-        'hex'
+        'hex',
       );
       return {
         eventId: eventId,
         txId: box.transactionId,
         boxId: box.boxId,
         serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         toChain: Buffer.from(R5Serialized[2]).toString(),
         toAddress: Buffer.from(R5Serialized[4]).toString(),
         networkFee: BigInt(
-          '0x' + Buffer.from(R5Serialized[7]).toString('hex')
+          '0x' + Buffer.from(R5Serialized[7]).toString('hex'),
         ).toString(10),
         bridgeFee: BigInt(
-          '0x' + Buffer.from(R5Serialized[6]).toString('hex')
+          '0x' + Buffer.from(R5Serialized[6]).toString('hex'),
         ).toString(10),
         amount: BigInt(
-          '0x' + Buffer.from(R5Serialized[5]).toString('hex')
+          '0x' + Buffer.from(R5Serialized[5]).toString('hex'),
         ).toString(10),
         sourceChainTokenId: Buffer.from(R5Serialized[8]).toString(),
         targetChainTokenId: Buffer.from(R5Serialized[9]).toString(),
@@ -155,13 +155,13 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
         WIDsHash: WIDsHash,
         sourceChainHeight: Number(
           BigInt('0x' + Buffer.from(R5Serialized[11]).toString('hex')).toString(
-            10
-          )
+            10,
+          ),
         ),
       };
     } catch (e) {
       this.logger.warn(
-        `Unexpected error occurred while extracting trigger data for box ${box.boxId}: ${e}`
+        `Unexpected error occurred while extracting trigger data for box ${box.boxId}: ${e}`,
       );
       return undefined;
     }
@@ -175,7 +175,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
    */
   processTransactions = async (
     txs: Array<Transaction>,
-    block: BlockInfo
+    block: BlockInfo,
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedEventTrigger> = [];
@@ -187,14 +187,14 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
           // extract output box data
           if (this.hasData(output)) {
             this.logger.debug(
-              `Trying to extract data from box ${output.boxId} at height ${block.height}`
+              `Trying to extract data from box ${output.boxId} at height ${block.height}`,
             );
             const data = this.extractBoxData(output);
             if (data) {
               this.logger.debug(
                 `Extracted data ${JsonBI.stringify(data)} from box ${
                   output.boxId
-                }`
+                }`,
               );
               boxes.push(data);
             }
@@ -212,7 +212,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       if (boxes.length > 0) {
         if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
           this.logger.warn(
-            `Data insertion failed at height ${block.height} for extractor ${this.id}`
+            `Data insertion failed at height ${block.height} for extractor ${this.id}`,
           );
           return false;
         }
@@ -221,14 +221,14 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       const spentData = await this.actions.spendBoxes(
         spendInfoArray,
         block,
-        this.id
+        this.id,
       );
       this.triggerCallbacks(CallbackType.Spend, spentData);
     } catch (e) {
       this.logger.error(
         `Error in storing data in ${this.getId()} of the block ${
           block.height
-        }: ${e}`
+        }: ${e}`,
       );
       return false;
     }
@@ -268,7 +268,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
             if (txId === '') {
               paymentTxId = transaction.id;
               this.logger.debug(
-                `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`
+                `successful event is spent. tx [${transaction.id}] is both payment and reward distribution tx`,
               );
             }
             // paymentTxId is extracted. no need to process next boxes
