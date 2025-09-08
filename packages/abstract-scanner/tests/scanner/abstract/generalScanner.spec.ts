@@ -416,9 +416,7 @@ describe('generalScanner', () => {
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
       const scanner = new firstScanner(dataSource, network);
-      const processSpy = vi
-        .spyOn(scanner as any, 'processBlock')
-        .mockImplementation(async () => {});
+      const processSpy = vi.spyOn(scanner as any, 'processBlock');
       vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
       vi.spyOn(
         scanner as any,
