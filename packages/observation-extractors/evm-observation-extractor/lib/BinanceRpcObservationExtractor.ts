@@ -11,7 +11,7 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
@@ -21,9 +21,9 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
         tokens,
         'binance',
         'bnb',
-        logger
+        logger,
       ),
-      logger
+      logger,
     );
   }
 

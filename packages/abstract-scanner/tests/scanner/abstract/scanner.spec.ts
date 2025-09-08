@@ -113,14 +113,14 @@ describe('AbstractScanner', () => {
           await dataSource
             .getRepository(BlockEntity)
             .findBy({ scanner: scanner1.name() })
-        ).length
+        ).length,
       ).toEqual(2);
       expect(
         (
           await dataSource
             .getRepository(BlockEntity)
             .findBy({ scanner: scanner2.name() })
-        ).length
+        ).length,
       ).toEqual(10);
     });
 
@@ -153,7 +153,7 @@ describe('AbstractScanner', () => {
       const scanner = new firstScanner(dataSource);
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-        []
+        [],
       );
       const instances = await dataSource.getRepository(BlockEntity).find();
       expect(instances.length).toEqual(1);
@@ -178,7 +178,7 @@ describe('AbstractScanner', () => {
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-        [{ height: 1, blockHash: '1' }]
+        [{ height: 1, blockHash: '1' }],
       );
       expect(extractor.txs.length).toEqual(1);
     });
@@ -199,7 +199,7 @@ describe('AbstractScanner', () => {
       await expect(() => {
         return scanner['processBlockTransactions'](
           { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
-          [{ height: 1, blockHash: '1' }]
+          [{ height: 1, blockHash: '1' }],
         );
       }).rejects.toBeTruthy();
     });

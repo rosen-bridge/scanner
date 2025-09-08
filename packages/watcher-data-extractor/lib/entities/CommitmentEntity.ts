@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('commitment_entity')
 @Unique(['boxId', 'extractor'])

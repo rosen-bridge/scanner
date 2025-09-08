@@ -43,13 +43,13 @@ describe('EventTrigger', () => {
           },
         ],
         block,
-        'extractorId'
+        'extractorId',
       );
       expect(
-        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
+        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length,
       ).toEqual(1);
       expect(
-        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length
+        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length,
       ).toEqual(0);
       expect(result).toEqual([{ boxId: 'id' }]);
     });

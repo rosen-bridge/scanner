@@ -20,7 +20,7 @@ export class TxAction {
    */
   deleteBlockTxs = async (blockId: string, extractor: string) => {
     this.logger.debug(
-      `Deleting transactions of block ${blockId} and extractor ${extractor}`
+      `Deleting transactions of block ${blockId} and extractor ${extractor}`,
     );
     await this.repository
       .createQueryBuilder()
@@ -42,13 +42,13 @@ export class TxAction {
   storeTxs = async (
     txs: Array<ExtractedTx>,
     block: Block,
-    extractor: string
+    extractor: string,
   ) => {
     await this.deleteBlockTxs(block.hash, extractor);
     this.logger.debug(
       `Inserting new transactions [${txs.map(
-        (tx) => tx.signedHash
-      )}] in block ${block.hash} and extractor ${extractor}`
+        (tx) => tx.signedHash,
+      )}] in block ${block.hash} and extractor ${extractor}`,
     );
     await this.repository
       .createQueryBuilder()
@@ -62,7 +62,7 @@ export class TxAction {
           blockId: block.hash,
           extractor: extractor,
           status: tx.status,
-        }))
+        })),
       )
       .execute();
   };

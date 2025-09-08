@@ -1,4 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('fraud_entity')
 export class FraudEntity {

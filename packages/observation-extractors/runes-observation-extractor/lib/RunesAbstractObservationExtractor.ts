@@ -15,7 +15,7 @@ import {
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 export abstract class RunesAbstractObservationExtractor<
-  TransactionType
+  TransactionType,
 > extends AbstractObservationExtractor<TransactionType> {
   readonly FROM_CHAIN = 'bitcoin-runes';
 
@@ -26,7 +26,7 @@ export abstract class RunesAbstractObservationExtractor<
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(dataSource, tokens, extractor, logger);
     this.lockAddress = lockAddress;
@@ -43,7 +43,7 @@ export abstract class RunesAbstractObservationExtractor<
    */
   processTransactions = async (
     txs: Array<TransactionType>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {
@@ -75,7 +75,7 @@ export abstract class RunesAbstractObservationExtractor<
               .wrapAmount(
                 outRune.rune,
                 BigInt(outRune.rune_amount),
-                this.FROM_CHAIN
+                this.FROM_CHAIN,
               )
               .amount.toString();
             runesTransformation = {
@@ -98,7 +98,7 @@ export abstract class RunesAbstractObservationExtractor<
       }
 
       const requestId = Buffer.from(
-        blake2b(this.getTxId(transaction), undefined, 32)
+        blake2b(this.getTxId(transaction), undefined, 32),
       ).toString('hex');
 
       observations.push({
@@ -124,7 +124,7 @@ export abstract class RunesAbstractObservationExtractor<
    * @param txId
    */
   protected getTxRunesTransfer = async (
-    txId: string
+    txId: string,
   ): Promise<OrdiscanRunesTransfer> => {
     const headers: AxiosHeaders = new AxiosHeaders();
     headers.setAuthorization(`Bearer ${this.ordiscanApiKey}`);

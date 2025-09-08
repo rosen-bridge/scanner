@@ -53,7 +53,7 @@ describe('generalScanner', () => {
             parentHash: '2',
             hash: '5',
             timestamp: 50,
-          })
+          }),
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
@@ -78,7 +78,7 @@ describe('generalScanner', () => {
             parentHash: '2',
             hash: '3',
             timestamp: 50,
-          })
+          }),
         );
       const scanner = new firstScanner(dataSource, network);
       await insertBlocks(scanner, 3);
@@ -164,7 +164,7 @@ describe('generalScanner', () => {
       const scanner = new firstScanner(dataSource, network);
       const mockedProcessBlockTransactions = jest.spyOn(
         scanner as any,
-        'processBlockTransactions'
+        'processBlockTransactions',
       );
       const result = await scanner['processBlock']({
         hash: '1',
@@ -392,7 +392,7 @@ describe('generalScanner', () => {
                   resolve(res);
                 }
               });
-          })
+          }),
         );
       await scanner.update();
       expect(mockedInit).toBeCalled();

@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 const PROCESSING = 'PROCESSING';
 const PROCEED = 'PROCEED';

@@ -23,7 +23,7 @@ export class TestInitializableErgoExtractorAction extends AbstractInitializableE
   createEntity = (
     boxes: AbstractBoxData[],
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ): Omit<AbstractErgoExtractorEntity, 'id'>[] => {
     return boxes.map((box) => ({
       boxId: box.boxId,
@@ -38,7 +38,7 @@ export class TestInitializableErgoExtractorAction extends AbstractInitializableE
    * convert the database entity back to raw data
    */
   convertEntityToData = (
-    entities: AbstractErgoExtractorEntity[]
+    entities: AbstractErgoExtractorEntity[],
   ): AbstractBoxData[] => {
     return entities.map((data) => pick(data, ['boxId', 'serialized']));
   };

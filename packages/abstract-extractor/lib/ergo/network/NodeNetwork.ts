@@ -48,7 +48,7 @@ export class NodeNetwork extends AbstractNetwork {
    * @param tx
    */
   private convertTransaction = (
-    tx: IndexedErgoTransaction
+    tx: IndexedErgoTransaction,
   ): ExtendedTransaction => {
     return {
       id: tx.id || '',
@@ -77,13 +77,13 @@ export class NodeNetwork extends AbstractNetwork {
    */
   getSpendingInfo = async (
     boxId: string,
-    spendTxId: string
+    spendTxId: string,
   ): Promise<BlockInfo & { spendIndex: number }> => {
     const tx = await this.api.getTxById(spendTxId);
     const spendIndex = tx.inputs?.findIndex((box) => box.boxId == boxId);
     if (spendIndex == undefined)
       throw Error(
-        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`
+        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`,
       );
     return {
       hash: tx.blockId,
@@ -102,7 +102,7 @@ export class NodeNetwork extends AbstractNetwork {
   getBoxesByAddress = async (
     address: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
     const boxes = await this.api.getBoxesByAddressUnspent(address, {
       offset: offset,
@@ -112,7 +112,7 @@ export class NodeNetwork extends AbstractNetwork {
     if (!boxes)
       throw new Error('Ergo node BoxesByAddress api expected to have items');
     const ergoBoxes = await Promise.all(
-      boxes.map(async (box) => await this.convertBox(box))
+      boxes.map(async (box) => await this.convertBox(box)),
     );
     return { boxes: ergoBoxes, hasNextBatch: boxes.length > 0 };
   };
@@ -127,7 +127,7 @@ export class NodeNetwork extends AbstractNetwork {
   getBoxesByTokenId = async (
     tokenId: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
     const boxes = await this.api.getBoxesByTokenId(tokenId, {
       offset: offset,
@@ -136,7 +136,7 @@ export class NodeNetwork extends AbstractNetwork {
     if (!boxes.items)
       throw new Error('Ergo node BoxesByTokenId api expected to have items');
     const ergoBoxes = await Promise.all(
-      boxes.items.map(async (box) => await this.convertBox(box))
+      boxes.items.map(async (box) => await this.convertBox(box)),
     );
     return { boxes: ergoBoxes, hasNextBatch: boxes.items.length > 0 };
   };
@@ -151,7 +151,7 @@ export class NodeNetwork extends AbstractNetwork {
   getAddressTransactionsWithOffsetLimit = async (
     address: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ items: Array<ExtendedTransaction>; total: number }> => {
     const txs = await this.api.getTxsByAddress(address, {
       offset,
@@ -159,7 +159,7 @@ export class NodeNetwork extends AbstractNetwork {
     });
     if (!txs.items)
       throw new Error(
-        'Explorer AddressTransactions api expected to have items'
+        'Explorer AddressTransactions api expected to have items',
       );
     return {
       items: txs.items.map((tx) => this.convertTransaction(tx)),

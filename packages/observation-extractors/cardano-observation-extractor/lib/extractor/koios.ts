@@ -22,7 +22,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
     dataSource: DataSource,
     tokens: TokenMap,
     address: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.logger = logger ? logger : new DummyLogger();
@@ -30,7 +30,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
     this.extractor = new CardanoKoiosRosenExtractor(
       address,
       tokens,
-      this.logger
+      this.logger,
     );
   }
 
@@ -47,7 +47,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
    */
   processTransactions = (
     txs: Array<KoiosTransaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -56,7 +56,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
           const data = this.extractor.get(transaction);
           if (data) {
             const requestId = Buffer.from(
-              blake2b(transaction.tx_hash, undefined, 32)
+              blake2b(transaction.tx_hash, undefined, 32),
             ).toString('hex');
             observations.push({
               fromChain: CardanoKoiosObservationExtractor.FROM_CHAIN,
@@ -81,7 +81,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
           })
           .catch((e) => {
             this.logger.error(
-              `An error occurred during store observations: ${e}`
+              `An error occurred during store observations: ${e}`,
             );
             reject(e);
           });

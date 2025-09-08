@@ -23,7 +23,7 @@ import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractor<
   ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity
+  ExtractorEntity extends AbstractErgoExtractorEntity,
 > extends AbstractExtractor<Transaction> {
   protected abstract actions: AbstractErgoExtractorAction<
     ExtractedData,
@@ -54,7 +54,7 @@ export abstract class AbstractErgoExtractor<
    */
   hook = async <T extends CallbackType>(
     type: T,
-    callback: CallbackMap<ExtractedData>[T]
+    callback: CallbackMap<ExtractedData>[T],
   ): Promise<string> => {
     const release = await this.callbackMutex.acquire();
     const callbackMap = this.callbacks[type];
@@ -76,7 +76,7 @@ export abstract class AbstractErgoExtractor<
     const callbackMap = this.callbacks[type];
     if (!callbackMap.has(id)) {
       this.logger.warn(
-        `Callback with Id [${id}] is not registered for type [${type}].`
+        `Callback with Id [${id}] is not registered for type [${type}].`,
       );
       return false;
     }
@@ -92,7 +92,7 @@ export abstract class AbstractErgoExtractor<
    */
   protected triggerCallbacks<T extends CallbackType>(
     type: T,
-    data: CallbackDataMap<ExtractedData>[T]
+    data: CallbackDataMap<ExtractedData>[T],
   ): void {
     const callbackMap = this.callbacks[type];
     callbackMap.forEach((callback) => {
@@ -109,7 +109,7 @@ export abstract class AbstractErgoExtractor<
   abstract extractBoxData: (
     box: OutputBox,
     inputExtensions: InputExtension[],
-    txExtra?: TxExtra
+    txExtra?: TxExtra,
   ) => ExtractedData | undefined;
 
   /**
@@ -141,7 +141,7 @@ export abstract class AbstractErgoExtractor<
    * @returns
    */
   getTransactionExtraData = (
-    tx: Transaction // eslint-disable-line @typescript-eslint/no-unused-vars
+    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): TxExtra => {
     return {};
   };
@@ -154,7 +154,7 @@ export abstract class AbstractErgoExtractor<
    */
   processTransactions = async (
     txs: Transaction[],
-    block: BlockInfo
+    block: BlockInfo,
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedData> = [];
@@ -169,13 +169,13 @@ export abstract class AbstractErgoExtractor<
           const extractedData = this.extractBoxData(
             output,
             inputExtensions,
-            this.getTransactionExtraData(tx)
+            this.getTransactionExtraData(tx),
           );
           if (extractedData) {
             this.logger.debug(
               `Extracted data ${JsonBigInt.stringify(extractedData)} from box ${
                 output.boxId
-              }`
+              }`,
             );
             boxes.push(extractedData);
           }
@@ -188,7 +188,7 @@ export abstract class AbstractErgoExtractor<
           this.logger.warn(
             `Data insertion failed for ${this.getId()} at the block ${
               block.height
-            }`
+            }`,
           );
           return false;
         }
@@ -197,7 +197,7 @@ export abstract class AbstractErgoExtractor<
       const spentData = await this.actions.spendBoxes(
         spentInfos,
         block,
-        this.getId()
+        this.getId(),
       );
       if (spentData.length > 0) {
         this.triggerCallbacks(CallbackType.Spend, spentData);
@@ -206,7 +206,7 @@ export abstract class AbstractErgoExtractor<
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
           block.height
-        } with error: ${e}`
+        } with error: ${e}`,
       );
       return false;
     }

@@ -27,7 +27,7 @@ export class FraudAction {
   storeBlockFrauds = async (
     frauds: Array<ExtractedFraud>,
     block: Block,
-    extractor: string
+    extractor: string,
   ) => {
     const boxIds = frauds.map((item) => item.boxId);
     const dbBoxes = await this.repository.findBy({
@@ -114,7 +114,7 @@ export class FraudAction {
         rwtCount: fraud.rwtCount,
         spendBlock: null,
         spendHeight: 0,
-      }
+      },
     );
   };
 
@@ -128,13 +128,13 @@ export class FraudAction {
     spendIds: Array<string>,
     block: Block,
     extractor: string,
-    txId: string
+    txId: string,
   ): Promise<void> => {
     const spendIdChunks = chunk(spendIds, dbIdChunkSize);
     for (const spendIdChunk of spendIdChunks) {
       const updateResult = await this.repository.update(
         { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height, spendTxId: txId }
+        { spendBlock: block.hash, spendHeight: block.height, spendTxId: txId },
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
@@ -145,7 +145,7 @@ export class FraudAction {
         });
         for (const row of spentRows) {
           this.logger.debug(
-            `Spent box with boxId [${row.boxId}] at transaction [${txId}] at height ${block.height}`
+            `Spent box with boxId [${row.boxId}] at transaction [${txId}] at height ${block.height}`,
           );
         }
       }
@@ -172,7 +172,7 @@ export class FraudAction {
       });
       for (const row of invalidRows) {
         this.logger.debug(
-          `deleted invalid fraud with boxId [${row.boxId}] at the forked block [${block}]`
+          `deleted invalid fraud with boxId [${row.boxId}] at the forked block [${block}]`,
         );
       }
     }
@@ -183,11 +183,11 @@ export class FraudAction {
     if (updatingRows.length > 0) {
       await this.repository.update(
         { spendBlock: block, extractor: extractor },
-        { spendBlock: null, spendHeight: 0, spendTxId: null }
+        { spendBlock: null, spendHeight: 0, spendTxId: null },
       );
       for (const row of updatingRows) {
         this.logger.debug(
-          `removed spending information of the fraud with boxId [${row.boxId}], spent at the forked block [${block}]`
+          `removed spending information of the fraud with boxId [${row.boxId}], spent at the forked block [${block}]`,
         );
       }
     }
@@ -228,11 +228,11 @@ export class FraudAction {
     boxId: string,
     extractor: string,
     blockId: string,
-    blockHeight: number
+    blockHeight: number,
   ) => {
     return await this.repository.update(
       { boxId: boxId, extractor: extractor },
-      { spendBlock: blockId, spendHeight: blockHeight }
+      { spendBlock: blockId, spendHeight: blockHeight },
     );
   };
 }

@@ -46,7 +46,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer'
+        'explorer',
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -65,7 +65,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer'
+        'explorer',
       );
       const tx1 = permitTxGenerator(true, 'ff11');
       const tx2 = permitTxGenerator(true, 'ff22');
@@ -86,7 +86,7 @@ describe('permitExtractor', () => {
         extractor: 'extractorId',
         boxId: box1.box_id().to_str(),
         boxSerialized: Buffer.from(box1.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         block: 'hash',
         height: 10,
@@ -100,7 +100,7 @@ describe('permitExtractor', () => {
         extractor: 'extractorId',
         boxId: box2.box_id().to_str(),
         boxSerialized: Buffer.from(box2.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         block: 'hash',
         height: 10,
@@ -114,7 +114,7 @@ describe('permitExtractor', () => {
         extractor: 'extractorId',
         boxId: box3.box_id().to_str(),
         boxSerialized: Buffer.from(box3.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         block: 'hash',
         height: 10,
@@ -136,7 +136,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer'
+        'explorer',
       );
       const tx1 = permitTxGenerator(true, 'ff11');
       const tx2 = permitTxGenerator(false, 'ff22');
@@ -144,7 +144,7 @@ describe('permitExtractor', () => {
       const tx4 = permitTxGenerator(false, 'ff33');
       const res = await extractor.processTransactions(
         [tx1, tx2, tx3, tx4],
-        block
+        block,
       );
       expect(res).toBeTruthy();
       const [, rowsCount] = await repository.findAndCount();
@@ -164,7 +164,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         RWTId,
-        'explorer'
+        'explorer',
       );
       const tx1 = permitTxGenerator(true, 'wid1');
       const tx2 = permitTxGenerator(true, 'wid2');
@@ -200,7 +200,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
       const boxData = await extractor.extractPermitData([
         addressBoxes.items[0] as any,
@@ -245,7 +245,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
       const boxData = await extractor.getTxBlock('txId');
       expect(boxData).toEqual({
@@ -281,7 +281,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
       const spy = jest
         .spyOn(extractor, 'extractPermitData')
@@ -323,7 +323,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
       const spy = jest
         .spyOn(extractor, 'extractPermitData')
@@ -360,7 +360,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
       const spy = jest
         .spyOn(extractor, 'extractPermitData')
@@ -379,7 +379,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
     });
 
@@ -472,7 +472,7 @@ describe('permitExtractor', () => {
         dataSource,
         permitAddress,
         'RWT',
-        'url'
+        'url',
       );
     });
 

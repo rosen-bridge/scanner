@@ -23,7 +23,7 @@ export const uint8ArrayToHex = (bytes: Uint8Array): string => {
 const getWidInfo = (WIDs: string) => {
   const WIDsArray = WIDs.split(',');
   const hash = Buffer.from(
-    blake2b(Buffer.from(WIDsArray.join(''), 'hex'), undefined, 32)
+    blake2b(Buffer.from(WIDsArray.join(''), 'hex'), undefined, 32),
   ).toString('hex');
 
   return {

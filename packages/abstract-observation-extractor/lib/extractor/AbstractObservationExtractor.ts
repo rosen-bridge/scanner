@@ -10,7 +10,7 @@ import { ObservationEntityAction } from '../actions/db';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 
 export abstract class AbstractObservationExtractor<
-  TransactionType
+  TransactionType,
 > extends AbstractExtractor<TransactionType> {
   protected readonly logger: AbstractLogger;
   protected readonly dataSource: DataSource;
@@ -23,7 +23,7 @@ export abstract class AbstractObservationExtractor<
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.dataSource = dataSource;
@@ -51,14 +51,14 @@ export abstract class AbstractObservationExtractor<
    */
   processTransactions = (
     txs: Array<TransactionType>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     txs.forEach((transaction) => {
       const data = this.extractor.get(transaction);
       if (data) {
         const requestId = Buffer.from(
-          blake2b(this.getTxId(transaction), undefined, 32)
+          blake2b(this.getTxId(transaction), undefined, 32),
         ).toString('hex');
         observations.push({
           fromChain: this.FROM_CHAIN,
