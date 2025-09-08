@@ -199,7 +199,6 @@ describe('CollateralExtractor', () => {
           ),
         ),
       );
-
       const tidyUpStoredCollateralsSpy = vi
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
         .mockImplementation();
