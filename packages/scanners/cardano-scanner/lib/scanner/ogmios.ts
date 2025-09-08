@@ -76,14 +76,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    */
   private rollBackward = async (
     response: BackwardResponse,
-    requestNext: () => void
+    requestNext: () => void,
   ) => {
     const hash = (response.point as Point).id;
     const savedBlock = await this.action.getBlockWithHash(hash);
     this.logger.debug(
       `Rolling backward to height ${
         savedBlock?.height
-      } in scanner ${this.name()}`
+      } in scanner ${this.name()}`,
     );
     if (savedBlock) {
       const block = {
@@ -105,14 +105,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
    */
   private rollForward = async (
     response: ForwardResponse,
-    requestNext: () => void
+    requestNext: () => void,
   ) => {
     if (response.block.type === 'praos') {
       const praosBlock = response.block as BlockPraos;
       this.logger.debug(
         `Queueing new block at height ${
           praosBlock.height
-        } in scanner ${this.name()}`
+        } in scanner ${this.name()}`,
       );
       const block = {
         hash: praosBlock.id,
@@ -153,7 +153,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
         let height = 0;
         if (blocks.length) {
           const foundedBlock = blocks.find(
-            (item) => (item.hash = intersectPoint.id)
+            (item) => (item.hash = intersectPoint.id),
           );
           if (foundedBlock) {
             height = foundedBlock.height;
@@ -179,7 +179,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     const retryPolicy = retry(
       handleWhen((error: Error) => {
         this.logger.warn(
-          `An error occurred while reconnecting to ogmios client: ${error}`
+          `An error occurred while reconnecting to ogmios client: ${error}`,
         );
         return true;
       }),
@@ -189,14 +189,14 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
           maxDelay: this.reconnectionConfig.maxDelay,
           initialDelay: this.reconnectionConfig.initialDelay,
         }),
-      }
+      },
     );
 
     let trial = 0;
     retryPolicy.execute(async () => {
       trial++;
       this.logger.debug(
-        `Retrying to connect to ogmios client in trial step #${trial}`
+        `Retrying to connect to ogmios client in trial step #${trial}`,
       );
       return await this.start();
     });
@@ -210,7 +210,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     const context: InteractionContext = await createInteractionContext(
       (err) => this.logger.error(`${err}`),
       this.connectionCloseHandler,
-      { connection: { port: this.port, host: this.host, tls: this.useTls } }
+      { connection: { port: this.port, host: this.host, tls: this.useTls } },
     );
     const intersect = await this.findIntersection(context);
     if (intersect) {
@@ -221,7 +221,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
           rollBackward: this.rollBackward,
           rollForward: this.rollForward,
         },
-        { sequential: true }
+        { sequential: true },
       );
       this.connected = true;
       await this.forkBlock(intersect.height + 1);

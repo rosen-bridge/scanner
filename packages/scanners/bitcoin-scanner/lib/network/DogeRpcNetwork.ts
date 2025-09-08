@@ -18,7 +18,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
     auth?: {
       username: string;
       password: string;
-    }
+    },
   ) {
     super();
     this.url = url;
@@ -93,7 +93,7 @@ export class DogeRpcNetwork extends AbstractNetworkConnector<DogeRpcTransaction>
    * @returns
    */
   getBlockTxs = async (
-    blockHash: string
+    blockHash: string,
   ): Promise<Array<DogeRpcTransaction>> => {
     const randomId = this.generateRandomId();
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {

@@ -9,7 +9,7 @@ export abstract class AbstractExtractor<TransactionType> {
    */
   abstract processTransactions: (
     txs: Array<TransactionType>,
-    block: Block
+    block: Block,
   ) => Promise<boolean>;
 
   /**

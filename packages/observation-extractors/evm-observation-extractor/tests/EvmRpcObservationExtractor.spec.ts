@@ -52,7 +52,7 @@ describe('EvmRpcObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -92,7 +92,7 @@ describe('EvmRpcObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -122,7 +122,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid

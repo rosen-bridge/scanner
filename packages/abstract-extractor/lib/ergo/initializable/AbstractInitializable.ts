@@ -12,7 +12,7 @@ import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
 
 export abstract class AbstractInitializableErgoExtractor<
   ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity
+  ExtractorEntity extends AbstractErgoExtractorEntity,
 > extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
   protected initialize: boolean;
   private address: string;
@@ -28,7 +28,7 @@ export abstract class AbstractInitializableErgoExtractor<
     url: string,
     address: string,
     logger?: AbstractLogger,
-    initialize = true
+    initialize = true,
   ) {
     super(logger);
     this.address = address;
@@ -62,29 +62,29 @@ export abstract class AbstractInitializableErgoExtractor<
           txs = await explorerNetwork.getAddressTransactionsWithHeight(
             this.address,
             fromHeight,
-            toHeight
+            toHeight,
           );
           this.logger.debug(
-            `Found ${txs.length} transactions for the address from height ${fromHeight} to height ${toHeight}`
+            `Found ${txs.length} transactions for the address from height ${fromHeight} to height ${toHeight}`,
           );
           if (txs.length < API_LIMIT || fromHeight === toHeight) {
             break; // Exit loop if we have fewer transactions than the limit or if the range is reduced to a single height
           }
           toHeight = Math.floor((toHeight - fromHeight) / 2) + fromHeight;
           this.logger.debug(
-            `Limiting the query height range to [${fromHeight}, ${toHeight}]`
+            `Limiting the query height range to [${fromHeight}, ${toHeight}]`,
           );
         }
         if (txs.length < API_LIMIT) {
           if (txs.length > 0) await this.processTransactionBatch(txs);
         } else {
           this.logger.debug(
-            `Block at height ${fromHeight} has more than (or equal) ${API_LIMIT} relevant txs, processing all txs in the block`
+            `Block at height ${fromHeight} has more than (or equal) ${API_LIMIT} relevant txs, processing all txs in the block`,
           );
           const blockId = await explorerNetwork.getBlockIdAtHeight(fromHeight);
           const blockTxs = await explorerNetwork.getBlockTxs(blockId);
           this.logger.debug(
-            `Found ${blockTxs.length} transactions at height ${fromHeight}`
+            `Found ${blockTxs.length} transactions at height ${fromHeight}`,
           );
           await this.processTransactions(blockTxs, {
             hash: blockId,
@@ -129,14 +129,14 @@ export abstract class AbstractInitializableErgoExtractor<
           ).getAddressTransactionsWithOffsetLimit(
             this.address,
             offset,
-            API_LIMIT
+            API_LIMIT,
           );
           total = response.total;
           const txs = response.items.filter(
-            (tx) => tx.inclusionHeight <= initialBlock.height
+            (tx) => tx.inclusionHeight <= initialBlock.height,
           );
           this.logger.debug(
-            `Found ${txs.length} transactions below the initial height with offset ${offset} and total number of transactions ${total}`
+            `Found ${txs.length} transactions below the initial height with offset ${offset} and total number of transactions ${total}`,
           );
           if (txs.length > 0) await this.processTransactionBatch(txs);
           offset += API_LIMIT;
@@ -148,7 +148,7 @@ export abstract class AbstractInitializableErgoExtractor<
     const txCountAfterInit = await this.getTotalTxCount();
     if (txCountAfterInit != txCountBeforeInit) {
       throw Error(
-        'Total transaction count changed during initialization phase, the stored data is not valid'
+        'Total transaction count changed during initialization phase, the stored data is not valid',
       );
     }
   };
@@ -164,18 +164,18 @@ export abstract class AbstractInitializableErgoExtractor<
     this.logger.debug(
       `The transaction batch grouped to ${
         Object.keys(groupedTxs).length
-      } blocks`
+      } blocks`,
     );
     for (const blockId in groupedTxs) {
       const blockTxs = groupedTxs[blockId];
       const block = { hash: blockId, height: blockTxs[0].inclusionHeight };
       this.logger.debug(
-        `Processing transactions at height ${blockTxs[0].inclusionHeight}`
+        `Processing transactions at height ${blockTxs[0].inclusionHeight}`,
       );
       const success = await this.processTransactions(blockTxs, block);
       if (!success)
         throw Error(
-          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`
+          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`,
         );
     }
   };
@@ -189,7 +189,7 @@ export abstract class AbstractInitializableErgoExtractor<
     let trial = 1;
     if (this.initialize) {
       this.logger.debug(
-        `Initializing ${this.getId()} started, removing all existing data`
+        `Initializing ${this.getId()} started, removing all existing data`,
       );
       await this.actions.removeAllData(this.getId());
       while (trial <= RETRIAL_COUNT) {
@@ -198,20 +198,20 @@ export abstract class AbstractInitializableErgoExtractor<
           break;
         } catch (e) {
           this.logger.warn(
-            `Initialization for ${this.getId()} failed with error :${e}`
+            `Initialization for ${this.getId()} failed with error :${e}`,
           );
           if (trial == RETRIAL_COUNT)
             throw Error(
-              `Initialization for ${this.getId()} failed after ${RETRIAL_COUNT} retrial`
+              `Initialization for ${this.getId()} failed after ${RETRIAL_COUNT} retrial`,
             );
           trial += 1;
           this.logger.info(
-            `Trying again to initialize ${this.getId()} with trial step ${trial}`
+            `Trying again to initialize ${this.getId()} with trial step ${trial}`,
           );
         }
       }
       this.logger.info(
-        `Initialization completed successfully for ${this.getId()}`
+        `Initialization completed successfully for ${this.getId()}`,
       );
     } else {
       this.logger.info(`Initialization for ${this.getId()} is turned off`);

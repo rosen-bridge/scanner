@@ -222,7 +222,7 @@ describe('FraudAction', () => {
     it('should insert the new fraud at initialization', async () => {
       await action.insertFraud(
         { ...fraud, blockId: 'block1', height: 100 },
-        'extractor'
+        'extractor',
       );
       const stored = (await repository.find())[0];
       expect(stored.wid).toEqual('wid');
@@ -315,7 +315,7 @@ describe('FraudAction', () => {
         'boxId',
         'extractor',
         'spendBlock-new',
-        110
+        110,
       );
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('spendBlock-new');

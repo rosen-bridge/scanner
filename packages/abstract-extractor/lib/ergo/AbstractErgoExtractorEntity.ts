@@ -1,4 +1,8 @@
-import { Column, PrimaryGeneratedColumn, Unique } from '@rosen-bridge/extended-typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Unique(['boxId', 'extractor'])
 export abstract class AbstractErgoExtractorEntity {

@@ -37,7 +37,7 @@ describe('RunesAbstractObservationExtractor', () => {
       {
         get: vi.fn().mockReturnValue(rosenData),
       } as any,
-      undefined
+      undefined,
     );
   });
 
@@ -71,7 +71,7 @@ describe('RunesAbstractObservationExtractor', () => {
       };
 
       vi.spyOn(extractor as any, 'getTxRunesTransfer').mockResolvedValue(
-        mockOrdiscanRunesTransfer
+        mockOrdiscanRunesTransfer,
       );
 
       vi.spyOn(extractor['tokens'], 'search').mockReturnValue([wrappedRune]);
@@ -115,7 +115,7 @@ describe('RunesAbstractObservationExtractor', () => {
           },
         ],
         mockBlock,
-        'test-observation-extractor'
+        'test-observation-extractor',
       );
 
       expect(result).toBe(true);

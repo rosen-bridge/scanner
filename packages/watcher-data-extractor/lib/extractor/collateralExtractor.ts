@@ -27,7 +27,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     private readonly address: string,
     private readonly dataSource: DataSource,
     explorerUrl: string,
-    private readonly logger: AbstractLogger = new DummyLogger()
+    private readonly logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
     this.ergoTree = ergoLib.Address.from_base58(this.address)
@@ -54,7 +54,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Transaction[],
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];
@@ -71,7 +71,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
         const extractedCollateral = this.toExtractedCollateral(
           outputBox,
           block.hash,
-          block.height
+          block.height,
         );
         if (extractedCollateral) boxes.push(extractedCollateral);
 
@@ -85,7 +85,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       await this.action.spendCollaterals(spentInfos, block, this.getId());
     } catch (e) {
       this.logger.error(
-        `Error in storing collaterals of the block ${block}: ${e}`
+        `Error in storing collaterals of the block ${block}: ${e}`,
       );
       return false;
     }
@@ -131,35 +131,35 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    */
   initializeBoxes = async (initialBlock: BlockInfo): Promise<void> => {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
-      initialBlock.height
+      initialBlock.height,
     );
     this.logger.debug(
       `unspent collateral box info with following IDs gotten form Ergo network: [${unspentCollaterals
         .map((box) => box.boxId)
-        .join(', ')}]`
+        .join(', ')}]`,
     );
 
     const storedUnspentCollateralBoxIds =
       await this.action.getUnspentCollateralBoxIds(this.getId());
     const unspentCollateralBoxIds = new Set(
-      unspentCollaterals.map((box) => box.boxId)
+      unspentCollaterals.map((box) => box.boxId),
     );
     await this.tidyUpStoredCollaterals(
       initialBlock.height,
       storedUnspentCollateralBoxIds.filter(
-        (boxId) => !unspentCollateralBoxIds.has(boxId)
-      )
+        (boxId) => !unspentCollateralBoxIds.has(boxId),
+      ),
     );
 
     for (const collateral of unspentCollaterals) {
       if (storedUnspentCollateralBoxIds.includes(collateral.boxId)) {
         this.logger.debug(
-          `updating unspent collateral with boxId=[${collateral.boxId}] at initialization phase`
+          `updating unspent collateral with boxId=[${collateral.boxId}] at initialization phase`,
         );
         await this.action.updateCollateral(collateral, this.getId());
       } else {
         this.logger.debug(
-          `inserting unspent collateral with boxId=[${collateral.boxId}] to database at initialization phase`
+          `inserting unspent collateral with boxId=[${collateral.boxId}] to database at initialization phase`,
         );
         await this.action.insertCollateral(collateral, this.getId());
       }
@@ -177,7 +177,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    */
   private async tidyUpStoredCollaterals(
     initialHeight: number,
-    collateralBoxIds: string[]
+    collateralBoxIds: string[],
   ) {
     for (const boxId of collateralBoxIds) {
       let boxInfo: V1.OutputInfo;
@@ -191,7 +191,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
           throw new Error(
             `something went wrong when trying to get box=[${boxId}] from Ergo network: ${
               (e as Error).message
-            }`
+            }`,
           );
         }
       }
@@ -200,12 +200,12 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
         try {
           const transactionInfo: V1.TransactionInfo =
             await this.explorerApi.v1.getApiV1TransactionsP1(
-              boxInfo.spentTransactionId
+              boxInfo.spentTransactionId,
             );
 
           if (transactionInfo.inclusionHeight < initialHeight) {
             this.logger.debug(
-              `collateral with boxId=[${boxId}] is spent and is being updated with spendHeight=[${transactionInfo.inclusionHeight}] and spendBlock=[${transactionInfo.blockId}]`
+              `collateral with boxId=[${boxId}] is spent and is being updated with spendHeight=[${transactionInfo.inclusionHeight}] and spendBlock=[${transactionInfo.blockId}]`,
             );
 
             await this.action.updateCollateral(
@@ -215,14 +215,14 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
                 spendBlock: transactionInfo.blockId,
                 spendTxId: transactionInfo.id,
               },
-              this.getId()
+              this.getId(),
             );
           }
         } catch (e) {
           throw new Error(
             `something went wrong when trying to get transaction=[${
               boxInfo.spentTransactionId
-            }] from Ergo network: ${(e as Error)?.message}`
+            }] from Ergo network: ${(e as Error)?.message}`,
           );
         }
       }
@@ -238,7 +238,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @memberof CollateralExtractor
    */
   private getAllUnspentCollaterals = async (
-    initialHeight: number
+    initialHeight: number,
   ): Promise<Array<ExtractedCollateral>> => {
     const extractedBoxes: Array<ExtractedCollateral> = [];
     let offset = 0;
@@ -246,7 +246,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
     while (offset < total) {
       const boxes = await this.explorerApi.v1.getApiV1BoxesUnspentByergotreeP1(
         this.ergoTree,
-        { offset: offset, limit: DefaultApiLimit }
+        { offset: offset, limit: DefaultApiLimit },
       );
 
       if (!boxes.items) {
@@ -259,12 +259,12 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
             (box) =>
               box.creationHeight &&
               box.creationHeight < initialHeight &&
-              this.isCollateralBox(box)
+              this.isCollateralBox(box),
           )
           .map((box) =>
-            this.toExtractedCollateral(box, box.blockId, box.settlementHeight)
+            this.toExtractedCollateral(box, box.blockId, box.settlementHeight),
           )
-          .filter((data): data is ExtractedCollateral => data != undefined)
+          .filter((data): data is ExtractedCollateral => data != undefined),
       );
       total = boxes.total;
       offset += DefaultApiLimit;
@@ -283,7 +283,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   private toExtractedCollateral = (
     box: V1.OutputInfo | OutputBox,
     blockId: string,
-    blockHeight: number
+    blockHeight: number,
   ): ExtractedCollateral | undefined => {
     const ergoOutputBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
 
@@ -292,13 +292,13 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       ?.to_byte_array();
     if (r4 == undefined) {
       this.logger.warn(
-        `collateral box with boxId=[${box.boxId}] has an invalid R4 register`
+        `collateral box with boxId=[${box.boxId}] has an invalid R4 register`,
       );
       return undefined;
     }
     const wid = uint8ArrayToHex(r4);
     this.logger.debug(
-      `Extracted WID=[${wid}] from R4 register of box=[${box.boxId}]`
+      `Extracted WID=[${wid}] from R4 register of box=[${box.boxId}]`,
     );
 
     const r5 = ergoOutputBox
@@ -308,19 +308,19 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
 
     if (r5 == undefined) {
       this.logger.warn(
-        `collateral box with boxId=[${box.boxId}] has an invalid R5 register`
+        `collateral box with boxId=[${box.boxId}] has an invalid R5 register`,
       );
       return undefined;
     }
     const rwtCount = BigInt(r5);
     this.logger.debug(
-      `Extracted rwtCount=[${rwtCount}] from R5 register of box=[${box.boxId}]`
+      `Extracted rwtCount=[${rwtCount}] from R5 register of box=[${box.boxId}]`,
     );
 
     return {
       boxId: box.boxId,
       boxSerialized: Buffer.from(
-        ergoOutputBox.sigma_serialize_bytes()
+        ergoOutputBox.sigma_serialize_bytes(),
       ).toString('base64'),
       wid: wid,
       rwtCount: rwtCount,

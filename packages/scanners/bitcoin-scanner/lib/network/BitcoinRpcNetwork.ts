@@ -18,7 +18,7 @@ export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransa
     auth?: {
       username: string;
       password: string;
-    }
+    },
   ) {
     super();
     this.url = url;
@@ -92,7 +92,7 @@ export class BitcoinRpcNetwork extends AbstractNetworkConnector<BitcoinRpcTransa
    * @returns
    */
   getBlockTxs = async (
-    blockHash: string
+    blockHash: string,
   ): Promise<Array<BitcoinRpcTransaction>> => {
     const randomId = this.generateRandomId();
     const blockHashResponse = await this.client.post<JsonRpcResult>('', {

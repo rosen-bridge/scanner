@@ -11,7 +11,7 @@ export abstract class AbstractNetwork {
   abstract getBoxesByAddress: (
     address: string,
     offset: number,
-    limit: number
+    limit: number,
   ) => Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }>;
 
   /**
@@ -24,6 +24,6 @@ export abstract class AbstractNetwork {
   abstract getBoxesByTokenId: (
     tokenId: string,
     offset: number,
-    limit: number
+    limit: number,
   ) => Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }>;
 }

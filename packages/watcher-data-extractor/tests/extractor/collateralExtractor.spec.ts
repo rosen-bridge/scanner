@@ -22,7 +22,7 @@ describe('CollateralExtractor', () => {
       testData.awcNft,
       testData.collateralAddress,
       dataSource,
-      testData.explorerUrl
+      testData.explorerUrl,
     );
   });
 
@@ -58,13 +58,13 @@ describe('CollateralExtractor', () => {
     collateral boxes`, async () => {
       const success = await collateralExtractor.processTransactions(
         [testData.tx1, testData.tx2, testData.tx3],
-        testData.block1
+        testData.block1,
       );
       const collateralBoxes = [
         testData.tx1.outputs[1],
         testData.tx2.outputs[1],
       ].filter(
-        (box) => box.assets && box.assets[0].tokenId === testData.awcNft
+        (box) => box.assets && box.assets[0].tokenId === testData.awcNft,
       );
       const [rows, rowsCount] = await repository.findAndCount();
 
@@ -76,7 +76,7 @@ describe('CollateralExtractor', () => {
           ...collateralExtractor['toExtractedCollateral'](
             box,
             testData.block1.hash,
-            testData.block1.height
+            testData.block1.height,
           ),
           extractor: testData.extractor,
           block: testData.block1.hash,
@@ -108,11 +108,10 @@ describe('CollateralExtractor', () => {
       const validCollateralBox = testData.collateralBoxesTx1
         .map((box) => box.to_js_eip12())
         .filter(
-          (box) => box.assets && box.assets[0].tokenId === testData.awcNft
+          (box) => box.assets && box.assets[0].tokenId === testData.awcNft,
         )[0];
-      const isValid = await collateralExtractor['isCollateralBox'](
-        validCollateralBox
-      );
+      const isValid =
+        await collateralExtractor['isCollateralBox'](validCollateralBox);
 
       expect(isValid).toBeTruthy();
     });
@@ -131,11 +130,10 @@ describe('CollateralExtractor', () => {
       const invalidCollateralBox = testData.collateralBoxesTx1
         .map((box) => box.to_js_eip12())
         .filter(
-          (box) => box.assets && box.assets[0].tokenId !== testData.awcNft
+          (box) => box.assets && box.assets[0].tokenId !== testData.awcNft,
         )[0];
-      const isValid = await collateralExtractor['isCollateralBox'](
-        invalidCollateralBox
-      );
+      const isValid =
+        await collateralExtractor['isCollateralBox'](invalidCollateralBox);
 
       expect(isValid).toBeFalsy();
     });
@@ -159,11 +157,11 @@ describe('CollateralExtractor', () => {
     status`, async () => {
       await collateralExtractor.processTransactions(
         [testData.tx1],
-        testData.block1
+        testData.block1,
       );
       await collateralExtractor.processTransactions(
         [testData.tx2],
-        testData.block2
+        testData.block2,
       );
       await collateralExtractor.forkBlock(testData.block2.hash);
       const [rows, rowsCount] = await repository.findAndCount();
@@ -188,7 +186,7 @@ describe('CollateralExtractor', () => {
     it(`should insert unspent collateral boxes into the DB up to the passed
     height`, async () => {
       const collateralBoxes = testData.tx1.outputs.filter(
-        (box) => box.assets && box.assets[0].tokenId === testData.awcNft
+        (box) => box.assets && box.assets[0].tokenId === testData.awcNft,
       );
       jest
         .spyOn(collateralExtractor as any, 'getAllUnspentCollaterals')
@@ -197,9 +195,9 @@ describe('CollateralExtractor', () => {
             collateralExtractor['toExtractedCollateral'](
               box,
               testData.block1.hash,
-              testData.block1.height
-            )
-          )
+              testData.block1.height,
+            ),
+          ),
         );
 
       const tidyUpStoredCollateralsSpy = jest
@@ -219,7 +217,7 @@ describe('CollateralExtractor', () => {
           ...collateralExtractor['toExtractedCollateral'](
             box,
             testData.block1.hash,
-            testData.block1.height
+            testData.block1.height,
           ),
           extractor: testData.extractor,
         });
@@ -271,9 +269,9 @@ describe('CollateralExtractor', () => {
           collateralExtractor['toExtractedCollateral'](
             box,
             block.hash,
-            block.height
+            block.height,
           )!,
-          extractor
+          extractor,
         );
       }
 
@@ -300,7 +298,7 @@ describe('CollateralExtractor', () => {
             const box = collateralBoxes.find(
               (box) =>
                 !missingBoxes.map((box) => box.boxId).includes(boxId) &&
-                box.boxId === boxId
+                box.boxId === boxId,
             );
 
             if (box == undefined) {
@@ -318,7 +316,7 @@ describe('CollateralExtractor', () => {
           },
           getApiV1TransactionsP1: async (txId: string) => {
             const txInfo = [beforeHeightSpendTx, afterHeightSpendTx].find(
-              (tx) => tx.id === txId
+              (tx) => tx.id === txId,
             );
             if (txInfo == undefined) {
               throw new Error('Tx not found');
@@ -331,7 +329,7 @@ describe('CollateralExtractor', () => {
       // call tidyUpStoredCollaterals
       await collateralExtractor['tidyUpStoredCollaterals'](
         initialHeight,
-        collateralBoxes.map((box) => box.boxId)
+        collateralBoxes.map((box) => box.boxId),
       );
 
       const [rows, rowsCount] = await repository.findAndCount();
@@ -343,7 +341,7 @@ describe('CollateralExtractor', () => {
       // spend data updated
       for (const row of rows) {
         const collateral = collateralBoxes.find(
-          (box) => box.boxId === row.boxId
+          (box) => box.boxId === row.boxId,
         );
 
         expect(collateral).toBeDefined();
@@ -351,7 +349,7 @@ describe('CollateralExtractor', () => {
           ...collateralExtractor['toExtractedCollateral'](
             collateral,
             testData.block1.hash,
-            testData.block1.height
+            testData.block1.height,
           ),
           extractor: testData.extractor,
           block: testData.block1.hash,
@@ -396,11 +394,11 @@ describe('CollateralExtractor', () => {
       } as any;
 
       const collateralBoxes = testData.tx1.outputs.filter(
-        (box) => box.assets && box.assets[0].tokenId === testData.awcNft
+        (box) => box.assets && box.assets[0].tokenId === testData.awcNft,
       );
 
       const result = await collateralExtractor['getAllUnspentCollaterals'](
-        testData.height1 + 100
+        testData.height1 + 100,
       );
 
       expect(result.length).toEqual(collateralBoxes.length);
@@ -409,9 +407,9 @@ describe('CollateralExtractor', () => {
           collateralExtractor['toExtractedCollateral'](
             collateralBoxes.find((col) => col.boxId === box.boxId)!,
             block.hash,
-            20
-          )
-        )
+            20,
+          ),
+        ),
       );
     });
   });
@@ -435,24 +433,24 @@ describe('CollateralExtractor', () => {
         collateralBox
           .register_value(ergoLib.NonMandatoryRegisterId.R5)!
           .to_i64()
-          .to_str()
+          .to_str(),
       );
       const wid = uint8ArrayToHex(
         collateralBox
           .register_value(ergoLib.NonMandatoryRegisterId.R4)!
-          .to_byte_array()
+          .to_byte_array(),
       );
 
       const extractedCollateral = collateralExtractor['toExtractedCollateral'](
         collaterlBoxData,
         block.hash,
-        20
+        20,
       );
 
       expect(extractedCollateral).toEqual({
         boxId: collaterlBoxData.boxId,
         boxSerialized: Buffer.from(
-          collateralBox.sigma_serialize_bytes()
+          collateralBox.sigma_serialize_bytes(),
         ).toString('base64'),
         wid: wid,
         rwtCount: rwtCount,

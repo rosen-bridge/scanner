@@ -10,7 +10,7 @@ export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
       config.network,
       config.blockRetrieveGap,
       config.logger,
-      config.suffix
+      config.suffix,
     );
   }
 }

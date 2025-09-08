@@ -68,8 +68,8 @@ export const txs: Array<TransactionResponse> = [
   (tx) =>
     new TransactionResponse(
       tx as unknown as TransactionResponseParams,
-      new JsonRpcProvider()
-    )
+      new JsonRpcProvider(),
+    ),
 );
 
 export const expectedExtractedTxs = [

@@ -56,7 +56,7 @@ export class EvmRpcNetwork extends AbstractNetworkConnector<TransactionResponse>
    * @returns array of RpcTransaction
    */
   getBlockTxs = async (
-    blockHash: string
+    blockHash: string,
   ): Promise<Array<TransactionResponse>> => {
     const block = await this.provider.getBlock(blockHash, true);
     if (block == undefined) {

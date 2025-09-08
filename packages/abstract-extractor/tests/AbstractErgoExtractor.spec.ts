@@ -52,7 +52,7 @@ describe('AbstractErgoExtractor', () => {
       expect(extractSpy).toBeCalledWith(
         tx.outputs[0],
         [tx.inputs[0].extension, {}],
-        {}
+        {},
       );
       expect(storeSpy).toBeCalledWith([extractedData], block, 'Test');
       expect(result).toEqual(true);
@@ -104,7 +104,7 @@ describe('AbstractErgoExtractor', () => {
           { boxId: tx.inputs[1].boxId, txId: tx.id, index: 2 },
         ],
         block,
-        'Test'
+        'Test',
       );
       expect(result).toEqual(true);
       expect(triggerCallbacks).toBeCalledWith(CallbackType.Spend, [
@@ -204,7 +204,7 @@ describe('AbstractErgoExtractor', () => {
       const insertCallback = vitest.fn();
       const id = await extractor.hook(CallbackType.Insert, insertCallback);
       expect(extractor['callbacks'][CallbackType.Insert]).toEqual(
-        new Map().set(id, insertCallback)
+        new Map().set(id, insertCallback),
       );
     });
   });
@@ -229,7 +229,7 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.unhook(CallbackType.Insert, id);
       expect(result).toBeTruthy();
       expect(extractor['callbacks'][CallbackType.Insert].get(id)).toEqual(
-        undefined
+        undefined,
       );
     });
 
@@ -253,10 +253,10 @@ describe('AbstractErgoExtractor', () => {
       const result = await extractor.unhook(CallbackType.Update, id);
       expect(result).toBeFalsy();
       expect(extractor['callbacks'][CallbackType.Insert].get(id)).toEqual(
-        insertCallback
+        insertCallback,
       );
       expect(extractor['callbacks'][CallbackType.Update].get(id)).toEqual(
-        undefined
+        undefined,
       );
     });
   });
