@@ -104,13 +104,13 @@ describe('TxAction', () => {
           parentHash: '',
           timestamp: 10,
         },
-        'extractor 1'
+        'extractor 1',
       );
       const records = await repository.find();
       expect(records.length).toEqual(2);
       for (const tx of txs) {
         const element = records.filter(
-          (item) => item.signedHash === tx.signedHash
+          (item) => item.signedHash === tx.signedHash,
         );
         expect(element.length).toEqual(1);
         expect(element[0].unsignedHash).toEqual(tx.unsignedHash);

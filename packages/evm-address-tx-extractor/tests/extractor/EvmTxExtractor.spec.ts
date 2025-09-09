@@ -57,7 +57,7 @@ describe('EvmTxExtractor', () => {
       expect(elements.length).toEqual(expectedExtractedTxs.length);
       for (const { status, tx } of expectedExtractedTxs) {
         const filteredElements = elements.filter(
-          (item) => item.signedHash === tx.signedHash
+          (item) => item.signedHash === tx.signedHash,
         );
         expect(filteredElements.length).toEqual(1);
         const element = filteredElements[0];

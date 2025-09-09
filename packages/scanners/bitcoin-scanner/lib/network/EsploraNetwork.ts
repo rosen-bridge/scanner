@@ -38,7 +38,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
     // get block headers using block hash
     const blockHeader = (
       await this.client.get<EsploraBlock>(
-        `${this.apiPrefix}/block/${blockHash}`
+        `${this.apiPrefix}/block/${blockHash}`,
       )
     ).data;
     return {
@@ -66,11 +66,11 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
    * @returns
    */
   getBlockTxs = async (
-    blockHash: string
+    blockHash: string,
   ): Promise<Array<BitcoinEsploraTransaction>> => {
     const txCount = (
       await this.client.get<EsploraBlock>(
-        `${this.apiPrefix}/block/${blockHash}`
+        `${this.apiPrefix}/block/${blockHash}`,
       )
     ).data.tx_count;
 
@@ -80,7 +80,7 @@ export class EsploraNetwork extends AbstractNetworkConnector<BitcoinEsploraTrans
     while (offset < txCount) {
       const txs = (
         await this.client.get<Array<BitcoinEsploraTransaction>>(
-          `${this.apiPrefix}/block/${blockHash}/txs/${offset}`
+          `${this.apiPrefix}/block/${blockHash}/txs/${offset}`,
         )
       ).data;
       blockTxs.push(...txs);

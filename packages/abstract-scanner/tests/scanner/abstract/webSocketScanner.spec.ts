@@ -80,7 +80,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
@@ -106,7 +106,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
@@ -128,7 +128,7 @@ describe('webSocketScanner', () => {
           extra: '',
           timestamp: 10,
         },
-        []
+        [],
       );
       const inserted = await repository.findBy({ height: 101 });
       expect(inserted.length).toBe(1);

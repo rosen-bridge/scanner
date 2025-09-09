@@ -97,7 +97,7 @@ describe('TxAction', () => {
           parentHash: '',
           timestamp: 10,
         },
-        'extractor 1'
+        'extractor 1',
       );
       const elements = await repository.find();
       expect(elements.length).toEqual(2);

@@ -22,13 +22,13 @@ export class ExplorerNetwork extends AbstractNetwork {
    */
   getSpendingInfo = async (
     boxId: string,
-    spendTxId: string
+    spendTxId: string,
   ): Promise<BlockInfo & { spendIndex: number }> => {
     const tx = await this.api.v1.getApiV1TransactionsP1(spendTxId);
     const spendIndex = tx.inputs?.findIndex((box) => box.boxId === boxId);
     if (spendIndex == undefined)
       throw Error(
-        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`
+        `Impossible behavior, the box [${boxId}] should have been spent in tx [${spendTxId}]`,
       );
     return {
       hash: tx.blockId,
@@ -57,7 +57,7 @@ export class ExplorerNetwork extends AbstractNetwork {
       value: box.value,
       additionalRegisters: mapValues(
         box.additionalRegisters,
-        'serializedValue'
+        'serializedValue',
       ),
       assets:
         box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
@@ -73,7 +73,7 @@ export class ExplorerNetwork extends AbstractNetwork {
    * @param tx
    */
   private convertTransaction = (
-    tx: V1.TransactionInfo
+    tx: V1.TransactionInfo,
   ): ExtendedTransaction => {
     return {
       id: tx.id,
@@ -91,7 +91,7 @@ export class ExplorerNetwork extends AbstractNetwork {
           transactionId: output.transactionId,
           additionalRegisters: mapValues(
             output.additionalRegisters,
-            'serializedValue'
+            'serializedValue',
           ),
           assets:
             output.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ??
@@ -143,7 +143,7 @@ export class ExplorerNetwork extends AbstractNetwork {
   getAddressTransactionsWithHeight = async (
     address: string,
     fromHeight: number,
-    toHeight: number
+    toHeight: number,
   ): Promise<Array<ExtendedTransaction>> => {
     const txs = await this.api.v1.getApiV1AddressesP1Transactions(address, {
       fromHeight,
@@ -152,7 +152,7 @@ export class ExplorerNetwork extends AbstractNetwork {
     });
     if (!txs.items)
       throw new Error(
-        'Explorer AddressTransactions api expected to have items'
+        'Explorer AddressTransactions api expected to have items',
       );
     return txs.items.map((tx) => this.convertTransaction(tx));
   };
@@ -176,11 +176,11 @@ export class ExplorerNetwork extends AbstractNetwork {
     const block = await this.api.v1.getApiV1BlocksP1(blockId);
     if (!block.block.blockTransactions) {
       throw new Error(
-        `Expected explorer block api to include block transactions for block ${blockId}`
+        `Expected explorer block api to include block transactions for block ${blockId}`,
       );
     }
     return block.block.blockTransactions.map((tx) =>
-      this.convertBlockTransaction(tx)
+      this.convertBlockTransaction(tx),
     );
   };
 
@@ -194,7 +194,7 @@ export class ExplorerNetwork extends AbstractNetwork {
   getBoxesByAddress = async (
     address: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
     const boxes = await this.api.v1.getApiV1BoxesUnspentByaddressP1(address, {
       offset: offset,
@@ -220,7 +220,7 @@ export class ExplorerNetwork extends AbstractNetwork {
   getBoxesByTokenId = async (
     tokenId: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ boxes: ErgoBox[]; hasNextBatch: boolean }> => {
     const boxes = await this.api.v1.getApiV1BoxesBytokenidP1(tokenId, {
       offset: offset,

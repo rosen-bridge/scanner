@@ -46,7 +46,7 @@ describe('AbstractObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [tx],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -98,7 +98,7 @@ describe('AbstractObservationExtractor', () => {
 
       const res = await extractor.processTransactions(
         [tx],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid

@@ -21,7 +21,7 @@ describe('CardanoOgmiosTxIdExtractor', () => {
     it('should store all transaction ids of block in database', async () => {
       const extractor = new CardanoOgmiosTxIdExtractor(
         dataSource,
-        'extractor1'
+        'extractor1',
       );
       const repository = dataSource.getRepository(TxIdEntity);
       await repository.createQueryBuilder().delete().execute();

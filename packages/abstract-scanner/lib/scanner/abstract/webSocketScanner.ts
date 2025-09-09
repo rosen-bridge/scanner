@@ -6,7 +6,7 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 const DEFAULT_MAX_TRY_BLOCK = 10;
 
 abstract class WebSocketScanner<
-  TransactionType
+  TransactionType,
 > extends AbstractScanner<TransactionType> {
   readonly maxTryBlock: number;
 
@@ -16,7 +16,7 @@ abstract class WebSocketScanner<
     protected scannerName: string,
     logger?: AbstractLogger,
     maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
-    protected suffix?: string
+    protected suffix?: string,
   ) {
     super(logger);
     this.maxTryBlock = maxTryBlock;
@@ -28,13 +28,13 @@ abstract class WebSocketScanner<
 
   protected tryRunningFunction = async (
     fn: () => Promise<boolean>,
-    msg: string
+    msg: string,
   ): Promise<boolean> => {
     for (let tryRound = 1; tryRound <= this.maxTryBlock; tryRound++) {
       if (await fn()) return true;
     }
     this.logger.error(
-      `${msg} can not be proceed in ${this.maxTryBlock} try. scanner restarted automatically`
+      `${msg} can not be proceed in ${this.maxTryBlock} try. scanner restarted automatically`,
     );
     await this.stop();
     await this.start();
@@ -49,7 +49,7 @@ abstract class WebSocketScanner<
    */
   protected stepForward = async (
     block: Block,
-    transactions: Array<TransactionType>
+    transactions: Array<TransactionType>,
   ) => {
     const release = await this.mutex.acquire();
     await this.tryRunningFunction(async () => {
@@ -68,7 +68,7 @@ abstract class WebSocketScanner<
           const res = await this.processBlockTransactions(block, transactions);
           if (res === false) {
             this.logger.error(
-              `Can not process block at height ${block.height}`
+              `Can not process block at height ${block.height}`,
             );
           } else {
             return true;

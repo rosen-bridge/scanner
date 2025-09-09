@@ -51,7 +51,7 @@ describe('AbstractErgoExtractorAction', () => {
         sampleEntities.map((entity) => ({
           ...entity,
           extractor: 'extractor-new',
-        }))
+        })),
       );
       const countBefore = await repository.count();
 

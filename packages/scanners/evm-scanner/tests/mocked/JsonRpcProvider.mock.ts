@@ -42,6 +42,6 @@ export const mockGetBlock = (provider: JsonRpcProvider, data: Block | null) => {
  */
 export const mockGetBlockNumber = (provider: JsonRpcProvider) => {
   vi.spyOn(provider, 'getBlockNumber').mockResolvedValue(
-    testData.blockInfo.number
+    testData.blockInfo.number,
   );
 };

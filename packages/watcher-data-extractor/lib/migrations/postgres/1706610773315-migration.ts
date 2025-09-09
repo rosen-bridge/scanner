@@ -1,4 +1,7 @@
-import { MigrationInterface, QueryRunner } from '@rosen-bridge/extended-typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+} from '@rosen-bridge/extended-typeorm';
 import { getWidInfo } from '../../utils';
 
 export class migration1706610773315 implements MigrationInterface {
@@ -37,7 +40,7 @@ export class migration1706610773315 implements MigrationInterface {
     // calculate `WIDsCount` and `WIDsHash` columns in `event_trigger_entity`
     for (const event of events) {
       const { WIDsHash, WIDsCount } = getWidInfo(
-        (event as { WIDs: string }).WIDs
+        (event as { WIDs: string }).WIDs,
       );
       await queryRunner.query(`
             UPDATE "event_trigger_entity"

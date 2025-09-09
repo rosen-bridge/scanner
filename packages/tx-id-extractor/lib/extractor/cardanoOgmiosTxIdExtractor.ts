@@ -13,7 +13,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   constructor(
     dataSource: DataSource,
     id: string,
-    logger: AbstractLogger = new DummyLogger()
+    logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
     this.id = id;
@@ -33,7 +33,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const txIds = txs.map((item) => item.id);
     await this.action.storeTxs(txIds, block, this.getId());

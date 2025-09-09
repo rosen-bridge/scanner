@@ -12,7 +12,7 @@ export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
       config.network,
       config.blockRetrieveGap,
       config.logger,
-      config.suffix
+      config.suffix,
     );
   }
 }
