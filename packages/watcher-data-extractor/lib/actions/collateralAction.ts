@@ -1,3 +1,4 @@
+import CollateralEntity from './../entities/CollateralEntity';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { difference } from 'lodash-es';
@@ -9,8 +10,6 @@ import {
   Repository,
 } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
-
-import CollateralEntity from '../entities/CollateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
 import { SpendInfo } from '../interfaces/types';
 

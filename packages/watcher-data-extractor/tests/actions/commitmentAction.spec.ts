@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-
 import CommitmentAction from '../../lib/actions/commitmentAction';
 import { CommitmentEntity } from '../../lib';
 import { block, block2 } from '../extractor/utilsVariable.mock';

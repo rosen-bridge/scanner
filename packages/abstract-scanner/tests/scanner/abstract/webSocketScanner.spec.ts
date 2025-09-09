@@ -36,7 +36,7 @@ describe('webSocketScanner', () => {
      * - must return true
      */
     it('should call fn once and return true ', async () => {
-      const mockFn = jest.fn();
+      const mockFn = vi.fn();
       mockFn.mockReturnValue(true);
       const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeTruthy();
@@ -52,7 +52,7 @@ describe('webSocketScanner', () => {
      * - must return false
      */
     it('should called fn 10 time if returns false and return false', async () => {
-      const mockFn = jest.fn();
+      const mockFn = vi.fn();
       mockFn.mockReturnValue(false);
       const res = await scanner.mockedTryFnCall(mockFn, '');
       expect(res).toBeFalsy();

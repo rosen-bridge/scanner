@@ -16,34 +16,34 @@ export class BlockEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   hash: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   parentHash: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   extra?: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   scanner: string;
 
-  @Column()
+  @Column({ type: 'bigint' })
   timestamp: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   year?: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   month?: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   day?: number;
 }
 

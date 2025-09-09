@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./lib",
-    "composite": true
+    "composite": true,
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["./lib/**/*.spec.ts", "./lib/**/*.test.ts", "./lib/**/*.mock.ts"],
   "include": ["./lib/**/*"],

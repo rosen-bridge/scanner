@@ -1,7 +1,6 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
-
 import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import EventTriggerExtractor from '../../lib/extractor/EventTriggerExtractor';
 import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
@@ -180,7 +179,7 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(extractor['actions'], 'spendBoxes');
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
       spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTxOldFormat;
       const res = await extractor.processTransactions([tx1], block);
@@ -217,7 +216,7 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(extractor['actions'], 'spendBoxes');
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
       spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTx;
       const res = await extractor.processTransactions([tx1], block);

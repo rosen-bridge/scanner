@@ -2,15 +2,15 @@ import { Column, Entity, PrimaryColumn } from '@rosen-bridge/extended-typeorm';
 
 @Entity('extractor_status_entity')
 export class ExtractorStatusEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'varchar' })
   scannerId: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'varchar' })
   extractorId: string;
 
-  @Column()
+  @Column({ type: 'int' })
   updateHeight: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   updateBlockHash: string;
 }

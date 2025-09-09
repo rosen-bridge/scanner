@@ -2,6 +2,7 @@ image: node:22.18
 
 stages:
   - installation
+  - depcheck
   - build
   - type_check
   - lint
@@ -18,6 +19,18 @@ installation:
       - '**/node_modules'
   script:
     - npm ci
+
+depcheck:
+  stage: depcheck
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+  script:
+    - git fetch origin $CI_DEFAULT_BRANCH
+    - npx lint-staged --diff origin/$CI_DEFAULT_BRANCH...HEAD
 
 build:
   stage: build

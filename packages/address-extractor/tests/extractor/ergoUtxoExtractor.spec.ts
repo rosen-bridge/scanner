@@ -1,7 +1,6 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
-
 import { ErgoUTXOExtractor } from '../../lib';
 import { createDatabase } from './utils.mock';
 import { extractedBox, tx1 } from './testData';
