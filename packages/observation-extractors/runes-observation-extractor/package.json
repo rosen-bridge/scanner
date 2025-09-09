@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/runes-observation-extractor",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Event observation data extractor for Runes chain",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "MIT",
@@ -34,7 +34,7 @@
     "@rosen-bridge/bitcoin-scanner": "^0.1.0",
     "@rosen-bridge/extended-typeorm": "^0.1.0",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
-    "@rosen-bridge/scanner-interfaces": "^0.1.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "@rosen-bridge/tokens": "^3.1.1",
     "axios": "1.9.0",
     "blakejs": "^1.2.1"

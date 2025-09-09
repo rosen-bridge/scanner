@@ -1,7 +1,5 @@
 # @rosen-bridge/abstract-observation-extractor
 
----
-
 ## 0.1.0
 
 - The package has been **renamed** from `@rosen-bridge/observation-extractor`.  

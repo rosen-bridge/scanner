@@ -1,7 +1,5 @@
 # @rosen-bridge/abstract-scanner
 
----
-
 ## 0.1.0
 
 - Added optional suffix support for WebSocket-based scanners
