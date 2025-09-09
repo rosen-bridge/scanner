@@ -32,6 +32,7 @@ abstract class GeneralScanner<
      * `initialHeight` by one so that it matches how other scanners work.
      */
     this.initialHeight = initialHeight + 1;
+    this.suffix = suffix;
     this.action = new BlockDbAction(
       this.dataSource,
       this.scannerName,
