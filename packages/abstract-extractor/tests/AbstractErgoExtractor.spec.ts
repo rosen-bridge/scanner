@@ -1,5 +1,4 @@
 import { V1 } from '@rosen-clients/ergo-explorer';
-import { describe, it, expect, vitest } from 'vitest';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import {

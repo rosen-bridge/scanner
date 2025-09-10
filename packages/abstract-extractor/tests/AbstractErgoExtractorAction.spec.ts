@@ -1,5 +1,4 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { describe, it, expect, beforeEach } from 'vitest';
 import { pick } from 'lodash-es';
 
 import { TestErgoExtractorAction } from './AbstractErgoExtractorAction.mock';

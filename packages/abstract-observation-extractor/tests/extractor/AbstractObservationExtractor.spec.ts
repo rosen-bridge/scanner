@@ -20,7 +20,7 @@ describe('AbstractObservationExtractor', () => {
     const tokenMap = new TokenMap();
     await tokenMap.updateConfigByJson(tokens);
     extractor = new TestAbstractObservationExtractor(dataSource, tokenMap, {
-      get: jest.fn(),
+      get: vi.fn(),
     } as unknown as AbstractRosenDataExtractor<TestTransactionType>);
   });
 
@@ -39,9 +39,7 @@ describe('AbstractObservationExtractor', () => {
      * - observation should be inserted into database
      */
     it('should return true and insert observation into database on valid lock tx', async () => {
-      jest
-        .spyOn(extractor.getRosenExtractor(), 'get')
-        .mockReturnValue(rosenData);
+      vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
       // run test
       const res = await extractor.processTransactions(
@@ -92,9 +90,7 @@ describe('AbstractObservationExtractor', () => {
      * - no observation should be in database
      */
     it('should return true with no observation in database on invalid lock tx', async () => {
-      jest
-        .spyOn(extractor.getRosenExtractor(), 'get')
-        .mockReturnValue(undefined);
+      vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(undefined);
 
       const res = await extractor.processTransactions(
         [tx],
