@@ -9,6 +9,8 @@
 ### Patch Changes
 
 - Rename observation-extractor package to abstract-observation-extractor
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.0
 
 ## 5.1.6
 
