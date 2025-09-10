@@ -1,34 +1,34 @@
 import { BitcoinEsploraTransaction } from '@rosen-bridge/bitcoin-scanner';
-import { RunesEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { BitcoinRunesEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { RunesAbstractObservationExtractor } from './RunesAbstractObservationExtractor';
+import { BitcoinRunesAbstractObservationExtractor } from './BitcoinRunesAbstractObservationExtractor';
 
-export class RunesEsploraObservationExtractor extends RunesAbstractObservationExtractor<BitcoinEsploraTransaction> {
+export class BitcoinRunesEsploraObservationExtractor extends BitcoinRunesAbstractObservationExtractor<BitcoinEsploraTransaction> {
   constructor(
     lockAddress: string,
-    ordiscanUrl: string,
-    ordiscanApiKey: string,
+    unisatUrl: string,
+    unisatApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger,
+    logger?: AbstractLogger
   ) {
     super(
       lockAddress,
-      ordiscanUrl,
-      ordiscanApiKey,
+      unisatUrl,
+      unisatApiKey,
       dataSource,
       tokens,
-      new RunesEsploraRosenExtractor(lockAddress, tokens, logger),
-      logger,
+      new BitcoinRunesEsploraRosenExtractor(lockAddress, tokens, logger),
+      logger
     );
   }
 
   /**
    * gets Id for current extractor
    */
-  getId = () => 'runes-esplora-extractor';
+  getId = () => 'bitcoin-runes-esplora-extractor';
 
   /**
    * gets transaction id from TransactionType
