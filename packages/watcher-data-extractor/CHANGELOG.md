@@ -1,5 +1,17 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.2.0
+
+### Minor Changes
+
+- Upgrade to Node.js version 22.18.0
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.1.0
+  - @rosen-bridge/scanner-interfaces@0.2.0
+
 ## 12.1.4
 
 ### Patch Changes

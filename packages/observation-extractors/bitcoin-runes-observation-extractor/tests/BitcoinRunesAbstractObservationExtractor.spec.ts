@@ -44,7 +44,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
       mockDataSource,
       mockTokenMap,
       mockRosenDataExtractor,
-      undefined
+      undefined,
     );
   });
 
@@ -64,10 +64,10 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
     it('should process ergo event transaction successfully', async () => {
       // arrange
       vi.spyOn(mockRosenDataExtractor as any, 'get').mockReturnValue(
-        ergoEventData
+        ergoEventData,
       );
       vi.spyOn(extractor as any, 'getTxOutputRunes').mockResolvedValue(
-        mockTxOutputRunes
+        mockTxOutputRunes,
       );
 
       const storeObservationsSpy = vi
@@ -96,7 +96,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
           },
         ],
         mockBlock,
-        'test-observation-extractor'
+        'test-observation-extractor',
       );
 
       expect(result).toBe(true);

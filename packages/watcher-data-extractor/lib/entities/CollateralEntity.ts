@@ -12,28 +12,28 @@ class CollateralEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   boxSerialized: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   wid: string;
 
   @Column({ type: 'bigint', transformer: new BigIntValueTransformer() })
   rwtCount: bigint;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
   @Column({ nullable: true, type: 'varchar' })

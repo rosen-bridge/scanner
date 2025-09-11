@@ -9,39 +9,39 @@ export class FraudEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   creationBlock: string;
 
-  @Column()
+  @Column({ type: 'int' })
   creationHeight: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   creationTxId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   serialized: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   triggerBoxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   wid: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   rwtCount: string;
 
   @Column({ nullable: true, type: 'text' })
   spendBlock?: string | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'int' })
   spendHeight?: number;
 
   @Column({ nullable: true, type: 'text' })
   spendTxId?: string | null;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 }

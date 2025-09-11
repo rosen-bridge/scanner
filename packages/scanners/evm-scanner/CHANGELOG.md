@@ -1,7 +1,5 @@
 # @rosen-bridge/evm-scanner
 
----
-
 ## 0.1.0
 
 - This package was **renamed** from `@rosen-bridge/evm-rpc-scanner`.  

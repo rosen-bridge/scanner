@@ -28,7 +28,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(dataSource, tokens, extractor, logger);
 
@@ -53,7 +53,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
    */
   processTransactions = async (
     txs: Array<TransactionType>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {
@@ -85,7 +85,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
               .wrapAmount(
                 outRune.runeId,
                 BigInt(outRune.runeAmount),
-                this.FROM_CHAIN
+                this.FROM_CHAIN,
               )
               .amount.toString();
             runesTransformation = {
@@ -108,7 +108,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       }
 
       const requestId = Buffer.from(
-        blake2b(this.getTxId(transaction), undefined, 32)
+        blake2b(this.getTxId(transaction), undefined, 32),
       ).toString('hex');
 
       observations.push({
@@ -134,7 +134,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
    * @param txId
    */
   protected getTxOutputRunes = async (
-    txId: string
+    txId: string,
   ): Promise<TxOutputRune[]> => {
     // Transform the RPC transaction to the expected BitcoinRunesTx format
     const runes: TxOutputRune[] = [];
@@ -147,14 +147,14 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       >(`/v1/indexer/runes/event?txid=${txId}`);
       this.logger.debug(
         `requested 'indexer/runes/event' filtering txId [${txId}]. Response: ${JsonBigInt.stringify(
-          response.data
-        )}`
+          response.data,
+        )}`,
       );
 
       txRunes = response.data.data;
       if (txRunes.detail.length !== txRunes.total) {
         throw Error(
-          `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`
+          `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,7 +169,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
     for (const transfer of txRunes.detail) {
       if (transfer.txid !== txId) {
         throw new Error(
-          `ImpossibleBehavior: Fetched runes event for tx [${txId}] but got a transfer with txId [${transfer.txid}]`
+          `ImpossibleBehavior: Fetched runes event for tx [${txId}] but got a transfer with txId [${transfer.txid}]`,
         );
       }
       if (transfer.type === 'send') continue;

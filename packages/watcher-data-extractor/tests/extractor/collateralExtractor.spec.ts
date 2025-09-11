@@ -188,19 +188,19 @@ describe('CollateralExtractor', () => {
       const collateralBoxes = testData.tx1.outputs.filter(
         (box) => box.assets && box.assets[0].tokenId === testData.awcNft,
       );
-      jest
-        .spyOn(collateralExtractor as any, 'getAllUnspentCollaterals')
-        .mockResolvedValue(
-          collateralBoxes.map((box) =>
-            collateralExtractor['toExtractedCollateral'](
-              box,
-              testData.block1.hash,
-              testData.block1.height,
-            ),
+      vi.spyOn(
+        collateralExtractor as any,
+        'getAllUnspentCollaterals',
+      ).mockResolvedValue(
+        collateralBoxes.map((box) =>
+          collateralExtractor['toExtractedCollateral'](
+            box,
+            testData.block1.hash,
+            testData.block1.height,
           ),
-        );
-
-      const tidyUpStoredCollateralsSpy = jest
+        ),
+      );
+      const tidyUpStoredCollateralsSpy = vi
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
         .mockImplementation();
 

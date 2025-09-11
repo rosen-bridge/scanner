@@ -12,7 +12,7 @@ export class BitcoinRunesRpcObservationExtractor extends BitcoinRunesAbstractObs
     unisatApiKey: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       lockAddress,
@@ -21,7 +21,7 @@ export class BitcoinRunesRpcObservationExtractor extends BitcoinRunesAbstractObs
       dataSource,
       tokens,
       new BitcoinRunesRpcRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

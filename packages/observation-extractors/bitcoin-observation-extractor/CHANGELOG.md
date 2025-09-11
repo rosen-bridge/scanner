@@ -1,5 +1,15 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.2.0
+
+### Minor Changes
+
+- Upgrade to Node.js version 22.18.0
+
+### Patch Changes
+
+- Rename observation-extractor package to abstract-observation-extractor
+
 ## 6.1.6
 
 ### Patch Changes

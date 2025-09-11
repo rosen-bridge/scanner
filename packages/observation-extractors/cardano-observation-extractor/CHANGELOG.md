@@ -1,7 +1,5 @@
 # @rosen-bridge/cardano-observation-extractor
 
----
-
 ## 0.1.0
 
 - This package was **extracted** from `@rosen-bridge/observation-extractor`.  

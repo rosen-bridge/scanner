@@ -1,7 +1,5 @@
 # @rosen-bridge/cardano-scanner
 
----
-
 ## 0.1.0
 
 - Added optional suffix support for Cardano Ogmios scanner
