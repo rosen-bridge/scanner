@@ -20,7 +20,8 @@
     "url": "git+https://github.com/rosen-bridge/scanner"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.1.0",
