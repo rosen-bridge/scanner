@@ -5,6 +5,7 @@ import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+
 import {
   permitTxGenerator,
   createDatabase,

@@ -1,4 +1,5 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/PermitEntity';
 import { block, block2 } from '../extractor/utilsVariable.mock';

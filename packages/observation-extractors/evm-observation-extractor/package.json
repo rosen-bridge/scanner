@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-observation-extractor",
-  "version": "5.1.6",
+  "version": "5.2.0",
   "description": "Event observation data extractor for EVM-compatible chains",
   "repository": "https://github.com/rosen-bridge/scanner",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "@rosen-bridge/abstract-observation-extractor": "^0.1.0",
     "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/rosen-extractor": "^8.0.1",
-    "@rosen-bridge/scanner-interfaces": "^0.1.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "@rosen-bridge/tokens": "^3.1.1",
     "blakejs": "^1.2.1",
     "ethers": "6.13.2"
