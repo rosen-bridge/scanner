@@ -499,7 +499,9 @@ describe('permitExtractor', () => {
       vi.spyOn(extractor, 'getAllUnspentPermits').mockResolvedValue([
         extractedPermit,
       ]);
-      vi.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
+      vi.spyOn(extractor, 'validateOldStoredPermits').mockImplementation(
+        vi.fn(),
+      );
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
@@ -537,7 +539,9 @@ describe('permitExtractor', () => {
       vi.spyOn(extractor, 'getAllUnspentPermits').mockResolvedValue([
         extractedPermit,
       ]);
-      vi.spyOn(extractor, 'validateOldStoredPermits').mockImplementation();
+      vi.spyOn(extractor, 'validateOldStoredPermits').mockImplementation(
+        vi.fn(),
+      );
       await insertPermitEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });
