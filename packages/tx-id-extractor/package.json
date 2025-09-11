@@ -2,6 +2,10 @@
   "name": "@rosen-bridge/tx-id-extractor",
   "version": "2.4.0",
   "description": "Extract and store all transaction ids in ogmios blocks.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "author": "Rosen Team",
   "license": "MIT",
   "main": "dist/index.js",

@@ -2,6 +2,10 @@
   "name": "@rosen-bridge/fraud-extractor",
   "version": "2.2.0",
   "description": "fraud information extractor for watcher faulty reports",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "author": "Rosen Team",
   "license": "MIT",
   "main": "dist/index.js",

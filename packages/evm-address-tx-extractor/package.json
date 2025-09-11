@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/evm-address-tx-extractor",
   "version": "1.2.0",
   "description": "Extract and store EVM chain notable data of transactions for an address",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",

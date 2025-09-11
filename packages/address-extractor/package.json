@@ -2,6 +2,10 @@
   "name": "@rosen-bridge/address-extractor",
   "version": "6.2.0",
   "description": "UTXO box extractor for any address or token.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "author": "Rosen Team",
   "license": "MIT",
   "main": "dist/index.js",

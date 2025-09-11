@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/evm-observation-extractor",
   "version": "5.2.0",
   "description": "Event observation data extractor for EVM-compatible chains",
-  "repository": "https://github.com/rosen-bridge/scanner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",

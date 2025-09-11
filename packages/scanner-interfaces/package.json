@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/scanner-interfaces",
   "version": "0.2.0",
   "description": "Defines all scanner interfaces",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",

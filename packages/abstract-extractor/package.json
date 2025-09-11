@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/abstract-extractor",
   "version": "2.1.0",
   "description": "Rosen Bridge extractor interfaces to work with scanner",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",

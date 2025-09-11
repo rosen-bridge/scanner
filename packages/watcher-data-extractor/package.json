@@ -2,6 +2,10 @@
   "name": "@rosen-bridge/watcher-data-extractor",
   "version": "12.2.0",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "author": "Rosen Team",
   "license": "MIT",
   "main": "dist/index.js",

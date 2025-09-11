@@ -2,7 +2,10 @@
   "name": "@rosen-bridge/evm-scanner",
   "version": "0.1.0",
   "description": "An EVM chain scanner based on RPC.",
-  "repository": "https://github.com/rosen-bridge/scanner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
