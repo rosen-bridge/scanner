@@ -180,7 +180,7 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(extractor['actions'], 'spendBoxes');
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
       spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTxOldFormat;
       const res = await extractor.processTransactions([tx1], block);
@@ -217,7 +217,7 @@ describe('EventTriggerExtractor', () => {
         permitAddress,
         fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(extractor['actions'], 'spendBoxes');
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
       spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTx;
       const res = await extractor.processTransactions([tx1], block);

@@ -19,7 +19,7 @@ import {
   fraudApiOutputBoxes,
 } from './fraudExtractorTestData';
 
-jest.mock('@rosen-clients/ergo-explorer');
+vi.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
 
 describe('fraudExtractor', () => {
@@ -81,7 +81,7 @@ describe('fraudExtractor', () => {
      * - should extract block data from api output
      */
     it('should extract block id and height for a transaction', async () => {
-      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+      vi.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1TransactionsP1: async () => ({
             blockId: 'blockId',
@@ -117,7 +117,7 @@ describe('fraudExtractor', () => {
      * - should get data and extract information twice when data count is more than api limit
      */
     it('should iterate on api when data count is more than api limit', async () => {
-      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+      vi.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1BoxesUnspentByergotreeP1: async () => ({
             items: [],
@@ -139,7 +139,7 @@ describe('fraudExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
-      const spy = jest
+      const spy = vi
         .spyOn(extractor, 'extractBoxData')
         .mockResolvedValue([extractedFraud]);
       const result = await extractor.getUnspentFrauds(100);
@@ -158,7 +158,7 @@ describe('fraudExtractor', () => {
      * - should filter one box with proper height and token and extract its data
      */
     it('should filter the boxes with required token and initialHeight', async () => {
-      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+      vi.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1BoxesUnspentByergotreeP1: async () => ({
             items: fraudApiOutputBoxes,
@@ -173,7 +173,7 @@ describe('fraudExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
-      const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
+      const spy = vi.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
       await extractor.getUnspentFrauds(110);
       expect(spy).toHaveBeenCalledWith([fraudApiOutputBoxes[0]]);
     });
@@ -205,7 +205,7 @@ describe('fraudExtractor', () => {
         triggerBoxId: 'triggerId',
         serialized: 'serialized',
       };
-      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+      vi.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1BoxesP1: async () => box,
         },
@@ -217,7 +217,7 @@ describe('fraudExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
-      const spy = jest
+      const spy = vi
         .spyOn(extractor, 'extractBoxData')
         .mockResolvedValue([extractedFraud]);
       const boxData = await extractor.getFraudInfoWithBoxId('boxId');
@@ -238,7 +238,7 @@ describe('fraudExtractor', () => {
      * - it should return undefined
      */
     it('should return undefined when box is forked', async () => {
-      jest.mocked(ergoExplorerClientFactory).mockReturnValue({
+      vi.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1BoxesP1: async () => {
             throw new Error('404');
@@ -252,7 +252,7 @@ describe('fraudExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         'eedc45c53ecd32d565ae04badf86aa2448a657b7c9e8e30a612338a9c0eb06d9',
       );
-      const spy = jest.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
+      const spy = vi.spyOn(extractor, 'extractBoxData').mockResolvedValue([]);
       const boxData = await extractor.getFraudInfoWithBoxId('boxId');
       expect(spy).not.toHaveBeenCalled();
       expect(boxData).toEqual(undefined);
@@ -274,7 +274,7 @@ describe('fraudExtractor', () => {
      */
     it('should remove invalid fraud from database', async () => {
       insertFraudEntity(dataSource, 'boxId');
-      const spy = jest
+      const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue(undefined);
       await extractor.validateOldStoredFrauds(['boxId'], 100);
@@ -296,7 +296,7 @@ describe('fraudExtractor', () => {
      */
     it('should update valid box information when spent bellow the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
-      const spy = jest
+      const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
@@ -323,7 +323,7 @@ describe('fraudExtractor', () => {
      */
     it('should not change valid fraud information when spent after the initial height', async () => {
       insertFraudEntity(dataSource, 'boxId');
-      const spy = jest
+      const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
           spendBlock: 'spendBlockId',
@@ -368,10 +368,10 @@ describe('fraudExtractor', () => {
           txId: 'txId',
         },
       ];
-      jest
-        .spyOn(extractor, 'getUnspentFrauds')
-        .mockResolvedValue(extractedFrauds);
-      const spy = jest
+      vi.spyOn(extractor, 'getUnspentFrauds').mockResolvedValue(
+        extractedFrauds,
+      );
+      const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation();
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
@@ -411,10 +411,10 @@ describe('fraudExtractor', () => {
           txId: 'txId',
         },
       ];
-      jest
-        .spyOn(extractor, 'getUnspentFrauds')
-        .mockResolvedValue(extractedFrauds);
-      const spy = jest
+      vi.spyOn(extractor, 'getUnspentFrauds').mockResolvedValue(
+        extractedFrauds,
+      );
+      const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation();
       insertFraudEntity(dataSource, 'boxId1');
@@ -438,7 +438,7 @@ describe('fraudExtractor', () => {
      * - should extract fraud data from api output
      */
     it('should extract fraud data from api output', async () => {
-      jest.spyOn(extractor, 'getTriggerBoxId').mockResolvedValue('triggerId');
+      vi.spyOn(extractor, 'getTriggerBoxId').mockResolvedValue('triggerId');
       const boxData = await extractor.extractBoxData([fraudBox]);
       expect(boxData[0]).toEqual(extractedFraud);
     });

@@ -9,12 +9,12 @@ export class TxIdEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   blockId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 }
