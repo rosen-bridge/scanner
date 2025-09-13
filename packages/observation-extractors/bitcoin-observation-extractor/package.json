@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-observation-extractor",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "description": "Event observation data extractor for Bitcoin chain",
   "repository": {
     "type": "git",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/abstract-observation-extractor": "^0.1.0",
+    "@rosen-bridge/abstract-observation-extractor": "^0.1.1",
     "@rosen-bridge/bitcoin-scanner": "^0.1.0",
     "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/rosen-extractor": "^9.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-observation-extractor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Event observation data extractor for different chains",
   "repository": {
     "type": "git",
