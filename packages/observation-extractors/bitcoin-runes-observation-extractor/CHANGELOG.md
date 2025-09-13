@@ -1,5 +1,15 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix getTxOutputRunes incorrect output array
+- Remove eslint and prettier related dependencies
+- Update vitest.config and tsconfig files to match the kodegen template
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.1.1
+
 ## 0.1.0
 
 - The package has been **renamed** from `@rosen-bridge/runes-observation-extractor`.

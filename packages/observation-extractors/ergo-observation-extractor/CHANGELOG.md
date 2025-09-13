@@ -1,5 +1,13 @@
 # @rosen-bridge/ergo-observation-extractor
 
+## 0.1.1
+
+### Patch Changes
+
+- Update @rosen-bridge/rosen-extractor version to 9.0.0
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.1.1
+
 ## 0.1.0
 
 - This package was **extracted** from `@rosen-bridge/observation-extractor`.  

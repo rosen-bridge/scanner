@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-observation-extractor
 
+## 0.1.1
+
+### Patch Changes
+
+- Update @rosen-bridge/rosen-extractor version to 9.0.0
+
 ## 0.1.0
 
 - The package has been **renamed** from `@rosen-bridge/observation-extractor`.  
