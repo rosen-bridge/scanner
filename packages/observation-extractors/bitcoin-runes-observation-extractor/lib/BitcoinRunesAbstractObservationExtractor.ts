@@ -137,7 +137,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
     txId: string,
   ): Promise<TxOutputRune[]> => {
     // Transform the RPC transaction to the expected BitcoinRunesTx format
-    const outputs: TxOutputRune[] = [];
+    const runes: TxOutputRune[] = [];
 
     // get the runes transfers of the transaction from Unisat
     let txRunes: UnisatTxRunes;
@@ -173,14 +173,14 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
         );
       }
       if (transfer.type === 'send') continue;
-      outputs[transfer.vout] = {
+      runes.push({
         address: transfer.address,
         runeId: transfer.runeId,
         runeAmount: transfer.amount,
         vout: transfer.vout,
-      };
+      });
     }
 
-    return outputs;
+    return runes;
   };
 }
