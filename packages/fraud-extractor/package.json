@@ -4,7 +4,7 @@
   "description": "fraud information extractor for watcher faulty reports",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rosen-bridge/scanner"
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
   },
   "author": "Rosen Team",
   "license": "MIT",

@@ -4,7 +4,7 @@
   "description": "A Bitcoin blockchain scanner based on Esplora or Rpc Block Explorer API",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rosen-bridge/scanner"
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
   },
   "license": "MIT",
   "author": "Rosen Team",

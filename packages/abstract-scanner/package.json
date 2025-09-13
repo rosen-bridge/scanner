@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rosen-bridge/scanner"
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
   },
   "files": [
     "dist",
