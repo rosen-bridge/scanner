@@ -40,7 +40,7 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-clients/rate-limited-axios": "^0.1.1",
+    "@rosen-clients/rate-limited-axios": "^1.0.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "cockatiel": "^3.2.1"
   }

@@ -25,7 +25,7 @@
     "@rosen-bridge/json-bigint": "^0.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "@rosen-bridge/tokens": "^3.1.1",
-    "@rosen-clients/ergo-explorer": "^1.1.5",
+    "@rosen-clients/ergo-explorer": "^2.0.0",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.1",

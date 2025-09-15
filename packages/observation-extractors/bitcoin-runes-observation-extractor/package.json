@@ -41,7 +41,7 @@
     "@rosen-bridge/bitcoin-scanner": "^0.1.0",
     "@rosen-bridge/extended-typeorm": "^0.1.0",
     "@rosen-bridge/json-bigint": "^0.2.0",
-    "@rosen-clients/rate-limited-axios": "^0.1.1",
+    "@rosen-clients/rate-limited-axios": "^1.0.0",
     "@rosen-bridge/rosen-extractor": "^9.0.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "@rosen-bridge/tokens": "^3.1.1",
