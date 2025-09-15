@@ -1,14 +1,14 @@
-import { ExtendedTransaction, RangeList } from '../interfaces';
-import { ExplorerNetwork } from '../network/ExplorerNetwork';
-import { API_LIMIT } from '../../constants';
-import { requestWithRetrial } from '../utils';
+import { ExtendedTransaction } from '../../interfaces';
+import { ExplorerNetwork } from '../../network/ExplorerNetwork';
+import { API_LIMIT } from '../../../constants';
+import { requestWithRetrial } from '../../utils';
 
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import PQueue from 'p-queue';
 import { WorkerManager } from './WorkerManager';
 
-export class ExplorerInitializer {
+export class ExplorerInitializationStrategy {
   private network: ExplorerNetwork;
   private extraLargeBlocks: BlockInfo[];
   private promiseQueue: PQueue;
@@ -20,12 +20,12 @@ export class ExplorerInitializer {
     private maxWorkers: number,
     private processTransactions: (
       txs: Transaction[],
-      block: BlockInfo
+      block: BlockInfo,
     ) => Promise<boolean>,
     private processTransactionBatch: (
-      txs: ExtendedTransaction[]
+      txs: ExtendedTransaction[],
     ) => Promise<void>,
-    private logger = new DummyLogger()
+    private logger = new DummyLogger(),
   ) {
     this.network = new ExplorerNetwork(url);
     this.extraLargeBlocks = [];
@@ -47,9 +47,9 @@ export class ExplorerInitializer {
             this.address,
             fromHeight,
             toHeight,
-            1
+            1,
           ),
-        this.logger
+        this.logger,
       )
     ).total;
   };
@@ -70,19 +70,19 @@ export class ExplorerInitializer {
     const txs = await requestWithRetrial(
       () =>
         this.network.getAddressTransactionsWithHeight(this.address, start, end),
-      this.logger
+      this.logger,
     );
     if (count && txs.total != count)
       this.logger.error(
-        `Impossible behavior: Range query count ${count} differs from total ${txs.total} for range [${start}, ${end}]`
+        `Impossible behavior: Range query count ${count} differs from total ${txs.total} for range [${start}, ${end}]`,
       );
     if (txs.total <= API_LIMIT && txs.total > 0) {
       this.logger.debug(
-        `Processing started for [${start}, ${end}] with ${txs.total} txs`
+        `Processing started for [${start}, ${end}] with ${txs.total} txs`,
       );
       await this.processTransactionBatch(txs.items);
       this.logger.debug(
-        `Processing finished for [${start}, ${end}] with ${txs.total} txs`
+        `Processing finished for [${start}, ${end}] with ${txs.total} txs`,
       );
     }
     return txs.total;
@@ -96,7 +96,7 @@ export class ExplorerInitializer {
   processBlockAtHeight = async (height: number) => {
     const blockId = await requestWithRetrial(
       () => this.network.getBlockIdAtHeight(height),
-      this.logger
+      this.logger,
     );
     const block = { hash: blockId, height: height };
     await this.processBlock(block);
@@ -112,10 +112,10 @@ export class ExplorerInitializer {
   processBlock = async (block: BlockInfo) => {
     const blockTxs = await requestWithRetrial(
       () => this.network.getBlockTxs(block.hash),
-      this.logger
+      this.logger,
     );
     this.logger.debug(
-      `Found ${blockTxs.length} transactions at height ${block.height}`
+      `Found ${blockTxs.length} transactions at height ${block.height}`,
     );
     await this.processTransactions(blockTxs, block);
   };
@@ -135,12 +135,12 @@ export class ExplorerInitializer {
     while (this.workerManager.isWorkerActive(workerIndex)) {
       const lastRangeQuery = await this.workerManager.getLastRange(
         workerIndex,
-        API_LIMIT
+        API_LIMIT,
       );
       this.logger.debug(
         `Worker-${workerIndex} is checking range query ${JSON.stringify(
-          lastRangeQuery
-        )}`
+          lastRangeQuery,
+        )}`,
       );
       if (
         lastRangeQuery.count > API_LIMIT &&
@@ -155,11 +155,11 @@ export class ExplorerInitializer {
           await this.processRange(
             lastRangeQuery.start,
             lastRangeQuery.end,
-            lastRangeQuery.count
+            lastRangeQuery.count,
           );
         } else {
           this.logger.debug(
-            `processing extra large block at height ${lastRangeQuery.start}`
+            `processing extra large block at height ${lastRangeQuery.start}`,
           );
           await this.processBlockAtHeight(lastRangeQuery.start);
         }
@@ -177,7 +177,7 @@ export class ExplorerInitializer {
       initialBlock.height,
       this.maxWorkers,
       this.getRangeTxCount,
-      this.logger
+      this.logger,
     );
     const addWorkerJob = (i: number) =>
       this.promiseQueue.add(() => this.startWorker(i));
@@ -186,7 +186,7 @@ export class ExplorerInitializer {
       Array.from({ length: this.maxWorkers }, async (_, i) => {
         await this.workerManager.registerWorker(i);
         addWorkerJob(i);
-      })
+      }),
     );
     // Periodically check for idle workers and reassign a new range to them
     const reassignWorker = setInterval(async () => {

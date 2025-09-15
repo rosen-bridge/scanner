@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import { WorkerManager } from '../../lib/ergo/initializable/WorkerManager';
+import { WorkerManager } from '../../lib/ergo/initializers/strategies/WorkerManager';
 import {
   mockGetRangeTxCount,
   mockRangeList,

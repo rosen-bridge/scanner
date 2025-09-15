@@ -1,13 +1,13 @@
-import { ErgoExtractedData, ExtendedTransaction } from '../interfaces';
-import { NodeNetwork } from '../network/NodeNetwork';
-import { API_LIMIT } from '../../constants';
-import { delay, requestWithRetrial } from '../utils';
+import { ExtendedTransaction } from '../../interfaces';
+import { NodeNetwork } from '../../network/NodeNetwork';
+import { API_LIMIT } from '../../../constants';
+import { delay, requestWithRetrial } from '../../utils';
 
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import PQueue from 'p-queue';
 
-export class NodeInitializer {
+export class NodeInitializationStrategy {
   private network: NodeNetwork;
 
   constructor(
@@ -15,9 +15,9 @@ export class NodeInitializer {
     private address: string,
     private maxParallelRequests: number,
     private processTransactionBatch: (
-      txs: ExtendedTransaction[]
+      txs: ExtendedTransaction[],
     ) => Promise<void>,
-    private logger = new DummyLogger()
+    private logger = new DummyLogger(),
   ) {
     this.network = new NodeNetwork(url);
   }
@@ -30,7 +30,7 @@ export class NodeInitializer {
     const response = await this.network.getAddressTransactionsWithOffsetLimit(
       this.address,
       0,
-      0
+      0,
     );
     return response.total;
   };
@@ -44,7 +44,7 @@ export class NodeInitializer {
   private processWithOffsetLimit = async (
     offset: number,
     limit: number,
-    initialHeight: number
+    initialHeight: number,
   ) => {
     this.logger.debug(`Requesting node getTxsByAddress with offset ${offset}`);
     const response = await requestWithRetrial(
@@ -52,15 +52,15 @@ export class NodeInitializer {
         this.network.getAddressTransactionsWithOffsetLimit(
           this.address,
           offset,
-          limit
+          limit,
         ),
-      this.logger
+      this.logger,
     );
     const txs = response.items.filter(
-      (tx) => tx.inclusionHeight <= initialHeight
+      (tx) => tx.inclusionHeight <= initialHeight,
     );
     this.logger.debug(
-      `Found ${txs.length} new transactions below the initial height with offset ${offset}, total is ${response.total}`
+      `Found ${txs.length} new transactions below the initial height with offset ${offset}, total is ${response.total}`,
     );
     if (txs.length > 0) await this.processTransactionBatch(txs);
     this.logger.debug(`Processing completed for request with offset ${offset}`);
@@ -80,7 +80,7 @@ export class NodeInitializer {
       await delay(100);
       ((offset: number) =>
         promiseQueue.add(() =>
-          this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height)
+          this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height),
         ))(offset);
       offset += API_LIMIT;
     }

@@ -1,5 +1,5 @@
 import { Mutex } from 'await-semaphore';
-import { RangeList, RangeQuery } from '../interfaces';
+import { RangeList, RangeQuery } from '../../interfaces';
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 
 export class WorkerManager {
@@ -10,7 +10,7 @@ export class WorkerManager {
     private maxHeight: number,
     private workerCount: number,
     private getRangeTxCount: (start: number, end: number) => Promise<number>,
-    private logger = new DummyLogger()
+    private logger = new DummyLogger(),
   ) {
     this.workersRangeList = Array.from({ length: workerCount }, () => []);
     this.initialSegmentSize = Math.ceil(this.maxHeight / this.workerCount);
@@ -34,11 +34,11 @@ export class WorkerManager {
     const start = workerIndex * this.initialSegmentSize;
     const end = Math.min(
       (workerIndex + 1) * this.initialSegmentSize - 1,
-      this.maxHeight
+      this.maxHeight,
     );
     await this.addWorkerRange(workerIndex, start, end);
     this.logger.debug(
-      `Worker-${workerIndex} is initialized with range [${start}, ${end}]`
+      `Worker-${workerIndex} is initialized with range [${start}, ${end}]`,
     );
   };
 
@@ -52,7 +52,7 @@ export class WorkerManager {
   private addWorkerRange = async (
     workerIndex: number,
     start: number,
-    end: number
+    end: number,
   ) => {
     const count = await this.getRangeTxCount(start, end);
     const release = await this.mutex.acquire();
@@ -79,7 +79,7 @@ export class WorkerManager {
     this.logger.debug(
       `Limiting the range by adding a new range query [${
         (lastRangeQuery.start, newQueryEnd)
-      }]`
+      }]`,
     );
     await this.addWorkerRange(workerIndex, lastRangeQuery.start, newQueryEnd);
   };
@@ -141,8 +141,8 @@ export class WorkerManager {
     this.logger.debug(`Found idle workers ${idleWorkerIndexes}`);
     this.logger.debug(
       `Workers range lists before splitting ${JSON.stringify(
-        this.workersRangeList
-      )}`
+        this.workersRangeList,
+      )}`,
     );
     const newWorkers: number[] = [];
     for (const idleWorkerIndex of idleWorkerIndexes) {
@@ -154,8 +154,8 @@ export class WorkerManager {
       }
       this.logger.debug(
         `biggest incomplete range is ${JSON.stringify(
-          this.workersRangeList[biggestIncompleteRangeIndex]
-        )}`
+          this.workersRangeList[biggestIncompleteRangeIndex],
+        )}`,
       );
       const removedRangeQuery =
         this.workersRangeList[biggestIncompleteRangeIndex].shift()!;
@@ -171,7 +171,7 @@ export class WorkerManager {
     }
     release();
     this.logger.debug(
-      `Range lists after splitting ${JSON.stringify(this.workersRangeList)}`
+      `Range lists after splitting ${JSON.stringify(this.workersRangeList)}`,
     );
     return newWorkers;
   };
@@ -191,11 +191,11 @@ export class WorkerManager {
    */
   getLastRange = async (
     workerIndex: number,
-    rangeThreshold: number
+    rangeThreshold: number,
   ): Promise<RangeQuery> => {
     const rangeList = this.workersRangeList[workerIndex];
     this.logger.debug(
-      `Search range of worker-${workerIndex} is ${JSON.stringify(rangeList)}`
+      `Search range of worker-${workerIndex} is ${JSON.stringify(rangeList)}`,
     );
     let lastRangeQuery = rangeList.at(-1)!;
     // avoid race condition when updating the shared `rangeList` variable

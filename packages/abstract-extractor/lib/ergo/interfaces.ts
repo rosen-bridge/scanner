@@ -22,6 +22,10 @@ export interface SpendInfo {
   extras?: { [key: string]: string };
 }
 
+export interface ExtendedSpendInfo extends SpendInfo {
+  height: number;
+  block: string;
+}
 export interface AbstractEntityData {
   identifier: string;
   serialized: string;
@@ -50,3 +54,15 @@ export type CallbackMap<ExtractedData extends AbstractEntityData> = {
 };
 
 export type TxExtra = { [key: string]: string };
+
+export interface RangeQuery {
+  start: number;
+  end: number;
+  count: number;
+}
+
+/**
+ * The range list is an array where each new range is a child of the previous
+ * one. So, any range in the list supersedes all the ranges that come after it.
+ * */
+export type RangeList = RangeQuery[];

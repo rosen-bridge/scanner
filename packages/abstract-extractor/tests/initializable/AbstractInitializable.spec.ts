@@ -9,7 +9,7 @@ import {
 import { MockedInitializableErgoExtractor } from './AbstractInitializable.mock';
 import { transactionBatch } from './testData';
 import { RETRIAL_COUNT } from '../../lib/constants';
-import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializable';
+import { AbstractInitializableErgoExtractorAction } from '../../lib/ergo/initializers';
 
 describe('AbstractInitializableErgoExtractor', () => {
   describe('getTotalTxCount', () => {

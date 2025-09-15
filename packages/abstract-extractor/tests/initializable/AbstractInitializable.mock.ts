@@ -4,7 +4,7 @@ import { BlockInfo, OutputBox } from '@rosen-bridge/scanner-interfaces';
 import {
   AbstractInitializableErgoExtractor,
   AbstractInitializableErgoExtractorAction,
-} from '../../lib/ergo/initializable';
+} from '../../lib/ergo/initializers';
 import { AbstractBoxData, AbstractErgoExtractorEntity } from '../../lib';
 import { ergoBoxes } from './testData';
 

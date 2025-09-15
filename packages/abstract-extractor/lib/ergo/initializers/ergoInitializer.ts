@@ -1,54 +1,59 @@
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { groupBy, sortBy } from 'lodash-es';
 import { Mutex } from 'await-semaphore';
-import { BlockInfo, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
-
 import {
-  AbstractBoxData,
+  BlockInfo,
+  ErgoNetworkType,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
+import {
+  AbstractEntityData,
   ExtendedSpendInfo,
   ExtendedTransaction,
 } from '../interfaces';
-import { AbstractErgoExtractor } from '../AbstractErgoExtractor';
-import { AbstractErgoExtractorEntity } from '../AbstractErgoExtractorEntity';
-import { AbstractInitializableErgoExtractorAction } from './AbstractInitializableAction';
-import { ExplorerInitializer } from './ExplorerInitializer';
-import { NodeInitializer } from './NodeInitializer';
-import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
-export abstract class AbstractInitializableErgoExtractor<
-  ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity,
-> extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
+import { ExplorerInitializationStrategy } from './strategies/ExplorerInitializationStrategy';
+import { NodeInitializationStrategy } from './strategies/NodeInitializationStrategy';
+import { MAX_PARALLEL_REQUESTS } from '../../constants';
+import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
+import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
+
+export abstract class ErgoInitializer<
+  ExtractedData extends AbstractEntityData,
+  ExtractorEntity extends AbstractErgoEntity,
+> {
   private dbMutex = new Mutex();
   private spendRecordsMutex = new Mutex();
   private spendRecords: ExtendedSpendInfo[];
-  protected abstract actions: AbstractInitializableErgoExtractorAction<
-    ExtractedData,
-    ExtractorEntity
-  >;
 
-  private initializer: ExplorerInitializer | NodeInitializer;
+  private initializationStrategy:
+    | ExplorerInitializationStrategy
+    | NodeInitializationStrategy;
 
   constructor(
     type: ErgoNetworkType,
     url: string,
     address: string,
-    logger?: AbstractLogger,
-    private initialize = true,
+    protected extractorId: string,
+    protected processTransactions: (
+      txs: Transaction[],
+      block: BlockInfo,
+    ) => Promise<boolean>,
+    protected actions: AbstractErgoAction<ExtractedData, ExtractorEntity>,
     maxParallelRequests = MAX_PARALLEL_REQUESTS,
+    protected logger = new DummyLogger(),
   ) {
-    super(logger);
     if (type == ErgoNetworkType.Explorer) {
-      this.initializer = new ExplorerInitializer(
+      this.initializationStrategy = new ExplorerInitializationStrategy(
         url,
         address,
         maxParallelRequests,
-        this.processTransactions,
+        processTransactions,
         this.processTransactionBatch,
         logger,
       );
     } else if (type == ErgoNetworkType.Node) {
-      this.initializer = new NodeInitializer(
+      this.initializationStrategy = new NodeInitializationStrategy(
         url,
         address,
         maxParallelRequests,
@@ -152,7 +157,7 @@ export abstract class AbstractInitializableErgoExtractor<
       this.logger.debug(
         `Processing spend records at height ${blockRecords[0].height}`,
       );
-      await this.actions.spendBoxes(blockRecords, block, this.getId());
+      await this.actions.spendBoxes(blockRecords, block, this.extractorId);
     }
     release();
   };
@@ -164,19 +169,15 @@ export abstract class AbstractInitializableErgoExtractor<
    * ignore initialization if this feature is off
    * @param initialBlock
    */
-  initializeBoxes = async (initialBlock: BlockInfo) => {
-    if (this.initialize) {
-      this.logger.debug(
-        `Initializing ${this.getId()} started, removing all existing data`,
-      );
-      await this.actions.removeAllData(this.getId());
-      await this.initializer.initialize(initialBlock);
-      await this.applySpendRecords();
-      this.logger.info(
-        `Initialization completed successfully for ${this.getId()}`,
-      );
-    } else {
-      this.logger.info(`Initialization for ${this.getId()} is turned off`);
-    }
+  initializeData = async (initialBlock: BlockInfo) => {
+    this.logger.debug(
+      `Initializing ${this.extractorId} started, removing all existing data`,
+    );
+    await this.actions.removeAllData(this.extractorId);
+    await this.initializationStrategy.initialize(initialBlock);
+    await this.applySpendRecords();
+    this.logger.info(
+      `Initialization completed successfully for ${this.extractorId}`,
+    );
   };
 }
