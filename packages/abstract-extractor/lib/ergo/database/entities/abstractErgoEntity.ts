@@ -4,13 +4,10 @@ import {
   Unique,
 } from '@rosen-bridge/extended-typeorm';
 
-@Unique(['boxId', 'extractor'])
-export abstract class AbstractErgoExtractorEntity {
+@Unique(['identifier', 'extractor'])
+export abstract class AbstractErgoEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'varchar' })
-  boxId: string;
 
   @Column({ type: 'varchar' })
   block: string;
@@ -18,14 +15,13 @@ export abstract class AbstractErgoExtractorEntity {
   @Column({ type: 'int' })
   height: number;
 
-  @Column({ nullable: true, type: 'varchar' })
-  spendBlock?: string | null;
-
-  @Column({ nullable: true, type: 'int' })
-  spendHeight?: number | null;
-
   @Column({ type: 'varchar' })
   extractor: string;
+
+  // This is an identifier for the entity in blockchain
+  // It will be boxId for boxes or txId for transactions
+  @Column({ type: 'varchar' })
+  identifier: string;
 
   @Column({ type: 'varchar' })
   serialized: string;

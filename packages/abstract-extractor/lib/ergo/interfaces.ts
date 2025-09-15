@@ -22,28 +22,8 @@ export interface SpendInfo {
   extras?: { [key: string]: string };
 }
 
-export interface ExtendedSpendInfo extends SpendInfo {
-  height: number;
-  block: string;
-}
-
-export interface ErgoExtractedData {
-  boxId: string;
-}
-
-export interface RangeQuery {
-  start: number;
-  end: number;
-  count: number;
-}
-
-/**
- * The range list is an array where each new range is a child of the previous
- * one. So, any range in the list supersedes all the ranges that come after it.
- * */
-export type RangeList = RangeQuery[];
-export interface AbstractBoxData {
-  boxId: string;
+export interface AbstractEntityData {
+  identifier: string;
   serialized: string;
 }
 
@@ -54,18 +34,18 @@ export enum CallbackType {
   Delete = 'delete',
 }
 
-export interface BoxInfo {
-  boxId: string;
+export interface EntityInfo {
+  identifier: string;
 }
 
-export type CallbackDataMap<ExtractedData extends AbstractBoxData> = {
-  [CallbackType.Update]: BoxInfo[];
+export type CallbackDataMap<ExtractedData extends AbstractEntityData> = {
+  [CallbackType.Update]: EntityInfo[];
   [CallbackType.Insert]: ExtractedData[];
   [CallbackType.Delete]: ExtractedData[];
-  [CallbackType.Spend]: BoxInfo[];
+  [CallbackType.Spend]: EntityInfo[];
 };
 
-export type CallbackMap<ExtractedData extends AbstractBoxData> = {
+export type CallbackMap<ExtractedData extends AbstractEntityData> = {
   [K in CallbackType]: (data: CallbackDataMap<ExtractedData>[K]) => void;
 };
 
