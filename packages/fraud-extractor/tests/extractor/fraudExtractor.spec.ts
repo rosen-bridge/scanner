@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
@@ -373,7 +373,7 @@ describe('fraudExtractor', () => {
       );
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
-        .mockImplementation();
+        .mockImplementation(async () => {});
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
@@ -416,7 +416,7 @@ describe('fraudExtractor', () => {
       );
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
-        .mockImplementation();
+        .mockImplementation(async () => {});
       insertFraudEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });

@@ -1,5 +1,5 @@
-import RateLimitedAxios from '@rosen-bridge/rate-limited-axios';
-import axios from '@rosen-bridge/rate-limited-axios';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from '@rosen-clients/rate-limited-axios';
 import { vi } from 'vitest';
 
 export const axiosInstance = {
@@ -22,7 +22,5 @@ export const mockAxiosGet = (result: unknown) => {
  */
 export const resetAxiosMock = () => {
   axiosInstance.get.mockReset();
-  vi.spyOn(axios, 'create').mockReturnValue(
-    axiosInstance as unknown as RateLimitedAxios,
-  );
+  vi.spyOn(axios, 'create').mockReturnValue(axiosInstance as any);
 };
