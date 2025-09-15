@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import EventTriggerEntity from './entities/EventTriggerEntity';
 import CommitmentEntity from './entities/CommitmentEntity';
 import CommitmentExtractor from './extractor/commitmentExtractor';

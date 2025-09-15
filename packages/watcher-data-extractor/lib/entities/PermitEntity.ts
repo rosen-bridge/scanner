@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('permit_entity')
 @Unique(['boxId', 'extractor'])
@@ -6,22 +11,22 @@ class PermitEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   boxSerialized: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   WID: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
   @Column({ nullable: true, type: 'text' })
@@ -30,7 +35,7 @@ class PermitEntity {
   @Column({ nullable: true, type: 'int' })
   spendHeight?: number | null;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 }
 

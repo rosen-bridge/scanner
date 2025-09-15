@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { EventResult, EventTriggerEntity } from '../../lib';
@@ -43,13 +43,13 @@ describe('EventTrigger', () => {
           },
         ],
         block,
-        'extractorId'
+        'extractorId',
       );
       expect(
-        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length
+        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length,
       ).toEqual(1);
       expect(
-        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length
+        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length,
       ).toEqual(0);
       expect(result).toEqual([{ boxId: 'id' }]);
     });

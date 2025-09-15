@@ -1,5 +1,5 @@
-import { DataSource } from 'typeorm';
-import { migrations as scannerMigrations } from '@rosen-bridge/scanner';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { migrations as scannerMigrations } from '@rosen-bridge/abstract-scanner';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import JsonBI from '@rosen-bridge/json-bigint';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
@@ -38,30 +38,32 @@ const generateFraudTx = (
   rwtId: string,
   wid: string,
   fraudAddress: string,
-  hasToken = true
+  hasToken = true,
 ) => {
   const sk = wasm.SecretKey.random_dlog();
   const commitmentAddressContract = wasm.Contract.pay_to_address(
-    wasm.Address.from_base58(fraudAddress)
+    wasm.Address.from_base58(fraudAddress),
   );
   const address = wasm.Contract.pay_to_address(sk.get_address());
   const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     commitmentAddressContract,
-    0
+    0,
   );
 
   if (hasToken) {
     outBoxBuilder.add_token(
       wasm.TokenId.from_str(rwtId),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
     );
   }
 
   outBoxBuilder.set_register_value(
     4,
-    wasm.Constant.from_coll_coll_byte([new Uint8Array(Buffer.from(wid, 'hex'))])
+    wasm.Constant.from_coll_coll_byte([
+      new Uint8Array(Buffer.from(wid, 'hex')),
+    ]),
   );
 
   const outBox = outBoxBuilder.build();
@@ -70,8 +72,8 @@ const generateFraudTx = (
     tokens.add(
       new wasm.Token(
         wasm.TokenId.from_str(rwtId),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-      )
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
+      ),
     );
   }
 
@@ -81,14 +83,14 @@ const generateFraudTx = (
     address,
     wasm.TxId.zero(),
     0,
-    tokens
+    tokens,
   );
   const unspentBoxes = new wasm.ErgoBoxes(inputBox);
   const txOutputs = new wasm.ErgoBoxCandidates(outBox);
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
   const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64())
+    outBoxValue.as_i64().checked_add(fee.as_i64()),
   );
   const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
   const tx = wasm.TxBuilder.new(
@@ -96,7 +98,7 @@ const generateFraudTx = (
     txOutputs,
     0,
     fee,
-    sk.get_address()
+    sk.get_address(),
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
@@ -108,7 +110,7 @@ const generateFraudTx = (
     ctx,
     tx,
     unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([])
+    wasm.ErgoBoxes.from_boxes_json([]),
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
@@ -123,7 +125,7 @@ const generateFraudTx = (
 const insertFraudEntity = (
   dataSource: DataSource,
   boxId?: string,
-  height?: number
+  height?: number,
 ) => {
   const repository = dataSource.getRepository(FraudEntity);
   return repository.insert({

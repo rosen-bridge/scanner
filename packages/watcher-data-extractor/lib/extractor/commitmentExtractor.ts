@@ -1,5 +1,5 @@
 import * as wasm from 'ergo-lib-wasm-nodejs';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
@@ -25,13 +25,13 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     RWTId: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.id = id;
     this.dataSource = dataSource;
     this.commitmentsErgoTrees = addresses.map((address) =>
-      wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
+      wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes(),
     );
     this.RWTId = RWTId;
     this.logger = logger ? logger : new DummyLogger();
@@ -52,7 +52,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -70,16 +70,16 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
             ) {
               try {
                 const decodedBox = wasm.ErgoBox.from_json(
-                  JsonBI.stringify(output)
+                  JsonBI.stringify(output),
                 );
                 const R4 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R4
+                  wasm.NonMandatoryRegisterId.R4,
                 );
                 const R5 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R5
+                  wasm.NonMandatoryRegisterId.R5,
                 );
                 const R6 = decodedBox.register_value(
-                  wasm.NonMandatoryRegisterId.R6
+                  wasm.NonMandatoryRegisterId.R6,
                 );
                 if (R4 && R5 && R6) {
                   const R4Value = R4.to_byte_array();
@@ -95,13 +95,13 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
                     eventId: requestId,
                     boxId: output.boxId,
                     boxSerialized: Buffer.from(
-                      decodedBox.sigma_serialize_bytes()
+                      decodedBox.sigma_serialize_bytes(),
                     ).toString('base64'),
                     rwtCount: this.tokenMap
                       .wrapAmount(
                         this.RWTId,
                         BigInt(output.assets[0].amount),
-                        'ergo'
+                        'ergo',
                       )
                       .amount.toString(),
                   });
@@ -131,7 +131,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
           .catch((e) => reject(e));
       } catch (e) {
         this.logger.error(
-          `Error in soring permits of the block ${block}: ${e}`
+          `Error in soring permits of the block ${block}: ${e}`,
         );
         reject(e);
       }

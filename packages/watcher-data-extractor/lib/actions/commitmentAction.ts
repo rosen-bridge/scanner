@@ -1,4 +1,4 @@
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Block } from '@rosen-bridge/scanner-interfaces';
@@ -28,7 +28,7 @@ class CommitmentAction {
   storeCommitments = async (
     commitments: Array<extractedCommitment>,
     block: Block,
-    extractor: string
+    extractor: string,
   ): Promise<boolean> => {
     if (commitments.length === 0) return true;
     const boxIds = commitments.map((commitment) => commitment.boxId);
@@ -40,9 +40,8 @@ class CommitmentAction {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    const repository = await queryRunner.manager.getRepository(
-      CommitmentEntity
-    );
+    const repository =
+      await queryRunner.manager.getRepository(CommitmentEntity);
     try {
       for (const commitment of commitments) {
         const saved = savedCommitments.some((entity) => {
@@ -62,12 +61,12 @@ class CommitmentAction {
         };
         if (!saved) {
           this.logger.info(
-            `Saving commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
+            `Saving commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`,
           );
           await repository.insert(entity);
         } else {
           this.logger.info(
-            `Updating commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`
+            `Updating commitment [${commitment.boxId}] for event [${commitment.eventId}] from watcher [${commitment.WID}] at height ${block.height} and extractor ${extractor}`,
           );
           await repository.update({ boxId: commitment.boxId }, entity);
         }
@@ -76,7 +75,7 @@ class CommitmentAction {
       await queryRunner.commitTransaction();
     } catch (e) {
       this.logger.error(
-        `An error occurred during store commitments action: ${e}`
+        `An error occurred during store commitments action: ${e}`,
       );
       await queryRunner.rollbackTransaction();
       success = false;
@@ -95,7 +94,7 @@ class CommitmentAction {
   spendCommitments = async (
     spendId: Array<SpendInfo>,
     block: Block,
-    extractor: string
+    extractor: string,
   ): Promise<void> => {
     // TODO: improve updating (local:ergo/rosen-bridge/scanner#85)
     const spendIdChunks = chunk(spendId, dbIdChunkSize);
@@ -107,11 +106,11 @@ class CommitmentAction {
 
       for (const commitment of commitments) {
         const spendInfo = spendIdChunk.find(
-          (info) => info.boxId === commitment.boxId
+          (info) => info.boxId === commitment.boxId,
         );
         if (!spendInfo)
           throw new Error(
-            `Impossible behavior: box [${commitment.boxId}] is not found in spending info list`
+            `Impossible behavior: box [${commitment.boxId}] is not found in spending info list`,
           );
 
         await this.commitmentRepository.update(
@@ -123,10 +122,10 @@ class CommitmentAction {
             spendHeight: block.height,
             spendTxId: spendInfo.txId,
             spendIndex: spendInfo.index,
-          }
+          },
         );
         this.logger.info(
-          `Spent commitment [${commitment.boxId}] for event [${commitment.eventId}] at height ${block.height}`
+          `Spent commitment [${commitment.boxId}] for event [${commitment.eventId}] at height ${block.height}`,
         );
         this.logger.debug(`Spent commitment [${JSON.stringify(commitment)}]`);
       }
@@ -141,7 +140,7 @@ class CommitmentAction {
    */
   deleteBlock = async (block: string, extractor: string) => {
     this.logger.info(
-      `Deleting commitments of block [${block}] and extractor ${extractor}`
+      `Deleting commitments of block [${block}] and extractor ${extractor}`,
     );
     await this.commitmentRepository.delete({
       block: block,
@@ -149,7 +148,12 @@ class CommitmentAction {
     });
     await this.commitmentRepository.update(
       { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: null, spendTxId: null, spendIndex: null }
+      {
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
+      },
     );
   };
 }

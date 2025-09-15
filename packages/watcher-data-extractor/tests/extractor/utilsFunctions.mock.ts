@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
@@ -51,7 +51,7 @@ export async function clearDB(dataSource: DataSource) {
     const repository = await dataSource.getRepository(entity.name);
     await repository.query(`DELETE FROM ${entity.tableName};`);
     await repository.query(
-      `DELETE FROM SQLITE_SEQUENCE WHERE name='${entity.tableName}';`
+      `DELETE FROM SQLITE_SEQUENCE WHERE name='${entity.tableName}';`,
     );
   }
 }
@@ -65,26 +65,26 @@ export async function clearDB(dataSource: DataSource) {
 export const permitTxGenerator = (hasToken = true, WID: string) => {
   const sk = wasm.SecretKey.random_dlog();
   const permitAddressContract = wasm.Contract.pay_to_address(
-    wasm.Address.from_base58(permitAddress)
+    wasm.Address.from_base58(permitAddress),
   );
   const address = wasm.Contract.pay_to_address(sk.get_address());
   const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     permitAddressContract,
-    0
+    0,
   );
 
   if (hasToken) {
     outBoxBuilder.add_token(
       wasm.TokenId.from_str(RWTId),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
     );
   }
 
   outBoxBuilder.set_register_value(
     4,
-    wasm.Constant.from_byte_array(new Uint8Array(Buffer.from(WID, 'hex')))
+    wasm.Constant.from_byte_array(new Uint8Array(Buffer.from(WID, 'hex'))),
   );
 
   const outBox = outBoxBuilder.build();
@@ -93,8 +93,8 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
     tokens.add(
       new wasm.Token(
         wasm.TokenId.from_str(RWTId),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-      )
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
+      ),
     );
   }
 
@@ -104,14 +104,14 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
     address,
     wasm.TxId.zero(),
     0,
-    tokens
+    tokens,
   );
   const unspentBoxes = new wasm.ErgoBoxes(inputBox);
   const txOutputs = new wasm.ErgoBoxCandidates(outBox);
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
   const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64())
+    outBoxValue.as_i64().checked_add(fee.as_i64()),
   );
   const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
   const tx = wasm.TxBuilder.new(
@@ -119,7 +119,7 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
     txOutputs,
     0,
     fee,
-    sk.get_address()
+    sk.get_address(),
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
@@ -131,7 +131,7 @@ export const permitTxGenerator = (hasToken = true, WID: string) => {
     ctx,
     tx,
     unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([])
+    wasm.ErgoBoxes.from_boxes_json([]),
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
@@ -147,24 +147,24 @@ export const commitmentTxGenerator = (
   hasToken = true,
   WID: string,
   requestId: string,
-  eventDigest: string
+  eventDigest: string,
 ) => {
   const sk = wasm.SecretKey.random_dlog();
   const commitmentAddressContract = wasm.Contract.pay_to_address(
-    wasm.Address.from_base58(commitmentAddress)
+    wasm.Address.from_base58(commitmentAddress),
   );
   const address = wasm.Contract.pay_to_address(sk.get_address());
   const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     commitmentAddressContract,
-    0
+    0,
   );
 
   if (hasToken) {
     outBoxBuilder.add_token(
       wasm.TokenId.from_str(RWTId),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
     );
   }
 
@@ -177,8 +177,8 @@ export const commitmentTxGenerator = (
   outBoxBuilder.set_register_value(
     6,
     wasm.Constant.from_byte_array(
-      new Uint8Array(Buffer.from(eventDigest, 'hex'))
-    )
+      new Uint8Array(Buffer.from(eventDigest, 'hex')),
+    ),
   );
 
   const outBox = outBoxBuilder.build();
@@ -187,8 +187,8 @@ export const commitmentTxGenerator = (
     tokens.add(
       new wasm.Token(
         wasm.TokenId.from_str(RWTId),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-      )
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
+      ),
     );
   }
 
@@ -198,14 +198,14 @@ export const commitmentTxGenerator = (
     address,
     wasm.TxId.zero(),
     0,
-    tokens
+    tokens,
   );
   const unspentBoxes = new wasm.ErgoBoxes(inputBox);
   const txOutputs = new wasm.ErgoBoxCandidates(outBox);
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
   const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64())
+    outBoxValue.as_i64().checked_add(fee.as_i64()),
   );
   const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
   const tx = wasm.TxBuilder.new(
@@ -213,7 +213,7 @@ export const commitmentTxGenerator = (
     txOutputs,
     0,
     fee,
-    sk.get_address()
+    sk.get_address(),
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
@@ -225,7 +225,7 @@ export const commitmentTxGenerator = (
     ctx,
     tx,
     unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([])
+    wasm.ErgoBoxes.from_boxes_json([]),
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
@@ -239,30 +239,30 @@ export const commitmentTxGenerator = (
 export const eventTriggerTxGenerator = (
   hasToken = true,
   WID: Array<string>,
-  eventData: Array<string>
+  eventData: Array<string>,
 ) => {
   const sk = wasm.SecretKey.random_dlog();
   const eventTriggerAddressContract = wasm.Contract.pay_to_address(
-    wasm.Address.from_base58(eventTriggerAddress)
+    wasm.Address.from_base58(eventTriggerAddress),
   );
   const address = wasm.Contract.pay_to_address(sk.get_address());
   const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
   const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
     outBoxValue,
     eventTriggerAddressContract,
-    0
+    0,
   );
 
   if (hasToken) {
     outBoxBuilder.add_token(
       wasm.TokenId.from_str(RWTId),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
+      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
     );
   }
 
   const wids = WID.map((val) => new Uint8Array(Buffer.from(val, 'hex'))).reduce(
     (buf: Buffer, wid: Uint8Array) => Buffer.concat([buf, wid]),
-    Buffer.from('')
+    Buffer.from(''),
   );
   const R4Value = wids.length ? blake2b(wids, undefined, 32) : Buffer.from('');
   outBoxBuilder.set_register_value(4, wasm.Constant.from_byte_array(R4Value));
@@ -276,11 +276,11 @@ export const eventTriggerTxGenerator = (
   }
   outBoxBuilder.set_register_value(
     5,
-    wasm.Constant.from_coll_coll_byte(R5Value)
+    wasm.Constant.from_coll_coll_byte(R5Value),
   );
   outBoxBuilder.set_register_value(
     6,
-    wasm.Constant.from_byte_array(Buffer.from(''))
+    wasm.Constant.from_byte_array(Buffer.from('')),
   );
   outBoxBuilder.set_register_value(7, wasm.Constant.from_i32(WID.length));
 
@@ -290,8 +290,8 @@ export const eventTriggerTxGenerator = (
     tokens.add(
       new wasm.Token(
         wasm.TokenId.from_str(RWTId),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10'))
-      )
+        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
+      ),
     );
   }
 
@@ -301,14 +301,14 @@ export const eventTriggerTxGenerator = (
     address,
     wasm.TxId.zero(),
     0,
-    tokens
+    tokens,
   );
   const unspentBoxes = new wasm.ErgoBoxes(inputBox);
   const txOutputs = new wasm.ErgoBoxCandidates(outBox);
   const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
   const boxSelector = new wasm.SimpleBoxSelector();
   const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64())
+    outBoxValue.as_i64().checked_add(fee.as_i64()),
   );
   const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
   const tx = wasm.TxBuilder.new(
@@ -316,7 +316,7 @@ export const eventTriggerTxGenerator = (
     txOutputs,
     0,
     fee,
-    sk.get_address()
+    sk.get_address(),
   ).build();
   const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
   const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
@@ -328,7 +328,7 @@ export const eventTriggerTxGenerator = (
     ctx,
     tx,
     unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([])
+    wasm.ErgoBoxes.from_boxes_json([]),
   );
   return JsonBI.parse(signed.to_json()) as Transaction;
 };
@@ -336,7 +336,7 @@ export const eventTriggerTxGenerator = (
 export const insertPermitEntity = (
   dataSource: DataSource,
   boxId?: string,
-  height?: number
+  height?: number,
 ) => {
   const repository = dataSource.getRepository(PermitEntity);
   return repository.insert({

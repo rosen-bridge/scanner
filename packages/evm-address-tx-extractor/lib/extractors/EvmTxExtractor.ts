@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { isCallException, Transaction, TransactionResponse } from 'ethers';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Block } from '@rosen-bridge/scanner-interfaces';
@@ -20,7 +20,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
     dataSource: DataSource,
     id: string,
     address: string,
-    logger: AbstractLogger = new DummyLogger()
+    logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
     this.id = id;
@@ -41,7 +41,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
    */
   processTransactions = async (
     txs: Array<TransactionResponse>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = [];
     for (const tx of txs) {
@@ -58,7 +58,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
           if (result) status = EvmTxStatus.succeed;
           else
             throw Error(
-              `Impossible behavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`
+              `Impossible behavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
             );
         } catch (e) {
           if (isCallException(e)) status = EvmTxStatus.failed;

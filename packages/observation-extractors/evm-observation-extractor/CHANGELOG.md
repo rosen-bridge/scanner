@@ -1,5 +1,91 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.2.1
+
+### Patch Changes
+
+- Update @rosen-bridge/rosen-extractor version to 9.0.0
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.1.1
+
+## 5.2.0
+
+### Minor Changes
+
+- Upgrade to Node.js version 22.18.0
+
+### Patch Changes
+
+- Rename observation-extractor package to abstract-observation-extractor
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.0
+
+## 5.1.6
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/observation-extractor@7.1.4
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
+## 5.1.5
+
+### Patch Changes
+
+- Downgrade ethers version
+- Update dependencies
+  - @rosen-bridge/evm-rpc-scanner@4.0.1
+  - @rosen-bridge/observation-extractor@7.1.3
+
+## 5.1.4
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@7.3.3
+  - @rosen-bridge/evm-rpc-scanner@4.0.0
+  - @rosen-bridge/observation-extractor@7.1.2
+
+## 5.1.3
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+- Updated dependencies
+  - @rosen-bridge/rosen-extractor@7.3.0
+  - @rosen-bridge/observation-extractor@7.1.1
+  - @rosen-bridge/evm-rpc-scanner@3.0.1
+
+## 5.1.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/evm-rpc-scanner@3.0.0
+
+## 5.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/evm-rpc-scanner@2.1.1
+
+## 5.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/evm-rpc-scanner@2.1.0
+  - @rosen-bridge/observation-extractor@7.1.0
+  - @rosen-bridge/tokens@3.1.0
+  - @rosen-bridge/rosen-extractor@7.2.2
+
 ## 5.0.0
 
 ### Major Changes

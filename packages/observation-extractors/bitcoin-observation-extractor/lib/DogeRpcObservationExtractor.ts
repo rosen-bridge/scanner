@@ -1,9 +1,9 @@
-import { AbstractObservationExtractor } from '@rosen-bridge/observation-extractor';
-import { DogeRpcTransaction } from '@rosen-bridge/bitcoin-rpc-scanner';
+import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { DogeRpcTransaction } from '@rosen-bridge/bitcoin-scanner';
 import { DogeRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export class DogeRpcObservationExtractor extends AbstractObservationExtractor<DogeRpcTransaction> {
   readonly FROM_CHAIN = 'doge';
@@ -12,13 +12,13 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
       tokens,
       new DogeRpcRosenExtractor(lockAddress, tokens, logger),
-      logger
+      logger,
     );
   }
 

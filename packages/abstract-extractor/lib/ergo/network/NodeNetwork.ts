@@ -36,7 +36,7 @@ export class NodeNetwork {
    * @param tx
    */
   private convertTransaction = (
-    tx: IndexedErgoTransaction
+    tx: IndexedErgoTransaction,
   ): ExtendedTransaction => {
     return {
       id: tx.id || '',
@@ -59,7 +59,7 @@ export class NodeNetwork {
   getAddressTransactionsWithOffsetLimit = async (
     address: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<{ items: Array<ExtendedTransaction>; total: number }> => {
     const txs = await this.api.getTxsByAddress(address, {
       offset,
@@ -67,7 +67,7 @@ export class NodeNetwork {
     });
     if (!txs.items)
       throw new Error(
-        'Explorer AddressTransactions api expected to have items'
+        'Explorer AddressTransactions api expected to have items',
       );
     return {
       items: txs.items.map((tx) => this.convertTransaction(tx)),

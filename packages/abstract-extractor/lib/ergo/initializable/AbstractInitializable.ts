@@ -17,7 +17,7 @@ import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
 export abstract class AbstractInitializableErgoExtractor<
   ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity
+  ExtractorEntity extends AbstractErgoExtractorEntity,
 > extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
   private dbMutex = new Mutex();
   private spendRecordsMutex = new Mutex();
@@ -35,7 +35,7 @@ export abstract class AbstractInitializableErgoExtractor<
     address: string,
     logger?: AbstractLogger,
     private initialize = true,
-    maxParallelRequests = MAX_PARALLEL_REQUESTS
+    maxParallelRequests = MAX_PARALLEL_REQUESTS,
   ) {
     super(logger);
     if (type == ErgoNetworkType.Explorer) {
@@ -45,7 +45,7 @@ export abstract class AbstractInitializableErgoExtractor<
         maxParallelRequests,
         this.processTransactions,
         this.processTransactionBatch,
-        logger
+        logger,
       );
     } else if (type == ErgoNetworkType.Node) {
       this.initializer = new NodeInitializer(
@@ -53,7 +53,7 @@ export abstract class AbstractInitializableErgoExtractor<
         address,
         maxParallelRequests,
         this.processTransactionBatch,
-        logger
+        logger,
       );
     } else throw new Error(`Network type ${type} is not supported`);
     this.spendRecords = [];
@@ -70,19 +70,19 @@ export abstract class AbstractInitializableErgoExtractor<
     this.logger.debug(
       `The transaction batch grouped to ${
         Object.keys(groupedTxs).length
-      } blocks`
+      } blocks`,
     );
     const release = await this.dbMutex.acquire();
     for (const blockId in groupedTxs) {
       const blockTxs = groupedTxs[blockId];
       const block = { hash: blockId, height: blockTxs[0].inclusionHeight };
       this.logger.debug(
-        `Processing transactions at height ${blockTxs[0].inclusionHeight}`
+        `Processing transactions at height ${blockTxs[0].inclusionHeight}`,
       );
       const success = await this.processTransactions(blockTxs, block);
       if (!success)
         throw Error(
-          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`
+          `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`,
         );
     }
     release();
@@ -97,7 +97,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * @returns transaction spend info
    */
   protected extractTxSpendInfo = (
-    tx: ExtendedTransaction
+    tx: ExtendedTransaction,
   ): ExtendedSpendInfo[] => {
     const txSpendInfo = [];
     for (let i = 0; i < tx.inputs.length; i++) {
@@ -120,7 +120,7 @@ export abstract class AbstractInitializableErgoExtractor<
    * @param txs
    */
   private storeSpendInfoBatch = async (
-    txs: ExtendedTransaction[]
+    txs: ExtendedTransaction[],
   ): Promise<void> => {
     const spendRecordsBatch: ExtendedSpendInfo[] = [];
     for (const tx of txs) {
@@ -143,14 +143,14 @@ export abstract class AbstractInitializableErgoExtractor<
     const sortedRecords = sortBy(this.spendRecords, (record) => record.height);
     const groupedRecords = groupBy(sortedRecords, (tx) => tx.block);
     this.logger.debug(
-      `Spend records grouped to ${Object.keys(groupedRecords).length} blocks`
+      `Spend records grouped to ${Object.keys(groupedRecords).length} blocks`,
     );
     const release = await this.dbMutex.acquire();
     for (const blockId in groupedRecords) {
       const blockRecords = groupedRecords[blockId];
       const block = { hash: blockId, height: blockRecords[0].height };
       this.logger.debug(
-        `Processing spend records at height ${blockRecords[0].height}`
+        `Processing spend records at height ${blockRecords[0].height}`,
       );
       await this.actions.spendBoxes(blockRecords, block, this.getId());
     }
@@ -167,13 +167,13 @@ export abstract class AbstractInitializableErgoExtractor<
   initializeBoxes = async (initialBlock: BlockInfo) => {
     if (this.initialize) {
       this.logger.debug(
-        `Initializing ${this.getId()} started, removing all existing data`
+        `Initializing ${this.getId()} started, removing all existing data`,
       );
       await this.actions.removeAllData(this.getId());
       await this.initializer.initialize(initialBlock);
       await this.applySpendRecords();
       this.logger.info(
-        `Initialization completed successfully for ${this.getId()}`
+        `Initialization completed successfully for ${this.getId()}`,
       );
     } else {
       this.logger.info(`Initialization for ${this.getId()} is turned off`);

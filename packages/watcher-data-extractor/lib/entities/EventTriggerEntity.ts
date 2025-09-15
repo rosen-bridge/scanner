@@ -1,54 +1,54 @@
 import { AbstractErgoExtractorEntity } from '@rosen-bridge/abstract-extractor';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity } from '@rosen-bridge/extended-typeorm';
 
 @Entity('event_trigger_entity')
 class EventTriggerEntity extends AbstractErgoExtractorEntity {
-  @Column({ default: 'Not-set' })
+  @Column({ type: 'varchar', default: 'Not-set' })
   eventId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   fromChain: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   toChain: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   fromAddress: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   toAddress: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   amount: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   bridgeFee: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   networkFee: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceChainTokenId: string;
 
-  @Column()
+  @Column({ type: 'int' })
   sourceChainHeight: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   targetChainTokenId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceTxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   sourceBlockId: string;
 
-  @Column()
+  @Column({ type: 'int' })
   WIDsCount: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   WIDsHash: string;
 
   @Column({ nullable: true, type: 'text' })

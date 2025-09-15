@@ -1,15 +1,10 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import CommitmentEntity from '../../lib/entities/CommitmentEntity';
-import {
-  block,
-  commitmentAddress,
-  RWTId,
-  testTokenMap,
-} from './utilsVariable.mock';
+import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 import { JsonBI } from '../../lib/utils';
 import { TokenMap } from '@rosen-bridge/tokens';
 
@@ -35,7 +30,7 @@ describe('CommitmentExtractor', () => {
         [commitmentAddress],
         RWTId,
         dataSource,
-        tokenMap
+        tokenMap,
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -57,7 +52,7 @@ describe('CommitmentExtractor', () => {
         [commitmentAddress],
         RWTId,
         dataSource,
-        tokenMap
+        tokenMap,
       );
       const tx1 = commitmentTxGenerator(true, 'f1', '11', 'd1');
       const tx2 = commitmentTxGenerator(true, 'f2', '22', 'd2');
@@ -79,7 +74,7 @@ describe('CommitmentExtractor', () => {
         eventId: '11',
         boxId: box1.box_id().to_str(),
         boxSerialized: Buffer.from(box1.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         extractor: 'extractorId',
         block: 'hash',
@@ -98,7 +93,7 @@ describe('CommitmentExtractor', () => {
         eventId: '22',
         boxId: box2.box_id().to_str(),
         boxSerialized: Buffer.from(box2.sigma_serialize_bytes()).toString(
-          'base64'
+          'base64',
         ),
         extractor: 'extractorId',
         block: 'hash',
@@ -127,7 +122,7 @@ describe('CommitmentExtractor', () => {
         [commitmentAddress],
         RWTId,
         dataSource,
-        tokenMap
+        tokenMap,
       );
       const tx1 = commitmentTxGenerator(true, 'wid1', '1', 'digest1');
       const tx2 = commitmentTxGenerator(true, 'wid2', '2', 'digest2');

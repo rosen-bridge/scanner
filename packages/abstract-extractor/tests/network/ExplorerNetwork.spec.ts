@@ -1,4 +1,3 @@
-import { describe, expect, it, vitest } from 'vitest';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { omit } from 'lodash-es';
 
@@ -66,9 +65,8 @@ describe('ExplorerNetwork', () => {
      */
     it('should properly convert explorer api tx to transaction type', async () => {
       const explorerNetwork = new ExplorerNetwork('explorer_url');
-      const tx = await explorerNetwork['convertBlockTransaction'](
-        explorerBlockTx
-      );
+      const tx =
+        await explorerNetwork['convertBlockTransaction'](explorerBlockTx);
       expect(tx).toEqual(omit(convertedTx, ['blockId', 'inclusionHeight']));
     });
   });

@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
@@ -18,7 +18,7 @@ describe('AddressExtractor', () => {
       ergoLib.NetworkPrefix.Mainnet,
       'https://explorer.ergoplatform.com/',
       ErgoNetworkType.Explorer,
-      '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2'
+      '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
     );
   });
 
@@ -83,7 +83,7 @@ describe('AddressExtractor', () => {
         'https://explorer.ergoplatform.com/',
         ErgoNetworkType.Explorer,
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367']
+        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
       const data = extractor.hasData(tx1.outputs[0]);
       expect(data).toEqual(true);
@@ -106,7 +106,7 @@ describe('AddressExtractor', () => {
         'https://explorer.ergoplatform.com/',
         ErgoNetworkType.Explorer,
         '',
-        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367']
+        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
       const data = extractor.hasData(tx1.outputs[3]);
       expect(data).toEqual(true);
@@ -129,7 +129,7 @@ describe('AddressExtractor', () => {
         'https://explorer.ergoplatform.com/',
         ErgoNetworkType.Explorer,
         '',
-        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367']
+        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
       const data = extractor.hasData(tx1.outputs[1]);
       expect(data).toEqual(false);
@@ -152,7 +152,7 @@ describe('AddressExtractor', () => {
         'https://explorer.ergoplatform.com/',
         ErgoNetworkType.Explorer,
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
-        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367']
+        ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
       const data = extractor.hasData(tx1.outputs[3]);
       expect(data).toEqual(false);

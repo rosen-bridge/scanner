@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
@@ -55,7 +55,7 @@ describe('EventTriggerExtractor', () => {
         eventTriggerAddress,
         RWTId,
         permitAddress,
-        fraudAddress
+        fraudAddress,
       );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
@@ -78,7 +78,7 @@ describe('EventTriggerExtractor', () => {
         eventTriggerAddress,
         RWTId,
         permitAddress,
-        fraudAddress
+        fraudAddress,
       );
       const tx1 = eventTriggerTxGenerator(true, ['ff'], sampleEventData);
       const res = await extractor.processTransactions([tx1], block);
@@ -138,7 +138,7 @@ describe('EventTriggerExtractor', () => {
         eventTriggerAddress,
         RWTId,
         permitAddress,
-        fraudAddress
+        fraudAddress,
       );
       const tx1 = eventTriggerTxGenerator(true, ['aa'], sampleEventData);
       const tx2 = eventTriggerTxGenerator(true, [], sampleEventData);
@@ -147,7 +147,7 @@ describe('EventTriggerExtractor', () => {
       const tx5 = eventTriggerTxGenerator(true, ['dd'], []);
       const res = await extractor.processTransactions(
         [tx1, tx2, tx3, tx4, tx5],
-        block
+        block,
       );
       expect(res).toBeTruthy();
       const repository = dataSource.getRepository(EventTriggerEntity);
@@ -178,20 +178,17 @@ describe('EventTriggerExtractor', () => {
         eventTriggerAddress,
         RWTId,
         permitAddress,
-        fraudAddress
+        fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(
-        (extractor as any).actions,
-        'spendBoxes'
-      );
-      spendTriggerSpy.mockResolvedValue(undefined);
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
+      spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTxOldFormat;
       const res = await extractor.processTransactions([tx1], block);
       expect(res).toEqual(true);
       expect(spendTriggerSpy).toHaveBeenCalledWith(
         expect.any(Array),
         block,
-        extractor.id
+        extractor.id,
       );
     });
 
@@ -218,20 +215,17 @@ describe('EventTriggerExtractor', () => {
         eventTriggerAddress,
         RWTId,
         permitAddress,
-        fraudAddress
+        fraudAddress,
       );
-      const spendTriggerSpy = jest.spyOn(
-        (extractor as any).actions,
-        'spendBoxes'
-      );
-      spendTriggerSpy.mockResolvedValue(undefined);
+      const spendTriggerSpy = vi.spyOn(extractor['actions'], 'spendBoxes');
+      spendTriggerSpy.mockResolvedValue([]);
       const tx1 = spendTriggerTx;
       const res = await extractor.processTransactions([tx1], block);
       expect(res).toEqual(true);
       expect(spendTriggerSpy).toHaveBeenCalledWith(
         expect.any(Array),
         block,
-        extractor.id
+        extractor.id,
       );
     });
   });

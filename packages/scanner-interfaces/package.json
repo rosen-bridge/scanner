@@ -1,9 +1,9 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Defines all scanner interfaces",
   "repository": "",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
@@ -16,15 +16,10 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^20.11.9",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.2.4",
+    "@types/node": "^22.18.0",
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.18.0"
   }
 }

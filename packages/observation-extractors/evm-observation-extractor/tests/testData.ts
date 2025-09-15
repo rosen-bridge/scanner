@@ -1,5 +1,10 @@
 import { blake2b } from 'blakejs';
-import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
+import {
+  JsonRpcProvider,
+  Transaction,
+  TransactionResponse,
+  TransactionResponseParams,
+} from 'ethers';
 
 export const tx = Transaction.from({
   type: 2,
@@ -20,7 +25,10 @@ export const tx = Transaction.from({
   },
   hash: '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
 });
-export const txRes = new TransactionResponse(tx as any, new JsonRpcProvider());
+export const txRes = new TransactionResponse(
+  tx as unknown as TransactionResponseParams,
+  new JsonRpcProvider(),
+);
 
 export const rosenData = {
   toChain: 'to-chain',

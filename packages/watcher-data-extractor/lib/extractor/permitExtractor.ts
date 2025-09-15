@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { difference } from 'lodash-es';
@@ -33,7 +33,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     address: string,
     RWT: string,
     explorerUrl: string,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super();
     this.id = id;
@@ -57,7 +57,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -75,10 +75,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                 output.ergoTree === this.permitErgoTree
               ) {
                 const boxOutput = wasm.ErgoBox.from_json(
-                  JsonBI.stringify(output)
+                  JsonBI.stringify(output),
                 );
                 const r4 = boxOutput.register_value(
-                  wasm.NonMandatoryRegisterId.R4
+                  wasm.NonMandatoryRegisterId.R4,
                 );
                 if (r4) {
                   const R4Serialized = r4.to_byte_array();
@@ -86,7 +86,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
                     boxes.push({
                       boxId: output.boxId,
                       boxSerialized: Buffer.from(
-                        boxOutput.sigma_serialize_bytes()
+                        boxOutput.sigma_serialize_bytes(),
                       ).toString('base64'),
                       WID: Buffer.from(R4Serialized).toString('hex'),
                       txId: output.transactionId,
@@ -115,13 +115,13 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
           })
           .catch((e) => {
             this.logger.error(
-              `Error in storing permits of the block ${block}: ${e}`
+              `Error in storing permits of the block ${block}: ${e}`,
             );
             reject(e);
           });
       } catch (e) {
         this.logger.error(
-          `block ${block} doesn't save in the database with error: ${e}`
+          `block ${block} doesn't save in the database with error: ${e}`,
         );
         reject(e);
       }
@@ -145,13 +145,13 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       if (allStoredBoxIds.includes(permit.boxId)) {
         await this.actions.updatePermit(permit, this.getId());
         this.logger.info(
-          `Updated the existing unspent permit with boxId, [${permit.boxId}]`
+          `Updated the existing unspent permit with boxId, [${permit.boxId}]`,
         );
         this.logger.debug(`Updated permit [${JSON.stringify(permit)}]`);
       } else {
         await this.actions.insertPermit(permit, this.getId());
         this.logger.info(
-          `Inserted new unspent permit with boxId, [${permit.boxId}]`
+          `Inserted new unspent permit with boxId, [${permit.boxId}]`,
         );
         this.logger.debug(`Inserted permit [${JSON.stringify(permit)}]`);
       }
@@ -171,7 +171,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    */
   validateOldStoredPermits = async (
     unchangedStoredBoxIds: Array<string>,
-    initialHeight: number
+    initialHeight: number,
   ) => {
     for (const boxId of unchangedStoredBoxIds) {
       const permit = await this.getPermitWithBoxId(boxId);
@@ -181,12 +181,12 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
             boxId,
             this.getId(),
             permit.spendBlock,
-            permit.spendHeight
+            permit.spendHeight,
           );
       } else {
         await this.actions.removePermit(boxId, this.getId());
         this.logger.info(
-          `Removed invalid box [${boxId}] in initialization validation`
+          `Removed invalid box [${boxId}] in initialization validation`,
         );
       }
     }
@@ -197,7 +197,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * @param boxId
    */
   getPermitWithBoxId = async (
-    boxId: string
+    boxId: string,
   ): Promise<ExtractedPermit | undefined> => {
     try {
       const box = await this.explorerApi.v1.getApiV1BoxesP1(boxId);
@@ -214,7 +214,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * @returns
    */
   getAllUnspentPermits = async (
-    initialHeight: number
+    initialHeight: number,
   ): Promise<Array<ExtractedPermit>> => {
     let extractedBoxes: Array<ExtractedPermit> = [];
     let offset = 0,
@@ -222,7 +222,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     while (offset < total) {
       const boxes = await this.explorerApi.v1.getApiV1BoxesUnspentByergotreeP1(
         this.permitErgoTree,
-        { offset: offset, limit: DefaultApiLimit }
+        { offset: offset, limit: DefaultApiLimit },
       );
       if (!boxes.items) {
         this.logger.warn('Explorer api output items should not be undefined.');
@@ -230,8 +230,8 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       }
       const filteredBoxes = await this.extractPermitData(
         boxes.items.filter(
-          (box) => box.creationHeight && box.creationHeight < initialHeight
-        )
+          (box) => box.creationHeight && box.creationHeight < initialHeight,
+        ),
       );
       extractedBoxes = [...extractedBoxes, ...filteredBoxes];
       total = boxes.total;
@@ -276,7 +276,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
         extractedBoxes.push({
           boxId: box.box_id().to_str(),
           boxSerialized: Buffer.from(box.sigma_serialize_bytes()).toString(
-            'base64'
+            'base64',
           ),
           block: boxJson.blockId,
           height: boxJson.settlementHeight,

@@ -1,5 +1,63 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.2.0
+
+### Minor Changes
+
+- Upgrade to Node.js version 22.18.0
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.1.0
+  - @rosen-bridge/scanner-interfaces@0.2.0
+
+## 12.1.4
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.3
+  - @rosen-bridge/scanner-interfaces@0.1.1
+
+## 12.1.3
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@2.0.2
+
+## 12.1.2
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.1
+
+## 12.1.1
+
+### Patch Changes
+
+- Fix event result extraction in EventTriggerExtractor
+- Fix fraud result storage in database
+
+## 12.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+- Update extra information interfaces and extraction functions
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/abstract-extractor@2.0.0
+  - @rosen-bridge/tokens@3.1.0
+  - @rosen-bridge/rosen-extractor@7.2.2
+
 ## 12.0.0
 
 ### Major Changes

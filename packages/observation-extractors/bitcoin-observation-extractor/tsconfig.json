@@ -3,10 +3,9 @@
   "compilerOptions": {
     "outDir": "./dist"
   },
-  "include": ["tests", "lib", "vitest.config.ts"],
+  "include": ["tests", "lib"],
   "references": [
-    { "path": "../../observation-extractor" },
-    { "path": "../../scanners/bitcoin-esplora-scanner" },
-    { "path": "../../scanners/bitcoin-rpc-scanner" }
+    { "path": "../../abstract-observation-extractor" },
+    { "path": "../../scanners/bitcoin-scanner" }
   ]
 }

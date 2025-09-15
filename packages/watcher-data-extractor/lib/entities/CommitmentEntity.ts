@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from '@rosen-bridge/extended-typeorm';
 
 @Entity('commitment_entity')
 @Unique(['boxId', 'extractor'])
@@ -6,31 +11,31 @@ class CommitmentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   txId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   extractor: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   eventId: string;
 
-  @Column()
+  @Column({ type: 'text' })
   commitment: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   WID: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   block: string;
 
-  @Column()
+  @Column({ type: 'int' })
   height: number;
 
-  @Column()
+  @Column({ type: 'text' })
   boxSerialized: string;
 
   @Column({ nullable: true, type: 'text' })
@@ -39,7 +44,7 @@ class CommitmentEntity {
   @Column({ nullable: true, type: 'int' })
   spendHeight?: number | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   rwtCount?: string;
 
   @Column({ nullable: true, type: 'text' })

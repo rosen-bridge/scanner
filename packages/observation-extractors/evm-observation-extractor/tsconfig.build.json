@@ -5,8 +5,8 @@
   },
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
-    { "path": "../../observation-extractor" },
-    { "path": "../../scanners/evm-rpc-scanner/tsconfig.build.json" },
+    { "path": "../../abstract-observation-extractor" },
+    { "path": "../../scanners/evm-scanner/tsconfig.build.json" },
     { "path": "../../scanner-interfaces/tsconfig.build.json" }
   ]
 }

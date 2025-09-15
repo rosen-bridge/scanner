@@ -6,7 +6,7 @@ import {
   EntityTarget,
   FindOptionsWhere,
   QueryRunner,
-} from 'typeorm';
+} from '@rosen-bridge/extended-typeorm';
 import { chunk, difference, pick } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
@@ -18,7 +18,7 @@ import { AbstractErgoExtractorEntity } from './AbstractErgoExtractorEntity';
 
 export abstract class AbstractErgoExtractorAction<
   ExtractedData extends AbstractBoxData,
-  ExtractorEntity extends AbstractErgoExtractorEntity
+  ExtractorEntity extends AbstractErgoExtractorEntity,
 > {
   private readonly datasource: DataSource;
   readonly logger: AbstractLogger;
@@ -28,7 +28,7 @@ export abstract class AbstractErgoExtractorAction<
   constructor(
     dataSource: DataSource,
     repo: EntityTarget<ExtractorEntity>,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     this.datasource = dataSource;
     this.logger = logger ? logger : new DummyLogger();
@@ -40,12 +40,12 @@ export abstract class AbstractErgoExtractorAction<
    * create the database entity from extracted data and block information
    */
   protected createEntity = (
-    data: ExtractedData[],
-    block: BlockInfo,
-    extractor: string
+    data: ExtractedData[], // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
+    extractor: string, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Array<Omit<ExtractorEntity, 'id'>> => {
     throw Error(
-      'You must implement `createEntity` or override `insertEntities` and `updateEntities`'
+      'You must implement `createEntity` or override `insertEntities` and `updateEntities`',
     );
   };
 
@@ -53,10 +53,10 @@ export abstract class AbstractErgoExtractorAction<
    * convert the database entity back to raw data
    */
   protected convertEntityToData = (
-    entities: ExtractorEntity[]
+    entities: ExtractorEntity[], // eslint-disable-line @typescript-eslint/no-unused-vars
   ): ExtractedData[] => {
     throw Error(
-      'You must implement `convertEntityToData` or override `deleteBlockEntities`'
+      'You must implement `convertEntityToData` or override `deleteBlockEntities`',
     );
   };
 
@@ -71,11 +71,11 @@ export abstract class AbstractErgoExtractorAction<
     queryRunner: QueryRunner,
     boxesToInsert: Array<ExtractedData>,
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ) => {
     const repository = queryRunner.manager.getRepository(this.repo);
     await repository.insert(
-      this.createEntity(boxesToInsert, block, extractor) as any
+      this.createEntity(boxesToInsert, block, extractor) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
   };
 
@@ -88,9 +88,9 @@ export abstract class AbstractErgoExtractorAction<
    */
   protected updateEntity = async (
     queryRunner: QueryRunner,
-    updateBox: ExtractedData,
-    block: BlockInfo,
-    extractor: string
+    updateBox: ExtractedData, // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
+    extractor: string,
   ) => {
     const repository = queryRunner.manager.getRepository(this.repo);
     const box = this.createEntity([updateBox], block, extractor)[0];
@@ -99,7 +99,7 @@ export abstract class AbstractErgoExtractorAction<
         boxId: box.boxId,
         extractor: extractor,
       } as FindOptionsWhere<ExtractorEntity>,
-      box as any
+      box as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
   };
 
@@ -113,16 +113,19 @@ export abstract class AbstractErgoExtractorAction<
   protected deleteBlockEntities = async (
     queryRunner: QueryRunner,
     extractor: string,
-    block: string
+    block: string,
   ): Promise<ExtractedData[]> => {
     const repository = queryRunner.manager.getRepository(this.repo);
     const deletedData = await repository.find({
-      where: { extractor: extractor, block: block } as any,
+      where: {
+        extractor: extractor,
+        block: block,
+      } as FindOptionsWhere<ExtractorEntity>,
     });
     await repository.delete({
       extractor: extractor,
       block: block,
-    } as any);
+    } as unknown as FindOptionsWhere<ExtractorEntity>);
     return this.convertEntityToData(deletedData);
   };
 
@@ -134,26 +137,31 @@ export abstract class AbstractErgoExtractorAction<
    * @returns
    */
   protected updateBlockEntities = async (
-    queryRunner: QueryRunner,
+    queryRunner: QueryRunner, // eslint-disable-line @typescript-eslint/no-unused-vars
     extractor: string,
-    block: string
+    block: string,
   ): Promise<ExtractorEntity[]> => {
-    const repository = queryRunner.manager.getRepository(this.repo);
+    const repository = this.datasource.getRepository(
+      this.repo as EntityTarget<new () => ExtractorEntity>,
+    );
     const updatedData = await repository.find({
       where: {
         extractor: extractor,
         spendBlock: block,
         block: Not(block),
-      } as any,
+      } as unknown as FindOptionsWhere<ExtractorEntity>,
     });
     await repository.update(
       {
         spendBlock: block,
         extractor: extractor,
-      } as FindOptionsWhere<ExtractorEntity>,
-      { spendBlock: null, spendHeight: 0 } as any
+      } as unknown as FindOptionsWhere<ExtractorEntity>,
+      {
+        spendBlock: null,
+        spendHeight: 0,
+      },
     );
-    return updatedData;
+    return updatedData as unknown as ExtractorEntity[];
   };
 
   /**
@@ -168,7 +176,7 @@ export abstract class AbstractErgoExtractorAction<
   storeBoxes = async (
     boxes: Array<ExtractedData>,
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ): Promise<boolean> => {
     let boxesToInsert: ExtractedData[] = [],
       boxesToUpdate: ExtractedData[] = [];
@@ -197,11 +205,11 @@ export abstract class AbstractErgoExtractorAction<
         this.logger.info(
           `Updating boxes with following Ids in the database: [${boxesToUpdate
             .map((col) => col.boxId)
-            .join(', ')}]`
+            .join(', ')}]`,
         );
       for (const box of boxesToUpdate) {
         this.logger.debug(
-          `Updating boxes in database [${JsonBigInt.stringify(box)}]`
+          `Updating boxes in database [${JsonBigInt.stringify(box)}]`,
         );
         await this.updateEntity(queryRunner, box, block, extractor);
       }
@@ -230,7 +238,7 @@ export abstract class AbstractErgoExtractorAction<
   spendBoxes = async (
     spendInfos: Array<SpendInfo>,
     block: BlockInfo,
-    extractor: string
+    extractor: string,
   ): Promise<BoxInfo[]> => {
     const spentData = [];
     const spendInfoChunks = chunk(spendInfos, DB_CHUNK_SIZE);
@@ -241,7 +249,10 @@ export abstract class AbstractErgoExtractorAction<
           boxId: In(boxIds),
           extractor: extractor,
         } as FindOptionsWhere<ExtractorEntity>,
-        { spendBlock: block.hash, spendHeight: block.height } as any
+        {
+          spendBlock: block.hash,
+          spendHeight: block.height,
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       );
 
       if (updateResult.affected && updateResult.affected > 0) {
@@ -252,7 +263,7 @@ export abstract class AbstractErgoExtractorAction<
         spentData.push(...spentRows);
         for (const row of spentRows) {
           this.logger.debug(
-            `Spent box with boxId [${row.boxId}] at height ${block.height}`
+            `Spent box with boxId [${row.boxId}] at height ${block.height}`,
           );
         }
       }
@@ -270,24 +281,24 @@ export abstract class AbstractErgoExtractorAction<
    */
   deleteBlockBoxes = async (
     block: string,
-    extractor: string
+    extractor: string,
   ): Promise<{ deletedData: ExtractedData[]; updatedData: BoxInfo[] }> => {
     const queryRunner = this.datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       this.logger.info(
-        `Deleting boxes in block ${block} and extractor ${extractor}`
+        `Deleting boxes in block ${block} and extractor ${extractor}`,
       );
       const updatedData = await this.updateBlockEntities(
         queryRunner,
         extractor,
-        block
+        block,
       );
       const deletedData = await this.deleteBlockEntities(
         queryRunner,
         extractor,
-        block
+        block,
       );
       await queryRunner.commitTransaction();
       return {
@@ -298,7 +309,7 @@ export abstract class AbstractErgoExtractorAction<
       await queryRunner.rollbackTransaction();
       this.logger.error(
         `An error occurred while deleting data extracted from block ${block}`,
-        error
+        error,
       );
       throw error;
     } finally {

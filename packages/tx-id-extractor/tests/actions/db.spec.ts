@@ -1,7 +1,7 @@
 import { createDatabase } from '../utils.mock';
 import { TxAction } from '../../lib/actions/db';
 import { TxIdEntity } from '../../lib';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 let dataSource: DataSource;
 let action: TxAction;
@@ -97,7 +97,7 @@ describe('TxAction', () => {
           parentHash: '',
           timestamp: 10,
         },
-        'extractor 1'
+        'extractor 1',
       );
       const elements = await repository.find();
       expect(elements.length).toEqual(2);

@@ -2,12 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./lib"
+    "rootDir": "./lib",
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["lib/**/*.spec.ts", "lib/**/*.test.ts", "lib/**/*.mock.ts"],
   "include": ["lib/**/*"],
   "references": [
-    { "path": "../scanner" },
+    { "path": "../abstract-scanner" },
     { "path": "../abstract-extractor/tsconfig.build.json" },
     { "path": "../scanner-interfaces/tsconfig.build.json" }
   ]

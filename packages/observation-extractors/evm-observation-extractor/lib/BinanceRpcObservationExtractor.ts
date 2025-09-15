@@ -1,7 +1,7 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { EvmEthersRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { EvmRpcObservationExtractor } from './EvmRpcObservationExtractor';
 
 export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
@@ -11,7 +11,7 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
     lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    logger?: AbstractLogger
+    logger?: AbstractLogger,
   ) {
     super(
       dataSource,
@@ -21,9 +21,9 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
         tokens,
         'binance',
         'bnb',
-        logger
+        logger,
       ),
-      logger
+      logger,
     );
   }
 

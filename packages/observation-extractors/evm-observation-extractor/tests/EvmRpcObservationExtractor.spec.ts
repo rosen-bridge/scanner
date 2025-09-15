@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { vi } from 'vitest';
-import { DataSource } from 'typeorm';
-import { blake2b } from 'blakejs';
-import { ObservationEntity } from '@rosen-bridge/observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { createDatabase, generateBlockEntity } from './utils.mock';
 import { expectedObservation, rosenData, tx, txRes } from './testData';
 import { TestEvmRpcObservationExtractor } from './TestObservationExtractor';
@@ -11,7 +12,7 @@ vi.mock('ethers', async (importOriginal) => {
   const ref = await importOriginal<typeof import('ethers')>();
   return {
     ...ref,
-    JsonRpcProvider: vi.fn().mockImplementation((url: string) => {
+    JsonRpcProvider: vi.fn().mockImplementation(() => {
       return {};
     }),
   };
@@ -51,7 +52,7 @@ describe('EvmRpcObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -82,7 +83,7 @@ describe('EvmRpcObservationExtractor', () => {
     it('should return true but insert no tx when transaction is failed', async () => {
       vi.spyOn(extractor.getRosenExtractor(), 'get').mockReturnValue(rosenData);
 
-      vi.spyOn(txRes, 'wait').mockImplementation((x: number | undefined) => {
+      vi.spyOn(txRes, 'wait').mockImplementation(() => {
         throw {
           code: 'CALL_EXCEPTION',
         };
@@ -91,7 +92,7 @@ describe('EvmRpcObservationExtractor', () => {
       // run test
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -99,7 +100,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
 
@@ -121,7 +122,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       const res = await extractor.processTransactions(
         [txRes],
-        generateBlockEntity(dataSource, 'block-id')
+        generateBlockEntity(dataSource, 'block-id'),
       );
 
       // check returned valid
@@ -129,7 +130,7 @@ describe('EvmRpcObservationExtractor', () => {
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
+      const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
     }, 100000);
   });

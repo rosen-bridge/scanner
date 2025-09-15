@@ -1,9 +1,9 @@
 {
   "name": "@rosen-bridge/evm-address-tx-extractor",
-  "version": "1.0.8",
+  "version": "1.2.0",
   "description": "Extract and store EVM chain notable data of transactions for an address",
   "repository": "",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
@@ -14,29 +14,24 @@
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path ./.gitignore",
     "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS=--loader=extensionless vitest",
+    "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^20.11.9",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
-    "@vitest/coverage-istanbul": "^1.2.2",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "extensionless": "^1.9.6",
-    "prettier": "^3.2.4",
+    "@types/node": "^22.18.0",
+    "@vitest/coverage-istanbul": "^3.1.4",
+    "tsx": "^4.19.4",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "vitest": "^3.1.4"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.18.0"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^1.0.2",
+    "@rosen-bridge/abstract-extractor": "^2.1.0",
     "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/scanner-interfaces": "^0.1.0",
-    "ethers": "^6.11.0",
-    "typeorm": "^0.3.20"
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.0",
+    "ethers": "6.13.2"
   }
 }

@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { AddressTxsEntity } from '../lib';
 import { migrations } from '../lib';
 import { randomBytes } from 'crypto';

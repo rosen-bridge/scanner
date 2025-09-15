@@ -1,7 +1,7 @@
 import {
   AbstractObservationExtractor,
   ExtractedObservation,
-} from '@rosen-bridge/observation-extractor';
+} from '@rosen-bridge/abstract-observation-extractor';
 import { isCallException, TransactionResponse } from 'ethers';
 import { blake2b } from 'blakejs';
 import { Block } from '@rosen-bridge/scanner-interfaces';
@@ -16,7 +16,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
    */
   processTransactions = async (
     txs: Array<TransactionResponse>,
-    block: Block
+    block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {
@@ -26,7 +26,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
           const result = await transaction.wait(0);
           if (result) {
             const requestId = Buffer.from(
-              blake2b(this.getTxId(transaction), undefined, 32)
+              blake2b(this.getTxId(transaction), undefined, 32),
             ).toString('hex');
             observations.push({
               fromChain: this.FROM_CHAIN,
@@ -44,12 +44,12 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
             });
           } else
             throw Error(
-              `Impossible behavior: Evm Tx [${transaction.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`
+              `Impossible behavior: Evm Tx [${transaction.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
             );
         } catch (e) {
           if (isCallException(e))
             this.logger.debug(
-              `found valid lock transaction [${transaction.hash}] but tx is failed`
+              `found valid lock transaction [${transaction.hash}] but tx is failed`,
             );
           else throw e;
         }
@@ -64,7 +64,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
   getTxId = (tx: TransactionResponse) => {
     if (tx.hash == null) {
       throw Error(
-        'ImpossibleBehavior: Transactions coming from RPC have to be signed.'
+        'ImpossibleBehavior: Transactions coming from RPC have to be signed.',
       );
     }
     return tx.hash;

@@ -1,4 +1,4 @@
-import { BlockEntity } from '@rosen-bridge/scanner';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
@@ -26,32 +26,34 @@ export const generateCollateralBox = (
   wid: string,
   rwtCount: bigint,
   rsn: string,
-  rsnCollateral: bigint
+  rsnCollateral: bigint,
 ): ergoLib.ErgoBoxCandidate => {
   const boxBuilder = new ergoLib.ErgoBoxCandidateBuilder(
     ergoLib.BoxValue.from_i64(ergoLib.I64.from_str(value.toString())),
     ergoLib.Contract.pay_to_address(ergoLib.Address.from_base58(address)),
-    height
+    height,
   );
 
   boxBuilder.set_register_value(
     4,
-    ergoLib.Constant.from_byte_array(hexToUint8Array(wid))
+    ergoLib.Constant.from_byte_array(hexToUint8Array(wid)),
   );
 
   boxBuilder.set_register_value(
     5,
-    ergoLib.Constant.from_i64(ergoLib.I64.from_str(rwtCount.toString()))
+    ergoLib.Constant.from_i64(ergoLib.I64.from_str(rwtCount.toString())),
   );
 
   boxBuilder.add_token(
     ergoLib.TokenId.from_str(awcNft),
-    ergoLib.TokenAmount.from_i64(ergoLib.I64.from_str('1'))
+    ergoLib.TokenAmount.from_i64(ergoLib.I64.from_str('1')),
   );
 
   boxBuilder.add_token(
     ergoLib.TokenId.from_str(rsn),
-    ergoLib.TokenAmount.from_i64(ergoLib.I64.from_str(rsnCollateral.toString()))
+    ergoLib.TokenAmount.from_i64(
+      ergoLib.I64.from_str(rsnCollateral.toString()),
+    ),
   );
 
   return boxBuilder.build();
@@ -60,7 +62,7 @@ export const generateCollateralBox = (
 export const generateTx = (
   txId: string,
   inputs: string[],
-  outputs: ergoLib.ErgoBox[]
+  outputs: ergoLib.ErgoBox[],
 ): Transaction => {
   return {
     id: txId,
@@ -73,12 +75,12 @@ export const generateTx = (
 export const toErgoBox = (
   boxCandidate: ergoLib.ErgoBoxCandidate,
   txId: string,
-  boxIndex: number
+  boxIndex: number,
 ): ergoLib.ErgoBox =>
   ergoLib.ErgoBox.from_box_candidate(
     boxCandidate,
     ergoLib.TxId.from_str(txId),
-    boxIndex
+    boxIndex,
   );
 
 export const txId1 =
@@ -104,8 +106,8 @@ export const collateralBoxesTx1 = [
       data.wid,
       data.rwtCount,
       rsn,
-      data.rsnCollateral
-    )
+      data.rsnCollateral,
+    ),
   )
   .map((box, i) => toErgoBox(box, txId1, i));
 export const tx1 = generateTx(txId1, [], collateralBoxesTx1);
@@ -137,14 +139,14 @@ export const collateralBoxesTx2 = [
       data.wid,
       data.rwtCount,
       rsn,
-      data.rsnCollateral
-    )
+      data.rsnCollateral,
+    ),
   )
   .map((box, i) => toErgoBox(box, txId2, i));
 export const tx2 = generateTx(
   txId2,
   collateralBoxesTx1.map((box) => box.box_id().to_str()).slice(0, 2),
-  collateralBoxesTx2
+  collateralBoxesTx2,
 );
 export const block2: BlockEntity = {
   id: 20,
@@ -176,8 +178,8 @@ export const collateralBoxesTx3 = [
       data.wid,
       data.rwtCount,
       rsn,
-      data.rsnCollateral
-    )
+      data.rsnCollateral,
+    ),
   )
   .map((box, i) => toErgoBox(box, txId3, i));
 export const tx3 = generateTx(txId3, [], collateralBoxesTx3);

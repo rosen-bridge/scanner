@@ -1,5 +1,93 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 6.2.1
+
+### Patch Changes
+
+- Update @rosen-bridge/rosen-extractor version to 9.0.0
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.1.1
+
+## 6.2.0
+
+### Minor Changes
+
+- Upgrade to Node.js version 22.18.0
+
+### Patch Changes
+
+- Rename observation-extractor package to abstract-observation-extractor
+
+## 6.1.6
+
+### Patch Changes
+
+- Update package license to MIT
+- Update dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@3.0.1
+  - @rosen-bridge/bitcoin-rpc-scanner@3.0.1
+  - @rosen-bridge/observation-extractor@7.1.4
+
+## 6.1.5
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/observation-extractor@7.1.3
+
+## 6.1.4
+
+### Patch Changes
+
+- Update network clients and ethers and rateLimitedAxios packages
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@7.3.3
+  - @rosen-bridge/bitcoin-esplora-scanner@3.0.0
+  - @rosen-bridge/bitcoin-rpc-scanner@3.0.0
+  - @rosen-bridge/observation-extractor@7.1.2
+
+## 6.1.3
+
+### Patch Changes
+
+- Use rate limiting methods using @rosen-bridge/rate-limited-axios to prevent overwhelming the endpoints
+- Updated dependencies
+  - @rosen-bridge/rosen-extractor@7.3.0
+  - @rosen-bridge/observation-extractor@7.1.1
+  - @rosen-bridge/bitcoin-esplora-scanner@2.0.1
+  - @rosen-bridge/bitcoin-rpc-scanner@2.0.1
+
+## 6.1.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@2.0.0
+  - @rosen-bridge/bitcoin-rpc-scanner@2.0.0
+
+## 6.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/bitcoin-rpc-scanner@1.2.1
+  - @rosen-bridge/bitcoin-esplora-scanner@1.2.1
+
+## 6.1.0
+
+### Minor Changes
+
+- Unify and move shared interfaces and update all package dependencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @rosen-bridge/bitcoin-esplora-scanner@1.2.0
+  - @rosen-bridge/bitcoin-rpc-scanner@1.2.0
+  - @rosen-bridge/observation-extractor@7.1.0
+  - @rosen-bridge/tokens@3.1.0
+  - @rosen-bridge/rosen-extractor@7.2.2
+
 ## 6.0.0
 
 ### Major Changes

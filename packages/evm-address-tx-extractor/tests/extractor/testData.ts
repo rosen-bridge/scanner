@@ -1,4 +1,9 @@
-import { JsonRpcProvider, Transaction, TransactionResponse } from 'ethers';
+import {
+  JsonRpcProvider,
+  Transaction,
+  TransactionResponse,
+  TransactionResponseParams,
+} from 'ethers';
 import { EvmTxStatus } from '../../lib';
 
 export const address = '0x103931ca7ea5a385918e77e64fdd96430f6d2eca';
@@ -59,7 +64,13 @@ export const txs: Array<TransactionResponse> = [
     },
     hash: '0x51aff9363672214b387a471b7c973de7fa06cd020d7e46f5b11e7794ff4dc29b',
   }),
-].map((tx) => new TransactionResponse(tx as any, new JsonRpcProvider()));
+].map(
+  (tx) =>
+    new TransactionResponse(
+      tx as unknown as TransactionResponseParams,
+      new JsonRpcProvider(),
+    ),
+);
 
 export const expectedExtractedTxs = [
   {

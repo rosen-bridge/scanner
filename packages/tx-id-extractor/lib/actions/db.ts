@@ -1,5 +1,5 @@
 import { TxIdEntity } from '../entities/TxIdEntity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
@@ -19,7 +19,7 @@ export class TxAction {
    */
   deleteBlockTxs = async (blockId: string, extractor: string) => {
     this.logger.info(
-      `Deleting transaction in block ${blockId} and extractor ${extractor}`
+      `Deleting transaction in block ${blockId} and extractor ${extractor}`,
     );
     await this.repository
       .createQueryBuilder()
@@ -41,13 +41,13 @@ export class TxAction {
   storeTxs = async (txIds: Array<string>, block: Block, extractor: string) => {
     await this.deleteBlockTxs(block.hash, extractor);
     this.logger.info(
-      `Inserting new transactions in block ${block} and extractor ${extractor}`
+      `Inserting new transactions in block ${block} and extractor ${extractor}`,
     );
     await this.repository
       .createQueryBuilder()
       .insert()
       .values(
-        txIds.map((item) => ({ txId: item, extractor, blockId: block.hash }))
+        txIds.map((item) => ({ txId: item, extractor, blockId: block.hash })),
       )
       .execute();
   };

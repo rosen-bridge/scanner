@@ -28,7 +28,7 @@ export class ExplorerNetwork {
       value: box.value,
       additionalRegisters: mapValues(
         box.additionalRegisters,
-        'serializedValue'
+        'serializedValue',
       ),
       assets:
         box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
@@ -50,7 +50,7 @@ export class ExplorerNetwork {
       value: box.value,
       additionalRegisters: mapValues(
         box.additionalRegisters,
-        'serializedValue'
+        'serializedValue',
       ),
       assets:
         box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
@@ -62,7 +62,7 @@ export class ExplorerNetwork {
    * @param tx
    */
   private convertTransaction = (
-    tx: V1.TransactionInfo
+    tx: V1.TransactionInfo,
   ): ExtendedTransaction => {
     return {
       id: tx.id,
@@ -118,7 +118,7 @@ export class ExplorerNetwork {
     address: string,
     fromHeight: number,
     toHeight: number,
-    limit = API_LIMIT
+    limit = API_LIMIT,
   ): Promise<{ items: Array<ExtendedTransaction>; total: number }> => {
     const txs = await this.api.v1.getApiV1AddressesP1Transactions(address, {
       fromHeight,
@@ -127,7 +127,7 @@ export class ExplorerNetwork {
     });
     if (!txs.items)
       throw new Error(
-        'Explorer AddressTransactions api expected to have items'
+        'Explorer AddressTransactions api expected to have items',
       );
     return {
       items: txs.items.map((tx) => this.convertTransaction(tx)),
@@ -154,11 +154,11 @@ export class ExplorerNetwork {
     const block = await this.api.v1.getApiV1BlocksP1(blockId);
     if (!block.block.blockTransactions) {
       throw new Error(
-        `Expected explorer block api to include block transactions for block ${blockId}`
+        `Expected explorer block api to include block transactions for block ${blockId}`,
       );
     }
     return block.block.blockTransactions.map((tx) =>
-      this.convertBlockTransaction(tx)
+      this.convertBlockTransaction(tx),
     );
   };
 }

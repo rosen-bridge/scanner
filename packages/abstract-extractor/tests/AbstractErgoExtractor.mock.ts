@@ -21,10 +21,12 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<
 
   initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
 
-  hasData = (box: V1.OutputInfo | OutputBox) => false;
+  hasData = (
+    box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => false;
 
   extractBoxData = (
-    box: V1.OutputInfo | OutputBox
+    box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): AbstractBoxData | undefined => {
     return undefined;
   };
