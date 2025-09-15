@@ -27,5 +27,5 @@ export abstract class AbstractExtractor<TransactionType> {
    * initialize extractor database with data created below the initial height
    * @param initialBlock
    */
-  abstract initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
+  abstract initializeData: (initialBlock: BlockInfo) => Promise<void>;
 }

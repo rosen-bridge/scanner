@@ -19,7 +19,7 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<
 
   getId = () => 'Test';
 
-  initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
+  initializeData: (initialBlock: BlockInfo) => Promise<void>;
 
   hasData = (
     box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
