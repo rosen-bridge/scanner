@@ -29,8 +29,7 @@ let tasks = {
 if (!process.env.CI) {
   tasks = {
     '*.ts': () => 'npm run type-check',
-    '*.{js,ts}': ['eslint --fix'],
-    '*.{js,ts}': 'npm run test -- related --run',
+    '*.{js,ts}': ['eslint --fix', 'npm run test -- related --run'],
     '*': 'prettier --ignore-unknown --write',
     ...tasks,
   };
