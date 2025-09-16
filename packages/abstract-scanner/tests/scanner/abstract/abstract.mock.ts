@@ -69,49 +69,31 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
   };
 }
 
-export const generateMockScannerClass = (name: string) => {
-  return class ScannerTest extends AbstractScanner<TestTransaction> {
-    name = (): string => name;
+export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
+  constructor(
+    private scannerName: string,
+    dataSource: DataSource,
+  ) {
+    super();
+    this.action = new BlockDbAction(dataSource, scannerName);
+  }
 
-    constructor(dataSource: DataSource) {
-      super();
-      this.action = new BlockDbAction(dataSource, this.name());
-    }
+  name = (): string => this.scannerName;
+}
+
+export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
+  constructor(
+    name: string,
+    dataSource: DataSource,
+    networkConnector: NetworkConnectorTest,
+  ) {
+    super(name, dataSource, 0, networkConnector, 100, undefined);
+  }
+
+  getFirstBlock = async (): Promise<Block> => {
+    return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
   };
-};
-
-export const generateMockGeneralScannerByBlockRetrieveGapClass = (
-  name: string,
-) => {
-  return class ScannerTest extends GeneralScanner<TestTransaction> {
-    constructor(
-      dataSource: DataSource,
-      networkConnector: NetworkConnectorTest,
-    ) {
-      super(name, dataSource, 0, networkConnector, 100, undefined);
-      this.action = new BlockDbAction(dataSource, this.name());
-    }
-
-    getFirstBlock = async (): Promise<Block> => {
-      return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
-    };
-  };
-};
-
-export const generateMockGeneralScannerClass = (name: string) => {
-  return class ScannerTest extends GeneralScanner<TestTransaction> {
-    constructor(
-      dataSource: DataSource,
-      networkConnector: NetworkConnectorTest,
-    ) {
-      super(name, dataSource, 0, networkConnector, 100, undefined);
-    }
-
-    getFirstBlock = async (): Promise<Block> => {
-      return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
-    };
-  };
-};
+}
 
 export const createDatabase = async () => {
   const dataSource = new DataSource({
