@@ -49,6 +49,7 @@ export class ErgoBoxInitializer<
       maxParallelRequests,
       logger,
     );
+    this.spendRecords = [];
   }
 
   /**

@@ -6,7 +6,7 @@ import { requestWithRetrial } from '../../utils';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import PQueue from 'p-queue';
-import { WorkerManager } from './WorkerManager';
+import { WorkerManager } from './workerManager';
 
 export class ExplorerInitializationStrategy {
   private network: ExplorerNetwork;

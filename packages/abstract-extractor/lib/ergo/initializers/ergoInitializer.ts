@@ -8,8 +8,8 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 import { AbstractEntityData, ExtendedTransaction } from '../interfaces';
 
-import { ExplorerInitializationStrategy } from './strategies/ExplorerInitializationStrategy';
-import { NodeInitializationStrategy } from './strategies/NodeInitializationStrategy';
+import { ExplorerInitializationStrategy } from './strategies/explorerInitializationStrategy';
+import { NodeInitializationStrategy } from './strategies/nodeInitializationStrategy';
 import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
 import { MAX_PARALLEL_REQUESTS } from '../../constants';

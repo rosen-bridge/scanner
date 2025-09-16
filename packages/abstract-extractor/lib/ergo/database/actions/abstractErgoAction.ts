@@ -149,6 +149,9 @@ export abstract class AbstractErgoAction<
     block: string,
     extractor: string,
   ): Promise<{ deletedData: ExtractedData[]; updatedData: EntityInfo[] }> => {
+    this.logger.debug(
+      `Deleting data in block ${block} and extractor ${extractor}`,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -197,6 +200,9 @@ export abstract class AbstractErgoAction<
     block: BlockInfo,
     extractor: string,
   ): Promise<boolean> => {
+    this.logger.debug(
+      `Storing entities in block ${block} and extractor ${extractor}`,
+    );
     let entitiesToInsert: ExtractedData[] = [],
       entitiesToUpdate: ExtractedData[] = [];
     const queryRunner = this.dataSource.createQueryRunner();
@@ -222,7 +228,9 @@ export abstract class AbstractErgoAction<
       entitiesToInsert = difference(entities, entitiesToUpdate);
 
       if (entitiesToInsert.length > 0) {
-        this.logger.debug(`Inserting entities`);
+        this.logger.debug(
+          `Inserting ${entitiesToInsert.length} new entities to database`,
+        );
         await this.insertEntities(
           queryRunner,
           entitiesToInsert,
@@ -258,6 +266,7 @@ export abstract class AbstractErgoAction<
    * @param extractorId
    */
   removeAllData = async (extractorId: string) => {
+    this.logger.debug(`Removing all old data for extractor ${extractorId}`);
     await this.repository.delete({
       extractor: extractorId,
     } as FindOptionsWhere<ExtractorEntity>);

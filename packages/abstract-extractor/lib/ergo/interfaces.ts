@@ -1,4 +1,8 @@
-import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  ErgoNetworkType,
+  OutputBox,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 export interface ErgoBox extends OutputBox {
   blockId: string;
@@ -66,3 +70,11 @@ export interface RangeQuery {
  * one. So, any range in the list supersedes all the ranges that come after it.
  * */
 export type RangeList = RangeQuery[];
+
+export interface InitializeOptions {
+  active: Boolean;
+  type: ErgoNetworkType;
+  url: string;
+  address: string;
+  maxParallelRequests?: number;
+}

@@ -1,7 +1,7 @@
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
 import {
@@ -9,9 +9,11 @@ import {
   CallbackType,
   CallbackMap,
   CallbackDataMap,
+  InitializeOptions,
 } from '../interfaces';
 import { AbstractErgoBoxEntity } from '../database/entities/abstractErgoBoxEntity';
 import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
+import { ErgoInitializer } from '../initializers';
 
 export abstract class AbstractErgoExtractor<
   ExtractedData extends AbstractEntityData,
@@ -21,7 +23,6 @@ export abstract class AbstractErgoExtractor<
     ExtractedData,
     ExtractorEntity
   >;
-  protected logger: AbstractLogger;
   protected callbacks: {
     [K in CallbackType]: Map<string, CallbackMap<ExtractedData>[K]>;
   } = {
@@ -32,9 +33,11 @@ export abstract class AbstractErgoExtractor<
   };
   private callbackMutex = new Mutex();
 
-  constructor(logger = new DummyLogger()) {
+  constructor(
+    protected initializeOptions?: InitializeOptions,
+    protected logger = new DummyLogger(),
+  ) {
     super();
-    this.logger = logger;
   }
 
   /**
@@ -102,5 +105,26 @@ export abstract class AbstractErgoExtractor<
       this.triggerCallbacks(CallbackType.Delete, result.deletedData);
     if (result.updatedData.length > 0)
       this.triggerCallbacks(CallbackType.Update, result.updatedData);
+  };
+
+  /**
+   * initialize extractor database with data created below the initial height
+   * @param initialBlock
+   */
+  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
+    if (this.initializeOptions && this.initializeOptions.active) {
+      const initializer = new ErgoInitializer(
+        this.initializeOptions.type,
+        this.initializeOptions.url,
+        this.initializeOptions.address,
+        this.getId(),
+        this.processTransactions,
+        this.actions,
+        this.initializeOptions.maxParallelRequests,
+        this.logger,
+      );
+      await initializer.initializeData(initialBlock);
+    } else
+      this.logger.info(`Initializiation for [${this.getId()}] is turned off`);
   };
 }

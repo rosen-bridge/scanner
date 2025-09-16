@@ -12,10 +12,12 @@ import {
   SpendInfo,
   CallbackType,
   TxExtra,
+  InitializeOptions,
 } from '../interfaces';
 import { AbstractErgoBoxEntity } from '../database/entities/abstractErgoBoxEntity';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
 import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
+import { ErgoBoxInitializer } from '../initializers/ergoBoxInitializer';
 
 export abstract class AbstractErgoBoxExtractor<
   ExtractedData extends AbstractEntityData,
@@ -26,9 +28,8 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractorEntity
   >;
 
-  constructor(logger: AbstractLogger) {
-    super(logger);
-    this.logger = logger;
+  constructor(initializeOptions: InitializeOptions, logger?: AbstractLogger) {
+    super(initializeOptions, logger);
   }
 
   /**
@@ -142,5 +143,27 @@ export abstract class AbstractErgoBoxExtractor<
       return false;
     }
     return true;
+  };
+
+  /**
+   * initialize extractor database with data created below the initial height
+   * @param initialBlock
+   */
+  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
+    if (this.initializeOptions && this.initializeOptions.active) {
+      const initializer = new ErgoBoxInitializer(
+        this.initializeOptions.type,
+        this.initializeOptions.url,
+        this.initializeOptions.address,
+        this.getId(),
+        this.hasData,
+        this.processTransactions,
+        this.actions,
+        this.initializeOptions.maxParallelRequests,
+        this.logger,
+      );
+      await initializer.initializeData(initialBlock);
+    } else
+      this.logger.info(`Initializiation for [${this.getId()}] is turned off`);
   };
 }

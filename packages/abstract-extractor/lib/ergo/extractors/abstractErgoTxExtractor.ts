@@ -2,7 +2,11 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { Transaction, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { AbstractEntityData, CallbackType } from '../interfaces';
+import {
+  AbstractEntityData,
+  CallbackType,
+  InitializeOptions,
+} from '../interfaces';
 import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
 import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
@@ -16,8 +20,8 @@ export abstract class AbstractErgoTxExtractor<
     ExtractorEntity
   >;
 
-  constructor(logger: AbstractLogger) {
-    super(logger);
+  constructor(initializeOptions: InitializeOptions, logger: AbstractLogger) {
+    super(initializeOptions, logger);
     this.logger = logger;
   }
 
