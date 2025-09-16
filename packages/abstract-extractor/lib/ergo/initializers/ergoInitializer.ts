@@ -6,27 +6,20 @@ import {
   ErgoNetworkType,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import {
-  AbstractEntityData,
-  ExtendedSpendInfo,
-  ExtendedTransaction,
-} from '../interfaces';
+import { AbstractEntityData, ExtendedTransaction } from '../interfaces';
 
 import { ExplorerInitializationStrategy } from './strategies/ExplorerInitializationStrategy';
 import { NodeInitializationStrategy } from './strategies/NodeInitializationStrategy';
-import { MAX_PARALLEL_REQUESTS } from '../../constants';
 import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
+import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
-export abstract class ErgoInitializer<
+export class ErgoInitializer<
   ExtractedData extends AbstractEntityData,
   ExtractorEntity extends AbstractErgoEntity,
 > {
-  private dbMutex = new Mutex();
-  private spendRecordsMutex = new Mutex();
-  private spendRecords: ExtendedSpendInfo[];
-
-  private initializationStrategy:
+  protected dbMutex = new Mutex();
+  protected initializationStrategy:
     | ExplorerInitializationStrategy
     | NodeInitializationStrategy;
 
@@ -48,7 +41,7 @@ export abstract class ErgoInitializer<
         url,
         address,
         maxParallelRequests,
-        processTransactions,
+        this.processTransactions,
         this.processTransactionBatch,
         logger,
       );
@@ -61,8 +54,26 @@ export abstract class ErgoInitializer<
         logger,
       );
     } else throw new Error(`Network type ${type} is not supported`);
-    this.spendRecords = [];
   }
+
+  /**
+   * override this function to store extra information of a transaction batch
+   * @param txs list of transactions
+   * @returns
+   */
+  protected storeExtraInfo(
+    txs: ExtendedTransaction[], // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  /**
+   * override this function to apply extra information to the extractor database
+   * @returns
+   */
+  protected applyExtraInfo = (): Promise<void> => {
+    return Promise.resolve();
+  };
 
   /**
    * Process a batch of transactions
@@ -92,74 +103,7 @@ export abstract class ErgoInitializer<
     }
     release();
     this.logger.debug(`storing spend info of transaction batch`);
-    await this.storeSpendInfoBatch(txs);
-  };
-
-  /**
-   * Extracts spending information of all related boxes in the transaction
-   * Note: override this function if the extractor needs extra spending info
-   * @param tx
-   * @returns transaction spend info
-   */
-  protected extractTxSpendInfo = (
-    tx: ExtendedTransaction,
-  ): ExtendedSpendInfo[] => {
-    const txSpendInfo = [];
-    for (let i = 0; i < tx.inputs.length; i++) {
-      const box = tx.inputs[i];
-      if (this.hasData(box)) {
-        txSpendInfo.push({
-          boxId: box.boxId,
-          txId: box.transactionId,
-          index: i,
-          height: tx.inclusionHeight,
-          block: tx.blockId,
-        });
-      }
-    }
-    return txSpendInfo;
-  };
-
-  /**
-   * Extract and store all spending information of a transaction batch
-   * @param txs
-   */
-  private storeSpendInfoBatch = async (
-    txs: ExtendedTransaction[],
-  ): Promise<void> => {
-    const spendRecordsBatch: ExtendedSpendInfo[] = [];
-    for (const tx of txs) {
-      spendRecordsBatch.push(...this.extractTxSpendInfo(tx));
-    }
-    const release = await this.spendRecordsMutex.acquire();
-    this.spendRecords.push(...spendRecordsBatch);
-    release();
-    this.logger.debug(`Stored ${spendRecordsBatch.length} new spend records`);
-  };
-
-  /**
-   * Apply stored spend records into extractor database
-   * Note: As transactions are processed out of order (due to parallel
-   * processing), some box spend information may be invalid after the first pass
-   * To avoid processing everything twice, we keep all spend records in the
-   * first pass and reapply them at the end
-   */
-  private applySpendRecords = async () => {
-    const sortedRecords = sortBy(this.spendRecords, (record) => record.height);
-    const groupedRecords = groupBy(sortedRecords, (tx) => tx.block);
-    this.logger.debug(
-      `Spend records grouped to ${Object.keys(groupedRecords).length} blocks`,
-    );
-    const release = await this.dbMutex.acquire();
-    for (const blockId in groupedRecords) {
-      const blockRecords = groupedRecords[blockId];
-      const block = { hash: blockId, height: blockRecords[0].height };
-      this.logger.debug(
-        `Processing spend records at height ${blockRecords[0].height}`,
-      );
-      await this.actions.spendBoxes(blockRecords, block, this.extractorId);
-    }
-    release();
+    await this.storeExtraInfo(txs);
   };
 
   /**
@@ -170,12 +114,10 @@ export abstract class ErgoInitializer<
    * @param initialBlock
    */
   initializeData = async (initialBlock: BlockInfo) => {
-    this.logger.debug(
-      `Initializing ${this.extractorId} started, removing all existing data`,
-    );
+    this.logger.info(`Initialization process for ${this.extractorId} started`);
     await this.actions.removeAllData(this.extractorId);
     await this.initializationStrategy.initialize(initialBlock);
-    await this.applySpendRecords();
+    await this.applyExtraInfo();
     this.logger.info(
       `Initialization completed successfully for ${this.extractorId}`,
     );
