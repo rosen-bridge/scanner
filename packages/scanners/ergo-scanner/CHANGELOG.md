@@ -1,7 +1,5 @@
 # @rosen-bridge/ergo-scanner
 
----
-
 ## 0.1.0
 
 - This package was **extracted** from `@rosen-bridge/scanner`.  

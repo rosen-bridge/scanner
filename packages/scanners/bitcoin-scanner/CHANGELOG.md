@@ -1,7 +1,5 @@
 # @rosen-bridge/bitcoin-scanner
 
----
-
 ## 0.1.0
 
 - This package was **integrated** from `@rosen-bridge/bitcoin-esplora-scanner` and `@rosen-bridge/bitcoin-rpc-scanner`.  

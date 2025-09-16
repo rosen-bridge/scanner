@@ -1,13 +1,20 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Defines all scanner interfaces",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "lint": "eslint --fix . && npm run prettify",

@@ -3,6 +3,7 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+
 import { FraudExtractor } from '../../lib';
 import { FraudEntity } from '../../lib';
 import {
@@ -372,7 +373,7 @@ describe('fraudExtractor', () => {
       );
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
-        .mockImplementation();
+        .mockImplementation(vi.fn());
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
@@ -415,7 +416,7 @@ describe('fraudExtractor', () => {
       );
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
-        .mockImplementation();
+        .mockImplementation(vi.fn());
       insertFraudEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });

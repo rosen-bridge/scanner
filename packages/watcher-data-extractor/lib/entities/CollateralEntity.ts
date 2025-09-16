@@ -39,7 +39,7 @@ class CollateralEntity {
   @Column({ nullable: true, type: 'varchar' })
   spendBlock?: string | null;
 
-  @Column({ nullable: true, type: 'int' })
+  @Column({ nullable: true, type: 'integer' })
   spendHeight?: number | null;
 
   @Column({ nullable: true, type: 'varchar' })
