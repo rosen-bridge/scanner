@@ -20,28 +20,19 @@ const perPackage = (resolver) => (files) => {
   );
 };
 
-export default {
-  '*': 'prettier --ignore-unknown --write',
-  '*.ts': () => 'npm run type-check --workspaces',
-  '*.{js,ts}': 'eslint --fix',
-  '**/{*.ts,package.json}': perPackage((directory) => {
-    const packages = [
-      'tsx',
-      '@vitest/coverage-istanbul',
-      '@types/json-bigint',
-      '@typescript-eslint/eslint-plugin',
-      '@typescript-eslint/parser',
-      '@types/node',
-      'eslint-config-prettier',
-    ];
-
-    const paths = ['vitest.config.ts.timestamp-*'];
-
-    return `npx depcheck ${path.relative(
-      process.cwd(),
-      directory,
-    )} --ignores="${packages.join(', ')}" --ignore-patterns="${paths.join(
-      ',',
-    )}"`;
+let tasks = {
+  '**/{*.ts,*.js,package.json}': perPackage((directory) => {
+    return `npx depcheck ${path.relative(process.cwd(), directory)}`;
   }),
 };
+
+if (!process.env.CI) {
+  tasks = {
+    '*.ts': () => 'npm run type-check',
+    '*.{js,ts}': ['eslint --fix', 'npm run test -- related --run'],
+    '*': 'prettier --ignore-unknown --write',
+    ...tasks,
+  };
+}
+
+export default tasks;

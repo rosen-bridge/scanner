@@ -202,7 +202,7 @@ describe('CollateralExtractor', () => {
       );
       const tidyUpStoredCollateralsSpy = vi
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
-        .mockImplementation();
+        .mockImplementation(vi.fn());
 
       await collateralExtractor.initializeBoxes({
         height: testData.height1 + 10,

@@ -4,7 +4,7 @@
     "rootDir": "./lib"
   },
   "references": [
-    { "path": "../../abstract-scanner" },
+    { "path": "../../abstract-scanner/tsconfig.build.json" },
     { "path": "../../scanner-interfaces/tsconfig.build.json" }
   ]
 }

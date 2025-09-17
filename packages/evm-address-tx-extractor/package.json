@@ -2,12 +2,19 @@
   "name": "@rosen-bridge/evm-address-tx-extractor",
   "version": "1.2.0",
   "description": "Extract and store EVM chain notable data of transactions for an address",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "coverage": "npm run test -- --coverage",
@@ -29,7 +36,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.1.0",
-    "@rosen-bridge/abstract-logger": "^2.0.1",
+    "@rosen-bridge/abstract-logger": "^2.1.0",
     "@rosen-bridge/extended-typeorm": "^0.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.0",
     "ethers": "6.13.2"
