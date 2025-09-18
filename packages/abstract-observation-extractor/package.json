@@ -2,12 +2,16 @@
   "name": "@rosen-bridge/abstract-observation-extractor",
   "version": "0.1.1",
   "description": "Event observation data extractor for different chains",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "author": "Rosen Team",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build tsconfig.build.json",
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "prettify": "prettier --write . --ignore-path  ../../.gitignore",
@@ -16,7 +20,8 @@
     "type-check": "tsc --noEmit"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.1.0",

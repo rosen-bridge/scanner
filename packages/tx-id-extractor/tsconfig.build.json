@@ -5,7 +5,7 @@
   },
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
-    { "path": "../../abstract-scanner/tsconfig.build.json" },
-    { "path": "../../scanner-interfaces/tsconfig.build.json" }
+    { "path": "../abstract-extractor/tsconfig.build.json" },
+    { "path": "../scanner-interfaces/tsconfig.build.json" }
   ]
 }

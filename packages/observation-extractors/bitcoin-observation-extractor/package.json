@@ -2,12 +2,19 @@
   "name": "@rosen-bridge/bitcoin-observation-extractor",
   "version": "6.2.1",
   "description": "Event observation data extractor for Bitcoin chain",
-  "repository": "https://github.com/rosen-bridge/scanner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "lint": "eslint --fix . && npm run prettify",
