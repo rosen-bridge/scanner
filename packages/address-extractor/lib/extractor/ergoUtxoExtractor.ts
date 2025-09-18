@@ -3,7 +3,7 @@ import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
-  AbstractInitializableErgoExtractor,
+  AbstractErgoBoxExtractor,
   boxHasToken,
 } from '@rosen-bridge/abstract-extractor';
 import { OutputBox, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
@@ -13,7 +13,7 @@ import { JsonBI } from '../utils';
 import { ExtractedBox } from '../interfaces/types';
 import { BoxEntity } from '../entities/boxEntity';
 
-export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
+export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
   ExtractedBox,
   BoxEntity
 > {
@@ -34,7 +34,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
     logger?: AbstractLogger,
     initialize = true,
   ) {
-    super(type, url, address, logger, initialize);
+    super({ type, url, address, active: initialize }, logger);
     this.id = id;
     this.networkType = networkType;
     this.ergoTree = address
@@ -69,7 +69,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
   extractBoxData = (box: OutputBox): ExtractedBox | undefined => {
     const ergoBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
     return {
-      boxId: ergoBox.box_id().to_str(),
+      identifier: ergoBox.box_id().to_str(),
       address: ergoLib.Address.recreate_from_ergo_tree(
         ergoLib.ErgoTree.from_base16_bytes(
           ergoBox.ergo_tree().to_base16_bytes(),

@@ -1,4 +1,4 @@
-import { RangeQuery } from '../../lib/ergo/interfaces';
+import { RangeQuery } from '../../../lib/ergo/interfaces';
 
 export const mockRangeQuery: RangeQuery = {
   start: 1000,
@@ -26,7 +26,7 @@ export const mockRangeList = [
 
 export const mockGetRangeTxCount = async (
   start: number,
-  end: number
+  end: number,
 ): Promise<number> => {
   return end - start;
 };

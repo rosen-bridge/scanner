@@ -366,7 +366,7 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
       const mockedInit = vi
-        .spyOn(extractor, 'initializeBoxes')
+        .spyOn(extractor, 'initializeData')
         .mockImplementation(vi.fn());
       await scanner['initializeExtractors'](['test'], {
         height: 100,
@@ -396,7 +396,7 @@ describe('AbstractScanner', () => {
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
       const mockedInit = vi
-        .spyOn(extractor, 'initializeBoxes')
+        .spyOn(extractor, 'initializeData')
         .mockImplementation(vi.fn());
       await scanner['initializeExtractors'](['test2'], {
         height: 100,

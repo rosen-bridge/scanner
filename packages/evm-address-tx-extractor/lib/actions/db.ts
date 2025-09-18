@@ -2,7 +2,7 @@ import { AddressTxsEntity } from '../entities/AddressTxsEntity';
 import { ExtractedTx } from '../interfaces/types';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 export class TxAction {
   private readonly repository: Repository<AddressTxsEntity>;
@@ -41,7 +41,7 @@ export class TxAction {
    */
   storeTxs = async (
     txs: Array<ExtractedTx>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ) => {
     await this.deleteBlockTxs(block.hash, extractor);

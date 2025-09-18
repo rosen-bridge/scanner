@@ -5,7 +5,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { components } from '@blockfrost/openapi';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import {
   ObservationEntityAction,
@@ -52,7 +52,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<Blo
    */
   processTransactions = (
     txs: Array<BlockFrostTransaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -108,7 +108,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<Blo
    * Extractor box initialization
    * No action needed in cardano extractors
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

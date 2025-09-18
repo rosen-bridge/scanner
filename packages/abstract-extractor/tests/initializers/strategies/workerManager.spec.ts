@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import { WorkerManager } from '../../lib/ergo/initializers/strategies/WorkerManager';
+import { WorkerManager } from '../../../lib/ergo/initializers/strategies/workerManager';
 import {
   mockGetRangeTxCount,
   mockRangeList,
   mockRangeQuery,
-} from './WorkerManager.mock';
+} from './workerManager.mock';
 
 describe('WorkerManager', () => {
   describe('isWorkerActive', () => {

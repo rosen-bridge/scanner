@@ -1,9 +1,9 @@
 import { DataSource, In } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
-  AbstractInitializableErgoExtractorAction,
-  BoxInfo,
+  AbstractErgoBoxAction,
   DB_CHUNK_SIZE,
+  EntityInfo,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
@@ -11,17 +11,14 @@ import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
-import { chunk, pick } from 'lodash-es';
+import { chunk, omit, pick, set } from 'lodash-es';
 
-class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
+class EventTriggerAction extends AbstractErgoBoxAction<
   ExtractedEventTrigger,
   EventTriggerEntity
 > {
-  private readonly dataSource: DataSource;
-
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
     super(dataSource, EventTriggerEntity, logger);
-    this.dataSource = dataSource;
   }
 
   /**
@@ -35,7 +32,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
     return triggerBoxes.map((trigger) => ({
       txId: trigger.txId,
       eventId: trigger.eventId,
-      boxId: trigger.boxId,
+      identifier: trigger.identifier,
       serialized: trigger.serialized,
       block: block.hash,
       height: block.height,
@@ -67,7 +64,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
       pick(data, [
         'eventId',
         'txId',
-        'boxId',
+        'identifier',
         'serialized',
         'fromChain',
         'toChain',
@@ -100,17 +97,17 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
     spendInfoArray: Array<SpendInfo>,
     block: BlockInfo,
     extractorId: string,
-  ): Promise<BoxInfo[]> => {
+  ): Promise<EntityInfo[]> => {
     const spentData = [];
     const spendInfoChunks = chunk(spendInfoArray, DB_CHUNK_SIZE);
     for (const spendInfoChunk of spendInfoChunks) {
       const spentTriggers = await this.repository.findBy({
-        boxId: In(spendInfoChunk.map((spendInfo) => spendInfo.boxId)),
+        identifier: In(spendInfoChunk.map((spendInfo) => spendInfo.boxId)),
         extractor: extractorId,
       });
       for (const spentTrigger of spentTriggers) {
         const spendInfo = spendInfoChunk.find(
-          (info) => info.boxId === spentTrigger.boxId,
+          (info) => info.boxId === spentTrigger.identifier,
         );
         if (!spendInfo || !spendInfo.extras || !spendInfo.extras.result) {
           throw Error(
@@ -120,7 +117,7 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
           );
         }
         await this.repository.update(
-          { boxId: spendInfo.boxId, extractor: extractorId },
+          { identifier: spendInfo.boxId, extractor: extractorId },
           {
             spendBlock: block.hash,
             spendHeight: block.height,
@@ -129,9 +126,9 @@ class EventTriggerAction extends AbstractInitializableErgoExtractorAction<
             paymentTxId: spendInfo.extras.paymentTxId || '',
           },
         );
-        spentData.push(pick(spendInfo, ['boxId']));
+        spentData.push({ identifier: spendInfo.boxId });
         this.logger.info(
-          `Spent trigger [${spentTrigger.boxId}] of event [${spentTrigger.eventId}] at height ${block.height}`,
+          `Spent trigger [${spentTrigger.identifier}] of event [${spentTrigger.eventId}] at height ${block.height}`,
         );
         this.logger.debug(
           `Spent trigger: [${JSON.stringify(

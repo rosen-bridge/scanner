@@ -34,22 +34,23 @@ export const delay = async (time: number) =>
  */
 export const requestWithRetrial = async <returnT>(
   request: () => Promise<returnT>,
-  logger = new DummyLogger()
+  logger = new DummyLogger(),
 ): Promise<returnT> => {
   let trial = 0;
-  while (true) {
+  let lastErrorMessage: string | undefined;
+  while (trial < RETRIAL_COUNT) {
     try {
       const result = await request();
       return result;
     } catch (e) {
-      if (trial >= RETRIAL_COUNT)
-        throw new Error(
-          `request failed after ${trial} retrials with error: ${e}`
-        );
+      lastErrorMessage = e instanceof Error ? e.message : String(e);
       trial++;
-      logger.warn(`request failed with error ${e}`);
+      logger.warn(`request failed with error ${lastErrorMessage}`);
       logger.debug(`Retrying the request with retrial step ${trial}`);
       await delay(1000);
     }
   }
+  throw new Error(
+    `request failed after ${trial} retrials with error: ${lastErrorMessage}`,
+  );
 };

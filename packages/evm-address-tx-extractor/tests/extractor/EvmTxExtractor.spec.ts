@@ -50,8 +50,6 @@ describe('EvmTxExtractor', () => {
       await extractor.processTransactions(txs, {
         height: 0,
         hash: 'block 1',
-        parentHash: '',
-        timestamp: 10,
       });
       const elements = await repository.find();
       expect(elements.length).toEqual(expectedExtractedTxs.length);

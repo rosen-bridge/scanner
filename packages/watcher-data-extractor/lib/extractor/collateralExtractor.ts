@@ -54,7 +54,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Transaction[],
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];
@@ -129,7 +129,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    * @return {Promise<void>}
    * @memberof CollateralExtractor
    */
-  initializeBoxes = async (initialBlock: BlockInfo): Promise<void> => {
+  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
       initialBlock.height,
     );

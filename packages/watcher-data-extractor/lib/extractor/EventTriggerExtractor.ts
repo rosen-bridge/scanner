@@ -3,7 +3,7 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { blake2b } from 'blakejs';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
-  AbstractInitializableErgoExtractor,
+  AbstractErgoBoxExtractor,
   CallbackType,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
@@ -20,7 +20,7 @@ import { JsonBI } from '../utils';
 import { EventResult } from '../types';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 
-class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
+class EventTriggerExtractor extends AbstractErgoBoxExtractor<
   ExtractedEventTrigger,
   EventTriggerEntity
 > {
@@ -43,7 +43,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
     logger?: AbstractLogger,
     initialize = true,
   ) {
-    super(type, url, address, logger, initialize);
+    super({ type, url, address, active: initialize }, logger);
     this.id = id;
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
@@ -130,7 +130,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       return {
         eventId: eventId,
         txId: box.transactionId,
-        boxId: box.boxId,
+        identifier: box.boxId,
         serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
           'base64',
         ),
@@ -210,7 +210,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
           });
       });
       if (boxes.length > 0) {
-        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
+        if (!(await this.actions.storeEntities(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed at height ${block.height} for extractor ${this.id}`,
           );

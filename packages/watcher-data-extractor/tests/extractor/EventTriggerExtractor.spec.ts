@@ -92,7 +92,7 @@ describe('EventTriggerExtractor', () => {
         eventId:
           '1e379d551cf0aed106c21a9f4b42ddd3b36349a93de799ed54d600acbe05d313',
         extractor: 'extractorId',
-        boxId: box.box_id().to_str(),
+        identifier: box.box_id().to_str(),
         serialized: Buffer.from(box.sigma_serialize_bytes()).toString('base64'),
         block: 'hash',
         height: 10,

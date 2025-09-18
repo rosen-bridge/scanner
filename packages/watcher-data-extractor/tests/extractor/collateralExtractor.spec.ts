@@ -172,13 +172,13 @@ describe('CollateralExtractor', () => {
     });
   });
 
-  describe('initializeBoxes', () => {
+  describe('initializeData', () => {
     /**
-     * @target initializeBoxes should insert unspent collateral boxes into the
+     * @target initializeData should insert unspent collateral boxes into the
      * DB up to the passed height
      * @dependencies
      * @scenario
-     * - call initializeBoxes
+     * - call initializeData
      * - check if right collaterals have been inserted into the DB
      * @expected
      * - right collaterals should have been inserted into the DB
@@ -204,7 +204,7 @@ describe('CollateralExtractor', () => {
         .spyOn(collateralExtractor as any, 'tidyUpStoredCollaterals')
         .mockImplementation(vi.fn());
 
-      await collateralExtractor.initializeBoxes({
+      await collateralExtractor.initializeData({
         height: testData.height1 + 10,
       } as BlockInfo);
       const [rows, rowsCount] = await repository.findAndCount();

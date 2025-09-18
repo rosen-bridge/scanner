@@ -1,8 +1,8 @@
 import { Registers } from '@rosen-clients/ergo-node';
 import { V1 } from '@rosen-clients/ergo-explorer';
-import { ErgoBox } from '../../lib';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-export const explorerBox = {
+export const explorerOutputBox: V1.OutputInfo = {
   boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
   transactionId:
     'f15985efc66ad527a2917bb73a39a65c91b6b93b5fe6b41f50931e7995b74a25',
@@ -43,6 +43,49 @@ export const explorerBox = {
   spentTransactionId:
     'f6eb4b116e193438028f8c85add462b42e0f539773a2d8d54c884df4a9fb4e34',
   mainChain: true,
+};
+
+export const explorerInputBox: V1.InputInfo = {
+  boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
+  value: 300000n,
+  index: 0,
+  spendingProof: undefined,
+  outputBlockId:
+    '8a95fbe64b202e1829800f16b06ab413efb396370a57bfbd104a0e3f428fd0e9',
+  outputTransactionId:
+    'f15985efc66ad527a2917bb73a39a65c91b6b93b5fe6b41f50931e7995b74a25',
+  outputIndex: 2,
+  outputGlobalIndex: 23793485n,
+  outputCreatedAt: 878778,
+  outputSettledAt: 878781,
+  ergoTree:
+    '10130400040004040400040204000e203ac8a90d0aa8c5c50e99dd2588a990fd37b5d3aee70e32d56241f41ed49e9f030404040004000400010104020400040004000e2026083658fce2ae5b9848ad00b7d72878ca84394a47294460d11c43fa1bae738d05020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
+  ergoTreeConstants:
+    '0: 0\n1: 0\n2: 2\n3: 0\n4: 1\n5: 0\n6: Coll(58,-56,-87,13,10,-88,-59,-59,14,-103,-35,37,-120,-87,-112,-3,55,-75,-45,-82,-25,14,50,-43,98,65,-12,30,-44,-98,-97,3)\n7: 2\n8: 0\n9: 0\n10: 0\n11: true\n12: 1\n13: 0\n14: 0\n15: 0\n16: Coll(38,8,54,88,-4,-30,-82,91,-104,72,-83,0,-73,-41,40,120,-54,-124,57,74,71,41,68,96,-47,28,67,-6,27,-82,115,-115)\n17: 1\n18: true',
+  ergoTreeScript:
+    '{\n  val box1 = OUTPUTS(placeholder[Int](0))\n  val coll2 = SELF.tokens(placeholder[Int](1))._1\n  val bool3 = OUTPUTS.slice(placeholder[Int](2), OUTPUTS.size).filter({(box3: Box) =\u003E box3.tokens.size \u003E placeholder[Int](3) }).exists(\n    {(box3: Box) =\u003E box3.tokens.exists({(tuple5: (Coll[Byte], Long)) =\u003E tuple5._1 == coll2 }) }\n  )\n  val coll4 = SELF.R4[Coll[Coll[Byte]]].get\n  val box5 = OUTPUTS(placeholder[Int](4))\n  val coll6 = box5.tokens\n  val bool7 = coll6.exists({(tuple7: (Coll[Byte], Long)) =\u003E tuple7._1 == coll2 })\n  if (box1.tokens(placeholder[Int](5))._1 == placeholder[Coll[Byte]](6)) {\n    sigmaProp(\n      allOf(\n        Coll[Boolean](\n          !bool3, INPUTS(placeholder[Int](7)).tokens(placeholder[Int](8))._1 == coll4(placeholder[Int](9)), if (bool7) {\n            allOf(Coll[Boolean](coll6(placeholder[Int](10))._1 == coll2, box5.propositionBytes == SELF.propositionBytes))\n          } else { placeholder[Boolean](11) }\n        )\n      )\n    )\n  } else {(\n    val coll8 = SELF.propositionBytes\n    sigmaProp(\n      allOf(\n        Coll[Boolean](\n          !bool3, box1.propositionBytes == coll8, box1.R4[Coll[Coll[Byte]]].get == coll4, INPUTS(placeholder[Int](12)).tokens(placeholder[Int](13))._1 == coll4(\n            placeholder[Int](14)\n          ), if (bool7) {(\n            val tuple9 = coll6(placeholder[Int](15))\n            allOf(\n              Coll[Boolean](\n                tuple9._1 == coll2, blake2b256(box5.propositionBytes) == placeholder[Coll[Byte]](16), box5.R5[Coll[Coll[Byte]]].isDefined, box5.R6[\n                  Coll[Byte]\n                ].isDefined, box5.R7[Coll[Byte]].get == blake2b256(coll8), box5.R4[Coll[Coll[Byte]]].get == coll4, tuple9._2 == placeholder[Long](17)\n              )\n            )\n          )} else { placeholder[Boolean](18) }\n        )\n      )\n    )\n  )}\n}',
+  address:
+    'EE7687i4URb4YuSGSQXPCb7UQgHfhJPtKCU7fZmQpof644wX74ZGWnGcLbxxWnLKb8cQnFxkZF1WWeTgmfjEhuAoF2QaMRXg3qdtFZEoKEzfRrMh8Nb7u5GWjEbN1yjQ86PF73Zoo2PeFGotN628Dbm3bPnZhysUcz8pTrQc6BoW32mD9w5jhZRdA7YdP4mzgvsnC7oVWATNA5hgqiKskJxSgvcE63xuG4HdPZb4qakyKRgppndQmDtXNTs7NMBTSFH6Vd9Yqp4TE4MAHMzpWP8iJDSamXS4ppXXeb9sRT5iAS9c2H4atBAkYQ8ntni8C5Wyaz3poq9AaoCxPc1e2jeARezhFCZcSo6AVGf1pTxLAugEoyXWfX7fcug38uQ2VqodFmS8WBVVSA3WixfaeWSdKuGBZqzXu8cG1YySNsYJCKLCRGtBN13wNpJoZYsxu3nav2qF2jMA9Re1g2LZwspkUJWKKd38NdXoqibxhRisFoXW9e8Xf2EW9MtqZGJKNTrjhgGm5Yn7u3AF1a75abYR1TX9yWcNqAjpQAr',
+  assets: [
+    {
+      tokenId:
+        '383d70ab083cc23336a46370fe730b2c51db0e831586b6d545202cbc33938ee1',
+      index: 0,
+      amount: 1n,
+      name: 'Ergo-RWT-V.beta',
+      decimals: 0,
+      type: 'EIP-004',
+    },
+  ],
+  additionalRegisters: {
+    R4: {
+      serializedValue:
+        '1a0120ed6b8b63d187198f3ba55468231b5c83c050f7273364211fcf3b1ca7526ff302',
+      sigmaType: 'Coll[Coll[SByte]]',
+      renderedValue:
+        '[ed6b8b63d187198f3ba55468231b5c83c050f7273364211fcf3b1ca7526ff302]',
+    },
+  },
 };
 
 export const nodeBox = {
@@ -1204,14 +1247,12 @@ export const explorerTxInfo = {
   size: 1600,
 };
 
-export const convertedBox: ErgoBox = {
+export const convertedBox: OutputBox = {
   boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
   transactionId:
     'f15985efc66ad527a2917bb73a39a65c91b6b93b5fe6b41f50931e7995b74a25',
-  blockId: '8a95fbe64b202e1829800f16b06ab413efb396370a57bfbd104a0e3f428fd0e9',
   index: 2,
   creationHeight: 878778,
-  inclusionHeight: 878781,
   value: 300000n,
   ergoTree:
     '10130400040004040400040204000e203ac8a90d0aa8c5c50e99dd2588a990fd37b5d3aee70e32d56241f41ed49e9f030404040004000400010104020400040004000e2026083658fce2ae5b9848ad00b7d72878ca84394a47294460d11c43fa1bae738d05020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
@@ -1225,12 +1266,6 @@ export const convertedBox: ErgoBox = {
   additionalRegisters: {
     R4: '1a0120ed6b8b63d187198f3ba55468231b5c83c050f7273364211fcf3b1ca7526ff302',
   },
-  spentTransactionId:
-    'f6eb4b116e193438028f8c85add462b42e0f539773a2d8d54c884df4a9fb4e34',
-  spentBlockId:
-    'd382fefb9ce4ba686190f8072164946c159d32127daf423f0fd5d6eed71f0552',
-  spentHeight: 879437,
-  spentIndex: 0,
 };
 
 export const nodeTx = {
@@ -1705,4 +1740,43 @@ export const convertedTx = {
     },
   ],
   dataInputs: [],
+};
+
+export const convertedTxWithInputs = {
+  ...convertedTx,
+  inputs: [
+    {
+      boxId: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
+      creationHeight: 1320523,
+      ergoTree:
+        '100904000580ade204040c0e2077dffd47b690caa52fe13345aaf64ecdf7d55f2e7e3496e8206311f491aa46cd04080404040004000e20720978c041239e7d6eb249d801f380557126f6324e12c5ba9172d820be2e1dded806d601b2a5730000d602c67201060ed603e4c6a70504d604c1a7d6059272047301d6069aa37302d1ec95e67202d801d607ed93e47202cbc2a793cbc272017303ecededededededed8fa3720391a39972037304720593db63087201db6308a792c17201720493e4c672010405e4c6a7040593e4c67201050472037207ededededededededed92a37203720593db63087201db6308a792c17201720493db63087201db6308a792c17201720493e4c672010405e4c6a7040592e4c672010504720690e4c6720105049a720673057207edededed93c27201c2a793db63087201db6308a791c17201720493e4c672010405e4c6a7040593e4c6720105047203938cb2db6308b2a4730600730700017308',
+      index: 0,
+      transactionId:
+        'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
+      value: 5810250000n,
+      additionalRegisters: {
+        R4: '05a686a9ad09',
+        R5: '04a299a101',
+      },
+      assets: [
+        {
+          tokenId:
+            '011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f',
+          amount: 1n,
+        },
+      ],
+    },
+    {
+      boxId: '4af30f9c715a7e2bc5f05ad8eedfab1592a320f3c7dd3ca6093902f5207b5c05',
+      creationHeight: 1320523,
+      ergoTree:
+        '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+      index: 6,
+      transactionId:
+        'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
+      value: 23326478571n,
+      additionalRegisters: {},
+      assets: [],
+    },
+  ],
 };

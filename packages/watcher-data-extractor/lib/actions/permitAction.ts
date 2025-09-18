@@ -1,7 +1,7 @@
 import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
 import { chunk } from 'lodash-es';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import PermitEntity from '../entities/PermitEntity';
@@ -66,7 +66,7 @@ class PermitAction {
    */
   storePermits = async (
     permits: Array<ExtractedPermit>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ) => {
     if (permits.length === 0) return true;
@@ -126,7 +126,7 @@ class PermitAction {
    */
   spendPermits = async (
     spendId: Array<string>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ): Promise<void> => {
     const spendIdChunks = chunk(spendId, dbIdChunkSize);

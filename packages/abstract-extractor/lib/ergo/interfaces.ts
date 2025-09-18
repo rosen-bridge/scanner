@@ -4,15 +4,6 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
-export interface ErgoBox extends OutputBox {
-  blockId: string;
-  inclusionHeight: number;
-  spentBlockId?: string;
-  spentHeight?: number;
-  spentTransactionId?: string;
-  spentIndex?: number;
-}
-
 export interface ExtendedTransaction extends Transaction {
   inclusionHeight: number;
   blockId: string;
@@ -72,7 +63,7 @@ export interface RangeQuery {
 export type RangeList = RangeQuery[];
 
 export interface InitializeOptions {
-  active: Boolean;
+  active: boolean;
   type: ErgoNetworkType;
   url: string;
   address: string;

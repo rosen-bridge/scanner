@@ -143,7 +143,7 @@ export abstract class AbstractScanner<TransactionType> {
     );
     for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
-      await extractor.initializeBoxes(block);
+      await extractor.initializeData(block);
       await this.action.updateOrInsertExtractorStatus(
         extractor.getId(),
         block.height,

@@ -393,7 +393,7 @@ describe('generalScanner', () => {
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
       const mockedInit = vi
-        .spyOn(extractor, 'initializeBoxes')
+        .spyOn(extractor, 'initializeData')
         .mockImplementation(async () => {});
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);

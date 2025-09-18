@@ -3,15 +3,15 @@ import { pick } from 'lodash-es';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import {
-  AbstractErgoExtractorEntity,
-  AbstractBoxData,
-  AbstractInitializableErgoExtractorAction,
+  AbstractErgoAction,
+  AbstractErgoEntity,
+  AbstractEntityData,
 } from '../../lib';
 import { TestEntity } from '../testUtils';
 
-export class TestInitializableErgoExtractorAction extends AbstractInitializableErgoExtractorAction<
-  AbstractBoxData,
-  AbstractErgoExtractorEntity
+export class TestErgoAction extends AbstractErgoAction<
+  AbstractEntityData,
+  AbstractErgoEntity
 > {
   constructor(dataSource: DataSource) {
     super(dataSource, TestEntity);
@@ -21,12 +21,12 @@ export class TestInitializableErgoExtractorAction extends AbstractInitializableE
    * create the test database entity from data and block information
    */
   createEntity = (
-    boxes: AbstractBoxData[],
+    boxes: AbstractEntityData[],
     block: BlockInfo,
     extractor: string,
-  ): Omit<AbstractErgoExtractorEntity, 'id'>[] => {
+  ): Omit<AbstractErgoEntity, 'id'>[] => {
     return boxes.map((box) => ({
-      boxId: box.boxId,
+      identifier: box.identifier,
       block: block.hash,
       height: block.height,
       serialized: box.serialized,
@@ -38,8 +38,8 @@ export class TestInitializableErgoExtractorAction extends AbstractInitializableE
    * convert the database entity back to raw data
    */
   convertEntityToData = (
-    entities: AbstractErgoExtractorEntity[],
-  ): AbstractBoxData[] => {
-    return entities.map((data) => pick(data, ['boxId', 'serialized']));
+    entities: AbstractErgoEntity[],
+  ): AbstractEntityData[] => {
+    return entities.map((data) => pick(data, ['identifier', 'serialized']));
   };
 }

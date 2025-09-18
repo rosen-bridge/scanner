@@ -339,15 +339,15 @@ describe('fraudExtractor', () => {
     });
   });
 
-  describe('initializeBoxes', () => {
+  describe('initializeData', () => {
     /**
-     * @target fraudExtractor.initializeBoxes should insert new found and validate the old existing fraud
+     * @target fraudExtractor.initializeData should insert new found and validate the old existing fraud
      * @dependencies
      * @scenario
      * - insert a mocked fraud in database
      * - mock getUnspentFrauds to return new extracted fraud
      * - mock validateOldStoredFrauds
-     * - run initializeBoxes
+     * - run initializeData
      * - should store the new fraud
      * - should call validateOldStoredFrauds with the old existing fraud
      * @expected
@@ -374,7 +374,7 @@ describe('fraudExtractor', () => {
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation(vi.fn());
-      await extractor.initializeBoxes({ height: 100 } as BlockInfo);
+      await extractor.initializeData({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(box).not.toBeNull();
       expect(box?.wid).toEqual('wid2');
@@ -385,13 +385,13 @@ describe('fraudExtractor', () => {
     });
 
     /**
-     * @target fraudExtractor.initializeBoxes should update the unspent existing fraud information
+     * @target fraudExtractor.initializeData should update the unspent existing fraud information
      * @dependencies
      * @scenario
      * - insert a mocked fraud in database
      * - mock getUnspentFrauds to return new extracted fraud
      * - mock validateOldStoredFrauds
-     * - run initializeBoxes
+     * - run initializeData
      * - should update the unspent fraud information
      * - should call validateOldStoredFrauds with nothing
      * @expected
@@ -418,7 +418,7 @@ describe('fraudExtractor', () => {
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation(vi.fn());
       insertFraudEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes({ height: 100 } as BlockInfo);
+      await extractor.initializeData({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(box).not.toBeNull();
       expect(box?.serialized).toEqual('newSerialized');

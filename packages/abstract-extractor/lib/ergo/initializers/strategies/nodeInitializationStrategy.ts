@@ -71,8 +71,8 @@ export class NodeInitializationStrategy {
    * @param initialBlock
    */
   initialize = async (initialBlock: BlockInfo) => {
-    let offset = 0,
-      total = await this.getTotalTxCount();
+    let offset = 0;
+    const total = await this.getTotalTxCount();
     const promiseQueue = new PQueue({
       concurrency: this.maxParallelRequests,
     });

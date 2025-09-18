@@ -460,7 +460,7 @@ describe('permitExtractor', () => {
     });
   });
 
-  describe('initializeBoxes', () => {
+  describe('initializeData', () => {
     let extractor: PermitExtractor;
     beforeEach(() => {
       extractor = new PermitExtractor(
@@ -473,13 +473,13 @@ describe('permitExtractor', () => {
     });
 
     /**
-     * @target PermitExtractor.initializeBoxes should insert new found permit and validate the old existing permit
+     * @target PermitExtractor.initializeData should insert new found permit and validate the old existing permit
      * @dependencies
      * @scenario
      * - insert a mocked bpermitox in database
      * - mock getUnspentBoxes to return new extracted permit
      * - mock validateOldStoredPermits
-     * - run initializeBoxes
+     * - run initializeData
      * - should store the new permit
      * - should call validateOldStoredPermits with the old existing permit
      * @expected
@@ -502,7 +502,7 @@ describe('permitExtractor', () => {
       vi.spyOn(extractor, 'validateOldStoredPermits').mockImplementation(
         vi.fn(),
       );
-      await extractor.initializeBoxes({ height: 100 } as BlockInfo);
+      await extractor.initializeData({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId2' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxId).toEqual('boxId2');
@@ -514,13 +514,13 @@ describe('permitExtractor', () => {
     });
 
     /**
-     * @target PermitExtractor.initializeBoxes should update the unspent existing permit information
+     * @target PermitExtractor.initializeData should update the unspent existing permit information
      * @dependencies
      * @scenario
      * - insert a mocked permit in database
      * - mock getUnspentBoxes to return new extracted permit
      * - mock validateOldStoredPermits
-     * - run initializeBoxes
+     * - run initializeData
      * - should update the unspent permit information
      * - should call validateOldStoredPermits with nothing
      * @expected
@@ -543,7 +543,7 @@ describe('permitExtractor', () => {
         vi.fn(),
       );
       await insertPermitEntity(dataSource, 'boxId1');
-      await extractor.initializeBoxes({ height: 100 } as BlockInfo);
+      await extractor.initializeData({ height: 100 } as BlockInfo);
       const permit = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(permit).not.toBeNull();
       expect(permit?.boxSerialized).toEqual('newSerialized');

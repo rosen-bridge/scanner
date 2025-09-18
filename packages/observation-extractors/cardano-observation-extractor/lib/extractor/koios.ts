@@ -4,7 +4,7 @@ import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { CardanoKoiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import {
   ExtractedObservation,
@@ -47,7 +47,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
    */
   processTransactions = (
     txs: Array<KoiosTransaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -103,7 +103,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
    * Extractor box initialization
    * No action needed in cardano extractors
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

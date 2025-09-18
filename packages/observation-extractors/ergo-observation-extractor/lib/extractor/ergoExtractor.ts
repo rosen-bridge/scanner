@@ -4,7 +4,7 @@ import { blake2b } from 'blakejs';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
 import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
@@ -41,7 +41,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -112,7 +112,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
    * Extractor box initialization
    * No action needed in cardano extractors
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

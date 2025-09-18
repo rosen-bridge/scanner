@@ -2,7 +2,7 @@ import {
   AbstractObservationExtractor,
   ExtractedObservation,
 } from '@rosen-bridge/abstract-observation-extractor';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { blake2b } from 'blakejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
@@ -53,7 +53,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
    */
   processTransactions = async (
     txs: Array<TransactionType>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {

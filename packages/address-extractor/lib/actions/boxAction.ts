@@ -1,13 +1,13 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { pick } from 'lodash-es';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { AbstractInitializableErgoExtractorAction } from '@rosen-bridge/abstract-extractor';
+import { AbstractErgoBoxAction } from '@rosen-bridge/abstract-extractor';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';
 
-export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<
+export class BoxEntityAction extends AbstractErgoBoxAction<
   ExtractedBox,
   BoxEntity
 > {
@@ -25,7 +25,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<
   ): Omit<BoxEntity, 'id'>[] => {
     return boxes.map((box) => ({
       address: box.address,
-      boxId: box.boxId,
+      identifier: box.identifier,
       block: block.hash,
       height: block.height,
       serialized: box.serialized,
@@ -38,7 +38,7 @@ export class BoxEntityAction extends AbstractInitializableErgoExtractorAction<
    */
   convertEntityToData = (entities: BoxEntity[]): ExtractedBox[] => {
     return entities.map((data) =>
-      pick(data, ['boxId', 'address', 'serialized']),
+      pick(data, ['identifier', 'address', 'serialized']),
     );
   };
 }

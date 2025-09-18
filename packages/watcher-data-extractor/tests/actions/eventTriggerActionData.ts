@@ -4,7 +4,7 @@ export const sampleEventEntity = {
   txId: 'txId',
   eventId: 'eventId',
   extractor: 'extractorId',
-  boxId: 'id',
+  identifier: 'id',
   serialized: 'boxSerialized',
   block: 'hash',
   height: 10,
@@ -39,7 +39,7 @@ export const sampleEventTrigger1: ExtractedEventTrigger = {
   sourceTxId: 'txId2',
   toAddress: 'addr4',
   toChain: 'cardano',
-  boxId: '1',
+  identifier: '1',
   serialized: 'serialized1',
   sourceBlockId: 'blockId',
   sourceChainHeight: 10,
@@ -60,7 +60,7 @@ export const sampleEventTrigger2: ExtractedEventTrigger = {
   sourceTxId: 'txId1',
   toAddress: 'addr1',
   toChain: 'cardano',
-  boxId: '2',
+  identifier: '2',
   serialized: 'serialized2',
   sourceBlockId: 'blockId',
   sourceChainHeight: 20,
@@ -68,10 +68,10 @@ export const sampleEventTrigger2: ExtractedEventTrigger = {
 
 export const sampleEventTrigger3: ExtractedEventTrigger = {
   ...sampleEventTrigger1,
-  boxId: '3',
+  identifier: '3',
 };
 
 export const sampleEventTrigger4: ExtractedEventTrigger = {
   ...sampleEventTrigger2,
-  boxId: '4',
+  identifier: '4',
 };

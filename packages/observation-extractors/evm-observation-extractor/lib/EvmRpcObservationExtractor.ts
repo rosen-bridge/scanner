@@ -4,7 +4,7 @@ import {
 } from '@rosen-bridge/abstract-observation-extractor';
 import { isCallException, TransactionResponse } from 'ethers';
 import { blake2b } from 'blakejs';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 export abstract class EvmRpcObservationExtractor extends AbstractObservationExtractor<TransactionResponse> {
   /**
@@ -16,7 +16,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
    */
   processTransactions = async (
     txs: Array<TransactionResponse>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {

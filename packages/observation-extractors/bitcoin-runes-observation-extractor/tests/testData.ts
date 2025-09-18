@@ -1,5 +1,5 @@
 import { RosenTokens } from '@rosen-bridge/tokens';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TxOutputRune } from '../lib/types';
 import { RosenData } from '@rosen-bridge/rosen-extractor';
 
@@ -38,14 +38,9 @@ export const mockTxOutputRunes: TxOutputRune[] = [
   },
 ];
 
-export const mockBlock: Block = {
+export const mockBlock: BlockInfo = {
   hash: '00000000000000000001ba4603460bcd27857e35ce18602e959ac2bcbf21ec0e',
   height: 912543,
-  timestamp: 1756639671,
-  txCount: 3212,
-  parentHash:
-    '000000000000000000014e3db3c91dd1bc54dfdc52d2f81e2da50aea9ac41c62',
-  extra: undefined,
 };
 
 export const mockTokens: RosenTokens = [

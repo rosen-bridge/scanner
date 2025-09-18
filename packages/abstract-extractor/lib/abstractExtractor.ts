@@ -1,4 +1,4 @@
-import { BlockInfo, Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 export abstract class AbstractExtractor<TransactionType> {
   /**
@@ -9,7 +9,7 @@ export abstract class AbstractExtractor<TransactionType> {
    */
   abstract processTransactions: (
     txs: Array<TransactionType>,
-    block: Block,
+    block: BlockInfo,
   ) => Promise<boolean>;
 
   /**

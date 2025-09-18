@@ -21,7 +21,7 @@ export class WorkerManager {
    * @param workerIndex
    * @returns true if worker has an incomplete range to work on
    */
-  isWorkerActive = (workerIndex: number): Boolean => {
+  isWorkerActive = (workerIndex: number): boolean => {
     return this.workersRangeList[workerIndex].length > 0;
   };
 
