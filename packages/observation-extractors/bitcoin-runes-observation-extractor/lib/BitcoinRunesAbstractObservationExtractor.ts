@@ -36,7 +36,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
     const unisatHeaders = { 'Content-Type': 'application/json' };
     // Add API key to headers if provided
     if (unisatApiKey) {
-      Object.assign(unisatHeaders, { 'x-api-key': unisatApiKey });
+      Object.assign(unisatHeaders, { Authorization: `Bearer ${unisatApiKey}` });
     }
     this.unisatClient = RateLimitedAxios.create({
       baseURL: unisatUrl,
