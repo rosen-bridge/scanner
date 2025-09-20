@@ -53,10 +53,10 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
      * @target BitcoinRunesAbstractObservationExtractor.processTransactions should process ergo event transaction successfully
      * @dependencies
      * @scenario
-     * - stub getTxOutputRunes to resolve to a mock runes array
+     * - stub getTxOutputRunes to resolve to a mock object
      * - stub actions.storeObservations to resolve to true
-     * - define a mock array containing 1 transaction
-     * - call processTransactions using the mock txs and block
+     * - define a mock tx array containing 1 transaction
+     * - call processTransactions using the mock tx array and block
      * @expected
      * - actions.storeObservations should have been called once with observations, block, and chain id
      * - processTransactions should have returned true
@@ -100,6 +100,35 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
       );
 
       expect(result).toBe(true);
+    });
+
+    /**
+     * @target BitcoinRunesAbstractObservationExtractor.processTransactions should throw when processing block height is greater than synced height of unisat
+     * @dependencies
+     * @scenario
+     * - stub getTxOutputRunes to resolve to a mock object that its height is set to less than processing block height
+     * - define a mock tx array containing 1 transaction
+     * - call processTransactions using the mock tx array and block
+     * @expected
+     * - processTransactions should have thrown
+     */
+    it('should throw when processing block height is greater than synced height of unisat', async () => {
+      // arrange
+      vi.spyOn(mockRosenDataExtractor as any, 'get').mockReturnValue(
+        ergoEventData,
+      );
+      vi.spyOn(extractor as any, 'getTxOutputRunes').mockResolvedValue(
+        Object.assign({}, mockTxOutputRunes, { height: mockBlock.height - 1 }),
+      );
+
+      const mockTxs: TestTransactionType[] = [{ txId: mockTxId }];
+
+      // act and assert
+      await expect(
+        async () => await extractor.processTransactions(mockTxs, mockBlock),
+      ).rejects.toThrowError(
+        `Unisat is not synced. processing block height is [${mockBlock.height}] and synced height of unisat is [${mockBlock.height - 1}]`,
+      );
     });
   });
 
