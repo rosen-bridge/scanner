@@ -17,27 +17,6 @@ export const validTxId =
 export const unisatUrl = 'https://open-api.unisat.io';
 export const unisatApiKey = '';
 
-export const mockTxOutputRunes: TxOutputRune[] = [
-  {
-    address: mockUserAddress,
-    vout: 0,
-    runeId: '880887:3052',
-    runeAmount: '998233983',
-  },
-  {
-    address: mockLockAddress,
-    vout: 2,
-    runeId: '880887:3052',
-    runeAmount: '1000',
-  },
-  {
-    address: mockUserAddress,
-    vout: 0,
-    runeId: '880887:3053',
-    runeAmount: '7001000',
-  },
-];
-
 export const mockBlock: Block = {
   hash: '00000000000000000001ba4603460bcd27857e35ce18602e959ac2bcbf21ec0e',
   height: 912543,
@@ -46,6 +25,30 @@ export const mockBlock: Block = {
   parentHash:
     '000000000000000000014e3db3c91dd1bc54dfdc52d2f81e2da50aea9ac41c62',
   extra: undefined,
+};
+
+export const mockTxOutputRunes: { runes: TxOutputRune[]; height: number } = {
+  runes: [
+    {
+      address: mockUserAddress,
+      vout: 0,
+      runeId: '880887:3052',
+      runeAmount: '998233983',
+    },
+    {
+      address: mockLockAddress,
+      vout: 2,
+      runeId: '880887:3052',
+      runeAmount: '1000',
+    },
+    {
+      address: mockUserAddress,
+      vout: 0,
+      runeId: '880887:3053',
+      runeAmount: '7001000',
+    },
+  ],
+  height: mockBlock.height + 2,
 };
 
 export const mockTokens: RosenTokens = [
@@ -113,26 +116,29 @@ export const ergoEventData: RosenData = {
   sourceTxId: mockTxId,
 };
 
-export const txOutputRunes = [
-  {
-    address: 'bc1qs0852en99dfctv0egj2qxnmc79mhjgn9ap975t',
-    runeAmount: '1000',
-    runeId: '880887:3052',
-    vout: 2,
-  },
-  {
-    address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
-    runeAmount: '1013032',
-    runeId: '880887:3052',
-    vout: 0,
-  },
-  {
-    address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
-    runeAmount: '4492999000',
-    runeId: '880352:855',
-    vout: 0,
-  },
-];
+export const txOutputRunes: { runes: TxOutputRune[]; height: number } = {
+  runes: [
+    {
+      address: 'bc1qs0852en99dfctv0egj2qxnmc79mhjgn9ap975t',
+      runeAmount: '1000',
+      runeId: '880887:3052',
+      vout: 2,
+    },
+    {
+      address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
+      runeAmount: '1013032',
+      runeId: '880887:3052',
+      vout: 0,
+    },
+    {
+      address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
+      runeAmount: '4492999000',
+      runeId: '880352:855',
+      vout: 0,
+    },
+  ],
+  height: mockBlock.height + 2,
+};
 
 export const mockUnisatResponse = {
   code: 0,
@@ -225,7 +231,7 @@ export const mockUnisatResponse = {
         spentVout: 0,
       },
     ],
-    height: 913423,
+    height: 912545,
     start: 0,
     total: 5,
   },
