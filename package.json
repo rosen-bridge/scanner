@@ -18,6 +18,9 @@
     "type-check": "npm run type-check --workspaces",
     "version": "npx changeset version && npm i"
   },
+  "dependencies": {
+    "kodegen": "^0.6.0"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@rosen-bridge/changeset-formatter": "^1.0.0",
