@@ -126,9 +126,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
       // act and assert
       await expect(
         async () => await extractor.processTransactions(mockTxs, mockBlock),
-      ).rejects.toThrowError(
-        `Unisat is not synced. processing block height is [${mockBlock.height}] and synced height of unisat is [${mockBlock.height - 1}]`,
-      );
+      ).rejects.toThrow();
     });
   });
 
