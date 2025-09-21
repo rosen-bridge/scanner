@@ -3,7 +3,6 @@ import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
-  Block,
   BlockInfo,
   OutputBox,
   Transaction,

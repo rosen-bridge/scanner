@@ -11,7 +11,7 @@ import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import EventTriggerEntity from '../entities/EventTriggerEntity';
 import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { JsonBI } from '../utils';
-import { chunk, omit, pick, set } from 'lodash-es';
+import { chunk, pick } from 'lodash-es';
 
 class EventTriggerAction extends AbstractErgoBoxAction<
   ExtractedEventTrigger,
