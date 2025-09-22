@@ -3,6 +3,14 @@ export type Asset = {
   amount: bigint;
 };
 
+export type ApiRegister =
+  | string
+  | {
+      serializedValue: string;
+      sigmaType: string;
+      renderedValue: string;
+    };
+
 export type AdditionalRegisters = Record<string, string>;
 
 export type Token = {
@@ -19,4 +27,10 @@ export type ErgoBox = {
   additionalRegisters: AdditionalRegisters;
   transactionId: string;
   index: number;
+};
+
+export type Transaction = {
+  id: string;
+  inputs: string[];
+  outputs: ErgoBox[];
 };
