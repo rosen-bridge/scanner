@@ -22,15 +22,6 @@
     "release": "npm run test -- --run && npm run build && npm publish --access public",
     "type-check": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@rosen-bridge/extended-typeorm": "^0.2.1",
-    "@types/node": "^22.18.0",
-    "tsx": "^4.19.4",
-    "typescript": "^5.3.3"
-  },
-  "engines": {
-    "node": ">=22.18.0"
-  },
   "dependencies": {
     "@blockfrost/blockfrost-js": "^6.0.0",
     "@blockfrost/openapi": "0.1.78",
@@ -40,8 +31,17 @@
     "@rosen-bridge/abstract-logger": "^2.0.1",
     "@rosen-bridge/abstract-scanner": "^0.1.0",
     "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/rate-limited-axios": "^0.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.0",
+    "@rosen-clients/rate-limited-axios": "^1.0.0",
     "cockatiel": "^3.2.1"
+  },
+  "devDependencies": {
+    "@rosen-bridge/extended-typeorm": "^0.2.1",
+    "@types/node": "^22.18.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }

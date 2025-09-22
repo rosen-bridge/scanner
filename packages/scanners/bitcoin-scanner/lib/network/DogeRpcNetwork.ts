@@ -1,4 +1,4 @@
-import axios, { Axios } from '@rosen-bridge/rate-limited-axios';
+import axios, { Axios } from '@rosen-clients/rate-limited-axios';
 import {
   AbstractNetworkConnector,
   Block,
