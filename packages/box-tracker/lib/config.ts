@@ -1,9 +1,4 @@
-export type Asset = {
-  tokenId: string;
-  amount: bigint;
-};
-
-export type AdditionalRegisters = Record<string, string>;
+import { AdditionalRegisters, Asset } from '@rosen-bridge/scanner-interfaces';
 
 export type Token = {
   tokenId: string;
