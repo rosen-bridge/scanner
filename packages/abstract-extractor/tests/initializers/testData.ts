@@ -1,3 +1,8 @@
+import {
+  ExtendedTransaction,
+  ExtendedSpendInfo,
+} from '../../lib/ergo/interfaces';
+
 export const ergoBoxes = [
   {
     boxId: '57d8334d8b6095393d9c6e471e25b477caba54adcc9757ea4f24d366fe72cdb3',
@@ -63,7 +68,7 @@ export const extractedData = {
   height: 98,
 };
 
-export const transactionBatch = [
+export const transactionBatch: ExtendedTransaction[] = [
   {
     id: 'c0bd3194b04c7d44159d57a532d2d00f6db3c9a1e4aa1a7dc3dee6e8ae3f0f80',
     inclusionHeight: 1320705,
@@ -123,10 +128,38 @@ export const transactionBatch = [
       {
         boxId:
           'be50cf8b4bf156e082c1f48199811cec081b123834422ac64e9659b36bc029f2',
+        value: 1000000n,
+        index: 0,
+        transactionId:
+          '41d16484deab78069aaa2fa7bce4797f55768bde4687d4357ac502e086d26d08',
+        creationHeight: 1320701,
+        ergoTree:
+          '100504000400050004000e20011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887fd803d601b2a5730000d602e4c6a70407d603b2db6501fe730100ea02d1ededededed93e4c672010407720293e4c67201050ec5720391e4c672010605730293c27201c2a793db63087201db6308a7938cb2db63087203730300017304cd7202',
+        assets: [
+          {
+            tokenId:
+              '8c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b9035',
+            amount: 1n,
+          },
+        ],
+        additionalRegisters: {
+          R4: '0702c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+          R5: '0e2056b8b7c2ae45876ec9a79c575d66f6be1ead5498879f08df00b40daa62ae1b94',
+          R6: '058cee94aa09',
+        },
       },
       {
         boxId:
           'b6db0c5629850b62a58a9c0dae956e1ce14438f5d48ca75c3e55e60df17836cb',
+        transactionId:
+          '0fbd5c82dc0a4316a40a9d1de4f0949c503b39c5fe0e3e113e26d43558285ef7',
+        value: 23279978571n,
+        index: 1,
+        creationHeight: 1320696,
+        ergoTree:
+          '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+        assets: [],
+        additionalRegisters: {},
       },
     ],
     dataInputs: [
@@ -195,10 +228,38 @@ export const transactionBatch = [
       {
         boxId:
           '3715c953269a829641db0022f3a7ab67917911491c6f363ab863d7ad42785437',
+        transactionId:
+          '0fbd5c82dc0a4316a40a9d1de4f0949c503b39c5fe0e3e113e26d43558285ef7',
+        index: 0,
+        value: 1000000n,
+        ergoTree:
+          '100504000400050004000e20011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887fd803d601b2a5730000d602e4c6a70407d603b2db6501fe730100ea02d1ededededed93e4c672010407720293e4c67201050ec5720391e4c672010605730293c27201c2a793db63087201db6308a7938cb2db63087203730300017304cd7202',
+        creationHeight: 1320698,
+        assets: [
+          {
+            tokenId:
+              '8c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b9035',
+            amount: 1n,
+          },
+        ],
+        additionalRegisters: {
+          R4: '0702c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+          R5: '0e2056b8b7c2ae45876ec9a79c575d66f6be1ead5498879f08df00b40daa62ae1b94',
+          R6: '058cee94aa09',
+        },
       },
       {
         boxId:
           '88105776d682d645de57a1aa1569665ebfc57138ca9072c7472274dc0e1f6746',
+        transactionId:
+          '37581fb23f50f7a9b1dd7cfdafe4f9d98c6690dfe56990d550a800171c0b5f67',
+        index: 1,
+        value: 3731616410n,
+        ergoTree:
+          '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+        creationHeight: 1320694,
+        assets: [],
+        additionalRegisters: {},
       },
     ],
     dataInputs: [
@@ -267,10 +328,38 @@ export const transactionBatch = [
       {
         boxId:
           '55cec880dcdce1c914de20a1fcaf949a76f1e5e5b2d474e351c9d11f2a00472c',
+        transactionId:
+          '37581fb23f50f7a9b1dd7cfdafe4f9d98c6690dfe56990d550a800171c0b5f67',
+        index: 0,
+        value: 1000000n,
+        ergoTree:
+          '100504000400050004000e20011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887fd803d601b2a5730000d602e4c6a70407d603b2db6501fe730100ea02d1ededededed93e4c672010407720293e4c67201050ec5720391e4c672010605730293c27201c2a793db63087201db6308a7938cb2db63087203730300017304cd7202',
+        creationHeight: 1320696,
+        assets: [
+          {
+            tokenId:
+              '8c27dd9d8a35aac1e3167d58858c0a8b4059b277da790552e37eba22df9b9035',
+            amount: 1n,
+          },
+        ],
+        additionalRegisters: {
+          R4: '0702c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
+          R5: '56b8b7c2ae45876ec9a79c575d66f6be1ead5498879f08df00b40daa62ae1b94',
+          R6: '058cee94aa09',
+        },
       },
       {
         boxId:
           '111d487d65d5ad5f715a6e0ff1bbd588596f73f7d8394eb7f50f1d278e482b88',
+        transactionId:
+          'dae45d7a2604377928940b327dd58969dd7bbc114794174c6122742bdeb6c22a',
+        index: 1,
+        value: 1500000n,
+        ergoTree:
+          '1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304',
+        creationHeight: 1320696,
+        assets: [],
+        additionalRegisters: {},
       },
     ],
     dataInputs: [
@@ -279,5 +368,29 @@ export const transactionBatch = [
           '56b8b7c2ae45876ec9a79c575d66f6be1ead5498879f08df00b40daa62ae1b94',
       },
     ],
+  },
+];
+
+export const mockSpendRecords: ExtendedSpendInfo[] = [
+  {
+    boxId: 'box1',
+    txId: 'tx1',
+    index: 0,
+    height: 1000,
+    block: 'block1',
+  },
+  {
+    boxId: 'box3',
+    txId: 'tx3',
+    index: 0,
+    height: 2000,
+    block: 'block2',
+  },
+  {
+    boxId: 'box2',
+    txId: 'tx2',
+    index: 1,
+    height: 1000,
+    block: 'block1',
   },
 ];

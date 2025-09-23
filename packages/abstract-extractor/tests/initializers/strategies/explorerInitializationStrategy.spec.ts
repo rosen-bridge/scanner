@@ -58,7 +58,7 @@ describe('ExplorerInitializationStrategy', () => {
         total: 150,
       });
 
-      const txCount = await strategy.getRangeTxCount(1000, 2000);
+      const txCount = await strategy['getRangeTxCount'](1000, 2000);
 
       expect(txCount).toEqual(150);
       expect(mockNetwork.getAddressTransactionsWithHeight).toHaveBeenCalledWith(
@@ -91,7 +91,7 @@ describe('ExplorerInitializationStrategy', () => {
         total: 3,
       });
 
-      await strategy.processRange(rangeQuery);
+      await strategy['processRange'](rangeQuery);
 
       expect(mockNetwork.getAddressTransactionsWithHeight).toHaveBeenCalledWith(
         'test-address',
@@ -115,7 +115,7 @@ describe('ExplorerInitializationStrategy', () => {
      */
     it('should skip processing when count is 0', async () => {
       const rangeQuery: RangeQuery = { start: 1000, end: 2000, count: 0 };
-      await strategy.processRange(rangeQuery);
+      await strategy['processRange'](rangeQuery);
       mockNetwork.getAddressTransactionsWithHeight = vi.fn();
 
       expect(
@@ -143,7 +143,7 @@ describe('ExplorerInitializationStrategy', () => {
       mockNetwork.getBlockIdAtHeight = vi.fn().mockResolvedValue(blockId);
       strategy['processBlock'] = vi.fn();
 
-      await strategy.processBlockAtHeight(1000);
+      await strategy['processBlockAtHeight'](1000);
 
       expect(mockNetwork.getBlockIdAtHeight).toHaveBeenCalledWith(1000);
       expect(strategy['processBlock']).toHaveBeenCalledWith({
@@ -175,7 +175,7 @@ describe('ExplorerInitializationStrategy', () => {
 
       mockNetwork.getBlockTxs = vi.fn().mockResolvedValue(mockBlockTxs);
 
-      await strategy.processBlock(block);
+      await strategy['processBlock'](block);
 
       expect(mockNetwork.getBlockTxs).toHaveBeenCalledWith('test-block-id');
       expect(mockProcessTransactions).toHaveBeenCalledWith(mockBlockTxs, block);
@@ -206,7 +206,7 @@ describe('ExplorerInitializationStrategy', () => {
       mockWorkerManager.popLastRangeQuery = vi.fn();
       strategy['processRange'] = vi.fn();
 
-      await strategy.startWorker(workerIndex);
+      await strategy['startWorker'](workerIndex);
 
       expect(mockWorkerManager.getLastRange).toHaveBeenCalledWith(
         workerIndex,
@@ -241,7 +241,7 @@ describe('ExplorerInitializationStrategy', () => {
       mockWorkerManager.popLastRangeQuery = vi.fn();
       strategy['processBlockAtHeight'] = vi.fn();
 
-      await strategy.startWorker(workerIndex);
+      await strategy['startWorker'](workerIndex);
 
       expect(strategy['processBlockAtHeight']).toHaveBeenCalledWith(1000);
       expect(mockWorkerManager.popLastRangeQuery).toHaveBeenCalledWith(
@@ -272,7 +272,7 @@ describe('ExplorerInitializationStrategy', () => {
       mockWorkerManager.popLastRangeQuery = vi.fn();
       mockWorkerManager.limitLastRange = vi.fn();
 
-      await strategy.startWorker(workerIndex);
+      await strategy['startWorker'](workerIndex);
 
       expect(mockWorkerManager.limitLastRange).toHaveBeenCalledWith(
         workerIndex,
@@ -308,7 +308,7 @@ describe('ExplorerInitializationStrategy', () => {
       mockWorkerManager.popLastRangeQuery = vi.fn();
       strategy['processRange'] = vi.fn();
 
-      await strategy.startWorker(workerIndex);
+      await strategy['startWorker'](workerIndex);
 
       expect(mockWorkerManager.getLastRange).toHaveBeenCalledTimes(2);
       expect(strategy['processRange']).toHaveBeenCalledTimes(2);

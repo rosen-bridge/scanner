@@ -44,7 +44,7 @@ export class ExplorerInitializationStrategy {
    * @param toHeight
    * @returns transaction count
    */
-  getRangeTxCount = async (fromHeight: number, toHeight: number) => {
+  private getRangeTxCount = async (fromHeight: number, toHeight: number) => {
     return (
       await requestWithRetrial(
         () =>
@@ -67,7 +67,7 @@ export class ExplorerInitializationStrategy {
    * @param count
    * @returns
    */
-  processRange = async (rangeQuery: RangeQuery) => {
+  private processRange = async (rangeQuery: RangeQuery) => {
     if (rangeQuery.count == 0) {
       this.logger.debug(
         `skipping range [${rangeQuery.start}, ${rangeQuery.end}] with 0 txs`,
@@ -101,7 +101,7 @@ export class ExplorerInitializationStrategy {
    * add the block to extra large blocks
    * @param height
    */
-  processBlockAtHeight = async (height: number) => {
+  private processBlockAtHeight = async (height: number) => {
     const blockId = await requestWithRetrial(
       () => this.network.getBlockIdAtHeight(height),
       this.logger,
@@ -117,7 +117,7 @@ export class ExplorerInitializationStrategy {
    * retry the request to avoid failure in case of accidental network issues
    * @param block
    */
-  processBlock = async (block: BlockInfo) => {
+  private processBlock = async (block: BlockInfo) => {
     const blockTxs = await requestWithRetrial(
       () => this.network.getBlockTxs(block.hash),
       this.logger,
@@ -139,7 +139,7 @@ export class ExplorerInitializationStrategy {
    *    range from top of the range list
    * @param workerIndex
    */
-  startWorker = async (workerIndex: number) => {
+  private startWorker = async (workerIndex: number) => {
     while (this.workerManager.isWorkerActive(workerIndex)) {
       const lastRangeQuery = await this.workerManager.getLastRange(
         workerIndex,
