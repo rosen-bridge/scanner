@@ -54,7 +54,7 @@ export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
    * @param box
    * @return true if the box has the required data and false otherwise
    */
-  hasData = (box: OutputBox): boolean => {
+  hasBoxData = (box: OutputBox): boolean => {
     return (
       (!this.ergoTree || box.ergoTree == this.ergoTree) &&
       (this.tokens.length == 0 || boxHasToken(box, this.tokens))

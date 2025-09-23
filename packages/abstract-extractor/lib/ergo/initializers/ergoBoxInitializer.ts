@@ -30,7 +30,7 @@ export class ErgoBoxInitializer<
     url: string,
     address: string,
     protected extractorId: string,
-    protected hasData: (box: OutputBox) => boolean,
+    protected hasBoxData: (box: OutputBox) => boolean,
     protected processTransactions: (
       txs: Transaction[],
       block: BlockInfo,
@@ -64,7 +64,7 @@ export class ErgoBoxInitializer<
     const txSpendInfo = [];
     for (let i = 0; i < tx.inputs.length; i++) {
       const box = tx.inputs[i];
-      if (this.hasData(box)) {
+      if (this.hasBoxData(box)) {
         txSpendInfo.push({
           boxId: box.boxId,
           txId: box.transactionId,

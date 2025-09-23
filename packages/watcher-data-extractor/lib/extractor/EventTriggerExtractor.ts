@@ -73,7 +73,7 @@ class EventTriggerExtractor extends AbstractErgoBoxExtractor<
    * @param box
    * @return true if the box has the required data and false otherwise
    */
-  hasData = (box: OutputBox): boolean => {
+  hasBoxData = (box: OutputBox): boolean => {
     try {
       if (
         box.additionalRegisters &&
@@ -185,7 +185,7 @@ class EventTriggerExtractor extends AbstractErgoBoxExtractor<
         const { result, paymentTxId } = this.extractEventResult(transaction);
         for (const output of transaction.outputs) {
           // extract output box data
-          if (this.hasData(output)) {
+          if (this.hasBoxData(output)) {
             this.logger.debug(
               `Trying to extract data from box ${output.boxId} at height ${block.height}`,
             );

@@ -88,7 +88,7 @@ export abstract class AbstractErgoExtractor<
   /**
    * Process a list of transactions in a block and store required information.
    * This method can be overridden by subclasses for custom transaction processing,
-   * or they can override extractTxData and hasData methods instead.
+   * or they can override extractTxData and hasTxData methods instead.
    * @param txs - List of transactions in the block
    * @param block - Block information
    * @returns true if the process is completed successfully and false otherwise
