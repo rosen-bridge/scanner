@@ -1,11 +1,11 @@
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import PQueue from 'p-queue';
+
 import { ExtendedTransaction } from '../../interfaces';
 import { NodeNetwork } from '../../network/NodeNetwork';
 import { API_LIMIT } from '../../../constants';
 import { delay, requestWithRetrial } from '../../utils';
-
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import PQueue from 'p-queue';
 
 export class NodeInitializationStrategy {
   private network: NodeNetwork;
@@ -71,19 +71,23 @@ export class NodeInitializationStrategy {
    * @param initialBlock
    */
   initialize = async (initialBlock: BlockInfo) => {
-    let offset = 0;
-    const total = await this.getTotalTxCount();
-    const promiseQueue = new PQueue({
-      concurrency: this.maxParallelRequests,
-    });
-    while (offset < total) {
-      await delay(100);
-      ((offset: number) =>
-        promiseQueue.add(() =>
-          this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height),
-        ))(offset);
-      offset += API_LIMIT;
+    try {
+      let offset = 0;
+      const total = await this.getTotalTxCount();
+      const promiseQueue = new PQueue({
+        concurrency: this.maxParallelRequests,
+      });
+      while (offset < total) {
+        await delay(100);
+        ((offset: number) =>
+          promiseQueue.add(() =>
+            this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height),
+          ))(offset);
+        offset += API_LIMIT;
+      }
+      await promiseQueue.onIdle();
+    } catch (error) {
+      throw new Error(`Error initializing extractor by node: ${error}`);
     }
-    await promiseQueue.onIdle();
   };
 }
