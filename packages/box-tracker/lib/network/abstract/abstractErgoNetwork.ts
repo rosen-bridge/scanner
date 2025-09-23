@@ -1,4 +1,5 @@
-import { ErgoBox, Token, Transaction } from '../../config';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import { ErgoBox, Token } from '../../config';
 
 export abstract class AbstractErgoNetwork {
   protected address: string;

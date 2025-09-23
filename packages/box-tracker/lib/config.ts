@@ -23,9 +23,3 @@ export type ErgoBox = {
   transactionId: string;
   index: number;
 };
-
-export type Transaction = {
-  id: string;
-  inputs: string[];
-  outputs: ErgoBox[];
-};

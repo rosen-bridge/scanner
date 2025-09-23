@@ -1,7 +1,8 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { ErgoBox, Token, Transaction } from '../config';
+import { ErgoBox, Token } from '../config';
 import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
 import { mapAdditionalRegisters } from '../utils';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 export class ExplorerErgoNetwork extends AbstractErgoNetwork {
   private api;
@@ -34,7 +35,8 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
 
     return rawTxs!.map((t) => ({
       id: t.id,
-      inputs: t.inputs?.map((e) => e.id) ?? [],
+      inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
+      dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
       outputs:
         t.outputs?.map<ErgoBox>((o) => ({
           boxId: o.id,
