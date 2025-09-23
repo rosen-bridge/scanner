@@ -1,7 +1,4 @@
-export type Asset = {
-  tokenId: string;
-  amount: bigint;
-};
+import { AdditionalRegisters, Asset } from '@rosen-bridge/scanner-interfaces';
 
 export type ApiRegister =
   | string
@@ -10,8 +7,6 @@ export type ApiRegister =
       sigmaType: string;
       renderedValue: string;
     };
-
-export type AdditionalRegisters = Record<string, string>;
 
 export type Token = {
   tokenId: string;

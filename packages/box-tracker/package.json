@@ -25,7 +25,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-clients/ergo-explorer": "^1.1.5"
+    "@rosen-clients/ergo-explorer": "^1.1.5",
+    "@rosen-bridge/scanner-interfaces": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.9",
