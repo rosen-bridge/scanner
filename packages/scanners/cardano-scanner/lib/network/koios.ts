@@ -1,4 +1,4 @@
-import axios, { Axios } from '@rosen-bridge/rate-limited-axios';
+import axios, { Axios } from '@rosen-clients/rate-limited-axios';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import {
   AbstractNetworkConnector,

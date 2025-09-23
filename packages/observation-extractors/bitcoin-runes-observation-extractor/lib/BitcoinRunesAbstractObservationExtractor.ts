@@ -11,7 +11,7 @@ import {
   TokenTransformation,
 } from '@rosen-bridge/rosen-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import RateLimitedAxios from '@rosen-bridge/rate-limited-axios';
+import RateLimitedAxios, { Axios } from '@rosen-clients/rate-limited-axios';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { TxOutputRune, UnisatResponse, UnisatTxRunes } from './types';
 
@@ -19,7 +19,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
   TransactionType,
 > extends AbstractObservationExtractor<TransactionType> {
   readonly FROM_CHAIN = 'bitcoin-runes';
-  protected unisatClient: RateLimitedAxios;
+  protected unisatClient: Axios;
 
   constructor(
     protected readonly lockAddress: string,
