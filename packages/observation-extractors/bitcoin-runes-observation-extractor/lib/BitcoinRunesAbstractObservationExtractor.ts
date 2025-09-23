@@ -36,7 +36,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
     const unisatHeaders = { 'Content-Type': 'application/json' };
     // Add API key to headers if provided
     if (unisatApiKey) {
-      Object.assign(unisatHeaders, { 'x-api-key': unisatApiKey });
+      Object.assign(unisatHeaders, { Authorization: `Bearer ${unisatApiKey}` });
     }
     this.unisatClient = RateLimitedAxios.create({
       baseURL: unisatUrl,
@@ -67,8 +67,15 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       let runesTransformation: TokenTransformation | undefined;
 
       try {
-        const txOutputRunes = await this.getTxOutputRunes(txId);
-        for (const outRune of txOutputRunes) {
+        const { runes, height } = await this.getTxOutputRunes(txId);
+
+        if (block.height > height) {
+          throw new Error(
+            `Unisat is not synced. processing block height is [${block.height}] and synced height of unisat is [${height}]`,
+          );
+        }
+
+        for (const outRune of runes) {
           // check if rune is transferred to the lock address
           if (outRune.address !== this.lockAddress) continue;
 
@@ -135,7 +142,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
    */
   protected getTxOutputRunes = async (
     txId: string,
-  ): Promise<TxOutputRune[]> => {
+  ): Promise<{ runes: TxOutputRune[]; height: number }> => {
     // Transform the RPC transaction to the expected BitcoinRunesTx format
     const runes: TxOutputRune[] = [];
 
@@ -153,7 +160,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
 
       txRunes = response.data.data;
       if (txRunes.detail.length !== txRunes.total) {
-        throw Error(
+        throw new Error(
           `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`,
         );
       }
@@ -181,6 +188,6 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       });
     }
 
-    return runes;
+    return { runes, height: txRunes.height };
   };
 }
