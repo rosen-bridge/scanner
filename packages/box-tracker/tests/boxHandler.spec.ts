@@ -12,7 +12,7 @@ describe('generateTracker', () => {
    * - call generateTracker with a matching address and token requirements
    * - run tracker function on a matching box
    * @expected
-   * - to return true
+   * - should return true
    */
   it('should returns true when address matches and all tokens are present with sufficient amount', () => {
     const tokens: Token[] = [
@@ -32,7 +32,7 @@ describe('generateTracker', () => {
    * - call generateTracker with an incorrect address
    * - run tracker function on a box
    * @expected
-   * - to return false
+   * - should return false
    */
   it('should returns false when address does not match', () => {
     const tokens: Token[] = [{ tokenId: 'tokenA', amount: 10n }];
@@ -49,7 +49,7 @@ describe('generateTracker', () => {
    * - call generateTracker with a token list including a missing token
    * - run tracker function on a box
    * @expected
-   * - to return false
+   * - should return false
    */
   it('should returns false when a token is missing', () => {
     const tokens: Token[] = [
@@ -69,7 +69,7 @@ describe('generateTracker', () => {
    * - call generateTracker with a higher amount than available
    * - run tracker function on a box
    * @expected
-   * - to return false
+   * - should return false
    */
   it('should returns false when token amount is insufficient', () => {
     const tokens: Token[] = [{ tokenId: 'tokenA', amount: 100n }];
