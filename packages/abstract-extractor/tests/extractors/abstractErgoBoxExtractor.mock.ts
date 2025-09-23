@@ -19,7 +19,7 @@ export class MockedErgoBoxExtractor extends AbstractErgoBoxExtractor<
 
   getId = () => 'TestErgoBoxExtractor';
 
-  hasData = (
+  hasBoxData = (
     box: V1.OutputInfo | OutputBox, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => false;
 

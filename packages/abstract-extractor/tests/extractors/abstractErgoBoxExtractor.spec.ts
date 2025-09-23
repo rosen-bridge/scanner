@@ -17,7 +17,7 @@ describe('AbstractErgoBoxExtractor', () => {
      * @dependencies
      * @scenario
      * - mock extractor
-     * - mock `hasData` to return true for one box
+     * - mock `hasBoxData` to return true for one box
      * - spy `extractBoxData` and `storeEntities`
      * - run test (call `processTransactions`)
      * @expected
@@ -30,7 +30,7 @@ describe('AbstractErgoBoxExtractor', () => {
       const extractor = new MockedErgoBoxExtractor();
       const triggerCallbacks = vitest.fn();
       extractor['triggerCallbacks'] = triggerCallbacks;
-      extractor.hasData = (box: V1.OutputInfo | OutputBox) => {
+      extractor.hasBoxData = (box: V1.OutputInfo | OutputBox) => {
         if (box.boxId == tx.outputs[0].boxId) return true;
         return false;
       };
@@ -68,7 +68,7 @@ describe('AbstractErgoBoxExtractor', () => {
      * @target processTransactions should extract spending information of all input boxes
      * @dependencies
      * @scenario
-     * - mock extractor (hasData returns false as default)
+     * - mock extractor (hasBoxData returns false as default)
      * - spy `extractBoxData`, `storeEntities` and `updateSpendingInfo`
      * - run test (call `processTransactions`)
      * @expected
@@ -121,7 +121,7 @@ describe('AbstractErgoBoxExtractor', () => {
      * @dependencies
      * @scenario
      * - mock extractor
-     * - mock `hasData` to return true for one box
+     * - mock `hasBoxData` to return true for one box
      * - spy `extractBoxData` and `storeEntities`
      * - run test (call `processTransactions`)
      * @expected
@@ -130,7 +130,7 @@ describe('AbstractErgoBoxExtractor', () => {
      */
     it('should return false if data insertion fails', async () => {
       const extractor = new MockedErgoBoxExtractor();
-      extractor.hasData = (box: V1.OutputInfo | OutputBox) => {
+      extractor.hasBoxData = (box: V1.OutputInfo | OutputBox) => {
         if (box.boxId == tx.outputs[0].boxId) return true;
         return false;
       };

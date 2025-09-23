@@ -19,6 +19,19 @@ import { AbstractErgoExtractor } from './abstractErgoExtractor';
 import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
 import { ErgoBoxInitializer } from '../initializers/ergoBoxInitializer';
 
+/**
+ * Abstract Ergo Box Extractor class for box-based data extraction.
+ *
+ * This class extends the AbstractErgoExtractor class and provides
+ * functionality for extracting box-based data from the blockchain.
+ *
+ * It overrides the `initializeData` method to use the box-based initializer.
+ * It overrides the `processTransactions` method to use the box-based data extraction.
+ * Triggers a new callback type `Spend` for each spent box.
+ *
+ * @template ExtractedData - The type of data extracted from blockchain
+ * @template ExtractorEntity - The database entity type for storing extracted data
+ */
 export abstract class AbstractErgoBoxExtractor<
   ExtractedData extends AbstractEntityData,
   ExtractorEntity extends AbstractErgoBoxEntity,
@@ -49,7 +62,7 @@ export abstract class AbstractErgoBoxExtractor<
    * @param box
    * @return true if the box has the required data and false otherwise
    */
-  abstract hasData: (box: OutputBox) => boolean;
+  abstract hasBoxData: (box: OutputBox) => boolean;
 
   /**
    * extract transaction extra information
@@ -94,7 +107,7 @@ export abstract class AbstractErgoBoxExtractor<
       for (const tx of txs) {
         const inputExtensions = tx.inputs.map((input) => input.extension || {});
         for (const output of tx.outputs) {
-          if (!this.hasData(output)) {
+          if (!this.hasBoxData(output)) {
             continue;
           }
           this.logger.debug(`Trying to extract data from box ${output.boxId}`);
@@ -156,7 +169,7 @@ export abstract class AbstractErgoBoxExtractor<
         this.initializeOptions.url,
         this.initializeOptions.address,
         this.getId(),
-        this.hasData,
+        this.hasBoxData,
         this.processTransactions,
         this.actions,
         this.initializeOptions.maxParallelRequests,

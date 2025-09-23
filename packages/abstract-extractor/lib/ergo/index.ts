@@ -1,6 +1,5 @@
 export * from './extractors/abstractErgoExtractor';
 export * from './extractors/abstractErgoBoxExtractor';
-export * from './extractors/abstractErgoTxExtractor';
 export * from './initializers/ergoBoxInitializer';
 export * from './initializers/ergoInitializer';
 export * from './database/actions/abstractErgoAction';

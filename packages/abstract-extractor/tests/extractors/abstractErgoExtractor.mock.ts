@@ -1,22 +1,23 @@
-import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import {
   AbstractErgoExtractor,
   AbstractEntityData,
-  AbstractErgoBoxEntity,
+  AbstractErgoEntity,
   AbstractErgoAction,
 } from '../../lib';
 
 export class MockedErgoExtractor extends AbstractErgoExtractor<
   AbstractEntityData,
-  AbstractErgoBoxEntity
+  AbstractErgoEntity
 > {
-  actions: AbstractErgoAction<AbstractEntityData, AbstractErgoBoxEntity>;
+  actions: AbstractErgoAction<AbstractEntityData, AbstractErgoEntity>;
 
-  processTransactions: (
-    transactions: Transaction[],
-    block: BlockInfo,
-  ) => Promise<boolean>;
-
+  hasTxData = (
+    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => false;
+  extractTxData = (
+    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => undefined;
   getId = () => 'TestErgoExtractor';
 }
