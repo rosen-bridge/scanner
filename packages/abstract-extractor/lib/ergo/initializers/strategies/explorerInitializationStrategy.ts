@@ -1,4 +1,4 @@
-import { ExtendedTransaction } from '../../interfaces';
+import { ExtendedTransaction, RangeQuery } from '../../interfaces';
 import { ExplorerNetwork } from '../../network/ExplorerNetwork';
 import { API_LIMIT } from '../../../constants';
 import { requestWithRetrial } from '../../utils';
@@ -30,6 +30,11 @@ export class ExplorerInitializationStrategy {
     this.network = new ExplorerNetwork(url);
     this.extraLargeBlocks = [];
     this.promiseQueue = new PQueue({ concurrency: maxWorkers });
+    this.workerManager = new WorkerManager(
+      this.maxWorkers,
+      this.getRangeTxCount,
+      this.logger,
+    );
   }
 
   /**
@@ -62,30 +67,33 @@ export class ExplorerInitializationStrategy {
    * @param count
    * @returns
    */
-  processRange = async (start: number, end: number, count?: number) => {
-    if (count != undefined && count == 0) {
-      this.logger.debug(`skipping range [${start}, ${end}] with 0 txs`);
+  processRange = async (rangeQuery: RangeQuery) => {
+    if (rangeQuery.count == 0) {
+      this.logger.debug(
+        `skipping range [${rangeQuery.start}, ${rangeQuery.end}] with 0 txs`,
+      );
       return 0;
     }
     const txs = await requestWithRetrial(
       () =>
-        this.network.getAddressTransactionsWithHeight(this.address, start, end),
+        this.network.getAddressTransactionsWithHeight(
+          this.address,
+          rangeQuery.start,
+          rangeQuery.end,
+        ),
       this.logger,
     );
-    if (count && txs.total != count)
+    if (txs.total != rangeQuery.count)
       this.logger.error(
-        `Impossible behavior: Range query count ${count} differs from total ${txs.total} for range [${start}, ${end}]`,
+        `Impossible behavior: Range query count ${rangeQuery.count} differs from total ${txs.total} for range [${rangeQuery.start}, ${rangeQuery.end}]`,
       );
-    if (txs.total <= API_LIMIT && txs.total > 0) {
-      this.logger.debug(
-        `Processing started for [${start}, ${end}] with ${txs.total} txs`,
-      );
-      await this.processTransactionBatch(txs.items);
-      this.logger.debug(
-        `Processing finished for [${start}, ${end}] with ${txs.total} txs`,
-      );
-    }
-    return txs.total;
+    this.logger.debug(
+      `Processing started for [${rangeQuery.start}, ${rangeQuery.end}] with ${txs.total} txs`,
+    );
+    await this.processTransactionBatch(txs.items);
+    this.logger.debug(
+      `Processing finished for [${rangeQuery.start}, ${rangeQuery.end}] with ${txs.total} txs`,
+    );
   };
 
   /**
@@ -152,11 +160,7 @@ export class ExplorerInitializationStrategy {
         // range is processable
         if (lastRangeQuery.count <= API_LIMIT) {
           this.logger.debug(`Processing transactions in range query`);
-          await this.processRange(
-            lastRangeQuery.start,
-            lastRangeQuery.end,
-            lastRangeQuery.count,
-          );
+          await this.processRange(lastRangeQuery);
         } else {
           this.logger.debug(
             `processing extra large block at height ${lastRangeQuery.start}`,
@@ -173,12 +177,7 @@ export class ExplorerInitializationStrategy {
    * @param initialBlock
    */
   initialize = async (initialBlock: BlockInfo) => {
-    this.workerManager = new WorkerManager(
-      initialBlock.height,
-      this.maxWorkers,
-      this.getRangeTxCount,
-      this.logger,
-    );
+    this.workerManager.setup(initialBlock.height);
     const addWorkerJob = (i: number) =>
       this.promiseQueue.add(() => this.startWorker(i));
     // Initialize the workers

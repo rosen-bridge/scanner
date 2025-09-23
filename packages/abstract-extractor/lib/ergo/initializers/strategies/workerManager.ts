@@ -6,15 +6,23 @@ export class WorkerManager {
   private workersRangeList: RangeList[];
   private mutex = new Mutex();
   private initialSegmentSize: number;
+  private maxHeight?: number;
+
   constructor(
-    private maxHeight: number,
     private workerCount: number,
     private getRangeTxCount: (start: number, end: number) => Promise<number>,
     private logger = new DummyLogger(),
-  ) {
-    this.workersRangeList = Array.from({ length: workerCount }, () => []);
+  ) {}
+
+  /**
+   * Setup the worker manager to start working
+   * @param maxHeight
+   */
+  setup = (maxHeight: number) => {
+    this.maxHeight = maxHeight;
+    this.workersRangeList = Array.from({ length: this.workerCount }, () => []);
     this.initialSegmentSize = Math.ceil(this.maxHeight / this.workerCount);
-  }
+  };
 
   /**
    * Checks if the worker's search range is completed
@@ -31,6 +39,8 @@ export class WorkerManager {
    * @param workerIndex
    */
   registerWorker = async (workerIndex: number) => {
+    if (!this.maxHeight)
+      throw Error('Please call setup before registering workers');
     const start = workerIndex * this.initialSegmentSize;
     const end = Math.min(
       (workerIndex + 1) * this.initialSegmentSize - 1,

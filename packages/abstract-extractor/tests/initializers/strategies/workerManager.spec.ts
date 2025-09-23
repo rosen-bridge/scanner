@@ -9,6 +9,14 @@ import {
 } from './workerManager.mock';
 
 describe('WorkerManager', () => {
+  let manager: WorkerManager;
+  let getRangeTxCountSpy: ReturnType<typeof vi.fn>;
+  beforeEach(() => {
+    getRangeTxCountSpy = vi.fn().mockImplementation(mockGetRangeTxCount);
+    manager = new WorkerManager(2, getRangeTxCountSpy);
+    manager.setup(10000);
+  });
+
   describe('isWorkerActive', () => {
     /**
      * @target isWorkerActive should return true when worker has ranges
@@ -22,10 +30,6 @@ describe('WorkerManager', () => {
      * - return true
      */
     it('should return true when worker has ranges', () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
       expect(manager.isWorkerActive(0)).toBe(true);
     });
@@ -41,10 +45,6 @@ describe('WorkerManager', () => {
      * - return false
      */
     it('should return false when worker has no ranges', () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       expect(manager.isWorkerActive(0)).toBe(false);
     });
   });
@@ -63,11 +63,6 @@ describe('WorkerManager', () => {
      * - getRangeTxCount should be called
      */
     it('should initialize worker with correct range', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
-
       await manager.registerWorker(0);
 
       expect(manager['workersRangeList'][0]).toHaveLength(1);
@@ -95,10 +90,6 @@ describe('WorkerManager', () => {
      * - getRangeTxCount should be called
      */
     it('should split the last range in half', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = [cloneDeep(mockRangeQuery)];
 
       await manager.limitLastRange(0);
@@ -123,10 +114,6 @@ describe('WorkerManager', () => {
      * - throw error
      */
     it('should throw error when worker has no ranges', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       await expect(manager.limitLastRange(0)).rejects.toThrow();
     });
   });
@@ -145,10 +132,6 @@ describe('WorkerManager', () => {
      * - other ranges should be updated
      */
     it('should remove last range and update others', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
 
       await manager.popLastRangeQuery(0);
@@ -177,10 +160,6 @@ describe('WorkerManager', () => {
      * - throw error
      */
     it('should throw error when worker has no ranges', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       await expect(manager.popLastRangeQuery(0)).rejects.toThrow();
     });
   });
@@ -199,10 +178,8 @@ describe('WorkerManager', () => {
      * - original worker should have updated range
      */
     it('should reassign work to idle workers', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 3, getRangeTxCountSpy);
+      manager = new WorkerManager(3, getRangeTxCountSpy);
+      manager.setup(10000);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
 
       const newWorkers = await manager.reassignIdleWorkers();
@@ -242,10 +219,6 @@ describe('WorkerManager', () => {
      * - return empty array
      */
     it('should return empty array when no idle workers', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
       manager['workersRangeList'][1] = cloneDeep(mockRangeList);
 
@@ -268,10 +241,6 @@ describe('WorkerManager', () => {
      * - return last range
      */
     it('should return last range when all ranges are above threshold', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
 
       const range = await manager.getLastRange(0, 20);
@@ -291,10 +260,6 @@ describe('WorkerManager', () => {
      * - return first range
      */
     it('should return second range when its range is below threshold', async () => {
-      const getRangeTxCountSpy = vi
-        .fn()
-        .mockImplementation(mockGetRangeTxCount);
-      const manager = new WorkerManager(10000, 2, getRangeTxCountSpy);
       manager['workersRangeList'][0] = cloneDeep(mockRangeList);
 
       const range = await manager.getLastRange(0, 50);
