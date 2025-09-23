@@ -143,22 +143,19 @@ export abstract class AbstractErgoAction<
    * if an entity is created in this block remove it from database
    * @param block
    * @param extractor
-   * @return deleted items and updated box ids
+   * @return deleted items and updated entity identifiers
    */
   deleteBlockData = async (
     block: string,
     extractor: string,
   ): Promise<{ deletedData: ExtractedData[]; updatedData: EntityInfo[] }> => {
-    this.logger.debug(
+    this.logger.info(
       `Deleting data in block ${block} and extractor ${extractor}`,
     );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      this.logger.info(
-        `Deleting boxes in block ${block} and extractor ${extractor}`,
-      );
       const updatedData = await this.revertBlockUpdates(
         queryRunner,
         extractor,
@@ -170,6 +167,9 @@ export abstract class AbstractErgoAction<
         block,
       );
       await queryRunner.commitTransaction();
+      this.logger.debug(
+        `Deleted data successfully in block ${block} and extractor ${extractor}`,
+      );
       return {
         deletedData,
         updatedData: updatedData.map((data) => pick(data, 'identifier')),
@@ -187,12 +187,12 @@ export abstract class AbstractErgoAction<
   };
 
   /**
-   * insert all extracted box data in an atomic transaction
-   * update the data if a box with the same id is already stored in db
-   * @param boxes
+   * insert all extracted entity data in an atomic transaction
+   * update the data if a entity with the same id is already stored in db
+   * @param entities
    * @param block
    * @param extractor
-   * @return inserted items and updated box ids
+   * @return inserted items and updated entity identifiers
    * returns undefined in case of any problem
    */
   storeEntities = async (
@@ -210,20 +210,20 @@ export abstract class AbstractErgoAction<
     await queryRunner.startTransaction();
     try {
       const repository = queryRunner.manager.getRepository(this.repo);
-      const dbBoxIds = (
+      const dbEntityIdentifiers = (
         await repository.findBy({
           identifier: In(entities.map((item) => item.identifier)),
           extractor: extractor,
         } as FindOptionsWhere<ExtractorEntity>)
       ).map((entity) => entity.identifier);
-      if (dbBoxIds.length > 0)
+      if (dbEntityIdentifiers.length > 0)
         this.logger.debug(
           `Found stored entities with same identifier`,
-          dbBoxIds,
+          dbEntityIdentifiers,
         );
 
       entitiesToUpdate = entities.filter((entity) =>
-        dbBoxIds.includes(entity.identifier),
+        dbEntityIdentifiers.includes(entity.identifier),
       );
       entitiesToInsert = difference(entities, entitiesToUpdate);
 
@@ -253,7 +253,7 @@ export abstract class AbstractErgoAction<
       await queryRunner.commitTransaction();
       return true;
     } catch (e) {
-      this.logger.error(`An error occurred during store boxes action: ${e}`);
+      this.logger.error(`An error occurred during store entities action: ${e}`);
       await queryRunner.rollbackTransaction();
       return false;
     } finally {

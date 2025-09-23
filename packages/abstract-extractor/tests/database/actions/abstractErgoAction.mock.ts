@@ -6,8 +6,8 @@ import {
   AbstractErgoAction,
   AbstractErgoEntity,
   AbstractEntityData,
-} from '../../lib';
-import { TestEntity } from '../testUtils';
+} from '../../../lib';
+import { TestEntity } from '../../testUtils';
 
 export class TestErgoAction extends AbstractErgoAction<
   AbstractEntityData,
@@ -21,15 +21,15 @@ export class TestErgoAction extends AbstractErgoAction<
    * create the test database entity from data and block information
    */
   createEntity = (
-    boxes: AbstractEntityData[],
+    entities: AbstractEntityData[],
     block: BlockInfo,
     extractor: string,
   ): Omit<AbstractErgoEntity, 'id'>[] => {
-    return boxes.map((box) => ({
-      identifier: box.identifier,
+    return entities.map((entity) => ({
+      identifier: entity.identifier,
       block: block.hash,
       height: block.height,
-      serialized: box.serialized,
+      serialized: entity.serialized,
       extractor: extractor,
     }));
   };

@@ -6,8 +6,8 @@ import {
   AbstractErgoBoxEntity,
   AbstractEntityData,
   AbstractErgoBoxAction,
-} from '../../lib';
-import { TestBoxEntity } from '../testUtils';
+} from '../../../lib';
+import { TestBoxEntity } from '../../testUtils';
 
 export class TestErgoBoxAction extends AbstractErgoBoxAction<
   AbstractEntityData,
