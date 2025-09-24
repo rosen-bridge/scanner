@@ -1,7 +1,7 @@
 {
   "name": "@rosen-bridge/box-tracker",
   "version": "0.1.0",
-  "description": " tracking specific boxes where only one instance should exist at any time with the specified parameters.",
+  "description": "Tracking specific boxes where only one instance should exist at any time with the specified parameters.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rosen-bridge/scanner.git"
@@ -35,6 +35,6 @@
     "vitest": "^3.1.4"
   },
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.18.0"
   }
 }
