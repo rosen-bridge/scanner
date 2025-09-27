@@ -5,6 +5,7 @@ import { migration1706610773315 } from './postgres/1706610773315-migration';
 import { Migration1709388482275 } from './postgres/1709388482275-migration';
 import { Migration1737785036299 } from './postgres/1737785036299-migration';
 import { migration1746354253000 } from './postgres/1746354253000-migration';
+import { Migration1758958886549 } from './postgres/1758958886549-migration';
 import { migration1688555766601 } from './sqlite/1688555766601-migration';
 import { migration1689175103163 } from './sqlite/1689175103163-migration';
 import { migration1699872205117 } from './sqlite/1699872205117-migration';
@@ -33,5 +34,6 @@ export const migrations = {
     Migration1709388482275,
     Migration1737785036299,
     migration1746354253000,
+    Migration1758958886549,
   ],
 };
