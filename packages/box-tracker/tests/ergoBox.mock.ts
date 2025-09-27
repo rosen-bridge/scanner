@@ -1,4 +1,4 @@
-import { ErgoBox } from '../lib/config';
+import { ErgoBox } from '../lib/interfaces';
 
 export const mockBoxes: ErgoBox[] = [
   {
