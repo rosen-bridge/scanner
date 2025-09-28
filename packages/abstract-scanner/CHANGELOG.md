@@ -1,5 +1,19 @@
 # @rosen-bridge/abstract-scanner
 
+## 0.2.0
+
+### Minor Changes
+
+- Apply suffix correctly for general scanners
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/extended-typeorm@1.0.0
+  - @rosen-bridge/json-bigint@1.0.0
+  - @rosen-bridge/abstract-logger@3.0.0
+  - @rosen-bridge/abstract-extractor@2.1.1
+
 ## 0.1.0
 
 - Added optional suffix support for WebSocket-based scanners
