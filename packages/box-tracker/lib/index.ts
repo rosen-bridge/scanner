@@ -1,2 +1,2 @@
-export * from './boxHandlers';
-export * from './config';
+export * from './boxHandler';
+export * from './interfaces';
