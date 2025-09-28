@@ -1,5 +1,16 @@
 # @rosen-bridge/abstract-extractor
 
+## 2.1.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/extended-typeorm@1.0.0
+  - @rosen-bridge/abstract-logger@3.0.0
+  - @rosen-bridge/json-bigint@1.0.0
+  - @rosen-clients/ergo-explorer@2.0.0
+  - @rosen-clients/ergo-node@3.0.0
+
 ## 2.1.0
 
 ### Minor Changes
