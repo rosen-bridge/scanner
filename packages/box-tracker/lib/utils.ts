@@ -1,4 +1,4 @@
-import { ApiRegister } from './config';
+import { ApiRegister } from './interfaces';
 
 export const mapAdditionalRegisters = (
   apiRegisters: Record<string, ApiRegister> = {},
@@ -9,7 +9,7 @@ export const mapAdditionalRegisters = (
     if (typeof reg === 'string') {
       result[key] = reg;
     } else {
-      result[key] = reg.renderedValue ?? reg.serializedValue ?? '';
+      result[key] = reg.renderedValue || reg.serializedValue || '';
     }
   }
   return result;

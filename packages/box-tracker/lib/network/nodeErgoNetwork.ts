@@ -1,5 +1,5 @@
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
-import { ErgoBox, Token } from '../config';
+import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 import { mapAdditionalRegisters } from '../utils';
@@ -54,5 +54,13 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
         index: o.index!,
       })),
     }));
+  }
+  async getBox(): Promise<ErgoBox | undefined> {
+    const boxes = await this.getBoxesByAddress(this.address);
+    return boxes.find((box) =>
+      this.tokens.every((t) =>
+        box.assets.some((a) => a.tokenId === t.tokenId && a.amount >= t.amount),
+      ),
+    );
   }
 }
