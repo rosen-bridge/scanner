@@ -1,5 +1,16 @@
 # @rosen-bridge/bitcoin-scanner
 
+## 0.2.0
+
+### Minor Changes
+
+- Use @rosen-clients/rate-limited-axios instead of @rosen-bridge/rate-limited-axios
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.0
+
 ## 0.1.0
 
 - This package was **integrated** from `@rosen-bridge/bitcoin-esplora-scanner` and `@rosen-bridge/bitcoin-rpc-scanner`.  

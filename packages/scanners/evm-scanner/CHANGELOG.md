@@ -1,5 +1,12 @@
 # @rosen-bridge/evm-scanner
 
+## 0.1.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.0
+
 ## 0.1.0
 
 - This package was **renamed** from `@rosen-bridge/evm-rpc-scanner`.  
