@@ -6,6 +6,7 @@ import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 export class ExplorerErgoNetwork extends AbstractErgoNetwork {
   private api;
+
   constructor(address: string, tokens: Token[] = [], url: string) {
     super(address, tokens);
     this.api = ergoExplorerClientFactory(url);
