@@ -1,5 +1,17 @@
 # @rosen-bridge/cardano-scanner
 
+## 0.2.0
+
+### Minor Changes
+
+- Use @rosen-clients/rate-limited-axios instead of @rosen-bridge/rate-limited-axios
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.0
+  - @rosen-bridge/extended-typeorm@1.0.0
+
 ## 0.1.0
 
 - Added optional suffix support for Cardano Ogmios scanner
