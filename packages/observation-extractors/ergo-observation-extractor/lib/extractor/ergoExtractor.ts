@@ -1,37 +1,43 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { Buffer } from 'buffer';
 import { blake2b } from 'blakejs';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { TokenMap } from '@rosen-bridge/tokens';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { ExtractedObservation } from '@rosen-bridge/abstract-observation-extractor';
-import { ObservationEntityAction } from '@rosen-bridge/abstract-observation-extractor';
+import {
+  AbstractObservationExtractor,
+  ExtractedObservation,
+} from '@rosen-bridge/abstract-observation-extractor';
+
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 
-export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
-  readonly logger: AbstractLogger;
-  private readonly actions: ObservationEntityAction;
-  private readonly extractor: ErgoNodeRosenExtractor;
-  static readonly FROM_CHAIN: string = 'ergo';
+export class ErgoObservationExtractor extends AbstractObservationExtractor<Transaction> {
+  readonly FROM_CHAIN: string = 'ergo';
 
   constructor(
+    lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    address: string,
     logger?: AbstractLogger,
   ) {
-    super();
-    this.logger = logger ? logger : new DummyLogger();
-    this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new ErgoNodeRosenExtractor(address, tokens, this.logger);
+    super(
+      dataSource,
+      tokens,
+      new ErgoNodeRosenExtractor(lockAddress, tokens, logger),
+      logger,
+    );
   }
 
   /**
    * get Id for current extractor
    */
   getId = () => 'ergo-observation-extractor';
+
+  /**
+   * gets transaction id from TransactionType
+   */
+  getTxId = (tx: Transaction) => tx.id;
 
   /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
@@ -65,7 +71,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               blake2b(transaction.id, undefined, 32),
             ).toString('hex');
             observations.push({
-              fromChain: ErgoObservationExtractor.FROM_CHAIN,
+              fromChain: this.FROM_CHAIN,
               toChain: data.toChain,
               networkFee: data.networkFee,
               bridgeFee: data.bridgeFee,
@@ -77,6 +83,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData,
             });
           }
         });

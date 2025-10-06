@@ -262,6 +262,7 @@ describe('ObservationEntityAction', () => {
               toChain: genHexString(),
               toAddress: genHexString(),
               fromChain: genHexString(),
+              rawData: 'mocked',
             },
           ],
           block,

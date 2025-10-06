@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "composite": true
   },
   "include": ["tests", "lib", "vitest.config.ts"],
   "references": [

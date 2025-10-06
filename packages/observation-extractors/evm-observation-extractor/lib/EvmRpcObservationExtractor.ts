@@ -41,6 +41,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData
             });
           } else
             throw Error(

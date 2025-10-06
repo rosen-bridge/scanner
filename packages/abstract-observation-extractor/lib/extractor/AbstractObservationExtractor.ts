@@ -73,6 +73,7 @@ export abstract class AbstractObservationExtractor<
           requestId: requestId,
           toAddress: data.toAddress,
           fromAddress: data.fromAddress,
+          rawData: data.rawData,
         });
       }
     });

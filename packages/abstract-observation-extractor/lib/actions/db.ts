@@ -59,6 +59,7 @@ export class ObservationEntityAction {
           targetChainTokenId: observation.targetChainTokenId,
           toAddress: observation.toAddress,
           extractor: extractor,
+          rawData: observation.rawData,
         };
         if (!saved) {
           this.logger.info(
