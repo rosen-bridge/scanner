@@ -1,5 +1,10 @@
 import { ApiRegister } from './interfaces';
 
+/**
+ * Maps Ergo API register objects into a normalized key-value record.
+ * @param apiRegisters - A record of API register objects.
+ * @return A record with register keys and their corresponding string values.
+ */
 export const mapAdditionalRegisters = (
   apiRegisters: Record<string, ApiRegister> = {},
 ): Record<string, string> => {

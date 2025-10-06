@@ -7,11 +7,23 @@ import { Transaction } from '@rosen-bridge/scanner-interfaces';
 export class ExplorerErgoNetwork extends AbstractErgoNetwork {
   private api;
 
+  /**
+   * Creates an instance of ExplorerErgoNetwork.
+   *
+   * @param address - The Ergo address to operate on.
+   * @param tokens[] - A list of tokens to track.
+   * @param url - The base URL of the Ergo Explorer API.
+   */
   constructor(address: string, tokens: Token[] = [], url: string) {
     super(address, tokens);
     this.api = ergoExplorerClientFactory(url);
   }
 
+  /**
+   * Retrieves all unspent boxes associated with a given Ergo address
+   * by querying the Ergo Explorer API.
+   *
+   */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
     const rawBoxes = (await this.api.v1.getApiV1BoxesByaddressP1(address))
       .items;
@@ -30,10 +42,12 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
       index: b.index,
     }));
   }
-
+  /**
+   * Fetches all unconfirmed transactions currently in the mempool.
+   *
+   */
   async getMempoolTxs(): Promise<Transaction[]> {
     const rawTxs = (await this.api.v0.getApiV0TransactionsUnconfirmed()).items;
-
     return rawTxs!.map((t) => ({
       id: t.id,
       inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
@@ -58,6 +72,11 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
     }));
   }
 
+  /**
+   * Retrieves a single Ergo box from the address that contains
+   * all required tokens specified in the instance.
+   *
+   */
   async getBox(): Promise<ErgoBox | undefined> {
     const boxes = await this.getBoxesByAddress(this.address);
     return boxes.find((box) =>

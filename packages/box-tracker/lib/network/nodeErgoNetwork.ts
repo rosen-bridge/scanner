@@ -6,11 +6,23 @@ import { mapAdditionalRegisters } from '../utils';
 
 export class NodeErgoNetwork extends AbstractErgoNetwork {
   private api;
+
+  /**
+   * Creates an instance of NodeErgoNetwork.
+   *
+   * @param  address - The Ergo address to operate on.
+   * @param  tokens[] - A list of tokens to track.
+   * @param url - The base URL of the Ergo node.
+   */
   constructor(address: string, tokens: Token[] = [], url: string) {
     super(address, tokens);
     this.api = ergoNodeClientFactory(url);
   }
 
+  /**
+   * Retrieves all unspent boxes associated with a given Ergo address.
+   *
+   */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
     const rawBoxes = (await this.api.getBoxesByAddress(address)).items ?? [];
 
@@ -29,10 +41,12 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       index: b.index ?? 0,
     }));
   }
-
+  /**
+   * Fetches all unconfirmed transactions currently in the mempool.
+   *
+   */
   async getMempoolTxs(): Promise<Transaction[]> {
     const rawTxs = await this.api.getUnconfirmedTransactions();
-
     return rawTxs.map((t) => ({
       id: t.id,
       inputs: t.inputs.map((i) => ({ boxId: i.boxId })),
@@ -55,6 +69,11 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       })),
     }));
   }
+  /**
+   * Retrieves a single Ergo box from the address that contains
+   * all required tokens specified in the instance.
+   *
+   */
   async getBox(): Promise<ErgoBox | undefined> {
     const boxes = await this.getBoxesByAddress(this.address);
     return boxes.find((box) =>
