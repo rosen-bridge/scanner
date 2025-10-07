@@ -44,17 +44,28 @@ export abstract class AbstractObservationExtractor<
   abstract getTxId: (tx: TransactionType) => string;
 
   /**
+   * filter transactions before processing
+   * @param txs
+   * @param block
+   */
+  protected filterProcessTransactions = (
+    txs: Array<TransactionType>,
+    block: Block, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) => txs;
+
+  /**
    * gets block id and transactions corresponding to the block and saves if they are valid rosen
    *  transactions and in case of success return true and in case of failure returns false
-   * @param block
    * @param txs
+   * @param block
    */
   processTransactions = (
     txs: Array<TransactionType>,
     block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
-    txs.forEach((transaction) => {
+    const filteredTxs = this.filterProcessTransactions(txs, block);
+    filteredTxs.forEach((transaction) => {
       const data = this.extractor.get(transaction);
       if (data) {
         const requestId = Buffer.from(

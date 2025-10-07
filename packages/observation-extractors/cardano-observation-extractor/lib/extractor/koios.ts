@@ -31,20 +31,4 @@ export class CardanoKoiosObservationExtractor extends AbstractObservationExtract
    * gets transaction id from TransactionType
    */
   getTxId = (tx: KoiosTransaction) => tx.tx_hash;
-
-  /**
-   * fork one block and remove all stored information for this block
-   * @param hash: block hash
-   */
-  forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockObservation(hash, this.getId());
-  };
-
-  /**
-   * Extractor box initialization
-   * No action needed in cardano extractors
-   */
-  initializeBoxes = async () => {
-    return;
-  };
 }
