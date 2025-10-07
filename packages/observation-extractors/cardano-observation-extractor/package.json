@@ -25,7 +25,6 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.0",
     "@types/node": "^22.18.0",
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.19.4",
@@ -36,14 +35,11 @@
     "@blockfrost/openapi": "0.1.78",
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
-    "@rosen-bridge/abstract-extractor": "^2.1.1",
     "@rosen-bridge/abstract-logger": "^3.0.0",
     "@rosen-bridge/abstract-observation-extractor": "^0.1.2",
     "@rosen-bridge/extended-typeorm": "^1.0.0",
     "@rosen-bridge/rosen-extractor": "^10.0.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.0",
-    "@rosen-bridge/tokens": "^4.0.0",
-    "blakejs": "^1.2.1"
+    "@rosen-bridge/tokens": "^4.0.0"
   },
   "engines": {
     "node": ">=22.18.0"
