@@ -44,11 +44,11 @@ export abstract class AbstractObservationExtractor<
   abstract getTxId: (tx: TransactionType) => string;
 
   /**
-   * filter transactions before processing
+   * manipulate transactions before processing
    * @param txs
    * @param block
    */
-  protected filterProcessTransactions = (
+  protected preprocessTransactions = (
     txs: Array<TransactionType>,
     block: Block, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => txs;
@@ -64,7 +64,7 @@ export abstract class AbstractObservationExtractor<
     block: Block,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
-    const filteredTxs = this.filterProcessTransactions(txs, block);
+    const filteredTxs = this.preprocessTransactions(txs, block);
     filteredTxs.forEach((transaction) => {
       const data = this.extractor.get(transaction);
       if (data) {

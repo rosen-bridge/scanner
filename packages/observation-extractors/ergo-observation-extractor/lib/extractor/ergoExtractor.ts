@@ -37,7 +37,7 @@ export class ErgoObservationExtractor extends AbstractObservationExtractor<Trans
   /**
    * Filter transactions before processing
    */
-  protected filterProcessTransactions = (
+  protected preprocessTransactions = (
     txs: Array<Transaction>,
     block: Block,
   ) => {
