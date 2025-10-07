@@ -1,10 +1,13 @@
-import { MigrationInterface, QueryRunner } from "@rosen-bridge/extended-typeorm";
+import {
+  MigrationInterface,
+  QueryRunner,
+} from '@rosen-bridge/extended-typeorm';
 
 export class Migration1759315440593 implements MigrationInterface {
-    name = 'Migration1759315440593'
+  name = 'Migration1759315440593';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "temporary_observation_entity" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fromChain" varchar(30) NOT NULL,
@@ -26,7 +29,7 @@ export class Migration1759315440593 implements MigrationInterface {
                 CONSTRAINT "UQ_a871fab5aa20b9306e13a057924" UNIQUE ("requestId", "extractor")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "temporary_observation_entity"(
                     "id",
                     "fromChain",
@@ -63,21 +66,21 @@ export class Migration1759315440593 implements MigrationInterface {
                 "extractor"
             FROM "observation_entity"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "observation_entity"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             ALTER TABLE "temporary_observation_entity"
                 RENAME TO "observation_entity"
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             ALTER TABLE "observation_entity"
                 RENAME TO "temporary_observation_entity"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             CREATE TABLE "observation_entity" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "fromChain" varchar(30) NOT NULL,
@@ -98,7 +101,7 @@ export class Migration1759315440593 implements MigrationInterface {
                 CONSTRAINT "UQ_a871fab5aa20b9306e13a057924" UNIQUE ("requestId", "extractor")
             )
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             INSERT INTO "observation_entity"(
                     "id",
                     "fromChain",
@@ -135,9 +138,8 @@ export class Migration1759315440593 implements MigrationInterface {
                 "extractor"
             FROM "temporary_observation_entity"
         `);
-        await queryRunner.query(`
+    await queryRunner.query(`
             DROP TABLE "temporary_observation_entity"
         `);
-    }
-
+  }
 }
