@@ -1,8 +1,10 @@
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
 import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
-import { mapAdditionalRegisters } from '../utils';
+import {
+  AdditionalRegisters,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 export class NodeErgoNetwork extends AbstractErgoNetwork {
   private api;
@@ -24,22 +26,32 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    *
    */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.getBoxesByAddress(address)).items ?? [];
-
-    return rawBoxes.map((b) => ({
-      boxId: b.boxId ?? '',
-      value: BigInt(b.value),
-      ergoTree: b.ergoTree,
-      creationHeight: b.creationHeight,
-      assets:
-        b.assets?.map((a) => ({
-          tokenId: a.tokenId,
-          amount: BigInt(a.amount),
-        })) ?? [],
-      additionalRegisters: mapAdditionalRegisters(b.additionalRegisters ?? {}),
-      transactionId: b.transactionId ?? '',
-      index: b.index ?? 0,
-    }));
+    const rawBoxes = (await this.api.getBoxesByAddress(address)).items;
+    if (rawBoxes) {
+      return rawBoxes.map((b) => ({
+        boxId: b.boxId ?? '',
+        value: BigInt(b.value),
+        ergoTree: b.ergoTree,
+        creationHeight: b.creationHeight,
+        assets:
+          b.assets?.map((a) => ({
+            tokenId: a.tokenId,
+            amount: BigInt(a.amount),
+          })) ?? [],
+        additionalRegisters: (() => {
+          const r: AdditionalRegisters = {};
+          const registers = ['R4', 'R5', 'R6', 'R7', 'R8', 'R9'] as const;
+          registers.forEach(
+            (k) =>
+              b.additionalRegisters[k] && (r[k] = b.additionalRegisters[k]),
+          );
+          return r;
+        })(),
+        transactionId: b.transactionId ?? '',
+        index: b.index ?? 0,
+      }));
+    }
+    return [];
   }
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
@@ -61,9 +73,15 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
             tokenId: a.tokenId,
             amount: BigInt(a.amount),
           })) ?? [],
-        additionalRegisters: mapAdditionalRegisters(
-          o.additionalRegisters ?? {},
-        ),
+        additionalRegisters: (() => {
+          const r: AdditionalRegisters = {};
+          const registers = ['R4', 'R5', 'R6', 'R7', 'R8', 'R9'] as const;
+          registers.forEach(
+            (k) =>
+              o.additionalRegisters[k] && (r[k] = o.additionalRegisters[k]),
+          );
+          return r;
+        })(),
         transactionId: o.transactionId ?? t.id,
         index: o.index!,
       })),
