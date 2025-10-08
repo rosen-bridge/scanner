@@ -1,8 +1,10 @@
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
-import { AdditionalRegisters } from '@rosen-bridge/scanner-interfaces';
+import {
+  AdditionalRegisters,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 export class ExplorerErgoNetwork extends AbstractErgoNetwork {
   private api;
@@ -33,22 +35,16 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
         value: BigInt(b.value),
         ergoTree: b.ergoTree,
         creationHeight: b.creationHeight,
-        assets: b.assets
-          ? b.assets.map((a: Token) => ({
-              tokenId: a.tokenId,
-              amount: BigInt(a.amount),
-            }))
-          : [],
-        additionalRegisters: (() => {
-          const r: AdditionalRegisters = {};
-          const registers = ['R4', 'R5', 'R6', 'R7', 'R8', 'R9'] as const;
-          registers.forEach(
-            (k) =>
-              b.additionalRegisters[k] &&
-              (r[k] = b.additionalRegisters[k].serializedValue),
-          );
-          return r;
-        })(),
+        assets: (b.assets || []).map((a) => ({
+          tokenId: a.tokenId,
+          amount: BigInt(a.amount),
+        })),
+        additionalRegisters: Object.fromEntries(
+          Object.entries(b.additionalRegisters || {}).map(([k, v]) => [
+            k,
+            v.serializedValue,
+          ]),
+        ) as AdditionalRegisters,
         transactionId: b.transactionId,
         index: b.index,
       }));
@@ -72,20 +68,16 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
             value: BigInt(o.value),
             ergoTree: o.ergoTree,
             creationHeight: o.creationHeight,
-            assets:
-              o.assets?.map((a: Token) => ({
-                tokenId: a.tokenId,
-                amount: BigInt(a.amount),
-              })) ?? [],
-            additionalRegisters: (() => {
-              const r: AdditionalRegisters = {};
-              const registers = ['R4', 'R5', 'R6', 'R7', 'R8', 'R9'] as const;
-              registers.forEach(
-                (k) =>
-                  o.additionalRegisters[k] && (r[k] = o.additionalRegisters[k]),
-              );
-              return r;
-            })(),
+            assets: (o.assets || []).map((a) => ({
+              tokenId: a.tokenId,
+              amount: BigInt(a.amount),
+            })),
+            additionalRegisters: Object.fromEntries(
+              Object.entries(o.additionalRegisters || {}).map(([k, v]) => [
+                k,
+                v,
+              ]),
+            ) as AdditionalRegisters,
             transactionId: o.txId,
             index: o.index,
           })) ?? [],
