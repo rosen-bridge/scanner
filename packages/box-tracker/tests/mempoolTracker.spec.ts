@@ -7,7 +7,6 @@ vi.mock('../lib/boxHandler', () => ({
   generateTracker: vi.fn(),
 }));
 
-// Helper to create a minimal valid ErgoBox
 const createMockBox = (boxId: string, value = 100n): ErgoBox => ({
   boxId,
   value,
