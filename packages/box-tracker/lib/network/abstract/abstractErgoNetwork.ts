@@ -28,7 +28,7 @@ export abstract class AbstractErgoNetwork {
 
     return boxes.find((box) =>
       this.tokens.every((t) => {
-        const asset = box.assets.find((a:Token) => a.tokenId === t.tokenId);
+        const asset = box.assets.find((a: Token) => a.tokenId === t.tokenId);
         return asset !== undefined && asset.amount >= t.amount;
       }),
     );
