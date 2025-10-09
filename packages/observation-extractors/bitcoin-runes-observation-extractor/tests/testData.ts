@@ -114,6 +114,7 @@ export const ergoEventData: RosenData = {
   sourceChainTokenId: '',
   targetChainTokenId: '',
   sourceTxId: mockTxId,
+  rawData: '',
 };
 
 export const txOutputRunes: { runes: TxOutputRune[]; height: number } = {

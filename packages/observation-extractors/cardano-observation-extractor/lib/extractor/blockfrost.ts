@@ -36,20 +36,4 @@ export class CardanoBlockFrostObservationExtractor extends AbstractObservationEx
    * gets transaction id from TransactionType
    */
   getTxId = (tx: BlockFrostTransaction) => tx.utxos.hash;
-
-  /**
-   * fork one block and remove all stored information for this block
-   * @param hash: block hash
-   */
-  forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockObservation(hash, this.getId());
-  };
-
-  /**
-   * Extractor box initialization
-   * No action needed in cardano extractors
-   */
-  initializeBoxes = async () => {
-    return;
-  };
 }
