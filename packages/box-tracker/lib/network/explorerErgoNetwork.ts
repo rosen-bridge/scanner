@@ -85,18 +85,4 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
     }
     return [];
   }
-
-  /**
-   * Retrieves a single Ergo box from the address that contains
-   * all required tokens specified in the instance.
-   *
-   */
-  async getBox(): Promise<ErgoBox | undefined> {
-    const boxes = await this.getBoxesByAddress(this.address);
-    return boxes.find((box) =>
-      this.tokens.every((t) =>
-        box.assets.some((a) => a.tokenId === t.tokenId && a.amount >= t.amount),
-      ),
-    );
-  }
 }
