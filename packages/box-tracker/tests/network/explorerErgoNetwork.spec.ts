@@ -1,5 +1,5 @@
 import { ExplorerErgoNetwork } from '../../lib/network/explorerErgoNetwork';
-import { mockedExplorerBoxes, mockedExplorerTxs } from './networkData.mock';
+import { mockedExplorerBoxes, mockedExplorerTxs } from './testData';
 
 vi.mock('@rosen-clients/ergo-explorer', () => ({
   default: vi.fn(() => ({

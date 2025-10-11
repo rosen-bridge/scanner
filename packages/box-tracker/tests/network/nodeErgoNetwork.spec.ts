@@ -1,5 +1,5 @@
 import { NodeErgoNetwork } from '../../lib/network/nodeErgoNetwork';
-import { mockedNodeBoxes, mockedNodeTxs } from './networkData.mock';
+import { mockedNodeBoxes, mockedNodeTxs } from './testData';
 
 vi.mock('@rosen-clients/ergo-node', () => ({
   default: vi.fn(() => ({
