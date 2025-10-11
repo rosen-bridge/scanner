@@ -4,4 +4,4 @@
 '@rosen-bridge/evm-observation-extractor': minor
 ---
 
-Added rawdata value inresults of processTransactions method of extractor(s)
+Added rawData value in results of processTransactions method of extractor(s)
