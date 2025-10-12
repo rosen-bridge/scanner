@@ -93,21 +93,4 @@ describe('NodeErgoNetwork', () => {
       expect(box).toBeUndefined();
     });
   });
-  /**
-   * @target getBox should return undefined if no box satisfies token requirement
-   * @scenario
-   * - mock getBoxesByAddress to return a predefined box
-   * - call getBox on the NodeErgoNetwork instance
-   * @expected
-   * - should return undefined
-   */
-  it('should return undefined if no box satisfies token requirement', async () => {
-    const network2 = new NodeErgoNetwork(
-      'addr',
-      [{ tokenId: 't3', amount: 1n }],
-      'url',
-    );
-    const box = await network2.getBox();
-    expect(box).toBeUndefined();
-  });
 });

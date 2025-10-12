@@ -25,3 +25,14 @@ export const mockBoxes: ErgoBox[] = [
     index: 1,
   },
 ];
+
+export const createMockBox = (boxId: string, value = 100n): ErgoBox => ({
+  boxId,
+  value,
+  ergoTree: 'mockTree',
+  creationHeight: 0,
+  assets: [],
+  additionalRegisters: {},
+  transactionId: 'tx-' + boxId,
+  index: 0,
+});
