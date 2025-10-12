@@ -4,14 +4,6 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
-export type ApiRegister =
-  | string
-  | {
-      serializedValue: string;
-      sigmaType: string;
-      renderedValue: string;
-    };
-
 export type Token = {
   tokenId: string;
   amount: bigint;
