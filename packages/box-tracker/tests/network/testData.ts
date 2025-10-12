@@ -1,4 +1,4 @@
-export const mockNodeBoxes = [
+export const mockedNodeBoxes = [
   {
     boxId: 'b1',
     value: '1000',
@@ -21,7 +21,7 @@ export const mockNodeBoxes = [
   },
 ];
 
-export const mockNodeTxs = [
+export const mockedNodeTxs = [
   {
     id: 'tx1',
     inputs: [{ boxId: 'in1' }],
@@ -58,7 +58,7 @@ export const mockNodeTxs = [
   },
 ];
 
-export const mockExplorerBoxes = [
+export const mockedExplorerBoxes = [
   {
     boxId: 'b1',
     value: '1000',
@@ -81,7 +81,7 @@ export const mockExplorerBoxes = [
   },
 ];
 
-export const mockExplorerTxs = [
+export const mockedExplorerTxs = [
   {
     id: 'tx1',
     inputs: [{ id: 'in1' }],
