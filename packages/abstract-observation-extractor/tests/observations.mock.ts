@@ -14,6 +14,7 @@ export const firstObservations: Array<ExtractedObservation> = [
     sourceTxId: 'ergoTxId1',
     sourceBlockId: 'ergoBlockId',
     requestId: 'reqId1',
+    rawData: 'mocked',
   },
   {
     fromChain: 'erg',
@@ -28,6 +29,7 @@ export const firstObservations: Array<ExtractedObservation> = [
     sourceTxId: 'ergoTxId2',
     sourceBlockId: 'ergoBlockId',
     requestId: 'reqId2',
+    rawData: 'mocked',
   },
 ];
 

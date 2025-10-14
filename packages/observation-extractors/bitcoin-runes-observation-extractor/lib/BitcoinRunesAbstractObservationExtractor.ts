@@ -131,6 +131,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
         requestId: requestId,
         toAddress: data.toAddress,
         fromAddress: data.fromAddress,
+        rawData: data.rawData,
       });
     }
     return this.actions.storeObservations(observations, block, this.getId());
