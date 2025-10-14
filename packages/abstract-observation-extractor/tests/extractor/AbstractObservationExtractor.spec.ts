@@ -73,6 +73,7 @@ describe('AbstractObservationExtractor', () => {
         block: 'block-id',
         requestId: Buffer.from(blake2b(txHash, undefined, 32)).toString('hex'),
         extractor: extractor.getId(),
+        rawData: 'mocked',
       });
     }, 100000);
 

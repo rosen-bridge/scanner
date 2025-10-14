@@ -32,7 +32,7 @@ export class TxPoolTracker {
   ): Promise<MempoolTrackResult> {
     const tracker = generateTracker(address, tokens);
     const boxes: ErgoBox[] = [];
-    const spentBoxIds: string[] = [];
+    const spentBox = new Set<string>();
 
     const txs: Transaction[] = await this.network.getMempoolTxs();
 
@@ -47,14 +47,13 @@ export class TxPoolTracker {
     }
     for (const tx of txs) {
       for (const input of tx.inputs) {
-        if (!spentBoxIds.includes(input.boxId)) {
-          spentBoxIds.push(input.boxId);
-        }
+        spentBox.add(input.boxId);
       }
       for (const out of tx.outputs) {
         if (tracker(out)) boxes.push(out);
       }
     }
+    const spentBoxIds: string[] = Array.from(spentBox);
 
     return { boxes, spentBoxIds };
   }

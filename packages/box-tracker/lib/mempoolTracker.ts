@@ -22,18 +22,17 @@ export class MempoolTracker {
     const txs = await this.network.getMempoolTxs();
 
     const boxes: ErgoBox[] = [];
-    const spentBoxIds: string[] = [];
+    const spentBox = new Set<string>();
 
     for (const tx of txs) {
       for (const input of tx.inputs) {
-        if (!spentBoxIds.includes(input.boxId)) {
-          spentBoxIds.push(input.boxId);
-        }
+        spentBox.add(input.boxId);
       }
       for (const out of tx.outputs) {
         if (tracker(out)) boxes.push(out);
       }
     }
+    const spentBoxIds: string[] = Array.from(spentBox);
 
     return { boxes, spentBoxIds };
   }

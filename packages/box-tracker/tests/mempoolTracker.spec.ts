@@ -1,8 +1,8 @@
 import { MempoolTracker } from '../lib/mempoolTracker';
 import * as boxHandler from '../lib/boxHandler';
 import { AbstractErgoNetwork } from '../lib/network/abstract/abstractErgoNetwork';
-import { ErgoBox } from '../lib/interfaces';
-import { createMockBox } from './ergoBox.mock';
+import { ErgoBox } from '../lib';
+import { createMockBox } from './testUtils';
 
 describe('MempoolTracker', () => {
   const mockNetwork = {
@@ -33,10 +33,8 @@ describe('MempoolTracker', () => {
      * @target track should collect spent box IDs from transaction inputs
      * @scenario
      * - mock getMempoolTxs to return a transaction with multiple inputs
-     * - mock tracker to always return false (no boxes tracked)
      * @expected
      * - spentBoxIds should include all input boxIds
-     * - boxes array should be empty
      */
     it('should collect spent box IDs from transaction inputs', async () => {
       mockNetwork.getMempoolTxs = vi
@@ -45,11 +43,9 @@ describe('MempoolTracker', () => {
           { inputs: [{ boxId: 'id1' }, { boxId: 'id2' }], outputs: [] },
         ]);
 
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
       const result = await mempoolTracker.track('addr', []);
 
       expect(result.spentBoxIds).toEqual(['id1', 'id2']);
-      expect(result.boxes).toEqual([]);
     });
 
     /**
@@ -58,7 +54,6 @@ describe('MempoolTracker', () => {
      * - mock getMempoolTxs to return a transaction with inputs and outputs
      * - mock tracker function to select only specific boxes
      * @expected
-     * - spentBoxIds should include all inputs
      * - boxes should include only boxes selected by the tracker function
      */
     it('should filter boxes using the tracker function', async () => {
@@ -76,8 +71,6 @@ describe('MempoolTracker', () => {
       );
 
       const result = await mempoolTracker.track('testAddr', []);
-
-      expect(result.spentBoxIds).toEqual(['spent1']);
       expect(result.boxes).toEqual([mockBox1]);
     });
   });

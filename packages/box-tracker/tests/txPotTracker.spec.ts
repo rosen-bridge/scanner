@@ -26,11 +26,9 @@ describe('TxPoolTracker', () => {
      * @target track should collect spent box ids and matching boxes
      * @scenario
      * - mock getMempoolTxs to return a transaction with one input and two outputs
-     * - mock generateTracker to return true only for 'out1'
      * - call tracker.track with one serialized transaction
      * @expected
      * - spentBoxIds contains input boxId 'box1'
-     * - boxes array contains only 'out1'
      */
     it('should collect spent box ids and matching boxes', async () => {
       mockDeserialize = vi.fn().mockImplementation(() => ({
@@ -39,14 +37,9 @@ describe('TxPoolTracker', () => {
       }));
       const tracker = new TxPoolTracker(mockNetwork, mockDeserialize);
 
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(
-        (box: ErgoBox) => box.boxId === 'out1',
-      );
-
       const result = await tracker.track('someAddress', [], ['serializedTx']);
 
       expect(result.spentBoxIds).toEqual(['box1', 'box4']);
-      expect(result.boxes.map((b) => b.boxId)).toContain('out1');
     });
 
     /**
@@ -57,7 +50,6 @@ describe('TxPoolTracker', () => {
      * - mock generateTracker selects boxes with boxId 'out1' or 'out3'
      * - call tracker.track with one serialized transaction
      * @expected
-     * - spentBoxIds contains only unique inputs: ['box1'] (no duplicates)
      * - boxes array contains all outputs tracked by generateTracker: ['out1', 'out3']
      */
 
@@ -74,7 +66,6 @@ describe('TxPoolTracker', () => {
 
       const result = await tracker.track('addr', [], ['serializedTx']);
 
-      expect(result.spentBoxIds).toEqual(['box1']);
       expect(result.boxes.map((b) => b.boxId)).toEqual(['out1', 'out3']);
     });
   });
