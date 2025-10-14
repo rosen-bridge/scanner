@@ -15,3 +15,8 @@ export type ErgoBox = {
   transactionId: string;
   index: number;
 };
+
+export interface MempoolTrackResult {
+  boxes: ErgoBox[];
+  spentBoxIds: string[];
+}
