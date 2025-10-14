@@ -3,4 +3,4 @@
 '@rosen-bridge/evm-observation-extractor': minor
 ---
 
-Add rawData to the results of extractor(s).processTransactions method
+Add rawData to the return data of the extractor's `processTransactions` method
