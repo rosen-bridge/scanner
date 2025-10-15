@@ -8,14 +8,10 @@ import {
 } from './interfaces';
 
 export class TxPoolTracker {
-  private deserializeTx: TxDeserializer;
-
   /**
    * Creates an instance of TxPoolTracker.
    */
-  constructor(deserializeTx: TxDeserializer) {
-    this.deserializeTx = deserializeTx;
-  }
+  constructor(private deserializeTx: TxDeserializer) {}
 
   /**
    * Tracks mempool transactions and serialized transactions from txPot for a given address and token list.
@@ -31,14 +27,12 @@ export class TxPoolTracker {
     const boxes: ErgoBox[] = [];
     const spentBox = new Set<string>();
     const txs: Transaction[] = [];
-    for (const sTx of transactions) {
-      let tx: Transaction | null = null;
+    for (const tx of transactions) {
       try {
-        tx = this.deserializeTx(sTx);
+        txs.push(this.deserializeTx(sTx))
       } catch {
-        continue;
+        /*empty*/
       }
-      if (tx) txs.push(tx);
     }
     for (const tx of txs) {
       for (const input of tx.inputs) {
