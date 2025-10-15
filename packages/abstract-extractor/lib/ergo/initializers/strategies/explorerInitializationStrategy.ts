@@ -62,9 +62,7 @@ export class ExplorerInitializationStrategy {
   /**
    * Get height range transactions and process them
    * retry the request to avoid failure in case of accidental network issues
-   * @param start
-   * @param end
-   * @param count
+   * @param rangeQuery
    * @returns
    */
   private processRange = async (rangeQuery: RangeQuery) => {

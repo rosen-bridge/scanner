@@ -51,7 +51,7 @@ export class NodeNetwork {
 
   /**
    * use node api to return related transactions of the specified address with limit offset
-   * @param tokenId
+   * @param address
    * @param offset
    * @param limit
    * @returns related transactions
