@@ -85,7 +85,7 @@ export class Migration1758049849122 implements MigrationInterface {
                     "serialized"
                 )
             SELECT "id",
-                "boxId",
+                "identifier",
                 "height",
                 "block",
                 "spendBlock",

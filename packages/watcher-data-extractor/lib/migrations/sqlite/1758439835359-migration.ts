@@ -109,6 +109,10 @@ export class Migration1758439835359 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+            ALTER TABLE "event_trigger_entity"
+                RENAME TO "temporary_event_trigger_entity"
+        `);
+    await queryRunner.query(`
             CREATE TABLE "event_trigger_entity" (
                 "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 "eventId" varchar NOT NULL DEFAULT ('Not-set'),
