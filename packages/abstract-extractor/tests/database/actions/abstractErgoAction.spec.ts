@@ -4,7 +4,7 @@ import { TestErgoAction } from './abstractErgoAction.mock';
 import { createDatabase, TestEntity } from '../../testUtils';
 import { block, block2, sampleEntities } from '../../testData';
 
-describe('AbstractErgoExtractorAction', () => {
+describe('AbstractErgoAction', () => {
   let dataSource: DataSource;
   let action: TestErgoAction;
   let repository: Repository<TestEntity>;

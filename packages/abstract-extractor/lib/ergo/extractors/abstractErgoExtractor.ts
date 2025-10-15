@@ -103,7 +103,7 @@ export abstract class AbstractErgoExtractor<
         if (!this.hasTxData(tx)) {
           continue;
         }
-        this.logger.debug(`Trying to extract data from tx ${tx.id}`);
+        this.logger.debug(`Trying to extract data from tx [${tx.id}]`);
         const extractedData = this.extractTxData(tx);
         if (extractedData) {
           this.logger.debug(
@@ -188,7 +188,13 @@ export abstract class AbstractErgoExtractor<
   ): void {
     const callbackMap = this.callbacks[type];
     callbackMap.forEach((callback) => {
-      callback(data);
+      try {
+        callback(data);
+      } catch (e) {
+        this.logger.warn(
+          `callback failed for ${type} action on data [${data}] with error: ${e}`,
+        );
+      }
     });
   }
 

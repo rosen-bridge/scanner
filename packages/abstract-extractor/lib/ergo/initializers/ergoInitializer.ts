@@ -24,7 +24,7 @@ export class ErgoInitializer<
     | NodeInitializationStrategy;
 
   constructor(
-    type: ErgoNetworkType,
+    networkType: ErgoNetworkType,
     url: string,
     address: string,
     protected extractorId: string,
@@ -36,7 +36,7 @@ export class ErgoInitializer<
     maxParallelRequests = MAX_PARALLEL_REQUESTS,
     protected logger = new DummyLogger(),
   ) {
-    if (type == ErgoNetworkType.Explorer) {
+    if (networkType == ErgoNetworkType.Explorer) {
       this.initializationStrategy = new ExplorerInitializationStrategy(
         url,
         address,
@@ -45,7 +45,7 @@ export class ErgoInitializer<
         this.processTransactionBatch,
         logger,
       );
-    } else if (type == ErgoNetworkType.Node) {
+    } else if (networkType == ErgoNetworkType.Node) {
       this.initializationStrategy = new NodeInitializationStrategy(
         url,
         address,
@@ -53,7 +53,7 @@ export class ErgoInitializer<
         this.processTransactionBatch,
         logger,
       );
-    } else throw new Error(`Network type ${type} is not supported`);
+    } else throw new Error(`Network type ${networkType} is not supported`);
   }
 
   /**
@@ -96,6 +96,7 @@ export class ErgoInitializer<
         `Processing transactions at height ${blockTxs[0].inclusionHeight}`,
       );
       const success = await this.processTransactions(blockTxs, block);
+      release();
       if (!success)
         throw Error(
           `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`,

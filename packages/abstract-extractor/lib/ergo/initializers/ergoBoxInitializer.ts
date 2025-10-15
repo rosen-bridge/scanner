@@ -26,7 +26,7 @@ export class ErgoBoxInitializer<
   private spendRecords: ExtendedSpendInfo[];
 
   constructor(
-    type: ErgoNetworkType,
+    networkType: ErgoNetworkType,
     url: string,
     address: string,
     protected extractorId: string,
@@ -40,7 +40,7 @@ export class ErgoBoxInitializer<
     protected logger = new DummyLogger(),
   ) {
     super(
-      type,
+      networkType,
       url,
       address,
       extractorId,
