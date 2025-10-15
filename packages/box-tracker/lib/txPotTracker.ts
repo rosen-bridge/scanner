@@ -6,17 +6,14 @@ import {
   Token,
   TxDeserializer,
 } from './interfaces';
-import { AbstractErgoNetwork } from './network/abstract/abstractErgoNetwork';
 
 export class TxPoolTracker {
-  private network: AbstractErgoNetwork;
   private deserializeTx: TxDeserializer;
 
   /**
    * Creates an instance of TxPoolTracker.
    */
-  constructor(network: AbstractErgoNetwork, deserializeTx: TxDeserializer) {
-    this.network = network;
+  constructor(deserializeTx: TxDeserializer) {
     this.deserializeTx = deserializeTx;
   }
 
@@ -33,9 +30,7 @@ export class TxPoolTracker {
     const tracker = generateTracker(address, tokens);
     const boxes: ErgoBox[] = [];
     const spentBox = new Set<string>();
-
-    const txs: Transaction[] = await this.network.getMempoolTxs();
-
+    const txs: Transaction[] = [];
     for (const sTx of transactions) {
       let tx: Transaction | null = null;
       try {
