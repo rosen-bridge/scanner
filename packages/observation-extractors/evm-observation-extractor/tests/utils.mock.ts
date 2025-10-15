@@ -1,4 +1,3 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
   ObservationEntity,
   migrations,
@@ -7,6 +6,7 @@ import {
   migrations as scannerMigrations,
   BlockEntity,
 } from '@rosen-bridge/abstract-scanner';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 const fromAddress =
   'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0';

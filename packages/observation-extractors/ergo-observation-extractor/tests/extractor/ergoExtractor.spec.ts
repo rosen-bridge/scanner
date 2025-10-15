@@ -1,13 +1,14 @@
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
+
 import { ErgoObservationExtractor } from '../../lib';
+import { tokens } from '../tokens.mock';
 import {
   generateBlockEntity,
   createDatabase,
   observationTxGenerator,
 } from '../utils.mock';
-import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
-import { tokens } from '../tokens.mock';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { TokenMap } from '@rosen-bridge/tokens';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 

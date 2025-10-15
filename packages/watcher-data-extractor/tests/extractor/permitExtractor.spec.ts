@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+
+import PermitEntity from '../../lib/entities/permitEntity';
+import PermitExtractor from '../../lib/extractor/permitExtractor';
+import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
+import { JsonBI } from '../../lib/utils';
 import {
   permitTxGenerator,
   createDatabase,
   insertPermitEntity,
 } from './utilsFunctions.mock';
-import PermitExtractor from '../../lib/extractor/permitExtractor';
-import PermitEntity from '../../lib/entities/PermitEntity';
 import {
   addressBoxes,
   block,
@@ -20,8 +22,6 @@ import {
   RWTId,
   sampleExtractedPermit,
 } from './utilsVariable.mock';
-import { JsonBI } from '../../lib/utils';
-import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
 
 vi.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;

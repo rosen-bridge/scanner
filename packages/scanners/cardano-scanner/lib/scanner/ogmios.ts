@@ -1,12 +1,4 @@
 import {
-  Block,
-  BlockPraos,
-  Point,
-  PointOrOrigin,
-  TipOrOrigin,
-  Transaction,
-} from '@cardano-ogmios/schema';
-import {
   createInteractionContext,
   createChainSynchronizationClient,
   InteractionContext,
@@ -16,18 +8,28 @@ import {
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
 import {
+  Block,
+  BlockPraos,
+  Point,
+  PointOrOrigin,
+  TipOrOrigin,
+  Transaction,
+} from '@cardano-ogmios/schema';
+import { ExponentialBackoff, handleWhen, retry } from 'cockatiel';
+
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import {
   BlockDbAction,
   WebSocketScanner,
 } from '@rosen-bridge/abstract-scanner';
-import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+
 import {
   RECONNECTION_INITIAL_DELAY,
   RECONNECTION_MAX_DELAY,
   SLOT_SHELLY_NUMBER,
   RECONNECTION_MAX_ATTEMPTS,
 } from '../constants';
-import { ExponentialBackoff, handleWhen, retry } from 'cockatiel';
+import { CardanoOgmiosConfig, OgmiosReconnectionConfig } from '../interfaces';
 
 interface BackwardResponse {
   point: PointOrOrigin;

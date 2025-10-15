@@ -1,10 +1,9 @@
-import { TransactionInfo1 } from '@rosen-clients/ergo-explorer/dist/src/v1/types';
 import {
   AbstractNetworkConnector,
   Block,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 
 export class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
   private client: ReturnType<typeof ergoExplorerClientFactory>;
@@ -33,7 +32,7 @@ export class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
    * convert Explorer transaction to scanner transaction type
    * @param tx
    */
-  private convertToTransaction = (tx: TransactionInfo1): Transaction => {
+  private convertToTransaction = (tx: V1.TransactionInfo1): Transaction => {
     return {
       id: tx.id,
       dataInputs:

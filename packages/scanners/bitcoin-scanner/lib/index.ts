@@ -1,8 +1,8 @@
-export { BitcoinEsploraScanner } from './scanner/BitcoinEsploraScanner';
+export { BitcoinEsploraScanner } from './scanner/bitcoinEsploraScanner';
 export * from './types';
-export { DogeEsploraScanner } from './scanner/DogeEsploraScanner';
-export { EsploraNetwork } from './network/EsploraNetwork';
-export * from './scanner/BitcoinRpcScanner';
-export * from './scanner/DogeRpcScanner';
-export * from './network/BitcoinRpcNetwork';
-export * from './network/DogeRpcNetwork';
+export { DogeEsploraScanner } from './scanner/dogeEsploraScanner';
+export { EsploraNetwork } from './network/esploraNetwork';
+export * from './scanner/bitcoinRpcScanner';
+export * from './scanner/dogeRpcScanner';
+export * from './network/bitcoinRpcNetwork';
+export * from './network/dogeRpcNetwork';

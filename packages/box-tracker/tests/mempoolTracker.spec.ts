@@ -1,7 +1,7 @@
-import { MempoolTracker } from '../lib/mempoolTracker';
-import * as boxHandler from '../lib/boxHandler';
-import { AbstractErgoNetwork } from '../lib/network/abstract/abstractErgoNetwork';
 import { ErgoBox } from '../lib';
+import * as boxHandler from '../lib/boxHandler';
+import { MempoolTracker } from '../lib/mempoolTracker';
+import { AbstractErgoNetwork } from '../lib/network/abstract/abstractErgoNetwork';
 import { createMockBox } from './testUtils';
 
 describe('MempoolTracker', () => {
