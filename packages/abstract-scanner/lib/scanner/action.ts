@@ -1,4 +1,4 @@
-import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   DataSource,
   DeleteResult,
@@ -7,7 +7,8 @@ import {
   In,
 } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+
+import { BlockEntity, PROCEED, PROCESSING } from '../entities/blockEntity';
 import { ExtractorStatusEntity } from '../entities/extractorStatusEntity';
 
 export class BlockDbAction {
@@ -218,7 +219,7 @@ export class BlockDbAction {
           { updateHeight: height, updateBlockHash: blockHash },
         );
       await runner.commitTransaction();
-    } catch (e) {
+    } catch {
       await runner.rollbackTransaction();
       success = false;
     } finally {

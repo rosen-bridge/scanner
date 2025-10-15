@@ -1,8 +1,9 @@
 import { Mutex } from 'await-semaphore';
-import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { difference, remove } from 'lodash-es';
+
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
 

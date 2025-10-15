@@ -1,11 +1,12 @@
-import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { chunk } from 'lodash-es';
+
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
+import { dbIdChunkSize } from '../constants';
 import { FraudEntity } from '../entities/fraudEntity';
 import { ExtractedFraud } from '../interfaces/types';
-import { dbIdChunkSize } from '../constants';
 
 export class FraudAction {
   private readonly datasource: DataSource;

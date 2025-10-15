@@ -1,4 +1,5 @@
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
+
 import { ExtractedFraud } from '../../lib/interfaces/types';
 
 const fraud: ExtractedFraud = {

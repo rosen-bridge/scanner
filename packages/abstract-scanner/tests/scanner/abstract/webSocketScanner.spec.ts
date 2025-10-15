@@ -1,10 +1,11 @@
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+
+import { BlockEntity, PROCEED } from '../../../lib';
 import {
   createDatabase,
   FailExtractor,
   TestWebSocketScanner,
 } from './abstract.mock';
-import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { BlockEntity, PROCEED } from '../../../lib';
 
 let dataSource: DataSource;
 let scanner: TestWebSocketScanner;
@@ -35,7 +36,7 @@ describe('webSocketScanner', () => {
      * - must called callback once
      * - must return true
      */
-    it('should call fn once and return true ', async () => {
+    it('should call fn once and return true', async () => {
       const mockFn = vi.fn();
       mockFn.mockReturnValue(true);
       const res = await scanner.mockedTryFnCall(mockFn, '');

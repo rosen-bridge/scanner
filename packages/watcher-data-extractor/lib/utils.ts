@@ -1,7 +1,8 @@
 import { blake2b } from 'blakejs';
-import JSONBigInt from 'json-bigint';
 
-const JsonBI = JSONBigInt({
+import { JsonBigIntFactory } from '@rosen-bridge/json-bigint';
+
+const JsonBI = JsonBigIntFactory({
   useNativeBigInt: true,
 });
 

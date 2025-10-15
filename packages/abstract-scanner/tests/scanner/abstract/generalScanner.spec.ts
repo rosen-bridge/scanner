@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
+import { BlockEntity } from '../../../lib';
 import {
   ExtractorTest,
   insertBlocks,
@@ -8,8 +10,6 @@ import {
   TestTransaction,
   TestGeneralScanner,
 } from './abstract.mock';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { BlockEntity } from '../../../lib';
 
 let dataSource: DataSource;
 

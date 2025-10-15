@@ -9,6 +9,6 @@ export {
   ConnectorSelectionStrategy,
   FailoverStrategy,
   RoundRobinStrategy,
-} from './scanner/network/ConnectorSelectionStrategies';
-export { NetworkConnectorManager } from './scanner/network/NetworkConnectorManager';
+} from './scanner/network/connectorSelectionStrategies';
+export { NetworkConnectorManager } from './scanner/network/networkConnectorManager';
 export { ScannerConfig } from './scanner/interfaces';

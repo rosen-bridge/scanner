@@ -1,3 +1,3 @@
-export * from './BitcoinRunesAbstractObservationExtractor';
-export * from './BitcoinRunesEsploraObservationExtractor';
-export * from './BitcoinRunesRpcObservationExtractor';
+export * from './bitcoinRunesAbstractObservationExtractor';
+export * from './bitcoinRunesEsploraObservationExtractor';
+export * from './bitcoinRunesRpcObservationExtractor';
