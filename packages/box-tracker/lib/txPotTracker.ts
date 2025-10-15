@@ -7,14 +7,14 @@ import {
   TxDeserializer,
 } from './interfaces';
 
-export class TxPoolTracker {
+export class TxPotTracker {
   /**
-   * Creates an instance of TxPoolTracker.
+   * Creates an instance of TxPotTracker.
    */
   constructor(private deserializeTx: TxDeserializer) {}
 
   /**
-   * Tracks mempool transactions and serialized transactions from txPot for a given address and token list.
+   * Tracks serialized transactions from txPot for a given address and token list.
    *
    * @returns MempoolTrackerResult containing matched boxes and spent box IDs.
    */
@@ -29,7 +29,7 @@ export class TxPoolTracker {
     const txs: Transaction[] = [];
     for (const tx of transactions) {
       try {
-        txs.push(this.deserializeTx(sTx))
+        txs.push(this.deserializeTx(tx));
       } catch {
         /*empty*/
       }
