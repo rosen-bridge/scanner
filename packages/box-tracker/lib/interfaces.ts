@@ -1,4 +1,8 @@
-import { AdditionalRegisters, Asset } from '@rosen-bridge/scanner-interfaces';
+import {
+  AdditionalRegisters,
+  Asset,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 export type Token = {
   tokenId: string;
@@ -20,3 +24,5 @@ export interface MempoolTrackResult {
   boxes: ErgoBox[];
   spentBoxIds: string[];
 }
+
+export type TxDeserializer = (serializedTx: string) => Transaction;
