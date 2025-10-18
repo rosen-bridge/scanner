@@ -1,18 +1,18 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
-import { difference } from 'lodash-es';
+import * as wasm from 'ergo-lib-wasm-nodejs';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { OutputInfo } from '@rosen-clients/ergo-explorer/dist/src/v1/types/outputInfo';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { difference } from 'lodash-es';
 
-import { DefaultApiLimit } from '../constants';
-import { JsonBI } from '../utils';
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
+import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
+
 import PermitAction from '../actions/permitAction';
+import { DefaultApiLimit } from '../constants';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
+import { JsonBI } from '../utils';
 
 class PermitExtractor extends AbstractExtractor<Transaction> {
   readonly logger: AbstractLogger;
@@ -256,7 +256,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    * @param heightDifference
    * @returns extracted permit
    */
-  extractPermitData = async (boxes: Array<OutputInfo>) => {
+  extractPermitData = async (boxes: Array<V1.OutputInfo>) => {
     const extractedBoxes: Array<ExtractedPermit> = [];
     for (const boxJson of boxes) {
       const box = ergoLib.ErgoBox.from_json(JsonBI.stringify(boxJson));

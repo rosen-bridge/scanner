@@ -54,4 +54,7 @@ export class ObservationEntity {
 
   @Column({ type: 'varchar' })
   extractor: string;
+
+  @Column({ type: 'varchar' })
+  rawData: string;
 }

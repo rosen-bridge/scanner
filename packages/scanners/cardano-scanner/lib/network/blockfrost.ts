@@ -1,12 +1,14 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
+
 import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
+
 import {
   BlockFrostNullValueError,
   BlockFrostTransaction,
-} from '../interfaces/BlockFrost';
+} from '../interfaces/blockFrost';
 
 export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransaction> {
   private client: BlockFrostAPI;

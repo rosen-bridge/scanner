@@ -1,8 +1,8 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
-import { TestErgoAction } from './abstractErgoAction.mock';
-import { createDatabase, TestEntity } from '../../testUtils';
 import { block, block2, sampleEntities } from '../../testData';
+import { createDatabase, TestEntity } from '../../testUtils';
+import { TestErgoAction } from './abstractErgoAction.mock';
 
 describe('AbstractErgoAction', () => {
   let dataSource: DataSource;

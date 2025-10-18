@@ -1,41 +1,30 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { Buffer } from 'buffer';
-import { blake2b } from 'blakejs';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { TokenMap } from '@rosen-bridge/tokens';
-import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { components } from '@blockfrost/openapi';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import {
-  ObservationEntityAction,
-  ExtractedObservation,
-} from '@rosen-bridge/abstract-observation-extractor';
+
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { CardanoBlockFrostRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];
   metadata: components['schemas']['tx_content_metadata'];
 }
 
-export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<BlockFrostTransaction> {
-  readonly logger: AbstractLogger;
-  private readonly actions: ObservationEntityAction;
-  private readonly extractor: CardanoBlockFrostRosenExtractor;
-  static readonly FROM_CHAIN: string = 'cardano';
+export class CardanoBlockFrostObservationExtractor extends AbstractObservationExtractor<BlockFrostTransaction> {
+  readonly FROM_CHAIN: string = 'cardano';
 
   constructor(
+    lockAddress: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    address: string,
     logger?: AbstractLogger,
   ) {
-    super();
-    this.logger = logger ? logger : new DummyLogger();
-    this.actions = new ObservationEntityAction(dataSource, this.logger);
-    this.extractor = new CardanoBlockFrostRosenExtractor(
-      address,
+    super(
+      dataSource,
       tokens,
-      this.logger,
+      new CardanoBlockFrostRosenExtractor(lockAddress, tokens, logger),
+      logger,
     );
   }
 
@@ -45,70 +34,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<Blo
   getId = () => 'cardano-blockfrost-extractor';
 
   /**
-   * gets block id and transactions corresponding to the block and saves if they are valid rosen
-   *  transactions and in case of success return true and in case of failure returns false
-   * @param block
-   * @param txs
+   * gets transaction id from TransactionType
    */
-  processTransactions = (
-    txs: Array<BlockFrostTransaction>,
-    block: BlockInfo,
-  ): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const observations: Array<ExtractedObservation> = [];
-        txs.forEach((transaction) => {
-          const data = this.extractor.get(transaction);
-          if (data) {
-            const requestId = Buffer.from(
-              blake2b(transaction.utxos.hash, undefined, 32),
-            ).toString('hex');
-            observations.push({
-              fromChain: CardanoBlockFrostObservationExtractor.FROM_CHAIN,
-              toChain: data.toChain,
-              amount: data.amount,
-              sourceChainTokenId: data.sourceChainTokenId,
-              targetChainTokenId: data.targetChainTokenId,
-              sourceTxId: data.sourceTxId,
-              bridgeFee: data.bridgeFee,
-              networkFee: data.networkFee,
-              sourceBlockId: block.hash,
-              requestId: requestId,
-              toAddress: data.toAddress,
-              fromAddress: data.fromAddress,
-            });
-          }
-        });
-        this.actions
-          .storeObservations(observations, block, this.getId())
-          .then((status) => {
-            resolve(status);
-          })
-          .catch((e) => {
-            this.logger.error(
-              `An error occurred during store observations: ${e}`,
-            );
-            reject(e);
-          });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  };
-
-  /**
-   * fork one block and remove all stored information for this block
-   * @param hash: block hash
-   */
-  forkBlock = async (hash: string): Promise<void> => {
-    await this.actions.deleteBlockObservation(hash, this.getId());
-  };
-
-  /**
-   * Extractor box initialization
-   * No action needed in cardano extractors
-   */
-  initializeData = async () => {
-    return;
-  };
+  getTxId = (tx: BlockFrostTransaction) => tx.utxos.hash;
 }

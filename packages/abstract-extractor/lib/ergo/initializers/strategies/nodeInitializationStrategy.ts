@@ -1,10 +1,11 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import PQueue from 'p-queue';
 
-import { ExtendedTransaction } from '../../interfaces';
-import { NodeNetwork } from '../../network/NodeNetwork';
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+
 import { API_LIMIT } from '../../../constants';
+import { ExtendedTransaction } from '../../interfaces';
+import { NodeNetwork } from '../../network/nodeNetwork';
 import { delay, requestWithRetrial } from '../../utils';
 
 export class NodeInitializationStrategy {

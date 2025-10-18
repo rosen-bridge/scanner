@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-observation-extractor",
-  "version": "5.2.2",
+  "version": "5.3.0",
   "description": "Event observation data extractor for EVM-compatible chains",
   "repository": {
     "type": "git",
@@ -17,32 +17,33 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run build && npm publish --access public",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
+    "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^0.2.0",
+    "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/rosen-extractor": "^10.1.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-bridge/tokens": "^4.0.1",
+    "blakejs": "^1.2.1",
+    "ethers": "6.13.2"
+  },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.0",
-    "@types/node": "^22.18.0",
+    "@rosen-bridge/abstract-scanner": "^0.2.1",
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.19.4",
-    "typescript": "^5.3.3",
     "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0"
-  },
-  "dependencies": {
-    "@rosen-bridge/abstract-logger": "^3.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^0.1.2",
-    "@rosen-bridge/extended-typeorm": "^1.0.0",
-    "@rosen-bridge/rosen-extractor": "^10.0.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.0",
-    "@rosen-bridge/tokens": "^4.0.0",
-    "blakejs": "^1.2.1",
-    "ethers": "6.13.2"
   }
 }

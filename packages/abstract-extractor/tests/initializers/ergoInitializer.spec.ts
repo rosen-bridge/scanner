@@ -1,13 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+
 import { BlockInfo, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
-import { ErgoInitializer } from '../../lib/ergo/initializers/ergoInitializer';
-import { transactionBatch } from './testData';
 import { AbstractErgoAction } from '../../lib/ergo/database/actions/abstractErgoAction';
 import { AbstractErgoEntity } from '../../lib/ergo/database/entities/abstractErgoEntity';
-import { AbstractEntityData } from '../../lib/ergo/interfaces';
+import { ErgoInitializer } from '../../lib/ergo/initializers/ergoInitializer';
 import { ExplorerInitializationStrategy } from '../../lib/ergo/initializers/strategies/explorerInitializationStrategy';
 import { NodeInitializationStrategy } from '../../lib/ergo/initializers/strategies/nodeInitializationStrategy';
+import { AbstractEntityData } from '../../lib/ergo/interfaces';
+import { transactionBatch } from './testData';
 
 describe('ErgoInitializer', () => {
   let initializer: ErgoInitializer<AbstractEntityData, AbstractErgoEntity>;

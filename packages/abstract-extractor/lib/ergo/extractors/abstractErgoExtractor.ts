@@ -1,10 +1,14 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
+
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
+import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
+import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
+import { ErgoInitializer } from '../initializers';
 import {
   AbstractEntityData,
   CallbackType,
@@ -12,9 +16,6 @@ import {
   CallbackDataMap,
   InitializeOptions,
 } from '../interfaces';
-import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
-import { ErgoInitializer } from '../initializers';
-import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 
 /**
  * Abstract Ergo-specific extractor that provides common functionality for all Ergo extractors.

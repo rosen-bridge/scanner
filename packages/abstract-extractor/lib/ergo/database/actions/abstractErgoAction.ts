@@ -1,3 +1,6 @@
+import { difference, pick } from 'lodash-es';
+
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   DataSource,
   EntityTarget,
@@ -6,10 +9,8 @@ import {
   QueryRunner,
   Repository,
 } from '@rosen-bridge/extended-typeorm';
-import { difference, pick } from 'lodash-es';
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import JsonBigInt from '@rosen-bridge/json-bigint';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractEntityData, EntityInfo } from '../../interfaces';
 import { AbstractErgoEntity } from '../entities/abstractErgoEntity';
@@ -80,8 +81,8 @@ export abstract class AbstractErgoAction<
    */
   protected updateEntity = async (
     queryRunner: QueryRunner,
-    updatedEntity: ExtractedData, // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
+    updatedEntity: ExtractedData,
+    block: BlockInfo,
     extractor: string,
   ) => {
     const repository = queryRunner.manager.getRepository(this.repo);

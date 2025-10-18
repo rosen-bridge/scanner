@@ -1,12 +1,13 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
-import { ExplorerInitializationStrategy } from '../../../lib/ergo/initializers/strategies/explorerInitializationStrategy';
-import { ExplorerNetwork } from '../../../lib/ergo/network/ExplorerNetwork';
-import { transactionBatch } from '../testData';
 import { API_LIMIT } from '../../../lib/constants';
+import { ExplorerInitializationStrategy } from '../../../lib/ergo/initializers/strategies/explorerInitializationStrategy';
 import { WorkerManager } from '../../../lib/ergo/initializers/strategies/workerManager';
 import { RangeQuery } from '../../../lib/ergo/interfaces';
+import { ExplorerNetwork } from '../../../lib/ergo/network/explorerNetwork';
+import { transactionBatch } from '../testData';
 
 // Mock the requestWithRetrial function
 vi.mock('../../../lib/ergo/utils', () => ({

@@ -1,5 +1,5 @@
-import { V1 } from '@rosen-clients/ergo-explorer';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { V1 } from '@rosen-clients/ergo-explorer';
 
 import {
   AbstractEntityData,

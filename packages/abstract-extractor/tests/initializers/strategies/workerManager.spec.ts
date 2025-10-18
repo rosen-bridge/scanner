@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
+import { describe, expect, it, vi } from 'vitest';
 
 import { WorkerManager } from '../../../lib/ergo/initializers/strategies/workerManager';
 import {

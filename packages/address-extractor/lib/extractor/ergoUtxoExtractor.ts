@@ -1,17 +1,18 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
 import {
   AbstractErgoBoxExtractor,
   boxHasToken,
 } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { OutputBox, ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import { BoxEntityAction } from '../actions/boxAction';
-import { JsonBI } from '../utils';
-import { ExtractedBox } from '../interfaces/types';
 import { BoxEntity } from '../entities/boxEntity';
+import { ExtractedBox } from '../interfaces/types';
+import { JsonBI } from '../utils';
 
 export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
   ExtractedBox,

@@ -1,7 +1,8 @@
-import { RosenTokens } from '@rosen-bridge/tokens';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { TxOutputRune } from '../lib/types';
 import { RosenData } from '@rosen-bridge/rosen-extractor';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import { RosenTokens } from '@rosen-bridge/tokens';
+
+import { TxOutputRune } from '../lib/types';
 
 export const mockLockAddress =
   'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk';
@@ -109,6 +110,7 @@ export const ergoEventData: RosenData = {
   sourceChainTokenId: '',
   targetChainTokenId: '',
   sourceTxId: mockTxId,
+  rawData: '',
 };
 
 export const txOutputRunes: { runes: TxOutputRune[]; height: number } = {

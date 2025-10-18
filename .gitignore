@@ -8,3 +8,7 @@ yarn.lock
 /sqlite
 .DS_Store
 .qodo/
+
+# yalc folder and lock-file
+**/.yalc
+**/yalc.lock

@@ -1,8 +1,9 @@
-import { RETRIAL_COUNT } from '../constants';
-
 import { intersection } from 'lodash-es';
+
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
+import { RETRIAL_COUNT } from '../constants';
 
 /**
  * Check box to have specified tokens

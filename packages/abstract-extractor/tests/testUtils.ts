@@ -1,4 +1,5 @@
 import { DataSource, Entity } from '@rosen-bridge/extended-typeorm';
+
 import { AbstractErgoBoxEntity, AbstractErgoEntity } from '../lib';
 
 @Entity('test_entity')

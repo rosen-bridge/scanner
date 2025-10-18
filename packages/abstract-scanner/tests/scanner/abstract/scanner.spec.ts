@@ -1,12 +1,13 @@
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+
+import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
 import {
   ExtractorTest,
   TestAbstractScanner,
   insertBlocks,
   createDatabase,
 } from './abstract.mock';
-import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 let dataSource: DataSource;
 
@@ -19,45 +20,18 @@ describe('AbstractScanner', () => {
     /**
      * Test register new extractor must insert extractor to scanner
      * Dependency: Nothing
-     * Scenario: Register new extractor
-     * Expected: extractors length must be 1
-     */
-    it('should register extractor', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
-      const extractor = new ExtractorTest('1');
-      await scanner.registerExtractor(extractor);
-      expect(scanner.newExtractors.length).toEqual(1);
-      expect(scanner.extractors.length).toEqual(0);
-    });
-
-    /**
-     * Test register new extractor must insert extractor to scanner
-     * Dependency: Nothing
      * Scenario: Register new extractor twice
      * Expected: extractors length must be 1
      */
     it('should register extractor', async () => {
       const scanner = new TestAbstractScanner('first', dataSource);
       const extractor = new ExtractorTest('1');
-      await scanner.registerExtractor(extractor);
-      await scanner.registerExtractor(extractor);
-      expect(scanner.newExtractors.length).toEqual(1);
-      expect(scanner.extractors.length).toEqual(0);
-    });
-
-    /**
-     * Test register new extractor must insert extractor to scanner
-     * Dependency: Nothing
-     * Scenario: Register two extractor
-     * Expected: extractors length must be 2
-     */
-    it('should register extractor', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
-      const extractor1 = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
-      await scanner.registerExtractor(extractor1);
+      await scanner.registerExtractor(extractor);
+      await scanner.registerExtractor(extractor);
       await scanner.registerExtractor(extractor2);
       expect(scanner.newExtractors.length).toEqual(2);
+      expect(scanner.extractors.length).toEqual(0);
     });
   });
 

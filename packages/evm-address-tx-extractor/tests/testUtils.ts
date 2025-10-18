@@ -1,7 +1,9 @@
+import { randomBytes } from 'crypto';
+
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+
 import { AddressTxsEntity } from '../lib';
 import { migrations } from '../lib';
-import { randomBytes } from 'crypto';
 
 export const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({

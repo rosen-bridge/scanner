@@ -1,3 +1,6 @@
+import { chunk, pick } from 'lodash-es';
+
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   DataSource,
   In,
@@ -6,12 +9,10 @@ import {
   FindOptionsWhere,
   QueryRunner,
 } from '@rosen-bridge/extended-typeorm';
-import { chunk, pick } from 'lodash-es';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { AbstractEntityData, EntityInfo, SpendInfo } from '../../interfaces';
 import { DB_CHUNK_SIZE } from '../../../constants';
+import { AbstractEntityData, EntityInfo, SpendInfo } from '../../interfaces';
 import { AbstractErgoBoxEntity } from '../entities/abstractErgoBoxEntity';
 import { AbstractErgoAction } from './abstractErgoAction';
 

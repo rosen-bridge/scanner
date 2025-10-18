@@ -1,6 +1,7 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import { groupBy, sortBy } from 'lodash-es';
 import { Mutex } from 'await-semaphore';
+import { groupBy, sortBy } from 'lodash-es';
+
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   BlockInfo,
   ErgoNetworkType,
@@ -8,15 +9,15 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
+import { MAX_PARALLEL_REQUESTS } from '../../constants';
+import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
+import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 import {
   AbstractEntityData,
   ExtendedSpendInfo,
   ExtendedTransaction,
 } from '../interfaces';
-import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
 import { ErgoInitializer } from './ergoInitializer';
-import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
-import { MAX_PARALLEL_REQUESTS } from '../../constants';
 
 export class ErgoBoxInitializer<
   ExtractedData extends AbstractEntityData,

@@ -1,5 +1,6 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { pick } from 'lodash-es';
+
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import {

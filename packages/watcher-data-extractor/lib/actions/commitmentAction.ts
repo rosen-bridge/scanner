@@ -1,11 +1,12 @@
-import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
 import { chunk } from 'lodash-es';
+
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { extractedCommitment } from '../interfaces/extractedCommitment';
-import CommitmentEntity from '../entities/CommitmentEntity';
 import { dbIdChunkSize } from '../constants';
+import CommitmentEntity from '../entities/commitmentEntity';
+import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { SpendInfo } from '../interfaces/types';
 
 class CommitmentAction {

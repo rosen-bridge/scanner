@@ -1,6 +1,8 @@
 import { Mutex } from 'await-semaphore';
-import { RangeList, RangeQuery } from '../../interfaces';
+
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
+
+import { RangeList, RangeQuery } from '../../interfaces';
 
 export class WorkerManager {
   private workersRangeList: RangeList[];

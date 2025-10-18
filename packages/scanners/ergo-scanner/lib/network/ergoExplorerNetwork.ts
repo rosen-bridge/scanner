@@ -1,10 +1,9 @@
-import { V1 } from '@rosen-clients/ergo-explorer';
 import {
   AbstractNetworkConnector,
   Block,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 
 export class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
   private client: ReturnType<typeof ergoExplorerClientFactory>;

@@ -1,10 +1,11 @@
-import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { pick } from 'lodash-es';
 
-import { TestErgoBoxAction } from './abstractErgoBoxAction.mock';
-import { createDatabase, TestBoxEntity } from '../../testUtils';
-import { block, block2, sampleEntities } from '../../testData';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+
 import { SpendInfo } from '../../../lib';
+import { block, block2, sampleEntities } from '../../testData';
+import { createDatabase, TestBoxEntity } from '../../testUtils';
+import { TestErgoBoxAction } from './abstractErgoBoxAction.mock';
 
 describe('AbstractErgoBoxAction', () => {
   let dataSource: DataSource;

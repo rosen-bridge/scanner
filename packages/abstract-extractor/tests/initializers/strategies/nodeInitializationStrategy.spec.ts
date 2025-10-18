@@ -1,10 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { NodeInitializationStrategy } from '../../../lib/ergo/initializers/strategies/nodeInitializationStrategy';
-import { NodeNetwork } from '../../../lib/ergo/network/NodeNetwork';
-import { transactionBatch } from '../testData';
 import { API_LIMIT } from '../../../lib/constants';
+import { NodeInitializationStrategy } from '../../../lib/ergo/initializers/strategies/nodeInitializationStrategy';
+import { NodeNetwork } from '../../../lib/ergo/network/nodeNetwork';
+import { transactionBatch } from '../testData';
 
 // Mock the delay and requestWithRetrial functions
 vi.mock('../../../lib/ergo/utils', () => ({

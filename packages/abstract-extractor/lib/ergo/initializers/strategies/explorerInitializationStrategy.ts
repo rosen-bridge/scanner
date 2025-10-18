@@ -1,11 +1,12 @@
-import { ExtendedTransaction, RangeQuery } from '../../interfaces';
-import { ExplorerNetwork } from '../../network/ExplorerNetwork';
-import { API_LIMIT } from '../../../constants';
-import { requestWithRetrial } from '../../utils';
-
-import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
 import PQueue from 'p-queue';
+
+import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
+
+import { API_LIMIT } from '../../../constants';
+import { ExtendedTransaction, RangeQuery } from '../../interfaces';
+import { ExplorerNetwork } from '../../network/explorerNetwork';
+import { requestWithRetrial } from '../../utils';
 import { WorkerManager } from './workerManager';
 
 export class ExplorerInitializationStrategy {

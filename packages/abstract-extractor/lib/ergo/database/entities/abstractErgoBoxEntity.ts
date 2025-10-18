@@ -1,4 +1,5 @@
 import { Column } from '@rosen-bridge/extended-typeorm';
+
 import { AbstractErgoEntity } from './abstractErgoEntity';
 
 /**

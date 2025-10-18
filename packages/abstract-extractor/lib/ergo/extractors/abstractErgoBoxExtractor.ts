@@ -7,6 +7,9 @@ import {
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
 
+import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
+import { AbstractErgoBoxEntity } from '../database/entities/abstractErgoBoxEntity';
+import { ErgoBoxInitializer } from '../initializers/ergoBoxInitializer';
 import {
   AbstractEntityData,
   SpendInfo,
@@ -14,10 +17,7 @@ import {
   TxExtra,
   InitializeOptions,
 } from '../interfaces';
-import { AbstractErgoBoxEntity } from '../database/entities/abstractErgoBoxEntity';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
-import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
-import { ErgoBoxInitializer } from '../initializers/ergoBoxInitializer';
 
 /**
  * Abstract Ergo Box Extractor class for box-based data extraction.

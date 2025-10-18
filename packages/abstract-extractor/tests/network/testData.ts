@@ -1,6 +1,6 @@
-import { Registers } from '@rosen-clients/ergo-node';
-import { V1 } from '@rosen-clients/ergo-explorer';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { V1 } from '@rosen-clients/ergo-explorer';
+import { Registers } from '@rosen-clients/ergo-node';
 
 export const explorerOutputBox: V1.OutputInfo = {
   boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
