@@ -7,9 +7,8 @@ import {
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
 
-import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
-import { AbstractErgoBoxEntity } from '../database/entities/abstractErgoBoxEntity';
-import { ErgoBoxInitializer } from '../initializers/ergoBoxInitializer';
+import { AbstractErgoBoxEntity, AbstractErgoBoxAction } from '../database';
+import { ErgoBoxInitializer } from '../initializers';
 import {
   AbstractEntityData,
   SpendInfo,

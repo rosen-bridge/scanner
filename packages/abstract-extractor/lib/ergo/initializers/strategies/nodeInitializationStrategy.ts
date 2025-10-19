@@ -5,7 +5,7 @@ import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction } from '../../interfaces';
-import { NodeNetwork } from '../../network/nodeNetwork';
+import { NodeNetwork } from '../../networks/nodeNetwork';
 import { delay, requestWithRetrial } from '../../utils';
 
 export class NodeInitializationStrategy {

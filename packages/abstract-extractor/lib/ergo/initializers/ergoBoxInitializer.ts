@@ -10,8 +10,7 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 
 import { MAX_PARALLEL_REQUESTS } from '../../constants';
-import { AbstractErgoBoxAction } from '../database/actions/abstractErgoBoxAction';
-import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
+import { AbstractErgoBoxAction, AbstractErgoEntity } from '../database';
 import {
   AbstractEntityData,
   ExtendedSpendInfo,

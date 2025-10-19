@@ -6,8 +6,7 @@ import JsonBigInt from '@rosen-bridge/json-bigint';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
-import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
-import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
+import { AbstractErgoEntity, AbstractErgoAction } from '../database';
 import { ErgoInitializer } from '../initializers';
 import {
   AbstractEntityData,

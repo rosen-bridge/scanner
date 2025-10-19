@@ -9,11 +9,12 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 
 import { MAX_PARALLEL_REQUESTS } from '../../constants';
-import { AbstractErgoAction } from '../database/actions/abstractErgoAction';
-import { AbstractErgoEntity } from '../database/entities/abstractErgoEntity';
+import { AbstractErgoAction, AbstractErgoEntity } from '../database';
 import { AbstractEntityData, ExtendedTransaction } from '../interfaces';
-import { ExplorerInitializationStrategy } from './strategies/explorerInitializationStrategy';
-import { NodeInitializationStrategy } from './strategies/nodeInitializationStrategy';
+import {
+  ExplorerInitializationStrategy,
+  NodeInitializationStrategy,
+} from './strategies';
 
 export class ErgoInitializer<
   ExtractedData extends AbstractEntityData,

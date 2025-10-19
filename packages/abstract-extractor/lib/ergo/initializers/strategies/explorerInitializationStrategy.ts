@@ -5,7 +5,7 @@ import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction, RangeQuery } from '../../interfaces';
-import { ExplorerNetwork } from '../../network/explorerNetwork';
+import { ExplorerNetwork } from '../../networks/explorerNetwork';
 import { requestWithRetrial } from '../../utils';
 import { WorkerManager } from './workerManager';
 
