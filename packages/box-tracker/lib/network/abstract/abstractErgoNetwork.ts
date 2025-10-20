@@ -1,4 +1,4 @@
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 import { ErgoBox, Token } from '../../interfaces';
 
 export abstract class AbstractErgoNetwork {
@@ -9,11 +9,6 @@ export abstract class AbstractErgoNetwork {
     this.address = address;
     this.tokens = tokens;
   }
-
-  /**
-   * Should return block information.
-   */
-  abstract getBlockInfo(hash: string): Promise<Block>;
 
   /**
    * Should return all boxes for the given address.

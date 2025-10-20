@@ -3,7 +3,6 @@ import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
 import {
   AdditionalRegisters,
-  Block,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
@@ -22,18 +21,6 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
     this.api = ergoNodeClientFactory(url);
   }
 
-  public async getBlockInfo(hash: string): Promise<Block> {
-    const rawBlock = await this.api.getBlockHeaderById(hash);
-    if (rawBlock) {
-      return {
-        hash: rawBlock.id,
-        parentHash: rawBlock.parentId,
-        height: rawBlock.height,
-        timestamp: Number(rawBlock.timestamp),
-      };
-    }
-    throw new Error(`Block not found: ${hash}`);
-  }
   /**
    * Retrieves all unspent boxes associated with a given Ergo address.
    *

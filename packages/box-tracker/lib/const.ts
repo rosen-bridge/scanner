@@ -1,1 +1,1 @@
-export const MAX_BOX_HISTORY = 10;
+export const MAX_BOX_HEIGHT = 10;

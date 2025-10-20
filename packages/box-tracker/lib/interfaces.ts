@@ -30,4 +30,5 @@ export type TxDeserializer = (serializedTx: string) => Transaction;
 export type BoxWithHeight = {
   box: ErgoBox;
   inclusionHeight: number;
+  hash: string;
 };
