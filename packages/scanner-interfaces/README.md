@@ -1,7 +1,5 @@
 # @rosen-bridge/scanner-interfaces
 
-.
-
 ## Table of contents
 
 - [Introduction](#introduction)
