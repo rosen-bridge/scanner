@@ -35,4 +35,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm publish --workspaces --access public || true
+          npm run publish:pkg --workspaces || true

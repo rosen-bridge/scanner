@@ -25,7 +25,8 @@
     "prettify:check": "prettier --check . --ignore-path ../../.gitignore",
     "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS='--import tsx' vitest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "publish:pkg": "npm publish --access public"
   },
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.1.2",
