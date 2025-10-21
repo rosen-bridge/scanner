@@ -1,4 +1,5 @@
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
 import { generateTracker } from './boxHandler';
 import {
   ErgoBox,
