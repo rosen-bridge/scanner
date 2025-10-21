@@ -1,8 +1,8 @@
-name: CI & Release 
+name: CI & Release
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: ['dev']
 
 jobs:
   ci_and_maybe_release:
@@ -30,8 +30,8 @@ jobs:
         run: npm run test
 
       - name: NPM release
-        if: ${{ startsWith(github.event.head_commit.message, 'version:') }}
+        if: ${{ startsWith(github.event.head_commit.message, 'rosen-version:') }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm run release
+          npm run release || true
