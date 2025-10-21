@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.0.0
+
+### Major Changes
+
+- final?
+
 ## 2.2.1
 
 ### Patch Changes
