@@ -1,6 +1,6 @@
-import { TxPotTracker } from '../lib/txPotTracker';
-import * as boxHandler from '../lib/boxHandler';
 import { ErgoBox, TxDeserializer } from '../lib';
+import * as boxHandler from '../lib/boxHandler';
+import { TxPotTracker } from '../lib/txPotTracker';
 
 describe('TxPotTracker', () => {
   let mockDeserialize: TxDeserializer;
