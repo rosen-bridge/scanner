@@ -1,5 +1,11 @@
 # @rosen-bridge/ergo-scanner
 
+## 0.1.3
+
+### Patch Changes
+
+- final?
+
 ## 0.1.2
 
 ### Patch Changes
