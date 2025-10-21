@@ -1,4 +1,4 @@
-export { AbstractObservationExtractor } from './extractor/AbstractObservationExtractor';
+export { AbstractObservationExtractor } from './extractor/abstractObservationExtractor';
 export { ObservationEntity } from './entities/observationEntity';
 export { migrations } from './migrations/index';
 export { ExtractedObservation } from './interfaces/extractedObservation';

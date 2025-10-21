@@ -1,4 +1,5 @@
 import { intersection } from 'lodash-es';
+
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 /**

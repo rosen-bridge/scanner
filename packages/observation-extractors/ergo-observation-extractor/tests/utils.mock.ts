@@ -1,16 +1,17 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import * as wasm from 'ergo-lib-wasm-nodejs';
-import {
-  migrations as scannerMigrations,
-  BlockEntity,
-} from '@rosen-bridge/abstract-scanner';
-import JsonBigint from '@rosen-bridge/json-bigint';
 import { Buffer } from 'buffer';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import * as wasm from 'ergo-lib-wasm-nodejs';
+
 import {
   migrations,
   ObservationEntity,
 } from '@rosen-bridge/abstract-observation-extractor';
+import {
+  migrations as scannerMigrations,
+  BlockEntity,
+} from '@rosen-bridge/abstract-scanner';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import JsonBigint from '@rosen-bridge/json-bigint';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 export const last10BlockHeader = [
   {

@@ -1,17 +1,17 @@
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
   Block,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 
-import { BlockEntity } from '../../../lib/entities/blockEntity';
-import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
-import { migrations } from '../../../lib/migrations';
-import { BlockDbAction } from '../../../lib/scanner/action';
-import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { WebSocketScanner } from '../../../lib';
+import { BlockEntity } from '../../../lib/entities/blockEntity';
 import { ExtractorStatusEntity } from '../../../lib/entities/extractorStatusEntity';
+import { migrations } from '../../../lib/migrations';
+import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
+import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
+import { BlockDbAction } from '../../../lib/scanner/action';
 
 export interface TestTransaction {
   height: number;

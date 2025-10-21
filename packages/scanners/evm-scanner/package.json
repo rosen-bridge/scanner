@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-scanner",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An EVM chain scanner based on RPC.",
   "repository": {
     "type": "git",
@@ -17,24 +17,25 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run test -- --run && npm run build && npm publish --access public",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
+    "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "@rosen-bridge/abstract-scanner": "^0.2.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "ethers": "6.13.2"
+  },
   "devDependencies": {
-    "@types/node": "^22.18.0",
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.19.4",
-    "typescript": "^5.3.3",
     "vitest": "^3.1.4"
-  },
-  "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.0",
-    "ethers": "6.13.2"
   },
   "engines": {
     "node": ">=22.18.0"

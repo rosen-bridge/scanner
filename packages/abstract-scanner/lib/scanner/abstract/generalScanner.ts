@@ -1,13 +1,14 @@
-import { AbstractScanner } from './scanner';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import JsonBI from '@rosen-bridge/json-bigint';
 import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
+
 import { BlockEntity } from '../../entities/blockEntity';
-import JsonBI from '@rosen-bridge/json-bigint';
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockDbAction } from '../action';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { AbstractScanner } from './scanner';
 
 abstract class GeneralScanner<
   TransactionType,

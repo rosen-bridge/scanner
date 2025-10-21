@@ -1,12 +1,13 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
-import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
-import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
-import CommitmentEntity from '../../lib/entities/CommitmentEntity';
-import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
-import { JsonBI } from '../../lib/utils';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
+
+import CommitmentEntity from '../../lib/entities/commitmentEntity';
+import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
+import { JsonBI } from '../../lib/utils';
+import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
+import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
 
 let dataSource: DataSource;
 

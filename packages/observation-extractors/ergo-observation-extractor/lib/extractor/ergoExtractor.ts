@@ -1,9 +1,9 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { TokenMap } from '@rosen-bridge/tokens';
+import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
-import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
 

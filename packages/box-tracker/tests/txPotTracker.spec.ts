@@ -1,8 +1,8 @@
-import { TxPoolTracker } from '../lib/txPotTracker';
-import * as boxHandler from '../lib/boxHandler';
 import { ErgoBox, TxDeserializer } from '../lib';
+import * as boxHandler from '../lib/boxHandler';
+import { TxPotTracker } from '../lib/txPotTracker';
 
-describe('TxPoolTracker', () => {
+describe('TxPotTracker', () => {
   let mockDeserialize: TxDeserializer;
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('TxPoolTracker', () => {
         inputs: [{ boxId: 'box4' }],
         outputs: [{ boxId: 'out3' }],
       }));
-      const tracker = new TxPoolTracker(mockDeserialize);
+      const tracker = new TxPotTracker(mockDeserialize);
 
       const result = await tracker.track('someAddress', [], ['serializedTx']);
 
@@ -45,7 +45,7 @@ describe('TxPoolTracker', () => {
         inputs: [{ boxId: 'box1' }],
         outputs: [{ boxId: 'out3' }],
       }));
-      const tracker = new TxPoolTracker(mockDeserialize);
+      const tracker = new TxPotTracker(mockDeserialize);
 
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(
         (box: ErgoBox) => box.boxId === 'out3',
