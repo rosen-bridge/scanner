@@ -1,9 +1,10 @@
-import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { Transaction } from '@cardano-ogmios/schema';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { TokenMap } from '@rosen-bridge/tokens';
-import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { CardanoOgmiosRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { TokenMap } from '@rosen-bridge/tokens';
 
 export class CardanoOgmiosObservationExtractor extends AbstractObservationExtractor<Transaction> {
   readonly FROM_CHAIN: string = 'cardano';

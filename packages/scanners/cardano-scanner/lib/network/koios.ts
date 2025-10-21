@@ -1,11 +1,13 @@
-import axios, { Axios } from '@rosen-clients/rate-limited-axios';
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
+
+import JsonBigint from '@rosen-bridge/json-bigint';
 import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
-import { KoiosBlock, KoiosCborTx, KoiosTransaction } from '../interfaces/Koios';
-import JsonBigint from '@rosen-bridge/json-bigint';
+import axios, { Axios } from '@rosen-clients/rate-limited-axios';
+
+import { KoiosBlock, KoiosCborTx, KoiosTransaction } from '../interfaces/koios';
 
 export class KoiosNetwork extends AbstractNetworkConnector<KoiosTransaction> {
   private readonly url: string;

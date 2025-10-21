@@ -1,10 +1,11 @@
-import ergoNodeClientFactory from '@rosen-clients/ergo-node';
-import { ErgoBox, Token } from '../interfaces';
-import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
 import {
   AdditionalRegisters,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
+import ergoNodeClientFactory from '@rosen-clients/ergo-node';
+
+import { ErgoBox, Token } from '../interfaces';
+import { AbstractErgoNetwork } from './abstract/abstractErgoNetwork';
 
 export class NodeErgoNetwork extends AbstractErgoNetwork {
   private api;

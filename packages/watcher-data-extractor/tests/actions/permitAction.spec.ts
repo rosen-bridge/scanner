@@ -1,10 +1,10 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import PermitAction from '../../lib/actions/permitAction';
-import PermitEntity from '../../lib/entities/PermitEntity';
-import { block, block2 } from '../extractor/utilsVariable.mock';
-import { createDatabase } from '../extractor/utilsFunctions.mock';
+import PermitEntity from '../../lib/entities/permitEntity';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
+import { createDatabase } from '../extractor/utilsFunctions.mock';
+import { block, block2 } from '../extractor/utilsVariable.mock';
 
 const samplePermit1 = {
   boxId: '1',

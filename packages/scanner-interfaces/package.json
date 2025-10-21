@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Defines all scanner interfaces",
   "repository": {
     "type": "git",
@@ -17,14 +17,13 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../.gitignore",
     "release": "npm run build && npm publish --access public",
     "type-check": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/node": "^22.18.0",
-    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=22.18.0"

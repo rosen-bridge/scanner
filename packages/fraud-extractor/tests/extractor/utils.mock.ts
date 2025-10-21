@@ -1,6 +1,7 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { migrations as scannerMigrations } from '@rosen-bridge/abstract-scanner';
 import * as wasm from 'ergo-lib-wasm-nodejs';
+
+import { migrations as scannerMigrations } from '@rosen-bridge/abstract-scanner';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 

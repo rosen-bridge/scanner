@@ -1,4 +1,5 @@
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
 import { ErgoBox, Token } from '../../interfaces';
 
 export abstract class AbstractErgoNetwork {

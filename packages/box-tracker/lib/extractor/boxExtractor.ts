@@ -1,15 +1,16 @@
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import {
   Block,
   BlockInfo,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
-import { BoxWithHeight, ErgoBox, Token } from '../interfaces';
+
 import { generateTracker } from '../boxHandler';
+import { MAX_BOX_HEIGHT } from '../const';
+import { BoxWithHeight, ErgoBox, Token } from '../interfaces';
+import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { MAX_BOX_HEIGHT } from '../const';
 
 export class BoxExtractor extends AbstractExtractor<Transaction> {
   private tracker: (box: ErgoBox) => boolean;

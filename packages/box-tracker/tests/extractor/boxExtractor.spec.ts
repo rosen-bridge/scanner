@@ -1,7 +1,7 @@
-import { BoxExtractor } from '../../lib/extractor/boxExtractor';
 import * as boxHandler from '../../lib/boxHandler';
-import { BoxWithHeight } from '../../lib/interfaces';
 import { MAX_BOX_HEIGHT } from '../../lib/const';
+import { BoxExtractor } from '../../lib/extractor/boxExtractor';
+import { BoxWithHeight } from '../../lib/interfaces';
 import { createMockBox } from '../testUtils';
 
 vi.mock('../../lib/network/explorerErgoNetwork', () => {
@@ -14,27 +14,30 @@ vi.mock('../../lib/network/explorerErgoNetwork', () => {
 });
 
 describe('BoxExtractor', () => {
-  let boxExtractor: BoxExtractor;
-
-  const mockBox = createMockBox('box1', 1000n);
-  const mockBlock = {
-    height: 100,
-    parentHash: 'parent-hash-1',
-    timestamp: 1234567890,
-    hash: 'block-hash-1',
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-
-    vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => {
-      return true;
-    });
-
-    boxExtractor = new BoxExtractor('explorer', 'http://fake-url', 'addr', []);
-    // // (boxExtractor as unknown as { network: AbstractErgoNetwork }).network = mockNetwork;
-  });
   describe('boxExtractor', () => {
+    let boxExtractor: BoxExtractor;
+    const mockBox = createMockBox('box1', 1000n);
+    const mockBlock = {
+      height: 100,
+      parentHash: 'parent-hash-1',
+      timestamp: 1234567890,
+      hash: 'block-hash-1',
+    };
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+
+      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => {
+        return true;
+      });
+
+      boxExtractor = new BoxExtractor(
+        'explorer',
+        'http://fake-url',
+        'addr',
+        [],
+      );
+    });
     /**
      * @target processTransactions should add boxes when tracker matches
      * @scenario
@@ -42,6 +45,7 @@ describe('BoxExtractor', () => {
      * - mock transaction with one output
      * @expected
      * - boxExtractor stores the new box
+     * - the stored box has correct boxId
      */
     it('should add boxes when tracker matches', async () => {
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => {
@@ -70,7 +74,6 @@ describe('BoxExtractor', () => {
       const txs = [{ outputs: [], id: '1', dataInputs: [], inputs: [mockBox] }];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-
       expect(boxExtractor.getRecentBoxes()).toHaveLength(0);
     });
 
@@ -81,7 +84,7 @@ describe('BoxExtractor', () => {
      * @expected
      * - it should be filtered out
      */
-    it('should remove old boxes', async () => {
+    it('should remove boxes older than MAX_BOX_HEIGHT', async () => {
       const oldBox: BoxWithHeight = {
         box: createMockBox('old'),
         inclusionHeight: mockBlock.height - MAX_BOX_HEIGHT - 1,
@@ -103,8 +106,9 @@ describe('BoxExtractor', () => {
      * - add multiple boxes with different block hashes
      * @expected
      * - only non-matching boxes remain
+     * - the remaining box has correct hash
      */
-    it('should remove boxes by forked hash', async () => {
+    it('should remove boxes matching given hash', async () => {
       (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = [
         { box: mockBox, inclusionHeight: 100, hash: 'H1' },
         { box: mockBox, inclusionHeight: 100, hash: 'H2' },

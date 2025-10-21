@@ -1,4 +1,5 @@
 import { RosenTokens } from '@rosen-bridge/tokens';
+
 import { ERGO_NATIVE_TOKEN } from '../lib/const';
 
 export const tokens: RosenTokens = [

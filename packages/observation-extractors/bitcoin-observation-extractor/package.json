@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-observation-extractor",
-  "version": "6.2.2",
+  "version": "6.3.0",
   "description": "Event observation data extractor for Bitcoin chain",
   "repository": {
     "type": "git",
@@ -17,25 +17,23 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run test -- --run && npm run build && npm publish --access public",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
+    "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "type-check": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@types/node": "^22.18.0",
-    "tsx": "^4.19.4",
-    "typescript": "^5.3.3"
+  "dependencies": {
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^0.2.0",
+    "@rosen-bridge/bitcoin-scanner": "^0.2.1",
+    "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/rosen-extractor": "^10.1.1",
+    "@rosen-bridge/tokens": "^4.0.1"
   },
   "engines": {
     "node": ">=22.18.0"
-  },
-  "dependencies": {
-    "@rosen-bridge/abstract-logger": "^3.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^0.1.2",
-    "@rosen-bridge/bitcoin-scanner": "^0.2.0",
-    "@rosen-bridge/extended-typeorm": "^1.0.0",
-    "@rosen-bridge/rosen-extractor": "^10.1.0",
-    "@rosen-bridge/tokens": "^4.0.0"
   }
 }

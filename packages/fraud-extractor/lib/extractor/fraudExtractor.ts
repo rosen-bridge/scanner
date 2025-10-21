@@ -1,17 +1,18 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import * as wasm from 'ergo-lib-wasm-nodejs';
 import { Buffer } from 'buffer';
+import * as wasm from 'ergo-lib-wasm-nodejs';
 import { difference } from 'lodash-es';
+
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
-import { V1 } from '@rosen-clients/ergo-explorer';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
 import {
   Block,
   BlockInfo,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
+import { V1 } from '@rosen-clients/ergo-explorer';
 
 import { FraudAction } from '../actions/fraudAction';
 import { DefaultApiLimit } from '../constants';

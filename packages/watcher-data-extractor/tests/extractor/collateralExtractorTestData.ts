@@ -1,5 +1,6 @@
-import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 export const awcNft =

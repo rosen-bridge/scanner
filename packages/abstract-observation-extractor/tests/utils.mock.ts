@@ -1,8 +1,9 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
   migrations as scannerMigrations,
   BlockEntity,
 } from '@rosen-bridge/abstract-scanner';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+
 import { migrations, ObservationEntity } from '../lib';
 
 export const createDatabase = async (): Promise<DataSource> => {

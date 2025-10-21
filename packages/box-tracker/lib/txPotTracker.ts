@@ -1,4 +1,5 @@
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
+
 import { generateTracker } from './boxHandler';
 import {
   ErgoBox,
@@ -7,18 +8,14 @@ import {
   TxDeserializer,
 } from './interfaces';
 
-export class TxPoolTracker {
-  private deserializeTx: TxDeserializer;
-
+export class TxPotTracker {
   /**
-   * Creates an instance of TxPoolTracker.
+   * Creates an instance of TxPotTracker.
    */
-  constructor(deserializeTx: TxDeserializer) {
-    this.deserializeTx = deserializeTx;
-  }
+  constructor(private deserializeTx: TxDeserializer) {}
 
   /**
-   * Tracks mempool transactions and serialized transactions from txPot for a given address and token list.
+   * Tracks serialized transactions from txPot for a given address and token list.
    *
    * @returns MempoolTrackerResult containing matched boxes and spent box IDs.
    */
@@ -31,14 +28,12 @@ export class TxPoolTracker {
     const boxes: ErgoBox[] = [];
     const spentBox = new Set<string>();
     const txs: Transaction[] = [];
-    for (const sTx of transactions) {
-      let tx: Transaction | null = null;
+    for (const tx of transactions) {
       try {
-        tx = this.deserializeTx(sTx);
+        txs.push(this.deserializeTx(tx));
       } catch {
-        continue;
+        /*empty*/
       }
-      if (tx) txs.push(tx);
     }
     for (const tx of txs) {
       for (const input of tx.inputs) {

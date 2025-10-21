@@ -1,7 +1,8 @@
-import { createDatabase } from '../utils.mock';
-import { TxAction } from '../../lib/actions/db';
-import { TxIdEntity } from '../../lib';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+
+import { TxIdEntity } from '../../lib';
+import { TxAction } from '../../lib/actions/db';
+import { createDatabase } from '../utils.mock';
 
 let dataSource: DataSource;
 let action: TxAction;

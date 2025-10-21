@@ -1,2 +1,2 @@
-export { EvmRpcScanner } from './EvmRpcScanner';
-export { EvmRpcNetwork } from './EvmRpcNetwork';
+export { EvmRpcScanner } from './evmRpcScanner';
+export { EvmRpcNetwork } from './evmRpcNetwork';
