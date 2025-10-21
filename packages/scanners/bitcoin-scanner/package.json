@@ -1,5 +1,5 @@
 {
-  "name": "@rosen-bridge/bitcoin-scanner",
+  "name": "@alakipalakikharaki/bitcoin-scanner",
   "version": "0.2.1",
   "description": "A Bitcoin blockchain scanner based on Esplora or Rpc Block Explorer API",
   "repository": {
