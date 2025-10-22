@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-scanner
 
+## 0.3.0
+
+### Minor Changes
+
+- update
+
 ## 0.2.2
 
 ### Patch Changes

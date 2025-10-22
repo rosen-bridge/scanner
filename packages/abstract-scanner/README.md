@@ -1,7 +1,5 @@
 # Scanner
 
-.
-
 ### Table of Contents
 
 - [Description](#description)

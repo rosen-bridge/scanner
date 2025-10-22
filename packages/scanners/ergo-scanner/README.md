@@ -1,7 +1,5 @@
 # @rosen-bridge/ergo-scanner
 
-.
-
 ## Table of contents
 
 - [Introduction](#introduction)
