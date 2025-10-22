@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 4.3.0
+
+### Minor Changes
+
+- a
+
 ## 4.2.0
 
 ### Minor Changes
