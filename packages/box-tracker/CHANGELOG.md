@@ -1,5 +1,11 @@
 # @alakipalakikharaki/box-tracker
 
+## 0.2.0
+
+### Minor Changes
+
+- new test
+
 ## 0.1.1
 
 ### Patch Changes
