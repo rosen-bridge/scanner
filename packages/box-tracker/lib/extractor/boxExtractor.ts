@@ -83,7 +83,6 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           !spentBoxes.has(b.box.boxId) &&
           b.inclusionHeight >= block.height - MAX_BOX_HEIGHT,
       );
-      console.log(this.boxes);
       return true;
     } catch (error) {
       console.error('BoxExtractor processTransactions failed:', error);

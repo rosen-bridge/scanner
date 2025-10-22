@@ -14,30 +14,25 @@ vi.mock('../../lib/network/explorerErgoNetwork', () => {
 });
 
 describe('BoxExtractor', () => {
-  describe('boxExtractor', () => {
-    let boxExtractor: BoxExtractor;
-    const mockBox = createMockBox('box1', 1000n);
-    const mockBlock = {
-      height: 100,
-      parentHash: 'parent-hash-1',
-      timestamp: 1234567890,
-      hash: 'block-hash-1',
-    };
+  let boxExtractor: BoxExtractor;
+  const mockBox = createMockBox('box1', 1000n);
+  const mockBlock = {
+    height: 100,
+    parentHash: 'parent-hash-1',
+    timestamp: 1234567890,
+    hash: 'block-hash-1',
+  };
 
-    beforeEach(() => {
-      vi.clearAllMocks();
+  beforeEach(() => {
+    vi.clearAllMocks();
 
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => {
-        return true;
-      });
-
-      boxExtractor = new BoxExtractor(
-        'explorer',
-        'http://fake-url',
-        'addr',
-        [],
-      );
+    vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => {
+      return true;
     });
+
+    boxExtractor = new BoxExtractor('explorer', 'http://fake-url', 'addr', []);
+  });
+  describe('processTransactions', () => {
     /**
      * @target processTransactions should add boxes when tracker matches
      * @scenario
@@ -99,7 +94,8 @@ describe('BoxExtractor', () => {
 
       expect(boxExtractor.getRecentBoxes()).toHaveLength(0);
     });
-
+  });
+  describe('forkBlock', () => {
     /**
      * @target forkBlock should remove boxes matching given hash
      * @scenario
