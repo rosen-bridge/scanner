@@ -63,6 +63,11 @@ jobs:
     if: needs.ci.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
