@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-scanner
 
+## 0.2.2
+
+### Patch Changes
+
+- final test
+
 ## 0.2.1
 
 ### Patch Changes
