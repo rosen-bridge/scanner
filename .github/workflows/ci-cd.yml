@@ -4,9 +4,6 @@ on:
   push:
     branches: ['dev']
 
-permissions:
-  contents: read
-
 jobs:
   ci:
     name: CI and Publish
@@ -40,4 +37,5 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm run release || true
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          npx changeset publish
