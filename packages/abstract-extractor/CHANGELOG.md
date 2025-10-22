@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- new day
+
 ## 3.0.0
 
 ### Major Changes
