@@ -4,10 +4,15 @@ on:
   push:
     branches: ['dev']
 
-jobs:
-  ci_and_maybe_release:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check_msg.outputs.should_release }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,11 +20,11 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          cache-dependency-path: '**/package-lock.json'
 
       - name: Install Dependencies
         run: npm ci
@@ -30,8 +35,51 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: NPM release
+      - name: Check commit message
+        id: check_msg
         if: ${{ startsWith(github.event.head_commit.message, 'rosen-version:') }}
+        run: |
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+      - name: Pack publishable workspaces
+        if: steps.check_msg.outputs.should_release == 'true'
+        run: |
+          rm -rf packed && mkdir -p packed
+          npm pack --workspaces --pack-destination packed
+          ls -l packed
+
+      - name: Upload tarballs
+        if: steps.check_msg.outputs.should_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-tarballs
+          path: packed/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: NPM Release
+    needs: ci
+    if: needs.ci.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download packed artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-tarballs
+          path: packed
+
+      - name: unpack packed
+        run: |
+          for file in packed/*.tgz; do tar -xzf "$file"; done
+
+      - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
