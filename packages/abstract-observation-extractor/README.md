@@ -1,5 +1,7 @@
 # Abstract Observation Extractor
 
+.
+
 ### Table of Contents
 
 - [Description](#description)

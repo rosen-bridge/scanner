@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-extractor
 
+## 6.0.0
+
+### Major Changes
+
+- test
+- test??
+
 ## 5.0.0
 
 ### Major Changes
