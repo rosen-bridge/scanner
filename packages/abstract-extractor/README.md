@@ -1,5 +1,7 @@
 # extractor
 
+.
+
 ## Table of contents
 
 - [Introduction](#introduction)
