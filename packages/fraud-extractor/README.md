@@ -1,5 +1,7 @@
 # Fraud Extractor
 
+.
+
 ### Table of Contents
 
 - [Description](#description)
