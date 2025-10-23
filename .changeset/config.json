@@ -9,8 +9,7 @@
   "updateInternalDependencies": "patch",
   "ignore": [],
   "privatePackages": {
-    "version": true,
-    "tag": true
+    "version": true
   },
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "updateInternalDependents": "always"
