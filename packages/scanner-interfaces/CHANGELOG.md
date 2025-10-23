@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner-interfaces
 
+## 0.5.0
+
+### Minor Changes
+
+- a
+
 ## 0.4.0
 
 ### Minor Changes
