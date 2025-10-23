@@ -1,5 +1,11 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.3.0
+
+### Minor Changes
+
+- new day
+
 ## 2.2.2
 
 ### Patch Changes

@@ -1,0 +1,60 @@
+name: CI & Publish to npmjs
+
+on:
+  push:
+    branches: ['dev']
+
+jobs:
+  ci:
+    name: CI and Publish
+    runs-on: ubuntu-latest
+
+    env:
+      PUBLISH_PREFIX: ${{ vars.PUBLISH_PREFIX != '' && vars.PUBLISH_PREFIX || 'rosen-version:' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+
+      - name: Check actor permission
+        if: ${{ startsWith(github.event.head_commit.message, env.PUBLISH_PREFIX) }}
+        id: perm
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          USER: ${{ github.actor }}
+        run: |
+          resp=$(curl -s -H "Authorization: Bearer $TOKEN" \
+                       -H "Accept: application/vnd.github+json" \
+                       "https://api.github.com/repos/$OWNER/$REPO/collaborators/$USER/permission")
+          echo "$resp" | jq '.permission, .role_name'
+          is_admin=$(echo "$resp" | jq -r '.permission == "admin"')
+          echo "is_admin=$is_admin" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        if: ${{ steps.perm.outputs.is_admin == 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          npx changeset publish

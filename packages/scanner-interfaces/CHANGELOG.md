@@ -1,5 +1,17 @@
 # @rosen-bridge/scanner-interfaces
 
+## 0.4.0
+
+### Minor Changes
+
+- final?
+
+## 0.3.0
+
+### Minor Changes
+
+- alaki
+
 ## 0.2.1
 
 ### Patch Changes

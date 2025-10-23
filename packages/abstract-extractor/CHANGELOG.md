@@ -1,5 +1,53 @@
 # @rosen-bridge/abstract-extractor
 
+## 5.0.0
+
+### Major Changes
+
+- new-release-2
+
+## 4.3.0
+
+### Minor Changes
+
+- a
+
+## 4.2.0
+
+### Minor Changes
+
+- update
+
+## 4.1.0
+
+### Minor Changes
+
+- final test
+
+## 4.0.0
+
+### Major Changes
+
+- new day
+
+## 3.0.0
+
+### Major Changes
+
+- final?
+
+## 2.2.1
+
+### Patch Changes
+
+- alaki
+
+## 2.2.0
+
+### Minor Changes
+
+- alaki
+
 ## 2.1.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
-  "name": "@rosen-bridge/abstract-scanner",
-  "version": "0.2.1",
+  "name": "@alakipalakikharaki/abstract-scanner",
+  "version": "0.3.0",
   "description": "Abstract scanner toolkit for blockchain scanning with logging.",
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 {
-  "name": "@rosen-bridge/evm-address-tx-extractor",
-  "version": "1.2.2",
+  "name": "@alakipalakikharaki/evm-address-tx-extractor",
+  "version": "1.2.3",
   "description": "Extract and store EVM chain notable data of transactions for an address",
   "repository": {
     "type": "git",

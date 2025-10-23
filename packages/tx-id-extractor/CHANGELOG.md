@@ -1,5 +1,11 @@
 # @rosen-bridge/tx-id-extractor
 
+## 3.0.0
+
+### Major Changes
+
+- final test
+
 ## 2.4.2
 
 ### Patch Changes
