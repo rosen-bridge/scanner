@@ -1,7 +1,7 @@
 {
   "name": "@alakipalakikharaki/abstract-scanner",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Abstract scanner toolkit for blockchain scanning with logging.",
   "repository": {
     "type": "git",
