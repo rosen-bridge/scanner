@@ -22,8 +22,6 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
@@ -35,7 +33,7 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Check actor permission
+      - name: Release Verification
         if: ${{ startsWith(github.event.head_commit.message, env.PUBLISH_PREFIX) }}
         id: perm
         env:
