@@ -1,5 +1,7 @@
 # box-tracker
 
+.
+
 ## Table of contents
 
 - [Introduction](#introduction)
