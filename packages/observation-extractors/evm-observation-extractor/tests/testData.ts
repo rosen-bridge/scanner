@@ -41,6 +41,7 @@ export const rosenData = {
   targetChainTokenId: 'target-token-id',
   sourceTxId:
     '0x3b194eea7cf9507e745806265738ca19213be209885534161ec0fa9c232c9fea',
+  rawData: 'raw-data',
 };
 
 export const expectedObservation = {

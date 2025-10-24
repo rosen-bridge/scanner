@@ -14,7 +14,7 @@ import {
 
 interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];
-  metadata: components['schemas']['tx_content_metadata'];
+  metadataCbor: components['schemas']['tx_content_metadata_cbor'];
 }
 
 export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<BlockFrostTransaction> {
@@ -76,6 +76,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractExtractor<Blo
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData,
             });
           }
         });

@@ -12,4 +12,5 @@ export const rosenData = {
   amount: '3000000000',
   targetChainTokenId: 'target-token-id',
   sourceTxId: 'tx-id',
+  rawData: 'raw-data',
 };

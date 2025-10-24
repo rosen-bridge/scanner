@@ -71,6 +71,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractExtractor<Transac
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData,
             });
           }
         }

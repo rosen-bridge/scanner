@@ -77,6 +77,7 @@ export class ErgoObservationExtractor extends AbstractExtractor<Transaction> {
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData,
             });
           }
         });

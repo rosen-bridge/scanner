@@ -11,7 +11,7 @@ import { TokenMap } from '@rosen-bridge/tokens';
 class CardanoBlockFrostExtractor extends CardanoBlockFrostObservationExtractor {}
 
 const bankAddress =
-  'addr_test1vze7yqqlg8cjlyhz7jzvsg0f3fhxpuu6m3llxrajfzqecggw704re';
+  'addr_test1vzg07d2qp3xje0w77f982zkhqey50gjxrsdqh89yx8r7nasu97hr0';
 
 let dataSource: DataSource;
 

@@ -97,4 +97,11 @@ export const validLockTx = {
       },
     },
   ],
+  metadataCbor: [
+    {
+      label: '0',
+      cbor_metadata: null,
+      metadata: null,
+    },
+  ],
 };

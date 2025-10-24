@@ -71,6 +71,7 @@ export class CardanoKoiosObservationExtractor extends AbstractExtractor<KoiosTra
               requestId: requestId,
               toAddress: data.toAddress,
               fromAddress: data.fromAddress,
+              rawData: data.rawData,
             });
           }
         });
