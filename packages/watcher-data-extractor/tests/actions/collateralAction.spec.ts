@@ -2,10 +2,10 @@ import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { CollateralEntity } from '../../lib';
 import CollateralAction from '../../lib/actions/collateralAction';
+import { SpendInfo } from '../../lib/interfaces/types';
 import { createDatabase } from '../extractor/utilsFunctions.mock';
 import { block } from '../extractor/utilsVariable.mock';
 import * as testData from './collateralActionTestData';
-import { SpendInfo } from '../../lib/interfaces/types';
 
 describe('CollateralAction', () => {
   let dataSource: DataSource;

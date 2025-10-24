@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 
 import { FraudExtractor } from '../../lib';
 import { FraudEntity } from '../../lib';
-import {
-  createDatabase,
-  generateFraudTx,
-  insertFraudEntity,
-} from './utils.mock';
 import { ExtractedFraud } from '../../lib/interfaces/types';
 import { block } from '../actions/fraudActionTestData';
 import {
@@ -17,6 +12,11 @@ import {
   extractedFraud,
   fraudApiOutputBoxes,
 } from './fraudExtractorTestData';
+import {
+  createDatabase,
+  generateFraudTx,
+  insertFraudEntity,
+} from './utils.mock';
 
 vi.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;

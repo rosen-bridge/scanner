@@ -1,9 +1,10 @@
-import { ObservationEntityAction } from '../../lib/actions/db';
-import { ObservationEntity } from '../../lib';
-import { createDatabase, generateBlockEntity } from '../utils.mock';
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
-import { firstObservations, secondObservations } from '../observations.mock';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+
+import { ObservationEntity } from '../../lib';
+import { ObservationEntityAction } from '../../lib/actions/db';
+import { firstObservations, secondObservations } from '../observations.mock';
+import { createDatabase, generateBlockEntity } from '../utils.mock';
 
 let dataSource: DataSource;
 let action: ObservationEntityAction;
@@ -262,6 +263,7 @@ describe('ObservationEntityAction', () => {
               toChain: genHexString(),
               toAddress: genHexString(),
               fromChain: genHexString(),
+              rawData: 'mocked',
             },
           ],
           block,

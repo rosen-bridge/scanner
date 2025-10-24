@@ -1,12 +1,13 @@
-import { createDatabase } from './abstract/abstract.mock';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { BlockDbAction } from '../../lib/scanner/action';
+
 import {
   BlockEntity,
   PROCEED,
   PROCESSING,
 } from '../../lib/entities/blockEntity';
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
+import { BlockDbAction } from '../../lib/scanner/action';
+import { createDatabase } from './abstract/abstract.mock';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -58,7 +59,7 @@ describe('action', () => {
      * Scenario: call getLastSavedBlock from database
      * Expected: return last height with status Processing
      */
-    it('should return latest block and ignore PROCESSING status ', async () => {
+    it('should return latest block and ignore PROCESSING status', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,
@@ -81,7 +82,7 @@ describe('action', () => {
      * Scenario: call getLastSavedBlock from database
      * Expected: return last height for my scanner
      */
-    it('should return latest block and ignore other scanner blocks ', async () => {
+    it('should return latest block and ignore other scanner blocks', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,
@@ -128,7 +129,7 @@ describe('action', () => {
      *           into database then call getLastSavedBlocks with skip=2 and count=5
      * Expected: must return block for heights [3-1]
      */
-    it('should return latest blocks and ignore PROCESSING status ', async () => {
+    it('should return latest blocks and ignore PROCESSING status', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,
@@ -150,7 +151,7 @@ describe('action', () => {
      *          into database then call getLastSavedBlocks with skip=2 and count=2
      * Expected: must return block for heights [3,2]
      */
-    it('should return latest blocks and ignore PROCESSING status ', async () => {
+    it('should return latest blocks and ignore other scanner blocks', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,
@@ -207,7 +208,7 @@ describe('action', () => {
      * Scenario: call getFirstSavedBlock from database
      * Expected: return last height with status Processing
      */
-    it('should return first block and ignore PROCESSING status ', async () => {
+    it('should return first block and ignore PROCESSING status', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,
@@ -230,7 +231,7 @@ describe('action', () => {
      * Scenario: call getFirstSavedBlock from database
      * Expected: return last height for my scanner
      */
-    it('should return first block and ignore other scanner blocks ', async () => {
+    it('should return first block and ignore other scanner blocks', async () => {
       for (let index = 0; index < 10; index++) {
         await dataSource.getRepository(BlockEntity).insert({
           height: index,

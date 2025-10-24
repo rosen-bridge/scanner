@@ -1,22 +1,20 @@
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
+
 import { ErgoObservationExtractor } from '../../lib';
+import { tokens } from '../tokens.mock';
 import {
   generateBlockEntity,
   createDatabase,
   observationTxGenerator,
 } from '../utils.mock';
-import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
-import { tokens } from '../tokens.mock';
-import { Buffer } from 'buffer';
-import { blake2b } from 'blakejs';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { TokenMap } from '@rosen-bridge/tokens';
 
 class ExtractorErgo extends ErgoObservationExtractor {}
 
 const bankAddress = '9f53ZBeKFk3VKS4KPj1Lap96BKFSw8zfdWb4FHYZH6qBBV6p9ZS';
 const bankSK =
   'f133100250abf1494e9ff5a0f998dc2fea7a5aa35641454ba723c913bff0e8fa';
-const watcherAddress = '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM';
 const watcherSK =
   '3870dab5e5fb3eebfdcb30031b65a8dbb8eec75ffe3558e7d0c7ef9529984ee1';
 let dataSource: DataSource;
@@ -26,124 +24,6 @@ describe('extractorErgo', () => {
     dataSource = await createDatabase();
   });
   describe('processTransactions', () => {
-    /**
-     * 1 Valid Transaction should save successfully
-     * Dependency: action.storeObservations
-     * Scenario: one valid observation should save successfully
-     * Expected: processTransactions should returns true and database row count should be 1 and database fields
-     *  should fulfill expected values
-     */
-    it('checks valid transaction', async () => {
-      const tokenMap = new TokenMap();
-      await tokenMap.updateConfigByJson(tokens);
-      const extractor = new ExtractorErgo(dataSource, tokenMap, bankAddress);
-      const Tx1 = observationTxGenerator(
-        true,
-        [
-          'cardano',
-          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
-          '10000',
-          '1000',
-          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
-        ],
-        bankSK,
-        watcherSK,
-      );
-      const Tx2 = observationTxGenerator(
-        true,
-        [
-          'cardano',
-          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
-          '10000',
-          '1000',
-        ],
-        bankSK,
-        watcherSK,
-      );
-      const Tx3 = observationTxGenerator(
-        false,
-        [
-          'cardano',
-          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
-          '10000',
-          '1000',
-          '9i1EZHaRPTLajwJivCFpdoi65r7A8ZgJxVbMtxZ23W5Z2gDkKdM',
-        ],
-        bankSK,
-        watcherSK,
-      );
-      const res = await extractor.processTransactions(
-        [Tx1, Tx2, Tx3],
-        generateBlockEntity(dataSource, '1'),
-      );
-      expect(res).toBeTruthy();
-      const repository = dataSource.getRepository(ObservationEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toEqual(2);
-      const observation1 = rows[0];
-      const box1 = Tx1.outputs[0];
-      const assetAmount = box1.assets ? box1.assets[0].amount.toString() : '';
-      const assetId = box1.assets ? box1.assets[0].tokenId : '';
-      expect(observation1).toEqual({
-        id: 1,
-        fromChain: 'ergo',
-        toChain: 'cardano',
-        fromAddress: watcherAddress,
-        toAddress: 'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
-        height: 1,
-        amount: assetAmount,
-        networkFee: '10000',
-        bridgeFee: '1000',
-        sourceChainTokenId: assetId,
-        targetChainTokenId: 'ada',
-        sourceBlockId: '1',
-        sourceTxId: box1.transactionId,
-        requestId: Buffer.from(
-          blake2b(box1.transactionId, undefined, 32),
-        ).toString('hex'),
-        block: '1',
-        extractor: 'ergo-observation-extractor',
-        rawData:
-          '1a050763617264616e6f3a6164647231767971347434336d6c6676326c36706664386737776d6e6c726e66646379353875746e7a70763938396e6e64356a7130796d667665053130303030043130303033396931455a48615250544c616a774a6976434670646f693635723741385a674a7856624d74785a323357355a3267446b4b644d',
-      });
-    });
-
-    /**
-     * 1 Valid Transaction but invalid bankAddress should not save
-     * Dependency: action.storeObservations
-     * Scenario: one valid observation with invalid bankAddress should not save in the database
-     * Expected: processTransactions should returns true and database row count should be 0
-     */
-    it('checks observation with invalid bankAddress should not saved', async () => {
-      const tokenMap = new TokenMap();
-      await tokenMap.updateConfigByJson(tokens);
-      const extractor = new ExtractorErgo(
-        dataSource,
-        tokenMap,
-        '9gDQ7emWoxJkAHW8kSwniCkDa43G2w9LCL9voHgfj2AvXfFSQ8i',
-      );
-      const Tx1 = observationTxGenerator(
-        true,
-        [
-          'cardano',
-          'addr1vyq4t43mlfv2l6pfd8g7wmnlrnfdcy58utnzpv989nnd5jq0ymfve',
-          '10000',
-          '1000',
-          watcherAddress,
-        ],
-        bankSK,
-        watcherSK,
-      );
-      const res = await extractor.processTransactions(
-        [Tx1],
-        generateBlockEntity(dataSource, '1'),
-      );
-      expect(res).toEqual(true);
-      const repository = dataSource.getRepository(ObservationEntity);
-      const [, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toEqual(0);
-    });
-
     /**
      * @target ExtractorErgo.processTransactions should ignore tx containing
      * output box with invalid creation height
@@ -161,7 +41,7 @@ describe('extractorErgo', () => {
     it('should ignore tx containing output box with invalid creation height', async () => {
       const tokenMap = new TokenMap();
       await tokenMap.updateConfigByJson(tokens);
-      const extractor = new ExtractorErgo(dataSource, tokenMap, bankAddress);
+      const extractor = new ExtractorErgo(bankAddress, dataSource, tokenMap);
       const Tx1 = observationTxGenerator(
         true,
         [

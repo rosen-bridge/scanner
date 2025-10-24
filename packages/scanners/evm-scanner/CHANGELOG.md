@@ -1,5 +1,31 @@
 # @rosen-bridge/evm-scanner
 
+## 0.1.2
+
+### Patch Changes
+
+- Fix package-lock and move typescript and types/node into root
+- Update eslint and plugins:
+  - Apply new rules such as sort imports and file name
+- Update dependencies
+  - @rosen-bridge/extended-typeorm@1.0.1
+  - @rosen-clients/rate-limited-axios@1.1.0
+  - @rosen-bridge/rosen-extractor@10.1.1
+  - @rosen-bridge/tokens@4.0.1
+  - @rosen-bridge/abstract-logger@3.0.1
+  - @rosen-bridge/json-bigint@1.1.0
+  - @rosen-clients/ergo-explorer@2.1.0
+  - @rosen-clients/ergo-node@3.1.0
+  - @rosen-bridge/scanner-interfaces@0.2.1
+  - @rosen-bridge/abstract-scanner@0.2.1
+
+## 0.1.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.0
+
 ## 0.1.0
 
 - This package was **renamed** from `@rosen-bridge/evm-rpc-scanner`.  

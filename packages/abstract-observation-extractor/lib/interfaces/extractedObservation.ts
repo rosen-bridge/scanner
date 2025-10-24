@@ -11,4 +11,5 @@ export interface ExtractedObservation {
   requestId: string;
   toAddress: string;
   fromAddress: string;
+  rawData: string;
 }

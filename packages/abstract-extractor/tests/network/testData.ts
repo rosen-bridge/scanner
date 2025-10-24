@@ -1,5 +1,6 @@
-import { Registers } from '@rosen-clients/ergo-node';
 import { V1 } from '@rosen-clients/ergo-explorer';
+import { Registers } from '@rosen-clients/ergo-node';
+
 import { ErgoBox } from '../../lib';
 
 export const explorerBox = {

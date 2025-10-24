@@ -1,11 +1,15 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { blake2b } from 'blakejs';
 import * as wasm from 'ergo-lib-wasm-nodejs';
+
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
+import { CollateralEntity } from '../../lib';
+import CommitmentEntity from '../../lib/entities/commitmentEntity';
+import EventTriggerEntity from '../../lib/entities/eventTriggerEntity';
+import PermitEntity from '../../lib/entities/permitEntity';
 import { migrations } from '../../lib/migrations';
-import PermitEntity from '../../lib/entities/PermitEntity';
-import CommitmentEntity from '../../lib/entities/CommitmentEntity';
-import EventTriggerEntity from '../../lib/entities/EventTriggerEntity';
+import { JsonBI } from '../../lib/utils';
 import {
   commitmentAddress,
   eventTriggerAddress,
@@ -13,9 +17,6 @@ import {
   permitAddress,
   RWTId,
 } from './utilsVariable.mock';
-import { JsonBI } from '../../lib/utils';
-import { CollateralEntity } from '../../lib';
-import { blake2b } from 'blakejs';
 
 /**
  * generates a dataSource with filename passed to the function for database file name

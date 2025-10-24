@@ -1,6 +1,7 @@
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
+import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
   Block,
@@ -8,13 +9,13 @@ import {
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 
 import CollateralAction from '../actions/collateralAction';
 import { DefaultApiLimit } from '../constants';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
-import { JsonBI, uint8ArrayToHex } from '../utils';
 import { SpendInfo } from '../interfaces/types';
+import { JsonBI, uint8ArrayToHex } from '../utils';
 
 export class CollateralExtractor extends AbstractExtractor<Transaction> {
   private readonly ergoTree: string;

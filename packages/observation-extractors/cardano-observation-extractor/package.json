@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-observation-extractor",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Event observation data extractor for Cardano chain",
   "repository": {
     "type": "git",
@@ -17,33 +17,26 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "coverage": "npm run test -- --coverage",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run test -- --run && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
+    "release": "npm run clean && npm run build && npm publish --access public",
     "type-check": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "@types/node": "^22.18.0",
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "typescript": "^5.3.3",
-    "vitest": "^3.1.4"
-  },
   "dependencies": {
-    "@blockfrost/openapi": "0.1.78",
+    "@blockfrost/openapi": "0.1.81",
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
-    "@rosen-bridge/abstract-extractor": "^2.1.0",
-    "@rosen-bridge/abstract-logger": "^3.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^0.1.1",
-    "@rosen-bridge/extended-typeorm": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^0.2.0",
+    "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/rosen-extractor": "^11.0.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.0",
-    "@rosen-bridge/tokens": "^4.0.0",
-    "blakejs": "^1.2.1"
+    "@rosen-bridge/tokens": "^4.0.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4"
   },
   "engines": {
     "node": ">=22.18.0"

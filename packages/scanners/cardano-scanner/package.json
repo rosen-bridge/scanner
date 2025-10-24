@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-scanner",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "A Cardano chain scanner.",
   "repository": {
     "type": "git",
@@ -17,29 +17,27 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "lint": "eslint --fix . && npm run prettify",
-    "prettify": "prettier --write . --ignore-path ./.gitignore",
-    "release": "npm run test -- --run && npm run build && npm publish --access public",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
+    "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "^6.0.0",
-    "@blockfrost/openapi": "0.1.78",
+    "@blockfrost/openapi": "0.1.81",
     "@cardano-ogmios/client": "^6.6.1",
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
-    "@rosen-bridge/abstract-logger": "^2.0.1",
-    "@rosen-bridge/abstract-scanner": "^0.1.0",
-    "@rosen-bridge/extended-typeorm": "^1.0.0",
-    "@rosen-bridge/json-bigint": "^0.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.0",
-    "@rosen-clients/rate-limited-axios": "^1.0.0",
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-scanner": "^0.2.1",
+    "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/json-bigint": "^1.1.0",
+    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-clients/rate-limited-axios": "^1.1.0",
     "cockatiel": "^3.2.1"
-  },
-  "devDependencies": {
-    "@types/node": "^22.18.0",
-    "tsx": "^4.19.4",
-    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=22.18.0"
