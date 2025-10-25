@@ -1,5 +1,11 @@
 # @rosen-bridge/fraud-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- test member versioning
+
 ## 3.0.0
 
 ### Major Changes
