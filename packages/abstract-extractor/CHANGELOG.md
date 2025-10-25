@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 6.1.2
+
+### Patch Changes
+
+- alaki
+
 ## 6.1.1
 
 ### Patch Changes
