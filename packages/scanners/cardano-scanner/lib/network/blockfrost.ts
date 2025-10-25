@@ -72,7 +72,7 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
 
     return {
       utxos: txUtxos,
-      metadata: txMetadata,
+      metadataCbor: txMetadata,
     };
   };
 
