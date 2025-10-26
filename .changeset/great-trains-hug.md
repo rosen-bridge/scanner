@@ -1,6 +1,6 @@
 ---
 '@rosen-bridge/cardano-scanner': major
-'@rosen-bridge/cardano-observation-extractor': patch
+'@rosen-bridge/cardano-observation-extractor': major
 ---
 
-Changed type metadata for Cardano Observation and Scanner.
+Change type of metadata for Blockfrost
