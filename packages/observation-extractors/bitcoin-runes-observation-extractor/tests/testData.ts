@@ -238,3 +238,20 @@ export const mockUnisatResponse = {
     total: 5,
   },
 };
+
+export const mockObservation = {
+  bridgeFee: ergoEventData.bridgeFee,
+  networkFee: ergoEventData.networkFee,
+  fromAddress: ergoEventData.fromAddress,
+  toAddress: ergoEventData.toAddress,
+  toChain: ergoEventData.toChain,
+  amount: '1000',
+  sourceChainTokenId: '880887:3052',
+  targetChainTokenId:
+    '7a51950e5f548549ec1aa63ffdc38279505b11e7e803d01bcf8347e0123c8666',
+  fromChain: 'bitcoin-runes',
+  sourceBlockId: mockBlock.hash,
+  sourceTxId: ergoEventData.sourceTxId,
+  requestId: '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',
+  rawData: '',
+};
