@@ -113,7 +113,8 @@ class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
         }) as TxOutputRune,
     );
 
-    return { runes, height: 0 };
+    // TODO: handle ordiscan synced height
+    return { runes, height: Infinity };
   };
 }
 
