@@ -35,7 +35,7 @@ class CommitmentEntity {
   @Column({ type: 'int' })
   height: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   boxSerialized: string;
 
   @Column({ nullable: true, type: 'text' })
@@ -47,7 +47,7 @@ class CommitmentEntity {
   @Column({ nullable: true, type: 'varchar' })
   rwtCount?: string;
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   spendTxId?: string | null;
 
   @Column({ nullable: true, type: 'int' })
