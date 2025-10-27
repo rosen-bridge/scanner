@@ -20,7 +20,7 @@ class CommitmentEntity {
   @Column({ type: 'varchar' })
   eventId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   commitment: string;
 
   @Column({ type: 'varchar' })
@@ -47,7 +47,7 @@ class CommitmentEntity {
   @Column({ nullable: true, type: 'varchar' })
   rwtCount?: string;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'text' })
   spendTxId?: string | null;
 
   @Column({ nullable: true, type: 'int' })
