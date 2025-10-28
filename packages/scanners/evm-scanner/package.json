@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-scanner",
-  "version": "0.1.2",
+  "version": "0.1.2-a25ac382",
   "description": "An EVM chain scanner based on RPC.",
   "repository": {
     "type": "git",
@@ -28,8 +28,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.1",
-    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-bridge/abstract-scanner": "^0.2.1-a25ac382",
+    "@rosen-bridge/scanner-interfaces": "^0.2.1-a25ac382",
     "ethers": "6.13.2"
   },
   "devDependencies": {
