@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "6.2.2",
+  "version": "6.2.2-82c56984",
   "description": "UTXO box extractor for any address or token.",
   "repository": {
     "type": "git",
@@ -28,11 +28,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.1.2",
+    "@rosen-bridge/abstract-extractor": "^2.1.2-82c56984",
     "@rosen-bridge/abstract-logger": "^3.0.1",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.1-82c56984",
     "ergo-lib-wasm-nodejs": "^0.24.1",
     "lodash-es": "^4.17.21"
   },
