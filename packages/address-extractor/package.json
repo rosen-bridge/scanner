@@ -31,12 +31,12 @@
     "@rosen-bridge/abstract-extractor": "^2.1.2",
     "@rosen-bridge/abstract-logger": "^3.0.1",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@rosen-bridge/json-bigint": "^1.1.0",
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.9.14",
     "vitest": "^3.1.4"

@@ -51,13 +51,13 @@ class EventTriggerEntity extends AbstractErgoExtractorEntity {
   @Column({ type: 'varchar' })
   WIDsHash: string;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'text' })
   spendTxId?: string | null;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'text' })
   result?: string | null;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'text' })
   paymentTxId?: string | null;
 }
 
