@@ -12,10 +12,12 @@ abstract class AbstractRunesProtocolNetwork {
   /**
    * returns the Runes transfer of a transaction
    * @param txId
+   * @param height
    */
   abstract getTxOutputRunes(
     txId: string,
-  ): Promise<{ runes: TxOutputRune[]; height: number }>;
+    height: number,
+  ): Promise<TxOutputRune[]>;
 }
 
 export default AbstractRunesProtocolNetwork;

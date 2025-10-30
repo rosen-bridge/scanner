@@ -2,7 +2,7 @@ import { RosenData } from '@rosen-bridge/rosen-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { RosenTokens } from '@rosen-bridge/tokens';
 
-import { TxOutputRune } from '../lib/types';
+import { OrdiscanRunesData, TxOutputRune, UnisatTxRunes } from '../lib/types';
 
 export const mockLockAddress =
   'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk';
@@ -28,29 +28,26 @@ export const mockBlock: Block = {
   extra: undefined,
 };
 
-export const mockTxOutputRunes: { runes: TxOutputRune[]; height: number } = {
-  runes: [
-    {
-      address: mockUserAddress,
-      vout: 0,
-      runeId: '880887:3052',
-      runeAmount: '998233983',
-    },
-    {
-      address: mockLockAddress,
-      vout: 2,
-      runeId: '880887:3052',
-      runeAmount: '1000',
-    },
-    {
-      address: mockUserAddress,
-      vout: 0,
-      runeId: '880887:3053',
-      runeAmount: '7001000',
-    },
-  ],
-  height: mockBlock.height + 2,
-};
+export const mockTxOutputRunes: TxOutputRune[] = [
+  {
+    address: mockUserAddress,
+    vout: 0,
+    runeId: '880887:3052',
+    runeAmount: '998233983',
+  },
+  {
+    address: mockLockAddress,
+    vout: 2,
+    runeId: '880887:3052',
+    runeAmount: '1000',
+  },
+  {
+    address: mockUserAddress,
+    vout: 0,
+    runeId: '880887:3053',
+    runeAmount: '7001000',
+  },
+];
 
 export const mockTokens: RosenTokens = [
   {
@@ -81,7 +78,9 @@ export const mockTokens: RosenTokens = [
       decimals: 3,
       type: 'BRC-20',
       residency: 'native',
-      extra: {},
+      extra: {
+        uniqueName: 'ROSENPOCRUNE',
+      },
     },
   },
   {
@@ -100,7 +99,9 @@ export const mockTokens: RosenTokens = [
       decimals: 3,
       type: 'BRC-20',
       residency: 'native',
-      extra: {},
+      extra: {
+        uniqueName: 'TESTINGCATAETCH',
+      },
     },
   },
 ];
@@ -254,4 +255,178 @@ export const mockObservation = {
   sourceTxId: ergoEventData.sourceTxId,
   requestId: '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',
   rawData: '',
+};
+
+export const mockUnisatResponse1: UnisatTxRunes = {
+  total: 2,
+  start: 0,
+  height: 200,
+  detail: [
+    {
+      txid: mockTxId,
+      type: 'receive',
+      address: 'addr1',
+      runeId: 'r1',
+      amount: '10',
+      vout: 0,
+      //
+      height: 0,
+      txidx: 0,
+      timestamp: 0,
+      rune: '',
+      spacedRune: '',
+      divisibility: 0,
+      spentTxid: '',
+      spentVout: 0,
+    },
+    {
+      txid: mockTxId,
+      type: 'send', // should be ignored
+      address: 'addr2',
+      runeId: 'r2',
+      amount: '5',
+      vout: 1,
+      //
+      height: 0,
+      txidx: 0,
+      timestamp: 0,
+      rune: '',
+      spacedRune: '',
+      divisibility: 0,
+      spentTxid: '',
+      spentVout: 0,
+    },
+  ],
+};
+
+export const mockUnisatResponse2: UnisatTxRunes = {
+  total: 2,
+  start: 0,
+  height: 100,
+  detail: [
+    {
+      txid: mockTxId,
+      type: 'receive',
+      address: 'addr1',
+      runeId: 'r1',
+      amount: '1',
+      vout: 0,
+      //
+      height: 0,
+      txidx: 0,
+      timestamp: 0,
+      rune: '',
+      spacedRune: '',
+      divisibility: 0,
+      spentTxid: '',
+      spentVout: 0,
+    }, // only 1 entry but total = 2, should trigger pagination error
+  ],
+};
+
+export const mockUnisatResponse3: UnisatTxRunes = {
+  total: 1,
+  start: 0,
+  height: 50,
+  detail: [
+    {
+      txid: mockTxId,
+      type: 'receive',
+      address: 'addrX',
+      runeId: 'rX',
+      amount: '99',
+      vout: 2,
+      //
+      height: 0,
+      txidx: 0,
+      timestamp: 0,
+      rune: '',
+      spacedRune: '',
+      divisibility: 0,
+      spentTxid: '',
+      spentVout: 0,
+    },
+  ],
+};
+
+export const mockOrdiscanResponse1: OrdiscanRunesData = {
+  txid: '8661fceca46235d59ada19f869eb72fce68678cae1c471cd2e4a6f4ee36b1642',
+  runestone_messages: [{ rune: 'ROSENPOCRUNE', type: 'TRANSFER' }],
+  inputs: [
+    {
+      address: mockLockAddress,
+      output:
+        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
+      rune: 'TESTINGCATAETCH',
+      rune_amount: '7001000',
+    },
+    {
+      address: mockLockAddress,
+      output:
+        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
+      rune: 'ROSENPOCRUNE',
+      rune_amount: '998234983',
+    },
+  ],
+  outputs: [
+    {
+      address: mockLockAddress,
+      vout: 0,
+      rune: 'ROSENPOCRUNE',
+      rune_amount: '998233983',
+    },
+    {
+      address: mockLockAddress,
+      vout: 2,
+      rune: 'ROSENPOCRUNE',
+      rune_amount: '1000',
+    },
+    {
+      address: mockLockAddress,
+      vout: 0,
+      rune: 'TESTINGCATAETCH',
+      rune_amount: '7001000',
+    },
+  ],
+};
+
+export const mockOrdiscanResponse2: OrdiscanRunesData = {
+  txid: '8661fceca46235d59ada19f869eb72fce68678cae1c471cd2e4a6f4ee36b1642',
+  runestone_messages: [{ rune: 'xROSENPOCRUNE', type: 'TRANSFER' }],
+  inputs: [
+    {
+      address: mockLockAddress,
+      output:
+        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
+      rune: 'TESTINGCATAETCH',
+      rune_amount: '7001000',
+    },
+    {
+      address: mockLockAddress,
+      output:
+        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
+      rune: 'xROSENPOCRUNE',
+      rune_amount: '998234983',
+    },
+  ],
+  outputs: [
+    {
+      address: mockLockAddress,
+      vout: 0,
+      rune: 'xROSENPOCRUNE',
+      rune_amount: '998233983',
+    },
+    {
+      address: mockLockAddress,
+      vout: 2,
+      rune: 'xROSENPOCRUNE',
+      rune_amount: '1000',
+    },
+    {
+      address: mockLockAddress,
+      vout: 0,
+      rune: 'TESTINGCATAETCH',
+      rune_amount: '7001000',
+    },
+  ],
 };

@@ -31,10 +31,12 @@ class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
   /**
    * returns the Runes transfer of a transaction
    * @param txId
+   * @param height
    */
   getTxOutputRunes = async (
     txId: string,
-  ): Promise<{ runes: TxOutputRune[]; height: number }> => {
+    height: number,
+  ): Promise<TxOutputRune[]> => {
     // Transform the RPC transaction to the expected BitcoinRunesTx format
     const runes: TxOutputRune[] = [];
 
@@ -54,6 +56,12 @@ class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
       if (txRunes.detail.length !== txRunes.total) {
         throw new Error(
           `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`,
+        );
+      }
+
+      if (height > txRunes.height) {
+        throw new Error(
+          `UnisatRunesProtocolNetwork is not synced. processing block height is [${height}] and synced height of network is [${txRunes.height}]`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,7 +88,7 @@ class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
       });
     }
 
-    return { runes, height: txRunes.height };
+    return runes;
   };
 }
 

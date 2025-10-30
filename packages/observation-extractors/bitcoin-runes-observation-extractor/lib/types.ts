@@ -65,23 +65,3 @@ export interface OrdiscanRunestoneMessage {
   rune: string;
   type: string;
 }
-
-export interface OrdiscanRuneInfo {
-  id: string;
-  name: string;
-  formatted_name: string;
-  spacers: number;
-  number: number;
-  inscription_id: string;
-  decimals: number;
-  mint_count_cap: string;
-  symbol: string;
-  etching_txid: string;
-  amount_per_mint: string;
-  timestamp_unix: string;
-  premined_supply: string;
-  mint_start_block: number | null;
-  mint_end_block: number | null;
-  current_supply: string;
-  current_mint_count: number;
-}

@@ -54,14 +54,10 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       let runesTransformation: TokenTransformation | undefined;
 
       try {
-        const { runes, height } =
-          await this.runesProtocolNetwork.getTxOutputRunes(txId);
-
-        if (block.height > height) {
-          throw new Error(
-            `RunesProtocolNetwork is not synced. processing block height is [${block.height}] and synced height of network is [${height}]`,
-          );
-        }
+        const runes = await this.runesProtocolNetwork.getTxOutputRunes(
+          txId,
+          block.height,
+        );
 
         for (const outRune of runes) {
           // check if rune is transferred to the lock address
