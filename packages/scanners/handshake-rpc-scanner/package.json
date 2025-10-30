@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/handshake-rpc-scanner",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Handshake blockchain scanner based on RPC API",
   "repository": {
     "type": "git",
