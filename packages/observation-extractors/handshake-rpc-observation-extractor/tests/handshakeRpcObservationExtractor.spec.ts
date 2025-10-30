@@ -1,0 +1,195 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { TokenMap } from '@rosen-bridge/tokens';
+
+import { HandshakeRpcObservationExtractor } from '../lib/handshakeRpcObservationExtractor';
+import {
+  mockLockAddress,
+  mockLockTx,
+  mockAuctionTx,
+  mockInvalidTx,
+  expectedObservation,
+  mockTokens,
+} from './testData';
+import { createDatabase, generateBlockEntity } from './utils.mock';
+
+describe('HandshakeRpcObservationExtractor', () => {
+  let dataSource: DataSource;
+  let extractor: HandshakeRpcObservationExtractor;
+  let tokenMap: TokenMap;
+
+  beforeEach(async () => {
+    dataSource = await createDatabase();
+    tokenMap = new TokenMap();
+    await tokenMap.updateConfigByJson(mockTokens);
+
+    extractor = new HandshakeRpcObservationExtractor(
+      mockLockAddress,
+      dataSource,
+      tokenMap,
+      undefined,
+    );
+  });
+
+  afterEach(async () => {
+    if (dataSource && dataSource.isInitialized) {
+      await dataSource.destroy();
+    }
+  });
+
+  describe('processTransactions', () => {
+    /**
+     * @target HandshakeRpcObservationExtractor.processTransactions
+     * should return true and insert observation into database on valid lock tx
+     * @dependencies
+     * @scenario
+     * - mock a valid Handshake lock transaction with OP_RETURN data
+     * - run test
+     * - check returned value
+     * - check database
+     * @expected
+     * - it should return true
+     * - observation should be inserted into database with correct data
+     */
+    it('should return true and insert observation into database on valid lock tx', async () => {
+      // run test
+      const result = await extractor.processTransactions(
+        [mockLockTx],
+        generateBlockEntity(dataSource, 'block-hash'),
+      );
+
+      // check returned value
+      expect(result).toEqual(true);
+
+      // check database
+      const repository = dataSource.getRepository(ObservationEntity);
+      const [rows, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(1);
+      const observation = rows[0];
+      expect(observation).toEqual(expectedObservation);
+    });
+
+    /**
+     * @target HandshakeRpcObservationExtractor.processTransactions
+     * should return true with no observation when transaction has name auction covenant
+     * @dependencies
+     * @scenario
+     * - mock a Handshake transaction with name auction covenant (type != 0)
+     * - run test
+     * - check returned value
+     * - check database
+     * @expected
+     * - it should return true
+     * - no observation should be inserted into database
+     */
+    it('should return true with no observation when transaction has name auction covenant', async () => {
+      // run test
+      const result = await extractor.processTransactions(
+        [mockAuctionTx],
+        generateBlockEntity(dataSource, 'block-hash'),
+      );
+
+      // check returned value
+      expect(result).toEqual(true);
+
+      // check database
+      const repository = dataSource.getRepository(ObservationEntity);
+      const [, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(0);
+    });
+
+    /**
+     * @target HandshakeRpcObservationExtractor.processTransactions
+     * should return true with no observation on invalid lock tx (missing OP_RETURN)
+     * @dependencies
+     * @scenario
+     * - mock a transaction without valid OP_RETURN data
+     * - run test
+     * - check returned value
+     * - check database
+     * @expected
+     * - it should return true
+     * - no observation should be inserted into database
+     */
+    it('should return true with no observation on invalid lock tx (missing OP_RETURN)', async () => {
+      // run test
+      const result = await extractor.processTransactions(
+        [mockInvalidTx],
+        generateBlockEntity(dataSource, 'block-hash'),
+      );
+
+      // check returned value
+      expect(result).toEqual(true);
+
+      // check database
+      const repository = dataSource.getRepository(ObservationEntity);
+      const [, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(0);
+    });
+
+    /**
+     * @target HandshakeRpcObservationExtractor.processTransactions
+     * should process multiple transactions and only insert valid ones
+     * @dependencies
+     * @scenario
+     * - mock multiple transactions (one valid, one auction, one invalid)
+     * - run test
+     * - check returned value
+     * - check database
+     * @expected
+     * - it should return true
+     * - only one observation should be inserted (the valid one)
+     */
+    it('should process multiple transactions and only insert valid ones', async () => {
+      // run test
+      const result = await extractor.processTransactions(
+        [mockLockTx, mockAuctionTx, mockInvalidTx],
+        generateBlockEntity(dataSource, 'block-hash'),
+      );
+
+      // check returned value
+      expect(result).toEqual(true);
+
+      // check database
+      const repository = dataSource.getRepository(ObservationEntity);
+      const [rows, rowsCount] = await repository.findAndCount();
+      expect(rowsCount).toEqual(1);
+      expect(rows[0].sourceTxId).toEqual(mockLockTx.txid);
+    });
+  });
+
+  describe('getId', () => {
+    /**
+     * @target HandshakeRpcObservationExtractor.getId
+     * should return the correct extractor ID
+     * @dependencies
+     * @scenario
+     * - call getId
+     * @expected
+     * - it should return 'handshake-rpc-extractor'
+     */
+    it('should return the correct extractor ID', () => {
+      const id = extractor.getId();
+      expect(id).toEqual('handshake-rpc-extractor');
+    });
+  });
+
+  describe('getTxId', () => {
+    /**
+     * @target HandshakeRpcObservationExtractor.getTxId
+     * should return the transaction ID from a HandshakeRpcTransaction
+     * @dependencies
+     * @scenario
+     * - call getTxId with a mock transaction
+     * @expected
+     * - it should return the txid field
+     */
+    it('should return the transaction ID from a HandshakeRpcTransaction', () => {
+      const txId = extractor.getTxId(mockLockTx);
+      expect(txId).toEqual(mockLockTx.txid);
+    });
+  });
+});

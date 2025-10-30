@@ -1,0 +1,24 @@
+# @rosen-bridge/handshake-rpc-observation-extractor
+
+## Table of contents
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+
+## Introduction
+
+Event observation data extractor for Handshake chain
+
+## Installation
+
+npm:
+
+```sh
+npm i @rosen-bridge/handshake-rpc-observation-extractor
+```
+
+yarn:
+
+```sh
+yarn add @rosen-bridge/handshake-rpc-observation-extractor
+```
