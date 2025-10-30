@@ -20,7 +20,7 @@ class CommitmentEntity {
   @Column({ type: 'varchar' })
   eventId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   commitment: string;
 
   @Column({ type: 'varchar' })
@@ -35,7 +35,7 @@ class CommitmentEntity {
   @Column({ type: 'int' })
   height: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   boxSerialized: string;
 
   @Column({ nullable: true, type: 'text' })
