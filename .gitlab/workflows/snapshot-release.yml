@@ -1,0 +1,41 @@
+image: node:22.18
+
+stages:
+  - check_permission
+  - release
+
+variables:
+  MIN_ACCESS_LEVEL: '40'
+
+check_user_permission:
+  stage: check_permission
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+      when: always
+  before_script:
+    - apt-get update && apt-get install -y jq
+  script:
+    - |
+      ALLOWED_USERS=$(curl -fsSL -H "PRIVATE-TOKEN: $GL_API_TOKEN" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/members/all" \
+        | jq -r ".[] | select(.access_level >= $MIN_ACCESS_LEVEL) |.username")
+
+      echo "$ALLOWED_USERS" | grep -qw "$GITLAB_USER_LOGIN" \
+        || (echo "$GITLAB_USER_LOGIN trigger snapshot release: persmission denied" && exit 1)
+
+snapshot-release:
+  stage: release
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  before_script:
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+  script:
+    - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
+    - npx changeset publish --no-git-tag --tag develop

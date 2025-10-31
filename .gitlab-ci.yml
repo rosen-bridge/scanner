@@ -2,12 +2,8 @@ image: node:22.18
 
 stages:
   - installation
-  - depcheck
   - build
-  - type_check
-  - lint
-  - test
-  - changeset
+  - triggers
 
 installation:
   stage: installation
@@ -20,82 +16,36 @@ installation:
   script:
     - npm ci
 
-depcheck:
-  stage: depcheck
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-  script:
-    - git fetch origin $CI_DEFAULT_BRANCH
-    - npx lint-staged --diff origin/$CI_DEFAULT_BRANCH...HEAD
-
 build:
   stage: build
   cache:
-    - key: $CI_COMMIT_REF_NAME
-      policy: pull-push
-      paths:
-        - node_modules
-        - '**/node_modules'
-        - '**/dist'
+    key: $CI_COMMIT_REF_NAME
+    policy: pull-push
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
   script:
     - npm run build
 
-type_check:
-  stage: type_check
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run type-check
+run_ci:
+  stage: triggers
+  trigger:
+    include:
+      - local: .gitlab/workflows/ci.yml
+    strategy: mirror
 
-lint:
-  stage: lint
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run lint:check
-
-test:
-  stage: test
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run coverage
-  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: '**/coverage/cobertura-coverage.xml'
-
-changeset:
-  stage: changeset
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  before_script:
-    - git fetch origin dev
-  script:
-    - npx changeset status --since=origin/dev
+run_snapshot_release:
+  stage: triggers
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+      allow_failure: false
+  variables:
+    NPM_TOKEN: $NPM_TOKEN
+  trigger:
+    include:
+      - local: .gitlab/workflows/snapshot-release.yml
+    strategy: mirror
+    forward:
+      pipeline_variables: true
