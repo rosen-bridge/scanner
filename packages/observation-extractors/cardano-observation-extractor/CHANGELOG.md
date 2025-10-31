@@ -1,5 +1,17 @@
 # @rosen-bridge/cardano-observation-extractor
 
+## 1.0.0
+
+### Major Changes
+
+- Change type of metadata for Blockfrost
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.1
+  - @rosen-bridge/rosen-extractor@11.0.0
+
 ## 0.2.0
 
 ### Minor Changes

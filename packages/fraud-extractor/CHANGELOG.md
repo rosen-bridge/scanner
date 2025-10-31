@@ -1,5 +1,11 @@
 # @rosen-bridge/fraud-extractor
 
+## 2.2.3
+
+### Patch Changes
+
+- Fixed type definitions in entities based migrations
+
 ## 2.2.2
 
 ### Patch Changes
