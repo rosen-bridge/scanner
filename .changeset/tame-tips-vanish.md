@@ -6,4 +6,3 @@
 ---
 
 - Fixed type definitions in entities based migrations
-- Added new SQLite migration for @rosen-bridge/watcher-data-extractor

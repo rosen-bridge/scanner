@@ -8,4 +8,6 @@
 '@rosen-bridge/evm-address-tx-extractor': patch
 ---
 
-Update @rosen-bridge/rosen-extractor version to 11.0.0
+Update Dependencies
+
+- @rosen-bridge/rosen-extractor@11.0.0
