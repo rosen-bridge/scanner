@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/address-extractor",
-  "version": "6.2.2",
+  "version": "6.3.0",
   "description": "UTXO box extractor for any address or token.",
   "repository": {
     "type": "git",
