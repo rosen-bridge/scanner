@@ -1,163 +1,244 @@
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+
 import * as boxHandler from '../../lib/boxHandler';
-import { MAX_BOX_HEIGHT } from '../../lib/const';
+import { MAX_BOX_LENGTH } from '../../lib/const';
+import { BoxExtractor } from '../../lib/extractor/boxExtractor';
 import { BoxWithHeight } from '../../lib/interfaces';
 import { createMockBox } from '../testUtils';
 
-vi.mock('../../lib/network/explorerErgoNetwork', () => {
-  return {
-    ExplorerErgoNetwork: vi.fn().mockImplementation(() => ({
-      getBox: async () => undefined,
-      getMempoolTxs: vi.fn().mockResolvedValue([]),
-    })),
-  };
-});
-
-describe('BoxExtractor', () => {
-  let boxExtractor: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const mockBox = createMockBox('box1', 1000n);
-  const mockBlock = {
+describe('MockBoxTracker', () => {
+  let boxExtractor: BoxExtractor;
+  const mockBlock: Block = {
     height: 100,
     parentHash: 'parent-hash-1',
     timestamp: 1234567890,
     hash: 'block-hash-1',
   };
-  const mockBlock2 = {
-    height: 101,
-    parentHash: 'parent-hash-2',
-    timestamp: 1234567895,
-    hash: 'block-hash-2',
-  };
-
   beforeEach(() => {
+    boxExtractor = new BoxExtractor();
     vi.clearAllMocks();
-    vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
   });
+
+  const getBoxes = (): BoxWithHeight[] =>
+    (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes ?? undefined;
+
+  const setBoxes = (boxes: BoxWithHeight[]): void => {
+    (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = boxes;
+  };
 
   describe('processTransactions', () => {
     /**
-     * @test processTransactions adds boxes when tracker matches
+     * @test processTransactions should not modify boxes when no matching transaction is tracked
      * @description
-     * Verifies that `processTransactions` correctly tracks new boxes
-     * when the generated tracker returns `true`.
+     * Verifies that if no transaction matches the tracker,
+     * the box array remains unchanged.
      *
      * @scenario
-     * - Mock tracker always returns `true`
-     * - Process a transaction containing one output box
-     * - Process another transaction spending the first box and creating a new one
+     * - One box is already stored
+     * - Process a transaction that doesn’t produce or spend any tracked box
      *
      * @expected
-     * - Both boxes should be stored
-     * - The stored box IDs should be in the correct order
+     * - The stored boxes remain identical to the original array
      */
-    it('should add boxes when tracker matches', async () => {
+    it('should not modify boxes when no matching transaction is tracked', async () => {
+      const initialBoxes: BoxWithHeight[] = [
+        { box: createMockBox('boxA'), inclusionHeight: 10, hash: 'H1' },
+      ];
+      setBoxes([...initialBoxes]);
+      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
+      const box1 = createMockBox('b1');
+      const box2 = createMockBox('b2');
+
+      const txs: Transaction[] = [
+        { id: 'tx1', inputs: [box1], outputs: [box2], dataInputs: [] },
+      ];
+      await boxExtractor.processTransactions(txs, mockBlock);
+
+      expect(getBoxes()).toEqual(initialBoxes);
+    });
+
+    /**
+     * @test processTransactions should track last unspent box in a chained transactions
+     * @description
+     * Ensures that when transactions form a spending chain,
+     * only the last unspent output is kept in the tracked boxes.
+     *
+     * @scenario
+     * - tx1 creates box1
+     * - tx2 spends box1 → creates box2
+     * - tx3 spends box2 → creates box3
+     *
+     * @expected
+     * - Only box3 remains in the tracked list
+     */
+    it('should track last unspent box in chained transactions', async () => {
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
 
-      const txs = [{ outputs: [mockBox], id: '1', dataInputs: [], inputs: [] }];
-      const mockBox2 = createMockBox('box2', 1000n);
-      const txs2 = [
-        { outputs: [mockBox2], id: '1', dataInputs: [], inputs: [mockBox] },
+      const box1 = createMockBox('b1');
+      const box2 = createMockBox('b2');
+      const box3 = createMockBox('b3');
+
+      const txs: Transaction[] = [
+        { id: 'tx1', inputs: [], outputs: [box1], dataInputs: [] },
+        { id: 'tx2', inputs: [box1], outputs: [box2], dataInputs: [] },
+        { id: 'tx3', inputs: [box2], outputs: [box3], dataInputs: [] },
       ];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-      await boxExtractor.processTransactions(txs2, mockBlock2);
-
-      const boxes = boxExtractor.getRecentBoxes();
-      expect(boxes.length).toBe(2);
-      expect(boxes[0].box.boxId).toBe('box1');
-      expect(boxes[1].box.boxId).toBe('box2');
+      expect(getBoxes()[0].box.boxId).toBe('b3');
     });
 
     /**
-     * @test processTransactions removes spent boxes
+     * @test processTransactions should remove oldest box when max capacity reached
      * @description
-     * Ensures that boxes already tracked by the extractor are removed
-     * when they are spent in subsequent transactions.
+     * Ensures the extractor maintains a fixed capacity (10 items)
+     * by removing the oldest box when new ones are added.
      *
      * @scenario
-     * - Start with one tracked box
-     * - Process transactions that sequentially spend and replace boxes
+     * - Fill the list with 10 boxes
+     * - Add one more transaction creating a new box
      *
      * @expected
-     * - Only the final unspent box remains in the extractor’s state
+     * - The new box is appended to the end
      */
-    it('should remove spent boxes', async () => {
-      (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = [
-        { box: mockBox, inclusionHeight: 90, hash: 'block-x' },
+    it('should remove oldest box when max capacity reached', async () => {
+      const filledBoxes: BoxWithHeight[] = Array.from({
+        length: MAX_BOX_LENGTH,
+      }).map((_, i) => ({
+        box: createMockBox(`box${i}`),
+        inclusionHeight: i,
+        hash: `H${i}`,
+      }));
+      setBoxes(filledBoxes);
+      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
+      const before = getBoxes().map((b) => b.box.boxId);
+      const newSpentBox = createMockBox('newSpentBox');
+      const newUnSpentBox = createMockBox('newUnspentBox');
+      const txs: Transaction[] = [
+        {
+          id: 'txX',
+          inputs: [newSpentBox],
+          outputs: [newUnSpentBox],
+          dataInputs: [],
+        },
       ];
-
-      const mockBox2 = createMockBox('box2', 1000n);
-      const mockBox3 = createMockBox('box3', 1000n);
-      const mockBox4 = createMockBox('box4', 1000n);
-
-      const txs = [
-        { outputs: [mockBox2], id: '1', dataInputs: [], inputs: [mockBox] },
-        { outputs: [mockBox3], id: '2', dataInputs: [], inputs: [mockBox2] },
-        { outputs: [mockBox4], id: '3', dataInputs: [], inputs: [mockBox3] },
-      ];
-
       await boxExtractor.processTransactions(txs, mockBlock);
-
-      const boxes = boxExtractor.getRecentBoxes();
-      expect(boxes).toHaveLength(1);
-      expect(boxes[0].box.boxId).toEqual('box4');
+      const after = getBoxes().map((b) => b.box.boxId);
+      expect(after).not.toContain(before[0]);
+      expect(after[-1]).toBe('newUnspentBox');
+      expect(after).toHaveLength(MAX_BOX_LENGTH);
     });
 
     /**
-     * @test processTransactions removes boxes older than MAX_BOX_HEIGHT
+     * @test processTransactions should call initializeBoxes when no boxes exist
      * @description
-     * Ensures that boxes older than the defined maximum height threshold
-     * (`MAX_BOX_HEIGHT`) are automatically pruned.
-     *
-     * @scenario
-     * - Insert a box with inclusionHeight older than allowed
-     * - Process an empty transaction batch
+     * When the internal box list is empty, `initializeBoxes`
+     * must be called with the provided block info.
      *
      * @expected
-     * - The old box should be removed from extractor’s state
+     * - initializeBoxes is called once
      */
-    it('should remove boxes older than MAX_BOX_HEIGHT', async () => {
-      const oldBox: BoxWithHeight = {
-        box: createMockBox('old'),
-        inclusionHeight: mockBlock.height - MAX_BOX_HEIGHT - 1,
-        hash: 'hash-old',
-      };
-
-      (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = [oldBox];
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
+    it('should call initializeBoxes when no boxes exist', async () => {
+      setBoxes([]);
+      const initSpy = vi
+        .spyOn(boxExtractor, 'initializeBoxes')
+        .mockResolvedValue(undefined);
 
       await boxExtractor.processTransactions([], mockBlock);
 
-      expect(boxExtractor.getRecentBoxes()).toHaveLength(0);
+      expect(initSpy).toHaveBeenCalledWith(mockBlock);
     });
   });
 
   describe('forkBlock', () => {
     /**
-     * @test forkBlock removes boxes matching a given hash
+     * @test forkBlock should not change boxes when forked block has no matching boxes
      * @description
-     * Confirms that `forkBlock` properly removes boxes from
-     * the extractor when their associated block hash matches
-     * the provided fork hash.
+     * Confirms that forkBlock leaves the state unchanged
+     * if no box belongs to the provided fork hash.
      *
      * @scenario
-     * - Add multiple boxes with different block hashes
-     * - Call `forkBlock` with one of the hashes
+     * - Boxes exist with unrelated hashes
+     * - forkBlock called with unknown hash
      *
      * @expected
-     * - Only non-matching boxes remain in the extractor’s state
-     * - Remaining boxes retain correct hash values
+     * - No boxes are removed
      */
-    it('should remove boxes matching given hash', async () => {
-      (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = [
-        { box: mockBox, inclusionHeight: 100, hash: 'H1' },
-        { box: mockBox, inclusionHeight: 100, hash: 'H2' },
+    it('should not change boxes when forked block has no matching boxes', async () => {
+      const boxes: BoxWithHeight[] = [
+        { box: createMockBox('b1'), inclusionHeight: 50, hash: 'H1' },
       ];
+      setBoxes(boxes);
+
+      await boxExtractor.forkBlock('UNKNOWN_HASH');
+      expect(getBoxes()).toHaveLength(1);
+      expect(getBoxes()[0].hash).toBe('H1');
+    });
+
+    /**
+     * @test forkBlock should remove boxes from forked block
+     * @description
+     * Ensures that boxes associated with the given
+     * block hash are removed correctly.
+     *
+     * @scenario
+     * - Two boxes with hashes H1 and H2 exist
+     * - forkBlock is called with H1
+     *
+     * @expected
+     * - Box with H1 is removed, only H2 remains
+     */
+    it('should remove boxes from forked block', async () => {
+      const boxes: BoxWithHeight[] = [
+        { box: createMockBox('b1'), inclusionHeight: 50, hash: 'H1' },
+        { box: createMockBox('b2'), inclusionHeight: 51, hash: 'H2' },
+      ];
+      setBoxes(boxes);
 
       await boxExtractor.forkBlock('H1');
 
-      const boxes = boxExtractor.getRecentBoxes();
-      expect(boxes).toHaveLength(1);
-      expect(boxes[0].hash).toBe('H2');
+      expect(getBoxes()).toHaveLength(1);
+      expect(getBoxes()[0].hash).toBe('H2');
+    });
+  });
+
+  describe('getRecentBoxes', () => {
+    /**
+     * @test getRecentBoxes should return undefined when boxes list is empty
+     * @description
+     * Ensures that when no boxes are tracked,
+     * the method returns `undefined`.
+     *
+     * @expected
+     * - getRecentBoxes must return undefined
+     */
+    it('should return undefined when boxes list is empty', () => {
+      setBoxes([]);
+      const result = boxExtractor.getRecentBox();
+      expect(result).toBeUndefined();
+    });
+
+    /**
+     * @test getRecentBoxes should return the latest box when boxes exist
+     * @description
+     * Ensures that when boxes exist, the most
+     * recently added one is returned.
+     *
+     * @scenario
+     * - Two boxes exist in the list
+     *
+     * @expected
+     * - Returns the last box in the array
+     */
+    it('should return the latest box when boxes exist', () => {
+      const boxList: BoxWithHeight[] = [
+        { box: createMockBox('b1'), inclusionHeight: 10, hash: 'H1' },
+        { box: createMockBox('b2'), inclusionHeight: 11, hash: 'H2' },
+      ];
+      setBoxes(boxList);
+
+      const result = boxExtractor.getRecentBox();
+      expect(result.box.boxId).toBe('b2');
     });
   });
 });
