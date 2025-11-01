@@ -1,5 +1,11 @@
 image: node:22.18
 
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE =~ /push|web/'
+      when: always
+    - when: never
+
 stages:
   - installation
   - build
@@ -30,6 +36,8 @@ build:
 
 run_ci:
   stage: triggers
+  rules:
+    - when: always
   trigger:
     include:
       - local: .gitlab/workflows/ci.yml
@@ -38,9 +46,10 @@ run_ci:
 run_snapshot_release:
   stage: triggers
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH != "dev"'
       when: manual
-      allow_failure: false
+    - when: never
+  allow_failure: true
   variables:
     NPM_TOKEN: $NPM_TOKEN
   trigger:
