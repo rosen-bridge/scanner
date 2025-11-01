@@ -2,6 +2,7 @@ import { RosenData } from '@rosen-bridge/rosen-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { RosenTokens } from '@rosen-bridge/tokens';
 
+import { FROM_CHAIN } from '../lib/constants';
 import { OrdiscanRunesData, TxOutputRune, UnisatTxRunes } from '../lib/types';
 
 export const mockLockAddress =
@@ -250,7 +251,7 @@ export const mockObservation = {
   sourceChainTokenId: '880887:3052',
   targetChainTokenId:
     '7a51950e5f548549ec1aa63ffdc38279505b11e7e803d01bcf8347e0123c8666',
-  fromChain: 'bitcoin-runes',
+  fromChain: FROM_CHAIN,
   sourceBlockId: mockBlock.hash,
   sourceTxId: ergoEventData.sourceTxId,
   requestId: '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',
@@ -357,7 +358,7 @@ export const mockOrdiscanResponse1: OrdiscanRunesData = {
       address: mockLockAddress,
       output:
         'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
-      rune: 'TESTINGCATAETCH',
+      rune: 'xTESTINGCATAETCH',
       rune_amount: '7001000',
     },
     {
@@ -384,49 +385,9 @@ export const mockOrdiscanResponse1: OrdiscanRunesData = {
     {
       address: mockLockAddress,
       vout: 0,
-      rune: 'TESTINGCATAETCH',
+      rune: 'xTESTINGCATAETCH',
       rune_amount: '7001000',
     },
   ],
-};
-
-export const mockOrdiscanResponse2: OrdiscanRunesData = {
-  txid: '8661fceca46235d59ada19f869eb72fce68678cae1c471cd2e4a6f4ee36b1642',
-  runestone_messages: [{ rune: 'xROSENPOCRUNE', type: 'TRANSFER' }],
-  inputs: [
-    {
-      address: mockLockAddress,
-      output:
-        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
-      rune: 'TESTINGCATAETCH',
-      rune_amount: '7001000',
-    },
-    {
-      address: mockLockAddress,
-      output:
-        'bdf8a7ca15739511959e19b80bca05cbf1d1fc69dd7b7c44e90a30082afbed2d:0',
-      rune: 'xROSENPOCRUNE',
-      rune_amount: '998234983',
-    },
-  ],
-  outputs: [
-    {
-      address: mockLockAddress,
-      vout: 0,
-      rune: 'xROSENPOCRUNE',
-      rune_amount: '998233983',
-    },
-    {
-      address: mockLockAddress,
-      vout: 2,
-      rune: 'xROSENPOCRUNE',
-      rune_amount: '1000',
-    },
-    {
-      address: mockLockAddress,
-      vout: 0,
-      rune: 'TESTINGCATAETCH',
-      rune_amount: '7001000',
-    },
-  ],
+  timestamp: '',
 };

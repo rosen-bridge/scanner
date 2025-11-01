@@ -14,11 +14,12 @@ import { Block } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { FROM_CHAIN } from './constants';
 
 export abstract class BitcoinRunesAbstractObservationExtractor<
   TransactionType,
 > extends AbstractObservationExtractor<TransactionType> {
-  readonly FROM_CHAIN = 'bitcoin-runes';
+  readonly FROM_CHAIN = FROM_CHAIN;
 
   constructor(
     protected readonly lockAddress: string,

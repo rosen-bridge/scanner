@@ -35,27 +35,23 @@ export interface UnisatBoxDetail {
   spentVout: number;
 }
 
-export interface OrdiscanResponse<Data> {
-  data: Data;
-}
-
 export interface OrdiscanRunesData {
   txid: string;
   runestone_messages: OrdiscanRunestoneMessage[];
   inputs: OrdiscanRunesTxInputUtxo[];
   outputs: OrdiscanRunesTxOutputUtxo[];
+  timestamp: string;
 }
 
 export interface OrdiscanRunesTxInputUtxo {
   address: string;
-  output?: string;
+  output: string;
   rune: string;
   rune_amount: string;
 }
 
 export interface OrdiscanRunesTxOutputUtxo {
   address: string;
-  output?: string;
   rune: string;
   rune_amount: string;
   vout: number;
@@ -63,5 +59,5 @@ export interface OrdiscanRunesTxOutputUtxo {
 
 export interface OrdiscanRunestoneMessage {
   rune: string;
-  type: string;
+  type: 'TRANSFER' | 'MINT' | 'ETCH';
 }
