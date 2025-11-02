@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/raw-data-provider",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "This package populates missing rawData values for extractors records stored in the database.",
   "license": "MIT",
   "author": "Rosen Team",
