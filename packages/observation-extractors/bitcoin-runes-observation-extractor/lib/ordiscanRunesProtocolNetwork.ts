@@ -52,7 +52,7 @@ class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
         });
         if (wrappedRune.length === 0) {
           this.logger.debug(
-            `Failed to find token with uniqueName [${utxo.rune}] in token-map`,
+            `Failed to find runes with uniqueName [${utxo.rune}] in token-map`,
           );
           return;
         }
