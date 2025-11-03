@@ -54,4 +54,18 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-          npx changeset publish
+          npx changeset publish | tee .changeset_log
+          { echo 'CHANGESET_LOG<<_LOG_'; cat .changeset_log; echo '_LOG_'; } >> "$GITHUB_ENV"
+
+      - name: Discord Annonce
+        if: ${{ steps.publish.conclusion == 'success' }}
+        shell: bash
+        run: |
+          PATTERN_START='success packages published successfully:'
+          PATTERN_END='Creating git tag...'
+
+          released_versions=$(printf '%s\n' "$CHANGESET_LOG" \
+            | sed -n "/$PATTERN_START/,/$PATTERN_END/{/$PATTERN_START/d;/$PATTERN_END/d;p}")
+
+          msg=$(echo "$released_versions" | cut -d'@' -f2-)
+          [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${{ secrets.DISCORD_HOOK }}"
