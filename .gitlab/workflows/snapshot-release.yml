@@ -4,14 +4,10 @@ stages:
   - check_permission
   - release
 
-variables:
-  MIN_ACCESS_LEVEL: '40'
-
 check_user_permission:
   stage: check_permission
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
-      when: always
   before_script:
     - apt-get update && apt-get install -y jq
   script:

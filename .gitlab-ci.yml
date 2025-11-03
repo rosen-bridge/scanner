@@ -36,8 +36,6 @@ build:
 
 run_ci:
   stage: triggers
-  rules:
-    - when: always
   trigger:
     include:
       - local: .gitlab/workflows/ci.yml
@@ -46,15 +44,9 @@ run_ci:
 run_snapshot_release:
   stage: triggers
   rules:
-    - if: '$CI_COMMIT_BRANCH != "dev"'
-      when: manual
-    - when: never
+    - when: manual
   allow_failure: true
-  variables:
-    NPM_TOKEN: $NPM_TOKEN
   trigger:
     include:
       - local: .gitlab/workflows/snapshot-release.yml
     strategy: mirror
-    forward:
-      pipeline_variables: true
