@@ -99,11 +99,9 @@ export abstract class AbstractErgoBoxAction<
           spendBlock: block.hash,
         } as FindOptionsWhere<ExtractorEntity>);
         spentData.push(...spentRows);
-        for (const row of spentRows) {
-          this.logger.debug(
-            `Spent box with boxId [${row.identifier}] at height ${block.height}`,
-          );
-        }
+        this.logger.debug(
+          `Spent boxes with boxId ${spentRows.map((row) => row.identifier)} at height ${block.height}`,
+        );
       }
     }
     return spentData.map((data) => pick(data, 'identifier'));

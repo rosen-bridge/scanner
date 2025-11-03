@@ -25,7 +25,9 @@ import { AbstractErgoExtractor } from './abstractErgoExtractor';
  * functionality for extracting box-based data from the blockchain.
  *
  * It overrides the `initializeData` method to use the box-based initializer.
- * It overrides the `processTransactions` method to use the box-based data extraction.
+ * It implements the `processTransactions` method to use the box-based data extraction.
+ *
+ * Triggers `Insert` callback on new data insertion.
  * Triggers a new callback type `Spend` for each spent box.
  *
  * @template ExtractedData - The type of data extracted from blockchain
@@ -152,6 +154,9 @@ export abstract class AbstractErgoBoxExtractor<
           block.height
         } with error: ${e}`,
       );
+      if (e instanceof Error && e.stack) {
+        this.logger.error(`error stack: ${e.stack}`);
+      }
       return false;
     }
     return true;

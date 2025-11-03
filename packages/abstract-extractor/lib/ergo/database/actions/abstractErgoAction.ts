@@ -32,26 +32,18 @@ export abstract class AbstractErgoAction<
   /**
    * create the database entity from extracted data and block information
    */
-  protected createEntity = (
-    data: ExtractedData[], // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
-    extractor: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): Array<Omit<ExtractorEntity, 'id'>> => {
-    throw Error(
-      'You must implement `createEntity` or override `insertEntities` and `updateEntities`',
-    );
-  };
+  protected abstract createEntity: (
+    data: ExtractedData[],
+    block: BlockInfo,
+    extractor: string,
+  ) => Array<Omit<ExtractorEntity, 'id'>>;
 
   /**
    * convert the database entity back to raw data
    */
-  protected convertEntityToData = (
-    entities: ExtractorEntity[], // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): ExtractedData[] => {
-    throw Error(
-      'You must implement `convertEntityToData` or override `deleteBlockEntities`',
-    );
-  };
+  protected abstract convertEntityToData: (
+    entities: ExtractorEntity[],
+  ) => ExtractedData[];
 
   /**
    * insert entities extracted from a block to database

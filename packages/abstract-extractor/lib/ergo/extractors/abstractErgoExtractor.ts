@@ -2,12 +2,10 @@ import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import JsonBigInt from '@rosen-bridge/json-bigint';
-import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
 import { AbstractErgoEntity, AbstractErgoAction } from '../database';
-import { ErgoInitializer } from '../initializers';
 import {
   AbstractEntityData,
   CallbackType,
@@ -19,13 +17,9 @@ import {
 /**
  * Abstract Ergo-specific extractor that provides common functionality for all Ergo extractors.
  *
- * It provides callback support, initialization capabilities, common database operations,
- * and transaction processing functionality.
+ * It provides callback support and blockchain fork handle for all ergo extractors.
  *
- * It triggers callbacks for the following actions:
- * - `Update`
- * - `Insert`
- * - `Delete`
+ * It triggers callbacks for the `Update` and `Delete` actions on a forked block.
  *
  * @template ExtractedData - The type of data extracted from blockchain
  * @template ExtractorEntity - The database entity type for storing extracted data
@@ -54,88 +48,6 @@ export abstract class AbstractErgoExtractor<
   ) {
     super();
   }
-
-  /**
-   * Extract transaction data to proper format (not including spending information).
-   * This method should be overridden by subclasses that need transaction-based extraction.
-   * @param tx - The transaction to extract data from
-   * @returns extracted data in proper format or undefined if no data should be extracted
-   * @throws Error if not overridden by subclass
-   */
-  extractTxData = (
-    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): ExtractedData | undefined => {
-    throw new Error(
-      'extractTxData method must be overridden by subclass or use processTransaction instead',
-    );
-  };
-
-  /**
-   * Check if the transaction has the required data format.
-   * This method should be overridden by subclasses that need transaction-based extraction.
-   * @param tx - The transaction to check
-   * @returns true if the transaction has the required data and false otherwise
-   * @throws Error if not overridden by subclass
-   */
-  hasTxData = (
-    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): boolean => {
-    throw new Error(
-      'hasTxData method must be overridden by subclass or use processTransaction instead',
-    );
-  };
-
-  /**
-   * Process a list of transactions in a block and store required information.
-   * This method can be overridden by subclasses for custom transaction processing,
-   * or they can override extractTxData and hasTxData methods instead.
-   * @param txs - List of transactions in the block
-   * @param block - Block information
-   * @returns true if the process is completed successfully and false otherwise
-   */
-  processTransactions = async (
-    txs: Transaction[],
-    block: BlockInfo,
-  ): Promise<boolean> => {
-    try {
-      const txsData: Array<ExtractedData> = [];
-      for (const tx of txs) {
-        if (!this.hasTxData(tx)) {
-          continue;
-        }
-        this.logger.debug(`Trying to extract data from tx [${tx.id}]`);
-        const extractedData = this.extractTxData(tx);
-        if (extractedData) {
-          this.logger.debug(
-            `Extracted data ${JsonBigInt.stringify(extractedData)} from tx ${
-              tx.id
-            }`,
-          );
-          txsData.push(extractedData);
-        }
-      }
-
-      if (txsData.length > 0) {
-        if (!(await this.actions.storeEntities(txsData, block, this.getId()))) {
-          this.logger.warn(
-            `Data insertion failed for ${this.getId()} at the block ${
-              block.height
-            }`,
-          );
-          return false;
-        }
-        this.triggerCallbacks(CallbackType.Insert, txsData);
-      }
-    } catch (e) {
-      this.logger.error(
-        `Processing transactions failed for ${this.getId()} at the block ${
-          block.height
-        } with error: ${e}`,
-      );
-      return false;
-    }
-    return true;
-  };
 
   /**
    * hook a new callback on a callback type
@@ -208,26 +120,5 @@ export abstract class AbstractErgoExtractor<
       this.triggerCallbacks(CallbackType.Delete, result.deletedData);
     if (result.updatedData.length > 0)
       this.triggerCallbacks(CallbackType.Update, result.updatedData);
-  };
-
-  /**
-   * initialize extractor database with data created below the initial height
-   * @param initialBlock
-   */
-  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
-    if (this.initializeOptions && this.initializeOptions.active) {
-      const initializer = new ErgoInitializer(
-        this.initializeOptions.type,
-        this.initializeOptions.url,
-        this.initializeOptions.address,
-        this.getId(),
-        this.processTransactions,
-        this.actions,
-        this.initializeOptions.maxParallelRequests,
-        this.logger,
-      );
-      await initializer.initializeData(initialBlock);
-    } else
-      this.logger.info(`Initializiation for [${this.getId()}] is turned off`);
   };
 }
