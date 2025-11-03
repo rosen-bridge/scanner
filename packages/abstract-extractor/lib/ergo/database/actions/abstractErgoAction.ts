@@ -169,9 +169,7 @@ export abstract class AbstractErgoAction<
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new Error(
-        `An error occurred while deleting data extracted from block ${block}: ${error}`,
-      );
+      throw error;
     } finally {
       await queryRunner.release();
     }

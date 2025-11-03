@@ -39,13 +39,7 @@ export abstract class AbstractScanner<TransactionType> {
         this.extractors.map((e) => e.getId()),
       );
       for (const extractor of this.extractors) {
-        try {
-          await extractor.forkBlock(lastBlock.hash);
-        } catch (e) {
-          this.logger.error(
-            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`,
-          );
-        }
+        await extractor.forkBlock(lastBlock.hash);
       }
       await this.action.removeBlocksFromHeight(lastBlock.height);
       lastBlock = await this.action.getBlockAtHeight(lastBlock.height - 1);

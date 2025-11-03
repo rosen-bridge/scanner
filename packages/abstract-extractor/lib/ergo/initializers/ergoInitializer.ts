@@ -61,7 +61,6 @@ export class ErgoInitializer<
   /**
    * override this function to store extra information of a transaction batch
    * @param txs list of transactions
-   * @returns
    */
   protected storeExtraInfo(
     txs: ExtendedTransaction[], // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -71,7 +70,6 @@ export class ErgoInitializer<
 
   /**
    * override this function to apply extra information to the extractor database
-   * @returns
    */
   protected applyExtraInfo = (): Promise<void> => {
     return Promise.resolve();
@@ -98,11 +96,12 @@ export class ErgoInitializer<
         `Processing transactions at height ${blockTxs[0].inclusionHeight}`,
       );
       const success = await this.processTransactions(blockTxs, block);
-      release();
-      if (!success)
+      if (!success) {
+        release();
         throw Error(
           `Processing transactions failed at height ${blockTxs[0].inclusionHeight}`,
         );
+      }
     }
     release();
     this.logger.debug(`storing spend info of transaction batch`);

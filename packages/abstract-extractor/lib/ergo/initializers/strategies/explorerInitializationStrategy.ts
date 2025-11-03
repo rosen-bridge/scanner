@@ -64,14 +64,13 @@ export class ExplorerInitializationStrategy {
    * Get height range transactions and process them
    * retry the request to avoid failure in case of accidental network issues
    * @param rangeQuery
-   * @returns
    */
-  private processRange = async (rangeQuery: RangeQuery) => {
+  private processRange = async (rangeQuery: RangeQuery): Promise<void> => {
     if (rangeQuery.count == 0) {
       this.logger.debug(
         `skipping range [${rangeQuery.start}, ${rangeQuery.end}] with 0 txs`,
       );
-      return 0;
+      return;
     }
     const txs = await requestWithRetrial(
       () =>
