@@ -11,3 +11,8 @@ export interface BlockInfo {
   height: number;
   hash: string;
 }
+
+export interface BlockInfoTest {
+  height: number;
+  hash: string;
+}
