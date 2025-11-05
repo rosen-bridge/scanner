@@ -34,3 +34,5 @@ snapshot-release:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   script:
     - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
+    - git status
+    - cat packages/scanners/ergo-scanner/CHANGELOG.md
