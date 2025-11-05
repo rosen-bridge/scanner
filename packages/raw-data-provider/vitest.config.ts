@@ -10,8 +10,8 @@ export default defineConfig({
     },
     passWithNoTests: true,
     poolOptions: {
-      forks: {
-        singleFork: true,
+      threads: {
+        singleThread: true,
       },
     },
   },

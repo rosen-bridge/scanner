@@ -69,16 +69,18 @@ export class RawDataProviderStateEntityAction {
    *
    * @param chain
    * @param offset
+   * @param length
    * @returns
    */
-  fetchBatchObservationsAfterHeightOfChain = async (
+  fetchChainObservations = async (
     chain: string,
     offset: number,
+    length: number = OBSERVATION_BATCH_SIZE,
   ): Promise<ObservationEntity[]> => {
     return await this.observationRepository.find({
       where: { fromChain: chain, height: MoreThan(offset) },
       order: { height: 'ASC' },
-      take: OBSERVATION_BATCH_SIZE,
+      take: length,
     });
   };
 

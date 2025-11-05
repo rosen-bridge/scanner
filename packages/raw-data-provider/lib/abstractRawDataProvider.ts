@@ -2,7 +2,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
-import { RawDataProviderStateEntityAction } from './actions/rawDataProviderStateAction';
+import { RawDataProviderStateEntityAction } from './actions/rawDataProviderStateEntityAction';
 import { RawDataProviderStateEntity } from './entities';
 
 export abstract class AbstractRawDataProvider {
@@ -24,7 +24,14 @@ export abstract class AbstractRawDataProvider {
    */
   abstract fetchRawData: (observation: ObservationEntity) => string;
 
-  protected fetchOrCreateStateForChain = async () => {
+  /**
+   * Retrieves the current RawDataProviderStateEntity for the configured chain.
+   *
+   * @returns The existing or newly created RawDataProviderStateEntity
+   */
+  protected fetchOrCreateStateForChain = async (): Promise<
+    RawDataProviderStateEntity | undefined
+  > => {
     let state = await this.action.fetchByChain(this.chain);
     if (!state) {
       const latestChainObservation =
@@ -89,11 +96,10 @@ export abstract class AbstractRawDataProvider {
   protected fillObservationsRawData = async (
     state: RawDataProviderStateEntity,
   ): Promise<RawDataProviderStateEntity | null> => {
-    const observations =
-      await this.action.fetchBatchObservationsAfterHeightOfChain(
-        this.chain,
-        state.syncedHeight,
-      );
+    const observations = await this.action.fetchChainObservations(
+      this.chain,
+      state.syncedHeight,
+    );
 
     if (observations.length === 0) {
       this.logger.debug(
