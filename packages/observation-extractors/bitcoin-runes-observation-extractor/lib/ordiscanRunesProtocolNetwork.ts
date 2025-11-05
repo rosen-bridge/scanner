@@ -5,7 +5,7 @@ import JsonBigInt from '@rosen-bridge/json-bigint';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
-import { FROM_CHAIN } from './constants';
+import { BITCOIN_RUNES_CHAIN } from './constants';
 import { TxOutputRune, OrdiscanRunesTxOutputUtxo } from './types';
 
 class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
@@ -47,7 +47,7 @@ class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
 
     return txRunes
       .map((utxo) => {
-        const wrappedRune = this.tokenMap.search(FROM_CHAIN, {
+        const wrappedRune = this.tokenMap.search(BITCOIN_RUNES_CHAIN, {
           extra: { uniqueName: utxo.rune },
         });
         if (wrappedRune.length === 0) {
@@ -58,7 +58,7 @@ class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
         }
         return {
           address: utxo.address,
-          runeId: wrappedRune[0][FROM_CHAIN].tokenId,
+          runeId: wrappedRune[0][BITCOIN_RUNES_CHAIN].tokenId,
           runeAmount: utxo.rune_amount,
           vout: utxo.vout,
         } as TxOutputRune;

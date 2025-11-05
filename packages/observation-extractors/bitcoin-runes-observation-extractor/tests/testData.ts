@@ -2,7 +2,7 @@ import { RosenData } from '@rosen-bridge/rosen-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { RosenTokens } from '@rosen-bridge/tokens';
 
-import { FROM_CHAIN } from '../lib/constants';
+import { BITCOIN_RUNES_CHAIN } from '../lib/constants';
 import { OrdiscanRunesData, TxOutputRune, UnisatTxRunes } from '../lib/types';
 
 export const mockLockAddress =
@@ -251,7 +251,7 @@ export const mockObservation = {
   sourceChainTokenId: '880887:3052',
   targetChainTokenId:
     '7a51950e5f548549ec1aa63ffdc38279505b11e7e803d01bcf8347e0123c8666',
-  fromChain: FROM_CHAIN,
+  fromChain: BITCOIN_RUNES_CHAIN,
   sourceBlockId: mockBlock.hash,
   sourceTxId: ergoEventData.sourceTxId,
   requestId: '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',

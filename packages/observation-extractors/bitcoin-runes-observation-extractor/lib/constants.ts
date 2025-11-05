@@ -1,1 +1,1 @@
-export const FROM_CHAIN = 'bitcoin-runes';
+export const BITCOIN_RUNES_CHAIN = 'bitcoin-runes';
