@@ -6,44 +6,30 @@ import {
   ExtractedObservation,
 } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import JsonBigInt from '@rosen-bridge/json-bigint';
 import {
   AbstractRosenDataExtractor,
   TokenTransformation,
 } from '@rosen-bridge/rosen-extractor';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
-import RateLimitedAxios, { Axios } from '@rosen-clients/rate-limited-axios';
 
-import { TxOutputRune, UnisatResponse, UnisatTxRunes } from './types';
+import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { BITCOIN_RUNES_CHAIN } from './constants';
 
 export abstract class BitcoinRunesAbstractObservationExtractor<
   TransactionType,
 > extends AbstractObservationExtractor<TransactionType> {
-  readonly FROM_CHAIN = 'bitcoin-runes';
-  protected unisatClient: Axios;
+  readonly FROM_CHAIN = BITCOIN_RUNES_CHAIN;
 
   constructor(
     protected readonly lockAddress: string,
-    protected readonly unisatUrl: string,
-    protected readonly unisatApiKey: string,
+    protected readonly runesProtocolNetwork: AbstractRunesProtocolNetwork,
     dataSource: DataSource,
     tokens: TokenMap,
     extractor: AbstractRosenDataExtractor<TransactionType>,
     logger?: AbstractLogger,
   ) {
     super(dataSource, tokens, extractor, logger);
-
-    // init Unisat client
-    const unisatHeaders = { 'Content-Type': 'application/json' };
-    // Add API key to headers if provided
-    if (unisatApiKey) {
-      Object.assign(unisatHeaders, { Authorization: `Bearer ${unisatApiKey}` });
-    }
-    this.unisatClient = RateLimitedAxios.create({
-      baseURL: unisatUrl,
-      headers: unisatHeaders,
-    });
   }
 
   /**
@@ -69,13 +55,10 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       let runesTransformation: TokenTransformation | undefined;
 
       try {
-        const { runes, height } = await this.getTxOutputRunes(txId);
-
-        if (block.height > height) {
-          throw new Error(
-            `Unisat is not synced. processing block height is [${block.height}] and synced height of unisat is [${height}]`,
-          );
-        }
+        const runes = await this.runesProtocolNetwork.getTxOutputRunes(
+          txId,
+          block.height,
+        );
 
         for (const outRune of runes) {
           // check if rune is transferred to the lock address
@@ -137,60 +120,5 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
       });
     }
     return this.actions.storeObservations(observations, block, this.getId());
-  };
-
-  /**
-   * returns the Runes transfer of a transaction according to unisat
-   * @param txId
-   */
-  protected getTxOutputRunes = async (
-    txId: string,
-  ): Promise<{ runes: TxOutputRune[]; height: number }> => {
-    // Transform the RPC transaction to the expected BitcoinRunesTx format
-    const runes: TxOutputRune[] = [];
-
-    // get the runes transfers of the transaction from Unisat
-    let txRunes: UnisatTxRunes;
-    try {
-      const response = await this.unisatClient.get<
-        UnisatResponse<UnisatTxRunes>
-      >(`/v1/indexer/runes/event?txid=${txId}`);
-      this.logger.debug(
-        `requested 'indexer/runes/event' filtering txId [${txId}]. Response: ${JsonBigInt.stringify(
-          response.data,
-        )}`,
-      );
-
-      txRunes = response.data.data;
-      if (txRunes.detail.length !== txRunes.total) {
-        throw new Error(
-          `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`,
-        );
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      const baseError = `Failed to get runes event for tx [${txId}] from Unisat: `;
-      if (e.response) {
-        throw new Error(baseError + `${JsonBigInt.stringify(e.response.data)}`);
-      }
-      throw new Error(baseError + e.message);
-    }
-
-    for (const transfer of txRunes.detail) {
-      if (transfer.txid !== txId) {
-        throw new Error(
-          `ImpossibleBehavior: Fetched runes event for tx [${txId}] but got a transfer with txId [${transfer.txid}]`,
-        );
-      }
-      if (transfer.type === 'send') continue;
-      runes.push({
-        address: transfer.address,
-        runeId: transfer.runeId,
-        runeAmount: transfer.amount,
-        vout: transfer.vout,
-      });
-    }
-
-    return { runes, height: txRunes.height };
   };
 }
