@@ -2,6 +2,11 @@
   "name": "@rosen-bridge/raw-data-provider",
   "version": "0.1.0",
   "description": "This package populates missing rawData values for extractors records stored in the database.",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
   "license": "MIT",
   "author": "Rosen Team",
   "type": "module",
@@ -13,6 +18,7 @@
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "lint:check": "eslint . && npm run prettify:check",
@@ -30,7 +36,6 @@
   "devDependencies": {
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.19.4",
-    "typescript": "^5.3.3",
     "vitest": "^3.1.4"
   },
   "engines": {
