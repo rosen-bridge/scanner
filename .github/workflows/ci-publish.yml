@@ -50,6 +50,7 @@ jobs:
 
       - name: Publish to npm
         if: ${{ steps.perm.outputs.is_admin == 'true' }}
+        id: publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
