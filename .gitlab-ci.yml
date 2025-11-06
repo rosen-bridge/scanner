@@ -21,6 +21,7 @@ installation:
       - '**/node_modules'
   script:
     - npm ci
+
 build:
   stage: build
   cache:
