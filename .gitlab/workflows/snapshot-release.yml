@@ -3,6 +3,7 @@ image: node:22.18
 stages:
   - check_permission
   - release
+  - annonce
 
 check_user_permission:
   stage: check_permission
@@ -34,4 +35,22 @@ snapshot-release:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   script:
     - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
-    - npx changeset publish --no-git-tag --tag develop
+    - npx changeset publish --no-git-tag --tag develop | tee .changeset_log
+  artifacts:
+    paths:
+      - .changeset_log
+    expire_in: 1 day
+
+discord-annonce:
+  stage: annonce
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  script:
+    - |
+      CHANGESET_LOG="$(cat .changeset_log)"
+      PATTERN_START='success packages published successfully:'
+      PATTERN_END='Creating git tag...'
+      released_versions=$(printf '%s\n' "$CHANGESET_LOG" \
+            | sed -n "/$PATTERN_START/,/$PATTERN_END/{/$PATTERN_START/d;/$PATTERN_END/d;p}")
+      msg=$(echo "$released_versions" | cut -d'@' -f2-)
+      [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${DISCORD_HOOK}"
