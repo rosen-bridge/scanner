@@ -24,9 +24,6 @@ jobs:
           node-version-file: .nvmrc
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm to 11.6.2
-        run: npm install -g npm@11.6.2
-
       - name: Install Dependencies
         run: npm ci
 
