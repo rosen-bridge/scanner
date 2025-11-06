@@ -1,2 +1,0 @@
-ignores: ["tsx", "lint-staged", "depcheck", "@vitest/coverage-istanbul", "reflect-metadata", "@types/json-bigint", "@typescript-eslint/eslint-plugin", "@typescript-eslint/parser", "@types/node", "eslint-config-prettier", "@rosen-bridge/changeset-formatter"]
-ignore-patterns: ['vitest.config.ts.timestamp-*', '**/vitest.config.ts.timestamp-*', '**/dist/*', 'node_modules', '**/node_modules']

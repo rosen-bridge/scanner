@@ -8,6 +8,7 @@ workflow:
 
 stages:
   - installation
+  - knip
   - build
   - triggers
 
@@ -21,7 +22,16 @@ installation:
       - '**/node_modules'
   script:
     - npm ci
-
+knip:
+  stage: knip
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+  script:
+    - npx knip --dependencies
 build:
   stage: build
   cache:
