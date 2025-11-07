@@ -1,6 +1,7 @@
 import {
   AdditionalRegisters,
   Asset,
+  BlockInfo,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
@@ -27,8 +28,7 @@ export interface MempoolTrackResult {
 
 export type TxDeserializer = (serializedTx: string) => Transaction;
 
-export type BoxWithHeight = {
+export type BoxWithBlock = {
   box: ErgoBox;
-  inclusionHeight: number;
-  hash: string;
+  blockInfo: BlockInfo;
 };

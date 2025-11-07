@@ -3,7 +3,7 @@ import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 import * as boxHandler from '../../lib/boxHandler';
 import { MAX_BOX_LENGTH } from '../../lib/const';
 import { BoxExtractor } from '../../lib/extractor/boxExtractor';
-import { BoxWithHeight } from '../../lib/interfaces';
+import { BoxWithBlock } from '../../lib/interfaces';
 import { createMockBox } from '../testUtils';
 
 describe('MockBoxTracker', () => {
@@ -19,11 +19,23 @@ describe('MockBoxTracker', () => {
     vi.clearAllMocks();
   });
 
-  const getBoxes = (): BoxWithHeight[] =>
-    (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes ?? undefined;
+  /**
+   * Returns the internal `boxes` array from the `BoxExtractor` instance.
+   * Since the property is private, it’s accessed via type casting.
+   *
+   * @returns Current box list.
+   */
+  const getBoxes = (): BoxWithBlock[] =>
+    (boxExtractor as unknown as { boxes: BoxWithBlock[] }).boxes ?? undefined;
 
-  const setBoxes = (boxes: BoxWithHeight[]): void => {
-    (boxExtractor as unknown as { boxes: BoxWithHeight[] }).boxes = boxes;
+  /**
+   * Forces the internal `boxes` array of the `BoxExtractor` instance
+   * to a specific value for test setup purposes.
+   *
+   * @param boxes - Array of boxes to inject.
+   */
+  const setBoxes = (boxes: BoxWithBlock[]): void => {
+    (boxExtractor as unknown as { boxes: BoxWithBlock[] }).boxes = boxes;
   };
 
   describe('processTransactions', () => {
@@ -41,8 +53,8 @@ describe('MockBoxTracker', () => {
      * - The stored boxes remain identical to the original array
      */
     it('should not modify boxes when no matching transaction is tracked', async () => {
-      const initialBoxes: BoxWithHeight[] = [
-        { box: createMockBox('boxA'), inclusionHeight: 10, hash: 'H1' },
+      const initialBoxes: BoxWithBlock[] = [
+        { box: createMockBox('boxA'), blockInfo: { height: 10, hash: 'H1' } },
       ];
       setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
@@ -85,7 +97,7 @@ describe('MockBoxTracker', () => {
       ];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-      expect(getBoxes()[0].box.boxId).toBe('b3');
+      expect(getBoxes()[-1].box.boxId).toBe('b3');
     });
 
     /**
@@ -102,12 +114,11 @@ describe('MockBoxTracker', () => {
      * - The new box is appended to the end
      */
     it('should remove oldest box when max capacity reached', async () => {
-      const filledBoxes: BoxWithHeight[] = Array.from({
+      const filledBoxes: BoxWithBlock[] = Array.from({
         length: MAX_BOX_LENGTH,
       }).map((_, i) => ({
         box: createMockBox(`box${i}`),
-        inclusionHeight: i,
-        hash: `H${i}`,
+        blockInfo: { height: i, hash: `H${i}` },
       }));
       setBoxes(filledBoxes);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
@@ -127,6 +138,7 @@ describe('MockBoxTracker', () => {
       expect(after).not.toContain(before[0]);
       expect(after[-1]).toBe('newUnspentBox');
       expect(after).toHaveLength(MAX_BOX_LENGTH);
+      expect(after.slice(0, -1)).toEqual(before.slice(1));
     });
 
     /**
@@ -165,14 +177,14 @@ describe('MockBoxTracker', () => {
      * - No boxes are removed
      */
     it('should not change boxes when forked block has no matching boxes', async () => {
-      const boxes: BoxWithHeight[] = [
-        { box: createMockBox('b1'), inclusionHeight: 50, hash: 'H1' },
+      const boxes: BoxWithBlock[] = [
+        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
       ];
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('UNKNOWN_HASH');
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].hash).toBe('H1');
+      expect(getBoxes()[0].blockInfo.hash).toBe('H1');
     });
 
     /**
@@ -189,16 +201,16 @@ describe('MockBoxTracker', () => {
      * - Box with H1 is removed, only H2 remains
      */
     it('should remove boxes from forked block', async () => {
-      const boxes: BoxWithHeight[] = [
-        { box: createMockBox('b1'), inclusionHeight: 50, hash: 'H1' },
-        { box: createMockBox('b2'), inclusionHeight: 51, hash: 'H2' },
+      const boxes: BoxWithBlock[] = [
+        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
+        { box: createMockBox('b2'), blockInfo: { height: 51, hash: 'H2' } },
       ];
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('H1');
 
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].hash).toBe('H2');
+      expect(getBoxes()[0].blockInfo.hash).toBe('H2');
     });
   });
 
@@ -231,9 +243,9 @@ describe('MockBoxTracker', () => {
      * - Returns the last box in the array
      */
     it('should return the latest box when boxes exist', () => {
-      const boxList: BoxWithHeight[] = [
-        { box: createMockBox('b1'), inclusionHeight: 10, hash: 'H1' },
-        { box: createMockBox('b2'), inclusionHeight: 11, hash: 'H2' },
+      const boxList: BoxWithBlock[] = [
+        { box: createMockBox('b1'), blockInfo: { height: 10, hash: 'H1' } },
+        { box: createMockBox('b2'), blockInfo: { height: 11, hash: 'H2' } },
       ];
       setBoxes(boxList);
 

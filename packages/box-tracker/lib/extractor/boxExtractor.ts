@@ -5,12 +5,12 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
-import { BoxWithHeight } from '..';
+import { BoxWithBlock } from '../interfaces';
 
 export class BoxExtractor extends AbstractExtractor<Transaction> {
   initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
   getId: () => string;
-  getRecentBox: () => BoxWithHeight;
+  getRecentBox: () => BoxWithBlock;
   processTransactions: (txs: Transaction[], block: Block) => Promise<boolean>;
   forkBlock: (hash: string) => Promise<void>;
 }
