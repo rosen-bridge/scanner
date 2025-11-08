@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-runes-observation-extractor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Event observation data extractor for Bitcoin Runes chain",
   "repository": {
     "type": "git",
