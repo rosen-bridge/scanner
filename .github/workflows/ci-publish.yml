@@ -74,7 +74,7 @@ jobs:
           npx changeset publish | tee .changeset_log
           { echo 'CHANGESET_LOG<<_LOG_'; cat .changeset_log; echo '_LOG_'; } >> "$GITHUB_ENV"
 
-      - name: Discord Annonce
+      - name: Discord Announce
         if: ${{ steps.publish.conclusion == 'success' }}
         shell: bash
         run: |

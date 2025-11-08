@@ -3,7 +3,7 @@ image: node:22.18
 stages:
   - check_permission
   - release
-  - annonce
+  - announce
 
 check_user_permission:
   stage: check_permission
@@ -41,8 +41,8 @@ snapshot-release:
       - .changeset_log
     expire_in: 1 day
 
-discord-annonce:
-  stage: annonce
+discord-announce:
+  stage: announce
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   script:
