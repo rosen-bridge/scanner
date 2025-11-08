@@ -41,12 +41,12 @@ run_ci:
       - local: .gitlab/workflows/ci.yml
     strategy: mirror
 
-run_snapshot_release:
+run_snapshot_publish:
   stage: triggers
   rules:
     - when: manual
   allow_failure: true
   trigger:
     include:
-      - local: .gitlab/workflows/snapshot-release.yml
+      - local: .gitlab/workflows/snapshot-publish.yml
     strategy: mirror

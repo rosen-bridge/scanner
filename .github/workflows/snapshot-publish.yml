@@ -1,4 +1,4 @@
-name: snapshot release
+name: snapshot publish
 
 on:
   workflow_dispatch:
@@ -22,10 +22,10 @@ jobs:
             | jq -r '.role_name'
           )
           if [[ "$PERM" != "admin" && "$PERM" != "maintain" ]]; then \
-            echo "$ACTOR triggers snapshot release: permission denied" && exit 1; fi
+            echo "$ACTOR triggers snapshot publish: permission denied" && exit 1; fi
 
-  snapshot-release:
-    name: snapshot release
+  snapshot-publish:
+    name: snapshot publish
     needs: check-user-permission
     runs-on: ubuntu-latest
     steps:
@@ -69,8 +69,8 @@ jobs:
           PATTERN_START='success packages published successfully:'
           PATTERN_END='Creating git tag...'
 
-          released_versions=$(printf '%s\n' "$CHANGESET_LOG" \
+          published_versions=$(printf '%s\n' "$CHANGESET_LOG" \
             | sed -n "/$PATTERN_START/,/$PATTERN_END/{/$PATTERN_START/d;/$PATTERN_END/d;p}")
 
-          msg=$(printf '%s\n' "$released_versions" | grep -o '@.*')
+          msg=$(printf '%s\n' "$published_versions" | grep -o '@.*')
           [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${{ secrets.DISCORD_HOOK }}"
