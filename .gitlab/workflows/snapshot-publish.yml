@@ -22,6 +22,7 @@ check_user_permission:
 
 snapshot-publish:
   stage: publish
+  needs: [check_user_permission]
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull
@@ -43,6 +44,7 @@ snapshot-publish:
 
 discord-announce:
   stage: announce
+  needs: [snapshot-publish]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   script:

@@ -24,6 +24,7 @@ installation:
 
 build:
   stage: build
+  needs: [installation]
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull-push
@@ -36,6 +37,7 @@ build:
 
 run_ci:
   stage: triggers
+  needs: [build]
   trigger:
     include:
       - local: .gitlab/workflows/ci.yml
@@ -43,6 +45,7 @@ run_ci:
 
 run_snapshot_publish:
   stage: triggers
+  needs: [build]
   rules:
     - when: manual
   allow_failure: true
