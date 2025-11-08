@@ -95,9 +95,18 @@ describe('MockBoxTracker', () => {
         { id: 'tx2', inputs: [box1], outputs: [box2], dataInputs: [] },
         { id: 'tx3', inputs: [box2], outputs: [box3], dataInputs: [] },
       ];
+      const before = getBoxes()?.map((b) => b.box.boxId) ?? [];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-      expect(getBoxes()[-1].box.boxId).toBe('b3');
+
+      const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
+      expect(before).toHaveLength(0);
+      expect(after).toHaveLength(1);
+      expect(after[0]).toBe('b3');
+      expect(after).not.toContain('b1');
+      expect(after).not.toContain('b2');
+
+      expect(after).not.toEqual(before);
     });
 
     /**
@@ -142,19 +151,19 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should call initializeBoxes when no boxes exist
+     * @test processTransactions should call init when no boxes exist
      * @description
-     * When the internal box list is empty, `initializeBoxes`
+     * When the internal box list is empty, `init`
      * must be called with the provided block info.
      *
      * @expected
-     * - initializeBoxes is called once
+     * - init is called once
      */
-    it('should call initializeBoxes when no boxes exist', async () => {
+    it('should call init when no boxes exist', async () => {
       setBoxes([]);
       const initSpy = vi
-        .spyOn(boxExtractor, 'initializeBoxes')
-        .mockResolvedValue(undefined);
+        .spyOn(boxExtractor, 'init')
+        .mockResolvedValue(createMockBox('initBox'));
 
       await boxExtractor.processTransactions([], mockBlock);
 

@@ -1,14 +1,11 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import {
-  Block,
-  BlockInfo,
-  Transaction,
-} from '@rosen-bridge/scanner-interfaces';
+import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 
-import { BoxWithBlock } from '../interfaces';
+import { BoxWithBlock, ErgoBox } from '../interfaces';
 
 export class BoxExtractor extends AbstractExtractor<Transaction> {
-  initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
+  initializeBoxes: () => Promise<void>;
+  init: () => Promise<ErgoBox>;
   getId: () => string;
   getRecentBox: () => BoxWithBlock;
   processTransactions: (txs: Transaction[], block: Block) => Promise<boolean>;
