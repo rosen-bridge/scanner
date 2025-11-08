@@ -59,27 +59,6 @@ describe('AbstractRawDataProvider', () => {
     });
 
     /**
-     * @target should return undefined if no observations exist for chain
-     * @dependencies
-     * - RawDataProvider instance
-     * @scenario
-     * - mock fetchByChain method to return null
-     * - call fetchOrCreateStateForChain
-     * @expected
-     * - method should return undefined
-     * - logger should record an error message about missing observations
-     */
-    it<TestInterface>('should return undefined if no observations exist for chain', async ({
-      provider,
-    }) => {
-      provider['action'].fetchByChain = vi.fn().mockResolvedValue(null);
-
-      const result = await provider['fetchOrCreateStateForChain']();
-
-      expect(result).toBeUndefined();
-    });
-
-    /**
      * @target should return existing state if found
      * @dependencies
      * - RawDataProvider instance

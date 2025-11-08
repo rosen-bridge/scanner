@@ -38,7 +38,7 @@ export class RawDataProviderStateEntityAction {
   };
 
   /**
-   * Retrieves the ObservationEntity by maximum height associated with the specified chain
+   * Retrieves the RawDataProviderStateEntity of specific chain
    *
    * @param chain
    * @returns
