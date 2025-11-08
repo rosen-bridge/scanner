@@ -13,7 +13,7 @@ import {
 import { Block } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
 import { BITCOIN_RUNES_CHAIN } from './constants';
 
 export abstract class BitcoinRunesAbstractObservationExtractor<

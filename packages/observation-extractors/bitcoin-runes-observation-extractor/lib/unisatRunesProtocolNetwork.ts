@@ -2,10 +2,10 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import RateLimitedAxios, { Axios } from '@rosen-clients/rate-limited-axios';
 
-import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
 import { TxOutputRune, UnisatResponse, UnisatTxRunes } from './types';
 
-class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
+export class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
   protected unisatClient: Axios;
 
   constructor(
@@ -91,5 +91,3 @@ class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
     return runes;
   };
 }
-
-export default UnisatRunesProtocolNetwork;

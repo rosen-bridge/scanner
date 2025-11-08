@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 1.0.2
+
+### Patch Changes
+
+- Replace default exports with named exports
+
 ## 1.0.1
 
 ### Patch Changes
