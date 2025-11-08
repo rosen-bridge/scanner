@@ -8,10 +8,9 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: 'cobertura',
     },
-    passWithNoTests: true,
     poolOptions: {
-      threads: {
-        singleThread: true,
+      forks: {
+        singleFork: true,
       },
     },
   },

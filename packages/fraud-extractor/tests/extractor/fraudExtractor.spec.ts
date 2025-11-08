@@ -272,7 +272,7 @@ describe('fraudExtractor', () => {
      * - it should remove the invalid fraud
      */
     it('should remove invalid fraud from database', async () => {
-      insertFraudEntity(dataSource, 'boxId');
+      await insertFraudEntity(dataSource, 'boxId');
       const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue(undefined);
@@ -294,7 +294,7 @@ describe('fraudExtractor', () => {
      * - it should update spending information of a valid box spent bellow the initial height
      */
     it('should update valid box information when spent bellow the initial height', async () => {
-      insertFraudEntity(dataSource, 'boxId');
+      await insertFraudEntity(dataSource, 'boxId');
       const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
@@ -321,7 +321,7 @@ describe('fraudExtractor', () => {
      * - it should not change the fraud information since its valid and spent after the initial height
      */
     it('should not change valid fraud information when spent after the initial height', async () => {
-      insertFraudEntity(dataSource, 'boxId');
+      await insertFraudEntity(dataSource, 'boxId');
       const spy = vi
         .spyOn(extractor, 'getFraudInfoWithBoxId')
         .mockResolvedValue({
@@ -354,7 +354,7 @@ describe('fraudExtractor', () => {
      * - it should validate the existing fraud1 (boxId1)
      */
     it('should insert new found box and validate the old existing box', async () => {
-      insertFraudEntity(dataSource, 'boxId1');
+      await insertFraudEntity(dataSource, 'boxId1');
       const extractedFrauds: Array<ExtractedFraud> = [
         {
           boxId: 'boxId2',
@@ -416,7 +416,7 @@ describe('fraudExtractor', () => {
       const spy = vi
         .spyOn(extractor, 'validateOldStoredFrauds')
         .mockImplementation(vi.fn());
-      insertFraudEntity(dataSource, 'boxId1');
+      await insertFraudEntity(dataSource, 'boxId1');
       await extractor.initializeBoxes({ height: 100 } as BlockInfo);
       const box = await repository.findOne({ where: { boxId: 'boxId1' } });
       expect(box).not.toBeNull();
