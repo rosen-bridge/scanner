@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 1.0.1
+
+### Patch Changes
+
+- Export abstract, unisat & ordiscan RunesProtocolNetwork
+
 ## 1.0.0
 
 ### Major Changes
