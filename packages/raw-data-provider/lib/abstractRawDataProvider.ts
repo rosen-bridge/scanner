@@ -37,7 +37,7 @@ export abstract class AbstractRawDataProvider {
           await this.action.fetchLatestObservationByChain(this.chain);
         let lastHeight = 0;
         if (!latestChainObservation) {
-          this.logger.info(
+          this.logger.warn(
             `Not find any ObservationEntity for the ${this.chain} chain`,
           );
         } else {
@@ -66,18 +66,20 @@ export abstract class AbstractRawDataProvider {
       `RawDataProvider Starting raw-data filling for [${this.chain}] chain`,
     );
 
-    let state: RawDataProviderStateEntity | null =
+    let state: RawDataProviderStateEntity =
       await this.fetchOrCreateStateForChain();
-    while (
-      state &&
-      state.lastHeight > 0 &&
-      state.syncedHeight <= state.lastHeight
-    ) {
+    while (state.syncedHeight < state.lastHeight) {
       this.logger.debug(
         `RawDataProvider Fetching observations for [${this.chain}] chain from height > ${state.syncedHeight}`,
       );
-      const result = await this.fillObservationsRawData(state);
-      state = result;
+      try {
+        const result = await this.fillObservationsRawData(state);
+        state = result;
+      } catch (err) {
+        this.logger.error(`RawDataProvider Error: ${err}`);
+        if (err instanceof Error && err.stack) this.logger.error(err.stack);
+        break;
+      }
     }
 
     this.logger.debug(
@@ -93,17 +95,14 @@ export abstract class AbstractRawDataProvider {
    */
   protected fillObservationsRawData = async (
     state: RawDataProviderStateEntity,
-  ): Promise<RawDataProviderStateEntity | null> => {
+  ): Promise<RawDataProviderStateEntity> => {
     const observations = await this.action.fetchChainObservations(
       this.chain,
       state.syncedHeight,
     );
 
     if (observations.length === 0) {
-      this.logger.debug(
-        `RawDataProvider No more observations found for [${this.chain}] chain`,
-      );
-      return null;
+      throw `No more observations found for [${this.chain}] chain`;
     }
 
     for (const observation of observations) {
