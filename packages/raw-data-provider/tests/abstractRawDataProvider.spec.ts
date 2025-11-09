@@ -1,6 +1,7 @@
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
+import { RawDataProviderStateEntity } from '../lib';
 import { AbstractRawDataProvider } from '../lib/abstractRawDataProvider';
 import {
   mockData,
@@ -17,10 +18,24 @@ class TestRawDataProvider extends AbstractRawDataProvider {
 interface TestInterface {
   dataSource: DataSource;
   provider: TestRawDataProvider;
+  repository: Repository<RawDataProviderStateEntity>;
   observationRepository: Repository<ObservationEntity>;
 }
 
 describe('AbstractRawDataProvider', () => {
+  /**
+   * This `beforeEach` hook sets up the test environment before each test case runs.
+   * It performs the following setup steps:
+   *
+   * 1. Creates an in-memory database instance for test isolation.
+   * 2. Initializes a `TestRawDataProvider` instance for the `cardano` chain using the created data source.
+   * 3. Populates the provider’s underlying action with predefined mock `RawDataProviderStateEntity` records.
+   * 4. Retrieves the repository for `ObservationEntity` from the data source.
+   * 5. Inserts predefined mock `ObservationEntity` records into the repository.
+   *
+   * This setup ensures that every test starts with a clean and consistent database state,
+   * along with initialized provider data for the Cardano chain.
+   */
   beforeEach<TestInterface>(async (context) => {
     context.dataSource = await createDatabase();
     context.provider = new TestRawDataProvider('cardano', context.dataSource);
@@ -29,6 +44,7 @@ describe('AbstractRawDataProvider', () => {
         async (entity) => await context.provider['action'].store(entity),
       ),
     );
+    context.repository = context.provider['action']['repository'];
     context.observationRepository =
       context.dataSource.getRepository(ObservationEntity);
     await Promise.all(
@@ -51,11 +67,11 @@ describe('AbstractRawDataProvider', () => {
      * - the created entity should match the mock stored entity
      */
     it<TestInterface>('should create new item if not found successfully', async ({
-      provider,
+      dataSource,
     }) => {
+      const provider = new TestRawDataProvider('ergo', dataSource);
       const result = await provider['fetchOrCreateStateForChain']();
-
-      expect(result).toEqual(mockData.storedEntities[0]);
+      expect(result).toEqual(mockData.entities[0]);
     });
 
     /**
@@ -69,14 +85,14 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should return existing state if found', async ({
       provider,
+      repository,
     }) => {
-      const beforeStatesCount = await provider['action']['repository'].count();
+      const beforeStatesCount = await repository.count();
 
-      await provider['fetchOrCreateStateForChain']();
+      const result = await provider['fetchOrCreateStateForChain']();
 
-      const afterStatesCount = await provider['action']['repository'].count();
-
-      expect(beforeStatesCount).toBe(afterStatesCount);
+      expect(beforeStatesCount).toBe(await repository.count());
+      expect(result).toEqual(mockData.storedEntities[0]);
     });
   });
 
@@ -84,33 +100,39 @@ describe('AbstractRawDataProvider', () => {
     /**
      * @target should fill observations raw-data successfully
      * @dependencies
-     * - RawDataProvider instance
-     * - observationRepository
+     * - RawDataProvider mock
+     * - observationRepository mock
      * @scenario
-     * - store mock observation entities for the target chain
-     * - call fillObservationsRawData with a valid state
+     * - create mock observation records for a specific chain
+     * - mock action.fetchChainObservations and action.updateRawData
+     * - call fillObservationsRawData with a mocked state
      * @expected
-     * - each observation.rawData should be filled with a valid value
+     * - each observation.rawData should be set to `raw-{id}`
      */
     it<TestInterface>('should fill observations raw-data successfully', async ({
       provider,
-      observationRepository,
     }) => {
-      const state = mockData.storedEntities[0];
-      await Promise.all(
-        mockObservationData.entities.map(
-          async (observation) => await observationRepository.save(observation),
-        ),
+      const mockObservations = mockObservationData.entities.map((e) => ({
+        ...e,
+        id: e.height,
+      }));
+      const storedObservations: string[] = [];
+      // mock action methods
+      provider['action']['fetchChainObservations'] = vi
+        .fn()
+        .mockResolvedValue(mockObservations);
+      provider['action']['updateRawData'] = vi.fn(
+        async (id: number, rawData: string) => {
+          storedObservations.push(rawData);
+        },
       );
 
-      await provider['fillObservationsRawData'](state);
+      // call the method under test
+      await provider['fillObservationsRawData'](mockData.storedEntities[0]);
 
-      const observations = await provider['action'][
-        'observationRepository'
-      ].find({ where: { fromChain: 'cardano' } });
-
-      expect(observations[0].rawData).toEqual(`raw-${observations[0].id}`);
-      expect(observations[1].rawData).toEqual(`raw-${observations[1].id}`);
+      // verify rawData updates
+      expect(storedObservations[0]).toBe(`raw-${mockObservations[0].id}`);
+      expect(storedObservations[1]).toBe(`raw-${mockObservations[1].id}`);
     });
   });
 
@@ -129,6 +151,7 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should update synced-height for chain successfully', async ({
       provider,
+      repository,
       observationRepository,
     }) => {
       await Promise.all(
@@ -137,7 +160,7 @@ describe('AbstractRawDataProvider', () => {
         ),
       );
 
-      const state = await provider['action']['repository'].findOne({
+      const state = await repository.findOne({
         where: { chain: 'cardano' },
       });
       state!.syncedHeight = 0;
@@ -145,9 +168,9 @@ describe('AbstractRawDataProvider', () => {
 
       await provider.fillRawData();
 
-      const observations = await provider['action'][
-        'observationRepository'
-      ].find({ where: { fromChain: 'cardano' } });
+      const observations = await observationRepository.find({
+        where: { fromChain: 'cardano' },
+      });
 
       expect(
         (await provider['fetchOrCreateStateForChain']())!.syncedHeight,

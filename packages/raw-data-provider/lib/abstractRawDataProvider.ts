@@ -111,7 +111,7 @@ export abstract class AbstractRawDataProvider {
       );
       const rawData = this.fetchRawData(observation);
       await this.action.updateRawData(observation.id, rawData);
-      state.syncedHeight = observations[observations.length - 1].height;
+      state.syncedHeight = observation.height;
       await this.action.store(state);
       this.logger.debug(
         `RawDataProvider syncedHeight updated to ${observation.height} for [${this.chain}] chain`,

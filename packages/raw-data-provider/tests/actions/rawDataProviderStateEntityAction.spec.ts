@@ -15,6 +15,19 @@ interface TestInterface {
 }
 
 describe('RawDataProviderStateEntityAction', () => {
+  /**
+   * This `beforeEach` hook initializes the test context before each test case runs.
+   * It performs the following setup steps:
+   *
+   * 1. Creates an in-memory database instance for isolated test execution.
+   * 2. Instantiates a `RawDataProviderStateEntityAction` using the created data source.
+   * 3. Populates the database with a predefined set of mock `RawDataProviderStateEntity` records.
+   * 4. Retrieves the repository for `ObservationEntity` from the data source.
+   * 5. Inserts a predefined set of mock `ObservationEntity` records into the repository.
+   *
+   * This ensures that each test starts with a clean and predictable database state,
+   * containing both stored state entities and observation entities.
+   */
   beforeEach<TestInterface>(async (context: TestInterface) => {
     context.dataSource = await createDatabase();
     context.action = new RawDataProviderStateEntityAction(context.dataSource);
@@ -106,6 +119,43 @@ describe('RawDataProviderStateEntityAction', () => {
     }) => {
       const result = await action.fetchChainObservations('ergo', 99);
       expect(result.length).toEqual(2);
+      expect(result).toEqual(mockObservationData.storedEntities);
+    });
+
+    /**
+     * @target should fetch observations above a specific height successfully
+     * @dependencies
+     * - RawDataProviderStateEntityAction instance
+     * @scenario
+     * - call fetchChainObservations with chain='ergo' and minHeight=100
+     * @expected
+     * - result length should be equal to 1
+     * - returned data should match mockObservationData.storedEntities.slice(1)
+     */
+    it<TestInterface>('should fetch observations above a specific height successfully', async ({
+      action,
+    }) => {
+      const result = await action.fetchChainObservations('ergo', 100);
+      expect(result.length).toEqual(1);
+      expect(result).toEqual(mockObservationData.storedEntities.slice(1));
+    });
+
+    /**
+     * @target should fetch limited number of observations starting from a given height
+     * @dependencies
+     * - RawDataProviderStateEntityAction instance
+     * @scenario
+     * - call fetchChainObservations with chain='ergo', minHeight=99 and limit=1
+     * @expected
+     * - result length should be equal to 1
+     * - returned data should match mockObservationData.storedEntities.slice(0, 1)
+     */
+    it<TestInterface>('should fetch limited number of observations starting from a given height', async ({
+      action,
+    }) => {
+      const result = await action.fetchChainObservations('ergo', 99, 1);
+      expect(result.length).toEqual(1);
+      expect(result).toEqual(mockObservationData.storedEntities.slice(0, 1));
     });
   });
 

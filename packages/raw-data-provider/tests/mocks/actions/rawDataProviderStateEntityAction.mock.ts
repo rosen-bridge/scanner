@@ -4,7 +4,7 @@ export const mockData = {
   storedEntities: [
     { chain: 'cardano', syncedHeight: 1, lastHeight: 100 },
   ] as RawDataProviderStateEntity[],
-  entities: [{ chain: 'ergo', syncedHeight: 100, lastHeight: 200 }],
+  entities: [{ chain: 'ergo', syncedHeight: 0, lastHeight: 101 }],
 };
 
 export const mockObservationData = {
