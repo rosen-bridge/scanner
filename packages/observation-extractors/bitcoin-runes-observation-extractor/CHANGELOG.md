@@ -1,5 +1,29 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 1.0.3
+
+### Patch Changes
+
+- Replace default exports with named exports
+
+~~## 1.0.2~~
+
+### Patch Changes
+
+- Replace default exports with named exports
+
+## 1.0.1
+
+### Patch Changes
+
+- Export abstract, unisat & ordiscan RunesProtocolNetwork
+
+## 1.0.0
+
+### Major Changes
+
+- Add implementation for the new OrdiscanRunesProtocolNetwork and UnisatRunesProtocolNetwork extending the AbstractRunesProtocolNetwork that implements getTxOutputRunes
+
 ## 0.3.1
 
 ### Patch Changes

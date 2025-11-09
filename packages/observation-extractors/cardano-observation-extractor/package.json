@@ -35,9 +35,6 @@
     "@rosen-bridge/rosen-extractor": "^11.0.0",
     "@rosen-bridge/tokens": "^4.0.1"
   },
-  "devDependencies": {
-    "tsx": "^4.19.4"
-  },
   "engines": {
     "node": ">=22.18.0"
   }

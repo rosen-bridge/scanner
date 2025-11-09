@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
@@ -10,16 +9,13 @@ import {
 import {
   mockBlock,
   mockLockAddress,
-  unisatApiKey,
   mockTxOutputRunes,
-  unisatUrl,
   mockTokens,
   ergoEventData,
   mockTxId,
-  txOutputRunes,
-  validTxId,
-  mockUnisatResponse,
+  mockObservation,
 } from './testData';
+import { TestRunesProtocolNetwork } from './testRunesProtocolNetwork';
 import { createDatabase } from './testUtils';
 
 describe('BitcoinRunesAbstractObservationExtractor', () => {
@@ -27,6 +23,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
   let mockDataSource: DataSource;
   let mockTokenMap: TokenMap;
   let mockRosenDataExtractor: AbstractRosenDataExtractor<TestTransactionType>;
+  let testRunesProtocolNetwork: TestRunesProtocolNetwork;
 
   beforeEach(async () => {
     mockDataSource = await createDatabase();
@@ -35,12 +32,14 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
 
     mockRosenDataExtractor = {
       get: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
+
+    testRunesProtocolNetwork = new TestRunesProtocolNetwork();
 
     extractor = new TestBitcoinRunesAbstractObservationExtractor(
       mockLockAddress,
-      unisatUrl,
-      unisatApiKey,
+      testRunesProtocolNetwork,
       mockDataSource,
       mockTokenMap,
       mockRosenDataExtractor,
@@ -63,10 +62,8 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
      */
     it('should process ergo event transaction successfully', async () => {
       // arrange
-      vi.spyOn(mockRosenDataExtractor as any, 'get').mockReturnValue(
-        ergoEventData,
-      );
-      vi.spyOn(extractor as any, 'getTxOutputRunes').mockResolvedValue(
+      vi.spyOn(mockRosenDataExtractor, 'get').mockReturnValue(ergoEventData);
+      vi.spyOn(testRunesProtocolNetwork, 'getTxOutputRunes').mockResolvedValue(
         mockTxOutputRunes,
       );
 
@@ -81,19 +78,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
 
       // assert
       expect(storeObservationsSpy).toHaveBeenCalledExactlyOnceWith(
-        [
-          {
-            ...ergoEventData,
-            amount: '1000',
-            sourceChainTokenId: '880887:3052',
-            targetChainTokenId:
-              '7a51950e5f548549ec1aa63ffdc38279505b11e7e803d01bcf8347e0123c8666',
-            fromChain: 'bitcoin-runes',
-            sourceBlockId: mockBlock.hash,
-            requestId:
-              '7be306c80af7374e216be190f129db29a7b5a4ef9f6519518631e4ce8f142adc',
-          },
-        ],
+        [mockObservation],
         mockBlock,
         'test-observation-extractor',
       );
@@ -102,7 +87,7 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
     });
 
     /**
-     * @target BitcoinRunesAbstractObservationExtractor.processTransactions should throw when processing block height is greater than synced height of unisat
+     * @target BitcoinRunesAbstractObservationExtractor.processTransactions should throw when processing block height is greater than synced height
      * @dependencies
      * @scenario
      * - stub getTxOutputRunes to resolve to a mock object that its height is set to less than processing block height
@@ -111,12 +96,10 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
      * @expected
      * - processTransactions should have thrown
      */
-    it('should throw when processing block height is greater than synced height of unisat', async () => {
+    it('should throw when processing block height is greater than synced height', async () => {
       // arrange
-      vi.spyOn(mockRosenDataExtractor as any, 'get').mockReturnValue(
-        ergoEventData,
-      );
-      vi.spyOn(extractor as any, 'getTxOutputRunes').mockResolvedValue(
+      vi.spyOn(mockRosenDataExtractor, 'get').mockReturnValue(ergoEventData);
+      vi.spyOn(testRunesProtocolNetwork, 'getTxOutputRunes').mockResolvedValue(
         Object.assign({}, mockTxOutputRunes, { height: mockBlock.height - 1 }),
       );
 
@@ -126,31 +109,6 @@ describe('BitcoinRunesAbstractObservationExtractor', () => {
       await expect(
         async () => await extractor.processTransactions(mockTxs, mockBlock),
       ).rejects.toThrow();
-    });
-  });
-
-  describe('getTxOutputRunes', () => {
-    /**
-     * @target BitcoinRunesAbstractObservationExtractor.getTxOutputRunes should successfully get the array of runes in a tx outputs
-     * @dependencies
-     * @scenario
-     * - stub unisatClient.get to resolve to a mock response
-     * - call getTxOutputRunes using a valid tx id
-     * @expected
-     * - getTxOutputRunes should have returned an array of 2 runes (for lock and change)
-     */
-    it('should successfully get the array of runes in a tx outputs', async () => {
-      // arrange
-      vi.spyOn(extractor['unisatClient'], 'get').mockResolvedValue({
-        status: 200,
-        data: mockUnisatResponse,
-      });
-
-      // act
-      const result = await extractor.callGetTxOutputRunes(validTxId);
-
-      // assert
-      expect(result).toEqual(txOutputRunes);
     });
   });
 });
