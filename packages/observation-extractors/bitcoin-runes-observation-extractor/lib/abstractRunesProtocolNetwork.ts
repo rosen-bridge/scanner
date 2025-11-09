@@ -2,7 +2,7 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 
 import { TxOutputRune } from './types';
 
-abstract class AbstractRunesProtocolNetwork {
+export abstract class AbstractRunesProtocolNetwork {
   logger: AbstractLogger;
 
   constructor(logger?: AbstractLogger) {
@@ -19,5 +19,3 @@ abstract class AbstractRunesProtocolNetwork {
     height: number,
   ): Promise<TxOutputRune[]>;
 }
-
-export default AbstractRunesProtocolNetwork;

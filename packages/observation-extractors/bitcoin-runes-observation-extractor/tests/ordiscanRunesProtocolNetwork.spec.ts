@@ -1,6 +1,6 @@
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import OrdiscanRunesProtocolNetwork from '../lib/ordiscanRunesProtocolNetwork';
+import { OrdiscanRunesProtocolNetwork } from '../lib/ordiscanRunesProtocolNetwork';
 import {
   mockTokens,
   mockTxId,

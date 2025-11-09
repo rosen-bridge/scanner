@@ -4,7 +4,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BitcoinRunesEsploraRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
 import { BitcoinRunesAbstractObservationExtractor } from './bitcoinRunesAbstractObservationExtractor';
 
 export class BitcoinRunesEsploraObservationExtractor extends BitcoinRunesAbstractObservationExtractor<BitcoinEsploraTransaction> {

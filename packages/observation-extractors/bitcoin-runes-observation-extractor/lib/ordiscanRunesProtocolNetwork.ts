@@ -4,11 +4,11 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import AbstractRunesProtocolNetwork from './abstractRunesProtocolNetwork';
+import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
 import { BITCOIN_RUNES_CHAIN } from './constants';
 import { TxOutputRune, OrdiscanRunesTxOutputUtxo } from './types';
 
-class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
+export class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
   protected ordiscanClient: Ordiscan;
 
   constructor(
@@ -66,5 +66,3 @@ class OrdiscanRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
       .filter((utxo) => !!utxo);
   };
 }
-
-export default OrdiscanRunesProtocolNetwork;

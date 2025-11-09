@@ -1,4 +1,4 @@
-import UnisatRunesProtocolNetwork from '../lib/unisatRunesProtocolNetwork';
+import { UnisatRunesProtocolNetwork } from '../lib/unisatRunesProtocolNetwork';
 import {
   mockTxId,
   mockUnisatResponse1,
