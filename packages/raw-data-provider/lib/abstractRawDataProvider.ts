@@ -101,9 +101,10 @@ export abstract class AbstractRawDataProvider {
       state.syncedHeight,
     );
 
-    if (observations.length === 0) {
-      throw `No more observations found for [${this.chain}] chain`;
-    }
+    if (observations.length === 0)
+      throw new Error(
+        `impossible case: No more observations found for [${this.chain}] chain`,
+      );
 
     for (const observation of observations) {
       this.logger.debug(

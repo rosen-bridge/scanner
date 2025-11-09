@@ -151,7 +151,6 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should update synced-height for chain successfully', async ({
       provider,
-      repository,
       observationRepository,
     }) => {
       await Promise.all(
@@ -160,21 +159,9 @@ describe('AbstractRawDataProvider', () => {
         ),
       );
 
-      const state = await repository.findOne({
-        where: { chain: 'cardano' },
-      });
-      state!.syncedHeight = 0;
-      await provider['action'].store(state!);
-
-      await provider.fillRawData();
-
-      const observations = await observationRepository.find({
-        where: { fromChain: 'cardano' },
-      });
-
       expect(
         (await provider['fetchOrCreateStateForChain']())!.syncedHeight,
-      ).toEqual(observations[1].height);
+      ).toEqual(mockObservationData.entities[1].height);
     });
   });
 });
