@@ -13,11 +13,13 @@ jobs:
     steps:
       - name: check user permission
         shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
         run: |
-          ACTOR='${{ github.actor }}'
-          REPO='${{ github.repository }}'
           PERM=$(
-            curl -fsSL -H "Authorization: Bearer ${{ github.token }}" \
+            curl -fsSL -H "Authorization: Bearer $TOKEN" \
               "https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission" \
             | jq -r '.role_name'
           )

@@ -54,15 +54,16 @@ jobs:
         id: perm
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          USER: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
         run: |
-          resp=$(curl -s -H "Authorization: Bearer $TOKEN" \
-                       -H "Accept: application/vnd.github+json" \
-                       "https://api.github.com/repos/$OWNER/$REPO/collaborators/$USER/permission")
-          is_admin=$(echo "$resp" | jq -r '.permission == "admin"')
-          echo "is_admin=$is_admin" >> "$GITHUB_OUTPUT"
+          PERM=$(
+            curl -fsSL -H "Authorization: Bearer $TOKEN" \
+              "https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission" \
+            | jq -r '.role_name'
+          )
+          if [[ "$PERM" == "admin" || "$PERM" == "maintain" ]]; then \
+            echo "is_admin=$is_admin" >> "$GITHUB_OUTPUT"; fi
 
       - name: Publish to npm
         if: ${{ steps.perm.outputs.is_admin == 'true' }}
