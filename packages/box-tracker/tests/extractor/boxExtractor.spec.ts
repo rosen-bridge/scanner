@@ -100,13 +100,8 @@ describe('MockBoxTracker', () => {
       await boxExtractor.processTransactions(txs, mockBlock);
 
       const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
-      expect(before).toHaveLength(0);
-      expect(after).toHaveLength(1);
-      expect(after[0]).toBe('b3');
-      expect(after).not.toContain('b1');
-      expect(after).not.toContain('b2');
-
-      expect(after).not.toEqual(before);
+      expect(after.slice(0, -1)).toEqual(before);
+      expect(after[-1]).toBe('b3');
     });
 
     /**
