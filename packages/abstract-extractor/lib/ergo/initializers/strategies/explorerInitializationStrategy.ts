@@ -7,6 +7,7 @@ import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction, RangeQuery } from '../../interfaces';
 import { ExplorerNetwork } from '../../networks/explorerNetwork';
 import { requestWithRetrial } from '../../utils';
+import { INIT_WORKERS_REASSIGN_INTERVAL } from './constants';
 import { WorkerManager } from './workerManager';
 
 export class ExplorerInitializationStrategy {
@@ -192,7 +193,7 @@ export class ExplorerInitializationStrategy {
         this.logger.debug(`Reassigned workers ${newWorkers}`);
         newWorkers.forEach((workerIndex) => addWorkerJob(workerIndex));
       }
-    }, 5000);
+    }, INIT_WORKERS_REASSIGN_INTERVAL);
     // Wait for all workers to finish their jobs
     await this.promiseQueue.onIdle();
     // Stop reassigning interval

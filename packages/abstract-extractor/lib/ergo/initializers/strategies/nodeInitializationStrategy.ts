@@ -7,6 +7,7 @@ import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction } from '../../interfaces';
 import { NodeNetwork } from '../../networks/nodeNetwork';
 import { delay, requestWithRetrial } from '../../utils';
+import { DELAY_BETWEEN_INIT_REQUESTS } from './constants';
 
 export class NodeInitializationStrategy {
   private network: NodeNetwork;
@@ -79,7 +80,7 @@ export class NodeInitializationStrategy {
         concurrency: this.maxParallelRequests,
       });
       while (offset < total) {
-        await delay(100);
+        await delay(DELAY_BETWEEN_INIT_REQUESTS);
         ((offset: number) =>
           promiseQueue.add(() =>
             this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height),
