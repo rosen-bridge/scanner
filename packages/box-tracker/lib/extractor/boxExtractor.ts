@@ -9,7 +9,8 @@ import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
 
 export class BoxExtractor extends AbstractExtractor<Transaction> {
-  private tracker: (box: ErgoBox) => boolean;
+  private address: string;
+  private tokens: Array<Token>;
   private network: AbstractErgoNetwork;
   private boxes: BoxWithBlock[] = [];
 
@@ -20,7 +21,8 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     tokens: Array<Token>,
   ) {
     super();
-    this.tracker = generateTracker(address, tokens);
+    this.address = address;
+    this.tokens = tokens;
     if (ergoNetworkType == 'explorer') {
       this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
     }
@@ -31,12 +33,13 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   /** @returns the unique ID of extractor */
   getId: () => 'BoxExtractor';
 
-  init: () => Promise<ErgoBox> = async () => {
-    const box = await this.network.getBox();
-    if (!box) {
-      throw new Error('No box found during initialization');
+  init: () => Promise<ErgoBox | undefined> = async () => {
+    try {
+      const box = await this.network.getBox();
+      return box;
+    } catch {
+      return;
     }
-    return box;
   };
 
   /**
@@ -65,10 +68,11 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           });
         }
       }
-
+      const tracker = generateTracker(this.address, this.tokens);
       for (const tx of txs) {
         for (const out of tx.outputs) {
-          if (this.tracker(out)) {
+          console.log(tracker(out));
+          if (tracker(out)) {
             this.boxes.push({
               box: out,
               blockInfo: { height: block.height, hash: block.hash },
@@ -79,12 +83,11 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           spentBoxes.add(input.boxId);
         }
       }
-
-      this.boxes = this.boxes.filter(
-        (b) =>
-          !spentBoxes.has(b.box.boxId) &&
-          b.blockInfo.height >= block.height - MAX_BOX_LENGTH,
-      );
+      this.boxes = this.boxes.filter((b) => !spentBoxes.has(b.box.boxId));
+      console.log(this.boxes);
+      if (this.boxes.length > MAX_BOX_LENGTH) {
+        this.boxes = this.boxes.slice(this.boxes.length - MAX_BOX_LENGTH);
+      }
       return true;
     } catch (error) {
       console.error('BoxExtractor processTransactions failed:', error);
@@ -109,7 +112,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   /**
    * Returns recent box.
    */
-  getRecentBox = (): BoxWithBlock => {
-    return this.boxes[-1];
+  getRecentBox = (): BoxWithBlock | undefined => {
+    return this.boxes.at(-1);
   };
 }

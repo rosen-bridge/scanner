@@ -101,7 +101,7 @@ describe('MockBoxTracker', () => {
 
       const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
       expect(after.slice(0, -1)).toEqual(before);
-      expect(after[-1]).toBe('b3');
+      expect(after.at(-1)).toBe('b3');
     });
 
     /**
@@ -140,7 +140,7 @@ describe('MockBoxTracker', () => {
       await boxExtractor.processTransactions(txs, mockBlock);
       const after = getBoxes().map((b) => b.box.boxId);
       expect(after).not.toContain(before[0]);
-      expect(after[-1]).toBe('newUnspentBox');
+      expect(after.at(-1)).toBe('newUnspentBox');
       expect(after).toHaveLength(MAX_BOX_LENGTH);
       expect(after.slice(0, -1)).toEqual(before.slice(1));
     });
@@ -162,7 +162,7 @@ describe('MockBoxTracker', () => {
 
       await boxExtractor.processTransactions([], mockBlock);
 
-      expect(initSpy).toHaveBeenCalledWith(mockBlock);
+      expect(initSpy).toHaveBeenCalledWith();
     });
   });
 
@@ -254,7 +254,8 @@ describe('MockBoxTracker', () => {
       setBoxes(boxList);
 
       const result = boxExtractor.getRecentBox();
-      expect(result.box.boxId).toBe('b2');
+      console.log('hi', result);
+      expect(result?.box.boxId).toBe('b2');
     });
   });
 });
