@@ -11,6 +11,12 @@ stages:
   - build
   - triggers
 
+variables:
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+
+before_script:
+  - npm i -g npm@11.6.2
+
 installation:
   stage: installation
   cache:
@@ -19,6 +25,7 @@ installation:
     paths:
       - node_modules
       - '**/node_modules'
+      - .npm
   script:
     - npm ci
 
@@ -32,6 +39,7 @@ build:
       - node_modules
       - '**/node_modules'
       - '**/dist'
+      - .npm
   script:
     - npm run build
 

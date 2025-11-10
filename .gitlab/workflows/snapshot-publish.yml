@@ -5,6 +5,9 @@ stages:
   - publish
   - announce
 
+variables:
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+
 check_user_permission:
   stage: check_permission
   rules:
@@ -22,7 +25,6 @@ check_user_permission:
 
 snapshot-publish:
   stage: publish
-  needs: [check_user_permission]
   cache:
     key: $CI_COMMIT_REF_NAME
     policy: pull
@@ -30,9 +32,11 @@ snapshot-publish:
       - node_modules
       - '**/node_modules'
       - '**/dist'
+      - .npm
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   before_script:
+    - npm i -g npm@11.6.2
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   script:
     - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
@@ -44,7 +48,6 @@ snapshot-publish:
 
 discord-announce:
   stage: announce
-  needs: [snapshot-publish]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   script:
