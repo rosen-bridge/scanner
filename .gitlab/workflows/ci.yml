@@ -1,5 +1,9 @@
 image: node:22.18
 
+workflow:
+  auto_cancel:
+    on_job_failure: all
+
 stages:
   - ci
 
