@@ -144,7 +144,6 @@ describe('AbstractRawDataProvider', () => {
      * - observationRepository
      * @scenario
      * - store observation entities for the chain
-     * - reset syncedHeight to 0 in current state
      * - call fillRawData
      * @expected
      * - syncedHeight in state should be updated to the highest observation height
