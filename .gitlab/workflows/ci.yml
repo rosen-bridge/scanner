@@ -1,0 +1,75 @@
+image: node:22.18
+
+stages:
+  - knip
+  - type_check
+  - lint
+  - test
+  - changeset
+
+knip:
+  stage: knip
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+  script:
+    - npx knip --dependencies
+
+type_check:
+  stage: type_check
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  script:
+    - npm run type-check
+
+lint:
+  stage: lint
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  script:
+    - npm run lint:check
+
+test:
+  stage: test
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  script:
+    - npm run coverage
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: '**/coverage/cobertura-coverage.xml'
+
+changeset:
+  stage: changeset
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+  before_script:
+    - git fetch origin dev
+  script:
+    - npx changeset status --since=origin/dev

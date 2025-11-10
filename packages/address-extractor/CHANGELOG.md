@@ -1,5 +1,11 @@
 # @rosen-bridge/address-extractor
 
+## 6.3.0
+
+### Minor Changes
+
+- Move `@rosen-bridge/json-bigint` to dependencies to ensure it's available at runtime
+
 ## 6.2.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @rosen-bridge/cardano-scanner
 
+## 1.0.0
+
+### Major Changes
+
+- Change type of metadata for Blockfrost
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes
