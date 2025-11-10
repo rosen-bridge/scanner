@@ -15,7 +15,7 @@ describe('MockBoxTracker', () => {
     hash: 'block-hash-1',
   };
   beforeEach(() => {
-    boxExtractor = new BoxExtractor();
+    boxExtractor = new BoxExtractor('node', 'http', 'address', []);
     vi.clearAllMocks();
   });
 
