@@ -68,11 +68,11 @@ export class BlockFrostNetwork extends AbstractNetworkConnector<BlockFrostTransa
    */
   getTxInformation = async (txId: string): Promise<BlockFrostTransaction> => {
     const txUtxos = await this.client.txsUtxos(txId);
-    const txMetadata = await this.client.txsMetadata(txId);
+    const txMetadata = await this.client.txsMetadataCbor(txId);
 
     return {
       utxos: txUtxos,
-      metadata: txMetadata,
+      metadataCbor: txMetadata,
     };
   };
 

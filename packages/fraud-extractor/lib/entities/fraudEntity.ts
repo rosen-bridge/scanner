@@ -21,7 +21,7 @@ export class FraudEntity {
   @Column({ type: 'varchar' })
   creationTxId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   serialized: string;
 
   @Column({ type: 'varchar' })

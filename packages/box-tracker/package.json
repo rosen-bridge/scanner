@@ -15,6 +15,7 @@
     "dist",
     "CHANGELOG.md"
   ],
+  "private": true,
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",

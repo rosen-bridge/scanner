@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-scanner
 
+## 0.2.2
+
+### Patch Changes
+
+- Fixed type definitions in entities based migrations
+
 ## 0.2.1
 
 ### Patch Changes

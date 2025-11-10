@@ -8,7 +8,6 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: 'cobertura',
     },
-    passWithNoTests: true,
     poolOptions: {
       forks: {
         singleFork: true,
