@@ -10,7 +10,7 @@ import {
 import { createDatabase } from './utils';
 
 class TestRawDataProvider extends AbstractRawDataProvider {
-  fetchRawData = vi.fn((observation: ObservationEntity) => {
+  fetchRawData = vi.fn(async (observation: ObservationEntity) => {
     return `raw-${observation.id}`;
   });
 }

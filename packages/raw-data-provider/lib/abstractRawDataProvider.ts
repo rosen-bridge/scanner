@@ -22,7 +22,7 @@ export abstract class AbstractRawDataProvider {
    * @param observation
    * @return {string}
    */
-  abstract fetchRawData: (observation: ObservationEntity) => string;
+  abstract fetchRawData: (observation: ObservationEntity) => Promise<string>;
 
   /**
    * Retrieves the current RawDataProviderStateEntity for the configured chain.
@@ -110,7 +110,7 @@ export abstract class AbstractRawDataProvider {
       this.logger.debug(
         `RawDataProvider Updating rawData for observation at height ${observation.height} for [${this.chain}] chain`,
       );
-      const rawData = this.fetchRawData(observation);
+      const rawData = await this.fetchRawData(observation);
       await this.action.updateRawData(observation.id, rawData);
       state.syncedHeight = observation.height;
       await this.action.store(state);
