@@ -1,5 +1,8 @@
 image: node:22.18
 
+default:
+  interruptible: true
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE =~ /push|web/'
