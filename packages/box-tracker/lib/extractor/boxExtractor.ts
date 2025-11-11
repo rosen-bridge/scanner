@@ -3,7 +3,7 @@ import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from '../boxHandler';
 import { MAX_BOX_LENGTH } from '../const';
-import { BoxWithBlock, ErgoBox, Token } from '../interfaces';
+import { BoxWithBlock, Token } from '../interfaces';
 import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
@@ -12,6 +12,9 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   private address: string;
   private tokens: Array<Token>;
   private network: AbstractErgoNetwork;
+  /**
+   * List of tracked boxes along with their associated block information.
+   */
   private boxes: BoxWithBlock[] = [];
 
   constructor(
@@ -30,15 +33,22 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       this.network = new NodeErgoNetwork(ergoNetworkType, [], networkUrl);
     }
   }
+
   /** @returns the unique ID of extractor */
   getId: () => 'BoxExtractor';
 
-  init: () => Promise<ErgoBox | undefined> = async () => {
-    try {
-      const box = await this.network.getBox();
-      return box;
-    } catch {
-      return;
+  /**
+   * Initializes the extractor by fetching the initial box from the network.
+   * Stores it with its block information if available.
+   *
+   */
+  init: () => Promise<void> = async () => {
+    const box = await this.network.getBox();
+    if (box) {
+      this.boxes.push({
+        box: box,
+        blockInfo: { height: box?.creationHeight, hash: box.BlockId! },
+      });
     }
   };
 
@@ -60,18 +70,11 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     const spentBoxes = new Set<string>();
     try {
       if (this.boxes.length === 0) {
-        const lastBox = await this.init();
-        if (lastBox) {
-          this.boxes.push({
-            box: lastBox,
-            blockInfo: { height: block.height, hash: block.hash },
-          });
-        }
+        await this.init();
       }
       const tracker = generateTracker(this.address, this.tokens);
       for (const tx of txs) {
         for (const out of tx.outputs) {
-          console.log(tracker(out));
           if (tracker(out)) {
             this.boxes.push({
               box: out,
@@ -84,7 +87,6 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
         }
       }
       this.boxes = this.boxes.filter((b) => !spentBoxes.has(b.box.boxId));
-      console.log(this.boxes);
       if (this.boxes.length > MAX_BOX_LENGTH) {
         this.boxes = this.boxes.slice(this.boxes.length - MAX_BOX_LENGTH);
       }
@@ -98,19 +100,26 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes tracked boxes at the starting block height.
    *
-   * @param initialBlock - Information about the initial block
    */
   initializeBoxes: () => Promise<void>;
 
   /**
-   * Removes boxes that belong to a forked block height.
+   * Handles blockchain forks by removing boxes belonging to the forked block hash.
+   * If no boxes remain, it reinitializes the extractor state.
+   *
+   * @param  hash - The hash of the forked block.
    */
   forkBlock = async (hash: string): Promise<void> => {
     this.boxes = this.boxes.filter((b) => b.blockInfo.hash !== hash);
+    if (this.boxes.length === 0) {
+      await this.init();
+    }
   };
 
   /**
-   * Returns recent box.
+   * Retrieves the most recent tracked box.
+   *
+   * @returns The latest tracked box, or undefined if none exist.
    */
   getRecentBox = (): BoxWithBlock | undefined => {
     return this.boxes.at(-1);

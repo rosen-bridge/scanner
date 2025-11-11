@@ -14,6 +14,7 @@ export type ErgoBox = {
   boxId: string;
   value: bigint;
   ergoTree: string;
+  BlockId?: string;
   creationHeight: number;
   assets: Array<Asset>;
   additionalRegisters: AdditionalRegisters;

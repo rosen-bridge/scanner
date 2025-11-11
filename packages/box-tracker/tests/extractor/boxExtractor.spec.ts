@@ -84,6 +84,10 @@ describe('MockBoxTracker', () => {
      * - Only box3 remains in the tracked list
      */
     it('should track last unspent box in chained transactions', async () => {
+      const initialBoxes: BoxWithBlock[] = [
+        { box: createMockBox('boxA'), blockInfo: { height: 10, hash: 'H1' } },
+      ];
+      setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
 
       const box1 = createMockBox('b1');
@@ -98,7 +102,6 @@ describe('MockBoxTracker', () => {
       const before = getBoxes()?.map((b) => b.box.boxId) ?? [];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-
       const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
       expect(after.slice(0, -1)).toEqual(before);
       expect(after.at(-1)).toBe('b3');
@@ -156,9 +159,7 @@ describe('MockBoxTracker', () => {
      */
     it('should call init when no boxes exist', async () => {
       setBoxes([]);
-      const initSpy = vi
-        .spyOn(boxExtractor, 'init')
-        .mockResolvedValue(createMockBox('initBox'));
+      const initSpy = vi.spyOn(boxExtractor, 'init').mockResolvedValue();
 
       await boxExtractor.processTransactions([], mockBlock);
 
@@ -216,6 +217,30 @@ describe('MockBoxTracker', () => {
       expect(getBoxes()).toHaveLength(1);
       expect(getBoxes()[0].blockInfo.hash).toBe('H2');
     });
+
+    /**
+     * @test forkBlock should call init method after removing forked ones
+     *
+     * @description
+     * Re-initializes boxes after removing forked ones.
+     *
+     * @scenario
+     * - box with hashes H1 exist
+     * - forkBlock is called with H1 and removed box
+     * - forkBlock call init method
+     * @expected
+     * init is called once.
+     */
+    it('should call init method after removing forked ones', async () => {
+      const initSpy = vi.spyOn(boxExtractor, 'init').mockResolvedValue();
+      const boxes: BoxWithBlock[] = [
+        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
+      ];
+      setBoxes(boxes);
+
+      await boxExtractor.forkBlock('H1');
+      expect(initSpy).toHaveBeenCalledWith();
+    });
   });
 
   describe('getRecentBoxes', () => {
@@ -252,9 +277,7 @@ describe('MockBoxTracker', () => {
         { box: createMockBox('b2'), blockInfo: { height: 11, hash: 'H2' } },
       ];
       setBoxes(boxList);
-
       const result = boxExtractor.getRecentBox();
-      console.log('hi', result);
       expect(result?.box.boxId).toBe('b2');
     });
   });

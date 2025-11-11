@@ -36,6 +36,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
         value: BigInt(b.value),
         ergoTree: b.ergoTree,
         creationHeight: b.creationHeight,
+        BlockId: b.blockId,
         assets: (b.assets || []).map((a) => ({
           tokenId: a.tokenId,
           amount: BigInt(a.amount),
