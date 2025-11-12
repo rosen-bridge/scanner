@@ -1,4 +1,4 @@
-image: node:22.18
+image: node:22.18.0
 
 default:
   interruptible: true
@@ -11,7 +11,7 @@ stages:
   - ci
 
 variables:
-  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
   NPM_VERSION: '11.6.2'
 
 before_script:
@@ -20,7 +20,7 @@ before_script:
 knip:
   stage: ci
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull
     paths:
       - node_modules
@@ -32,7 +32,7 @@ knip:
 type_check:
   stage: ci
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull
     paths:
       - node_modules
@@ -45,7 +45,7 @@ type_check:
 lint:
   stage: ci
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull
     paths:
       - node_modules
@@ -58,7 +58,7 @@ lint:
 test:
   stage: ci
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull
     paths:
       - node_modules
@@ -77,7 +77,7 @@ test:
 changeset:
   stage: ci
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull
     paths:
       - node_modules
