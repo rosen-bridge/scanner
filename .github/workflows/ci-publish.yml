@@ -45,7 +45,7 @@ jobs:
         run: npm run lint:check
 
       - name: Test
-        run: npm run test
+        run: npm run coverage
 
       - name: changeset
         run: |
