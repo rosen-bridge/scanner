@@ -66,7 +66,7 @@ jobs:
             | jq -r '.role_name'
           )
           if [[ "$PERM" == "admin" || "$PERM" == "maintain" ]]; then \
-            echo "is_admin=$is_admin" >> "$GITHUB_OUTPUT"; fi
+            echo "is_admin=true" >> "$GITHUB_OUTPUT"; fi
 
       - name: Publish to npm
         if: ${{ steps.perm.outputs.is_admin == 'true' }}
