@@ -28,8 +28,9 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
    *
    */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.v1.getApiV1BoxesByaddressP1(address))
-      .items;
+    const rawBoxes = (
+      await this.api.v1.getApiV1BoxesUnspentByaddressP1(address)
+    ).items;
     if (rawBoxes) {
       return rawBoxes.map((b) => ({
         boxId: b.boxId,

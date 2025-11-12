@@ -27,7 +27,7 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    *
    */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.getBoxesByAddress(address)).items;
+    const rawBoxes = await this.api.getBoxesByAddressUnspent(address);
     if (rawBoxes) {
       return rawBoxes.map((b) => ({
         boxId: b.boxId ?? '',
@@ -46,6 +46,15 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       }));
     }
     return [];
+  }
+
+  /**
+   * Retrieves blockId of a block by height.
+   *
+   */
+  async getBlockByHeight(height: number): Promise<string> {
+    const rawBoxes = await this.api.getFullBlockAt(height);
+    return rawBoxes[0];
   }
   /**
    * Fetches all unconfirmed transactions currently in the mempool.

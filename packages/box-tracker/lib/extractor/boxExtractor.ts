@@ -45,10 +45,20 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   init: () => Promise<void> = async () => {
     const box = await this.network.getBox();
     if (box) {
-      this.boxes.push({
-        box: box,
-        blockInfo: { height: box?.creationHeight, hash: box.BlockId! },
-      });
+      if (this.network instanceof NodeErgoNetwork) {
+        const blockHash = await this.network.getBlockByHeight(
+          box.creationHeight,
+        );
+        this.boxes.push({
+          box: box,
+          blockInfo: { height: box?.creationHeight, hash: blockHash },
+        });
+      } else {
+        this.boxes.push({
+          box: box,
+          blockInfo: { height: box?.creationHeight, hash: box.BlockId! },
+        });
+      }
     }
   };
 
@@ -68,6 +78,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     block: Block,
   ): Promise<boolean> => {
     const spentBoxes = new Set<string>();
+    let candidateBoxes: BoxWithBlock[] = [];
     try {
       if (this.boxes.length === 0) {
         await this.init();
@@ -76,7 +87,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       for (const tx of txs) {
         for (const out of tx.outputs) {
           if (tracker(out)) {
-            this.boxes.push({
+            candidateBoxes.push({
               box: out,
               blockInfo: { height: block.height, hash: block.hash },
             });
@@ -86,7 +97,10 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           spentBoxes.add(input.boxId);
         }
       }
-      this.boxes = this.boxes.filter((b) => !spentBoxes.has(b.box.boxId));
+      candidateBoxes = candidateBoxes.filter(
+        (b) => !spentBoxes.has(b.box.boxId),
+      );
+      this.boxes.push(...candidateBoxes);
       if (this.boxes.length > MAX_BOX_LENGTH) {
         this.boxes = this.boxes.slice(this.boxes.length - MAX_BOX_LENGTH);
       }
