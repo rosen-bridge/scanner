@@ -10,6 +10,7 @@ stages:
 
 variables:
   npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  NPM_VERSION: '11.6.2'
 
 check_user_permission:
   stage: check_permission
@@ -39,7 +40,7 @@ snapshot-publish:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   before_script:
-    - npm i -g npm@11.6.2
+    - npm i -g npm${NPM_VERSION}
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   script:
     - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"

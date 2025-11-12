@@ -16,9 +16,10 @@ stages:
 
 variables:
   npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  NPM_VERSION: '11.6.2'
 
 before_script:
-  - npm i -g npm@11.6.2
+  - npm i -g npm@${NPM_VERSION}
 
 installation:
   stage: installation
