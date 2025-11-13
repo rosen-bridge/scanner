@@ -19,11 +19,17 @@ export class CardanoBlockFrostObservationExtractor extends AbstractObservationEx
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new CardanoBlockFrostRosenExtractor(lockAddress, tokens, logger),
+      new CardanoBlockFrostRosenExtractor(
+        lockAddress,
+        tokens,
+        logger,
+        storeRawData,
+      ),
       logger,
     );
   }
