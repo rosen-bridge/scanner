@@ -13,11 +13,12 @@ export class DogeEsploraObservationExtractor extends AbstractObservationExtracto
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new DogeEsploraRosenExtractor(lockAddress, tokens, logger),
+      new DogeEsploraRosenExtractor(lockAddress, tokens, logger, storeRawData),
       logger,
     );
   }

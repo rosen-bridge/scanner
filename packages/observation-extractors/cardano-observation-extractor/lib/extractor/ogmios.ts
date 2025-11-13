@@ -14,11 +14,18 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new CardanoOgmiosRosenExtractor(lockAddress, tokens, logger),
+      new CardanoOgmiosRosenExtractor(
+        lockAddress,
+        tokens,
+        logger,
+        storeRawData,
+      ),
+      logger,
     );
   }
 
