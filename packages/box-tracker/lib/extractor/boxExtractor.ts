@@ -1,4 +1,5 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from '../boxHandler';
@@ -11,6 +12,7 @@ import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
 export class BoxExtractor extends AbstractExtractor<Transaction> {
   private address: string;
   private tokens: Array<Token>;
+  readonly logger: AbstractLogger;
   private network: AbstractErgoNetwork;
   /**
    * List of tracked boxes along with their associated block information.
@@ -22,10 +24,13 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     networkUrl: string,
     address: string,
     tokens: Array<Token>,
+    logger?: AbstractLogger,
   ) {
     super();
     this.address = address;
     this.tokens = tokens;
+    this.logger = logger ? logger : new DummyLogger();
+
     if (ergoNetworkType == 'explorer') {
       this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
     }
@@ -79,6 +84,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   ): Promise<boolean> => {
     const spentBoxes = new Set<string>();
     let candidateBoxes: BoxWithBlock[] = [];
+    this.logger.debug('processTransactions: start');
     try {
       if (this.boxes.length === 0) {
         await this.init();
@@ -91,6 +97,10 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
               box: out,
               blockInfo: { height: block.height, hash: block.hash },
             });
+            this.logger.debug('Candidate matched by tracker', {
+              boxId: out.boxId,
+              txId: tx.id,
+            });
           }
         }
         for (const input of tx.inputs) {
@@ -100,22 +110,32 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       candidateBoxes = candidateBoxes.filter(
         (b) => !spentBoxes.has(b.box.boxId),
       );
-      this.boxes.push(...candidateBoxes);
-      if (this.boxes.length > MAX_BOX_LENGTH) {
-        this.boxes = this.boxes.slice(this.boxes.length - MAX_BOX_LENGTH);
+      if (candidateBoxes.length > 1) {
+        this.logger.info(
+          'ImpossibleBehaviour: more than one candidateBox after filtering',
+        );
       }
+      this.boxes.push(...candidateBoxes);
+      this.logger.debug('Boxes updated after push');
+      if (this.boxes.length > MAX_BOX_LENGTH) {
+        this.boxes = this.boxes.slice(1);
+      }
+      this.logger.debug('processTransactions: completed successfully');
+
       return true;
     } catch (error) {
-      console.error('BoxExtractor processTransactions failed:', error);
+      this.logger.error('BoxExtractor processTransactions failed:', error);
       return false;
     }
   };
 
   /**
-   * Initializes tracked boxes at the starting block height.
+   * No-op initialization.
    *
    */
-  initializeBoxes: () => Promise<void>;
+  initializeBoxes = async (): Promise<void> => {
+    // intentionally empty; this extractor does not require initialization
+  };
 
   /**
    * Handles blockchain forks by removing boxes belonging to the forked block hash.
@@ -125,9 +145,6 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    */
   forkBlock = async (hash: string): Promise<void> => {
     this.boxes = this.boxes.filter((b) => b.blockInfo.hash !== hash);
-    if (this.boxes.length === 0) {
-      await this.init();
-    }
   };
 
   /**

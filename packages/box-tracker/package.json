@@ -29,6 +29,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@rosen-bridge/abstract-logger": "^3.0.1",
     "@rosen-bridge/abstract-extractor": "^2.1.2",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "@rosen-clients/ergo-explorer": "^2.1.0",

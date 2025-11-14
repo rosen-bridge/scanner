@@ -217,30 +217,6 @@ describe('MockBoxTracker', () => {
       expect(getBoxes()).toHaveLength(1);
       expect(getBoxes()[0].blockInfo.hash).toBe('H2');
     });
-
-    /**
-     * @test forkBlock should call init method after removing forked ones
-     *
-     * @description
-     * Re-initializes boxes after removing forked ones.
-     *
-     * @scenario
-     * - box with hashes H1 exist
-     * - forkBlock is called with H1 and removed box
-     * - forkBlock call init method
-     * @expected
-     * init is called once.
-     */
-    it('should call init method after removing forked ones', async () => {
-      const initSpy = vi.spyOn(boxExtractor, 'init').mockResolvedValue();
-      const boxes: BoxWithBlock[] = [
-        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
-      ];
-      setBoxes(boxes);
-
-      await boxExtractor.forkBlock('H1');
-      expect(initSpy).toHaveBeenCalledWith();
-    });
   });
 
   describe('getRecentBoxes', () => {

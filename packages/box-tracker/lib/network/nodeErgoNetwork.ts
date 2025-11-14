@@ -53,8 +53,8 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    *
    */
   async getBlockByHeight(height: number): Promise<string> {
-    const rawBoxes = await this.api.getFullBlockAt(height);
-    return rawBoxes[0];
+    const blocks = await this.api.getFullBlockAt(height);
+    return blocks[0];
   }
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
