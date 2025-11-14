@@ -8,5 +8,5 @@ export class BlockFrostNullValueError extends Error {
 
 export interface BlockFrostTransaction {
   utxos: components['schemas']['tx_content_utxo'];
-  metadata: components['schemas']['tx_content_metadata'];
+  metadataCbor: components['schemas']['tx_content_metadata_cbor'];
 }

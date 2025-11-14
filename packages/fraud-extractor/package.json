@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/fraud-extractor",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "fraud information extractor for watcher faulty reports",
   "repository": {
     "type": "git",
@@ -38,12 +38,13 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.1",
+    "@rosen-bridge/abstract-scanner": "^0.2.2",
     "@vitest/coverage-istanbul": "^3.1.4",
     "tsx": "^4.19.4",
     "vitest": "^3.1.4"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.18.0",
+    "npm": "11.6.2"
   }
 }
