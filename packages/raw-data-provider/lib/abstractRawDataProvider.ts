@@ -1,28 +1,23 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
 
 import { RawDataProviderStateEntityAction } from './actions/rawDataProviderStateEntityAction';
 import { RawDataProviderStateEntity } from './entities';
 
-export abstract class AbstractRawDataProvider {
+export abstract class AbstractRawDataProvider<TxType> {
   protected action: RawDataProviderStateEntityAction;
 
   constructor(
     protected chain: string,
-    dataSource: DataSource,
+    protected dataSource: DataSource,
+    protected extractor: AbstractObservationExtractor<TxType>,
+    protected network: AbstractNetworkConnector<TxType>,
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
     this.action = new RawDataProviderStateEntityAction(dataSource, logger);
   }
-
-  /**
-   * get an observationEntity object and return owned rawData
-   *
-   * @param observation
-   * @return {string}
-   */
-  abstract fetchRawData: (observation: ObservationEntity) => Promise<string>;
 
   /**
    * Retrieves the current RawDataProviderStateEntity for the configured chain.
@@ -62,7 +57,7 @@ export abstract class AbstractRawDataProvider {
    * @returns void
    */
   fillRawData = async (): Promise<void> => {
-    this.logger.debug(
+    this.logger.info(
       `RawDataProvider Starting raw-data filling for [${this.chain}] chain`,
     );
 
@@ -82,7 +77,7 @@ export abstract class AbstractRawDataProvider {
       }
     }
 
-    this.logger.debug(
+    this.logger.info(
       `RawDataProvider Finished filling raw-data for [${this.chain}] chain`,
     );
   };
@@ -103,15 +98,16 @@ export abstract class AbstractRawDataProvider {
 
     if (observations.length === 0)
       throw new Error(
-        `impossible case: No more observations found for [${this.chain}] chain`,
+        `ImpossibleBehavior: No more observations found for [${this.chain}] chain`,
       );
 
     for (const observation of observations) {
       this.logger.debug(
         `RawDataProvider Updating rawData for observation at height ${observation.height} for [${this.chain}] chain`,
       );
-      const rawData = await this.fetchRawData(observation);
-      await this.action.updateRawData(observation.id, rawData);
+      const block = await this.network.getBlockAtHeight(observation.height);
+      const txs = await this.network.getBlockTxs(block.hash);
+      await this.extractor.processTransactions(txs, block);
       state.syncedHeight = observation.height;
       await this.action.store(state);
       this.logger.debug(

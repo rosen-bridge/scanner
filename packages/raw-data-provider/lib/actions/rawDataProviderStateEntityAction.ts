@@ -22,26 +22,26 @@ export class RawDataProviderStateEntityAction {
   }
 
   /**
-   * Stores one or more RawDataProviderStateEntity in the database
+   * Stores one RawDataProviderStateEntity in the database
    *
    * @param rawDataProviderEntities
-   * @returns
+   * @returns {RawDataProviderStateEntity} saved instance
    */
   store = async (
     rawDataProviderEntity: RawDataProviderStateEntity,
   ): Promise<RawDataProviderStateEntity> => {
-    const states = await this.repository.save(rawDataProviderEntity);
+    const state = await this.repository.save(rawDataProviderEntity);
     this.logger.debug(
       `raw-data for chain state [${JSON.stringify(rawDataProviderEntity)}] stored in database`,
     );
-    return states;
+    return state;
   };
 
   /**
    * Retrieves the RawDataProviderStateEntity of specific chain
    *
    * @param chain
-   * @returns
+   * @returns {RawDataProviderStateEntity | null} Chain-related state, or null if not found
    */
   fetchByChain = async (
     chain: string,
@@ -53,13 +53,13 @@ export class RawDataProviderStateEntityAction {
    * Retrieves the latest ObservationEntity for the specified chain
    *
    * @param chain
-   * @returns
+   * @returns {ObservationEntity | null} Latest related observation, or null if not found
    */
   fetchLatestObservationByChain = async (
     chain: string,
   ): Promise<ObservationEntity | null> => {
     return await this.observationRepository.findOne({
-      where: { fromChain: chain },
+      where: { fromChain: chain, rawData: '' },
       order: { height: 'DESC' },
     });
   };
@@ -68,37 +68,19 @@ export class RawDataProviderStateEntityAction {
    * Fetches a batch of ObservationEntity records for the given chain
    *
    * @param chain
-   * @param offset
+   * @param offsetHeight
    * @param length
-   * @returns
+   * @returns {ObservationEntity[]} Chain-related observations
    */
   fetchChainObservations = async (
     chain: string,
-    offset: number,
+    offsetHeight: number,
     length: number = OBSERVATION_BATCH_SIZE,
   ): Promise<ObservationEntity[]> => {
     return await this.observationRepository.find({
-      where: { fromChain: chain, height: MoreThan(offset) },
+      where: { fromChain: chain, height: MoreThan(offsetHeight) },
       order: { height: 'ASC' },
       take: length,
     });
-  };
-
-  /**
-   * Updates the rawData field of the specified ObservationEntity
-   *
-   * @param entityId
-   * @param rawData
-   * @returns
-   */
-  updateRawData = async (entityId: number, rawData: string) => {
-    const entities = await this.observationRepository.update(
-      { id: entityId },
-      { rawData },
-    );
-    if (entities.affected == 0)
-      this.logger.error(
-        `Can't update raw-data field for ObservationEntity by [${entityId}] id`,
-      );
   };
 }

@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./lib"
+    "rootDir": "./lib",
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["tests", "vitest.config.ts"]
 }

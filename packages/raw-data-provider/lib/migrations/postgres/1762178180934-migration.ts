@@ -8,7 +8,7 @@ export class Migration1762178180934 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            CREATE TABLE "raw_data_provider_state" (
+            CREATE TABLE "raw_data_provider_state_entity" (
                 "chain" varchar PRIMARY KEY NOT NULL,
                 "lastHeight" integer NOT NULL,
                 "syncedHeight" integer NOT NULL
@@ -18,7 +18,7 @@ export class Migration1762178180934 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            DROP TABLE "raw_data_provider_state"
+            DROP TABLE "raw_data_provider_state_entity"
         `);
   }
 }

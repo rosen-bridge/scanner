@@ -1,18 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { CardanoKoiosObservationExtractor } from '@rosen-bridge/cardano-observation-extractor';
+import { KoiosTransaction } from '@rosen-bridge/cardano-observation-extractor/dist/interfaces/koiosTransaction';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+import {
+  AbstractNetworkConnector,
+  Block,
+} from '@rosen-bridge/scanner-interfaces';
 
 import { RawDataProviderStateEntity } from '../lib';
 import { AbstractRawDataProvider } from '../lib/abstractRawDataProvider';
 import {
   mockData,
+  mockedBlock,
+  mockedBlockTxs,
   mockObservationData,
 } from './mocks/abstractRawDataProvider.mock';
 import { createDatabase } from './utils';
 
-class TestRawDataProvider extends AbstractRawDataProvider {
+class TestRawDataProvider extends AbstractRawDataProvider<KoiosTransaction> {
   fetchRawData = vi.fn(async (observation: ObservationEntity) => {
     return `raw-${observation.id}`;
   });
+}
+
+class CardanoKoiosNetworkConnector extends AbstractNetworkConnector<KoiosTransaction> {
+  getBlockAtHeight = async () => mockedBlock;
+  getCurrentHeight = async () => 1;
+  getBlockTxs = async () => mockedBlockTxs;
 }
 
 interface TestInterface {
@@ -20,6 +35,8 @@ interface TestInterface {
   provider: TestRawDataProvider;
   repository: Repository<RawDataProviderStateEntity>;
   observationRepository: Repository<ObservationEntity>;
+  extractor: CardanoKoiosObservationExtractor;
+  networkConnector: CardanoKoiosNetworkConnector;
 }
 
 describe('AbstractRawDataProvider', () => {
@@ -38,7 +55,18 @@ describe('AbstractRawDataProvider', () => {
    */
   beforeEach<TestInterface>(async (context) => {
     context.dataSource = await createDatabase();
-    context.provider = new TestRawDataProvider('cardano', context.dataSource);
+    context.extractor = new CardanoKoiosObservationExtractor(
+      'adr',
+      context.dataSource,
+      {} as any,
+    );
+    context.networkConnector = new CardanoKoiosNetworkConnector();
+    context.provider = new TestRawDataProvider(
+      'cardano',
+      context.dataSource,
+      context.extractor,
+      context.networkConnector,
+    );
     await Promise.all(
       mockData.storedEntities.map(
         async (entity) => await context.provider['action'].store(entity),
@@ -68,8 +96,15 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should create new item if not found successfully', async ({
       dataSource,
+      extractor,
+      networkConnector,
     }) => {
-      const provider = new TestRawDataProvider('ergo', dataSource);
+      const provider = new TestRawDataProvider(
+        'ergo',
+        dataSource,
+        extractor,
+        networkConnector,
+      );
       const result = await provider['fetchOrCreateStateForChain']();
       expect(result).toEqual(mockData.entities[0]);
     });
@@ -104,26 +139,28 @@ describe('AbstractRawDataProvider', () => {
      * - observationRepository mock
      * @scenario
      * - create mock observation records for a specific chain
-     * - mock action.fetchChainObservations and action.updateRawData
+     * - mock action.fetchChainObservations and extractor.processTransactions
      * - call fillObservationsRawData with a mocked state
      * @expected
-     * - each observation.rawData should be set to `raw-{id}`
+     * - each extractor.processTransactions should be call with expected data
      */
     it<TestInterface>('should fill observations raw-data successfully', async ({
       provider,
+      extractor,
     }) => {
       const mockObservations = mockObservationData.entities.map((e) => ({
         ...e,
         id: e.height,
       }));
-      const storedObservations: string[] = [];
+      const processTransactionsCalls: any[][] = [];
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
         .fn()
         .mockResolvedValue(mockObservations);
-      provider['action']['updateRawData'] = vi.fn(
-        async (id: number, rawData: string) => {
-          storedObservations.push(rawData);
+      extractor['processTransactions'] = vi.fn(
+        async (txs: KoiosTransaction[], block: Block) => {
+          processTransactionsCalls.push([txs, block]);
+          return true;
         },
       );
 
@@ -131,8 +168,10 @@ describe('AbstractRawDataProvider', () => {
       await provider['fillObservationsRawData'](mockData.storedEntities[0]);
 
       // verify rawData updates
-      expect(storedObservations[0]).toBe(`raw-${mockObservations[0].id}`);
-      expect(storedObservations[1]).toBe(`raw-${mockObservations[1].id}`);
+      expect(processTransactionsCalls[0]).toStrictEqual([
+        mockedBlockTxs,
+        mockedBlock,
+      ]);
     });
   });
 
