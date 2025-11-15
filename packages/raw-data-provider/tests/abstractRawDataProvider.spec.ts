@@ -3,16 +3,12 @@ import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor'
 import { CardanoKoiosObservationExtractor } from '@rosen-bridge/cardano-observation-extractor';
 import { KoiosTransaction } from '@rosen-bridge/cardano-observation-extractor/dist/interfaces/koiosTransaction';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import {
-  AbstractNetworkConnector,
-  Block,
-} from '@rosen-bridge/scanner-interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import { RawDataProviderStateEntity } from '../lib';
 import { AbstractRawDataProvider } from '../lib/abstractRawDataProvider';
 import {
   mockData,
-  mockedBlock,
   mockedBlockTxs,
   mockObservationData,
 } from './mocks/abstractRawDataProvider.mock';
@@ -24,19 +20,12 @@ class TestRawDataProvider extends AbstractRawDataProvider<KoiosTransaction> {
   });
 }
 
-class CardanoKoiosNetworkConnector extends AbstractNetworkConnector<KoiosTransaction> {
-  getBlockAtHeight = async () => mockedBlock;
-  getCurrentHeight = async () => 1;
-  getBlockTxs = async () => mockedBlockTxs;
-}
-
 interface TestInterface {
   dataSource: DataSource;
   provider: TestRawDataProvider;
   repository: Repository<RawDataProviderStateEntity>;
   observationRepository: Repository<ObservationEntity>;
   extractor: CardanoKoiosObservationExtractor;
-  networkConnector: CardanoKoiosNetworkConnector;
 }
 
 describe('AbstractRawDataProvider', () => {
@@ -60,12 +49,11 @@ describe('AbstractRawDataProvider', () => {
       context.dataSource,
       {} as any,
     );
-    context.networkConnector = new CardanoKoiosNetworkConnector();
     context.provider = new TestRawDataProvider(
       'cardano',
       context.dataSource,
       context.extractor,
-      context.networkConnector,
+      () => mockedBlockTxs[0] as KoiosTransaction,
     );
     await Promise.all(
       mockData.storedEntities.map(
@@ -97,13 +85,12 @@ describe('AbstractRawDataProvider', () => {
     it<TestInterface>('should create new item if not found successfully', async ({
       dataSource,
       extractor,
-      networkConnector,
     }) => {
       const provider = new TestRawDataProvider(
         'ergo',
         dataSource,
         extractor,
-        networkConnector,
+        () => mockedBlockTxs[0] as KoiosTransaction,
       );
       const result = await provider['fetchOrCreateStateForChain']();
       expect(result).toEqual(mockData.entities[0]);
@@ -133,7 +120,7 @@ describe('AbstractRawDataProvider', () => {
 
   describe('fillObservationsRawData', () => {
     /**
-     * @target should fill observations raw-data successfully
+     * @target should call process transaction processor method successfully
      * @dependencies
      * - RawDataProvider mock
      * - observationRepository mock
@@ -144,7 +131,7 @@ describe('AbstractRawDataProvider', () => {
      * @expected
      * - each extractor.processTransactions should be call with expected data
      */
-    it<TestInterface>('should fill observations raw-data successfully', async ({
+    it<TestInterface>('should call process transaction processor method successfully', async ({
       provider,
       extractor,
     }) => {
@@ -169,8 +156,11 @@ describe('AbstractRawDataProvider', () => {
 
       // verify rawData updates
       expect(processTransactionsCalls[0]).toStrictEqual([
-        mockedBlockTxs,
-        mockedBlock,
+        [mockedBlockTxs[0]],
+        {
+          height: mockObservations[0].height,
+          hash: mockObservations[0].block,
+        },
       ]);
     });
   });

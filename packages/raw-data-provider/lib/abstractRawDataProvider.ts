@@ -1,7 +1,7 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { AbstractNetworkConnector } from '@rosen-bridge/scanner-interfaces';
+import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import { RawDataProviderStateEntityAction } from './actions/rawDataProviderStateEntityAction';
 import { RawDataProviderStateEntity } from './entities';
@@ -12,8 +12,8 @@ export abstract class AbstractRawDataProvider<TxType> {
   constructor(
     protected chain: string,
     protected dataSource: DataSource,
-    protected extractor: AbstractObservationExtractor<TxType>,
-    protected network: AbstractNetworkConnector<TxType>,
+    protected observationExtractor: AbstractObservationExtractor<TxType>,
+    protected txFetcher: (txId: string) => TxType,
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
     this.action = new RawDataProviderStateEntityAction(dataSource, logger);
@@ -105,9 +105,12 @@ export abstract class AbstractRawDataProvider<TxType> {
       this.logger.debug(
         `RawDataProvider Updating rawData for observation at height ${observation.height} for [${this.chain}] chain`,
       );
-      const block = await this.network.getBlockAtHeight(observation.height);
-      const txs = await this.network.getBlockTxs(block.hash);
-      await this.extractor.processTransactions(txs, block);
+      const block = {
+        height: observation.height,
+        hash: observation.block,
+      };
+      const tx = await this.txFetcher(observation.sourceTxId);
+      await this.observationExtractor.processTransactions([tx], block as Block);
       state.syncedHeight = observation.height;
       await this.action.store(state);
       this.logger.debug(

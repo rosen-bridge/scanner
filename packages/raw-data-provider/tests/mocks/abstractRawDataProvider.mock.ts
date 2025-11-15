@@ -34,10 +34,3 @@ export const mockedBlockTxs = [
     witness_set: {},
   },
 ];
-
-export const mockedBlock = {
-  height: 1,
-  hash: 'mocked_block_hash_1',
-  parentHash: 'mocked_block_parent_hash_1',
-  timestamp: 1,
-};
