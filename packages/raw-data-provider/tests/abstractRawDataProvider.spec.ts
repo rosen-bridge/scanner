@@ -1,20 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
-import { CardanoKoiosObservationExtractor } from '@rosen-bridge/cardano-observation-extractor';
-import { KoiosTransaction } from '@rosen-bridge/cardano-observation-extractor/dist/interfaces/koiosTransaction';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import { RawDataProviderStateEntity } from '../lib';
 import { AbstractRawDataProvider } from '../lib/abstractRawDataProvider';
 import {
   mockData,
-  mockedBlockTxs,
   mockObservationData,
 } from './mocks/abstractRawDataProvider.mock';
 import { createDatabase } from './utils';
 
-class TestRawDataProvider extends AbstractRawDataProvider<KoiosTransaction> {
+class TestRawDataProvider extends AbstractRawDataProvider {
   fetchRawData = vi.fn(async (observation: ObservationEntity) => {
     return `raw-${observation.id}`;
   });
@@ -25,7 +21,6 @@ interface TestInterface {
   provider: TestRawDataProvider;
   repository: Repository<RawDataProviderStateEntity>;
   observationRepository: Repository<ObservationEntity>;
-  extractor: CardanoKoiosObservationExtractor;
 }
 
 describe('AbstractRawDataProvider', () => {
@@ -44,16 +39,10 @@ describe('AbstractRawDataProvider', () => {
    */
   beforeEach<TestInterface>(async (context) => {
     context.dataSource = await createDatabase();
-    context.extractor = new CardanoKoiosObservationExtractor(
-      'adr',
-      context.dataSource,
-      {} as any,
-    );
     context.provider = new TestRawDataProvider(
       'cardano',
       context.dataSource,
-      context.extractor,
-      () => mockedBlockTxs[0] as KoiosTransaction,
+      async (observation: ObservationEntity) => Boolean(observation),
     );
     await Promise.all(
       mockData.storedEntities.map(
@@ -84,13 +73,11 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should create new item if not found successfully', async ({
       dataSource,
-      extractor,
     }) => {
       const provider = new TestRawDataProvider(
         'ergo',
         dataSource,
-        extractor,
-        () => mockedBlockTxs[0] as KoiosTransaction,
+        async (observation) => Boolean(observation),
       );
       const result = await provider['fetchOrCreateStateForChain']();
       expect(result).toEqual(mockData.entities[0]);
@@ -132,36 +119,31 @@ describe('AbstractRawDataProvider', () => {
      * - each extractor.processTransactions should be call with expected data
      */
     it<TestInterface>('should call process transaction processor method successfully', async ({
-      provider,
-      extractor,
+      dataSource,
     }) => {
       const mockObservations = mockObservationData.entities.map((e) => ({
         ...e,
         id: e.height,
       }));
-      const processTransactionsCalls: any[][] = [];
+      const processObservationsCalls: ObservationEntity[] = [];
+      const provider = new TestRawDataProvider(
+        'cardano',
+        dataSource,
+        async (observation) => {
+          processObservationsCalls.push(observation);
+          return true;
+        },
+      );
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
         .fn()
         .mockResolvedValue(mockObservations);
-      extractor['processTransactions'] = vi.fn(
-        async (txs: KoiosTransaction[], block: Block) => {
-          processTransactionsCalls.push([txs, block]);
-          return true;
-        },
-      );
 
       // call the method under test
       await provider['fillObservationsRawData'](mockData.storedEntities[0]);
 
       // verify rawData updates
-      expect(processTransactionsCalls[0]).toStrictEqual([
-        [mockedBlockTxs[0]],
-        {
-          height: mockObservations[0].height,
-          hash: mockObservations[0].block,
-        },
-      ]);
+      expect(processObservationsCalls).toStrictEqual(mockObservations);
     });
   });
 
@@ -172,24 +154,21 @@ describe('AbstractRawDataProvider', () => {
      * - RawDataProvider instance
      * - observationRepository
      * @scenario
-     * - store observation entities for the chain
+     * - store an observation entity for the chain
      * - call fillRawData
      * @expected
      * - syncedHeight in state should be updated to the highest observation height
      */
     it<TestInterface>('should update synced-height for chain successfully', async ({
-      provider,
       observationRepository,
+      provider,
+      repository,
     }) => {
-      await Promise.all(
-        mockObservationData.entities.map(
-          async (observation) => await observationRepository.save(observation),
-        ),
+      await observationRepository.save(mockObservationData.entities[1]);
+      await provider.fillRawData();
+      expect((await repository.find())[0]!.syncedHeight).toEqual(
+        mockObservationData.entities[1].height,
       );
-
-      expect(
-        (await provider['fetchOrCreateStateForChain']())!.syncedHeight,
-      ).toEqual(mockObservationData.entities[1].height);
     });
   });
 });

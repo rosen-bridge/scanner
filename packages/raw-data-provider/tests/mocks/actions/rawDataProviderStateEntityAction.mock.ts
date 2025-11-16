@@ -63,7 +63,7 @@ export const mockObservationData = {
       rawData: '',
       block: '1',
       extractor: 'extractor',
-      height: 10,
+      height: 15,
     },
     {
       fromChain: 'cardano',
@@ -81,7 +81,7 @@ export const mockObservationData = {
       rawData: '',
       block: '2',
       extractor: 'extractor',
-      height: 11,
+      height: 16,
     },
   ],
 };
