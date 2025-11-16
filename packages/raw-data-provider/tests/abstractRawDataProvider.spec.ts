@@ -1,4 +1,3 @@
- 
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
