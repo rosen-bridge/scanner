@@ -33,7 +33,7 @@
     "@rosen-bridge/bitcoin-scanner": "^0.2.2",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
-    "@rosen-bridge/rosen-extractor": "^11.1.0",
+    "@rosen-bridge/rosen-extractor": "^11.1.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "@rosen-bridge/tokens": "^4.0.1",
     "@rosen-clients/rate-limited-axios": "^1.1.0",
