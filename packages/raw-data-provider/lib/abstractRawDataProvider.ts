@@ -85,7 +85,7 @@ export abstract class AbstractRawDataProvider {
    * @param observation
    * @return {boolean} determining result of process done successfully or no
    */
-  protected abstract observationProcessor: (
+  protected abstract processObservation: (
     observation: ObservationEntity,
   ) => Promise<boolean>;
 
@@ -112,7 +112,7 @@ export abstract class AbstractRawDataProvider {
       this.logger.debug(
         `RawDataProvider Updating rawData for observation at height ${observation.height} for [${this.chain}] chain`,
       );
-      const isSuccess = await this.observationProcessor(observation);
+      const isSuccess = await this.processObservation(observation);
       if (isSuccess) {
         this.logger.debug(
           `RawDataProvider successfully processed observation at height ${observation.height} for [${this.chain}] chain`,

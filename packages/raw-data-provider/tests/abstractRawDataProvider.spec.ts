@@ -14,7 +14,7 @@ class TestRawDataProvider extends AbstractRawDataProvider {
     return `raw-${observation.id}`;
   });
 
-  protected observationProcessor = async () => {
+  protected processObservation = async () => {
     return true;
   };
 }
@@ -102,21 +102,21 @@ describe('AbstractRawDataProvider', () => {
 
   describe('fillObservationsRawData', () => {
     /**
-     * @target should process chain observations using observationProcessor
+     * @target should process chain observations using processObservation
      * @dependencies
      * - TestRawDataProvider instance
-     * - observationProcessor mock
+     * - processObservation mock
      * - fetchChainObservations mock
      * @scenario
      * - prepare mock observation entities with custom ids
-     * - mock observationProcessor to collect processed observations
+     * - mock processObservation to collect processed observations
      * - mock fetchChainObservations to return prepared observations
      * - call fillObservationsRawData on provider
      * @expected
-     * - observationProcessor should be called once for each fetched observation
+     * - processObservation should be called once for each fetched observation
      * - processed observations should strictly match mock observations list
      */
-    it<TestInterface>('should process chain observations using observationProcessor', async ({
+    it<TestInterface>('should process chain observations using processObservation', async ({
       dataSource,
     }) => {
       const mockObservations = mockObservationData.entities.map((e) => ({
@@ -124,7 +124,7 @@ describe('AbstractRawDataProvider', () => {
         id: e.height,
       }));
       const provider = new TestRawDataProvider('cardano', dataSource);
-      provider['observationProcessor'] = vi.fn().mockReturnValue(true);
+      provider['processObservation'] = vi.fn().mockReturnValue(true);
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
         .fn()
@@ -135,7 +135,7 @@ describe('AbstractRawDataProvider', () => {
 
       // verify call processor by correct observations
       for (const obs of mockObservations)
-        expect(provider['observationProcessor']).toHaveBeenCalledWith(obs);
+        expect(provider['processObservation']).toHaveBeenCalledWith(obs);
     });
   });
 
