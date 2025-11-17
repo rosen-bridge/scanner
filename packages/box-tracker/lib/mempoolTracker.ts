@@ -1,5 +1,7 @@
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
 import { generateTracker } from './boxHandler';
-import { ErgoBox, MempoolTrackResult, Token } from './interfaces';
+import { MempoolTrackResult, Token } from './interfaces';
 import { AbstractErgoNetwork } from './network/abstract/abstractErgoNetwork';
 
 export class MempoolTracker {
@@ -21,7 +23,7 @@ export class MempoolTracker {
     const tracker = generateTracker(address, tokens);
     const txs = await this.network.getMempoolTxs();
 
-    const boxes: ErgoBox[] = [];
+    const boxes: OutputBox[] = [];
     const spentBox = new Set<string>();
 
     for (const tx of txs) {

@@ -1,5 +1,6 @@
 import {
   AdditionalRegisters,
+  OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
@@ -37,7 +38,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
         value: BigInt(b.value),
         ergoTree: b.ergoTree,
         creationHeight: b.creationHeight,
-        BlockId: b.blockId,
+        blockId: b.blockId,
         assets: (b.assets || []).map((a) => ({
           tokenId: a.tokenId,
           amount: BigInt(a.amount),
@@ -66,7 +67,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
         inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
         dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
         outputs:
-          t.outputs?.map<ErgoBox>((o) => ({
+          t.outputs?.map<OutputBox>((o) => ({
             boxId: o.id,
             value: BigInt(o.value),
             ergoTree: o.ergoTree,

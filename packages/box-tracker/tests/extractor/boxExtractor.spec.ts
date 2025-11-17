@@ -1,9 +1,9 @@
 import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 
+import { ErgoBox } from '../../lib';
 import * as boxHandler from '../../lib/boxHandler';
 import { MAX_BOX_LENGTH } from '../../lib/const';
 import { BoxExtractor } from '../../lib/extractor/boxExtractor';
-import { BoxWithBlock } from '../../lib/interfaces';
 import { createMockBox } from '../testUtils';
 
 describe('MockBoxTracker', () => {
@@ -25,8 +25,8 @@ describe('MockBoxTracker', () => {
    *
    * @returns Current box list.
    */
-  const getBoxes = (): BoxWithBlock[] =>
-    (boxExtractor as unknown as { boxes: BoxWithBlock[] }).boxes ?? undefined;
+  const getBoxes = (): ErgoBox[] =>
+    (boxExtractor as unknown as { boxes: ErgoBox[] }).boxes ?? undefined;
 
   /**
    * Forces the internal `boxes` array of the `BoxExtractor` instance
@@ -34,8 +34,8 @@ describe('MockBoxTracker', () => {
    *
    * @param boxes - Array of boxes to inject.
    */
-  const setBoxes = (boxes: BoxWithBlock[]): void => {
-    (boxExtractor as unknown as { boxes: BoxWithBlock[] }).boxes = boxes;
+  const setBoxes = (boxes: ErgoBox[]): void => {
+    (boxExtractor as unknown as { boxes: ErgoBox[] }).boxes = boxes;
   };
 
   describe('processTransactions', () => {
@@ -53,9 +53,7 @@ describe('MockBoxTracker', () => {
      * - The stored boxes remain identical to the original array
      */
     it('should not modify boxes when no matching transaction is tracked', async () => {
-      const initialBoxes: BoxWithBlock[] = [
-        { box: createMockBox('boxA'), blockInfo: { height: 10, hash: 'H1' } },
-      ];
+      const initialBoxes: ErgoBox[] = [createMockBox('boxA')];
       setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
       const box1 = createMockBox('b1');
@@ -84,9 +82,7 @@ describe('MockBoxTracker', () => {
      * - Only box3 remains in the tracked list
      */
     it('should track last unspent box in chained transactions', async () => {
-      const initialBoxes: BoxWithBlock[] = [
-        { box: createMockBox('boxA'), blockInfo: { height: 10, hash: 'H1' } },
-      ];
+      const initialBoxes: ErgoBox[] = [createMockBox('boxA', 100n, 'block-0')];
       setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
 
@@ -99,10 +95,10 @@ describe('MockBoxTracker', () => {
         { id: 'tx2', inputs: [box1], outputs: [box2], dataInputs: [] },
         { id: 'tx3', inputs: [box2], outputs: [box3], dataInputs: [] },
       ];
-      const before = getBoxes()?.map((b) => b.box.boxId) ?? [];
+      const before = getBoxes()?.map((b) => b.boxId) ?? [];
 
       await boxExtractor.processTransactions(txs, mockBlock);
-      const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
+      const after = getBoxes()?.map((b) => b.boxId) ?? [];
       expect(after.slice(0, -1)).toEqual(before);
       expect(after.at(-1)).toBe('b3');
     });
@@ -121,15 +117,12 @@ describe('MockBoxTracker', () => {
      * - The new box is appended to the end
      */
     it('should remove oldest box when max capacity reached', async () => {
-      const filledBoxes: BoxWithBlock[] = Array.from({
+      const filledBoxes: ErgoBox[] = Array.from({
         length: MAX_BOX_LENGTH,
-      }).map((_, i) => ({
-        box: createMockBox(`box${i}`),
-        blockInfo: { height: i, hash: `H${i}` },
-      }));
+      }).map((_, i) => createMockBox(`box${i}`, 100n, `block-${i}`));
       setBoxes(filledBoxes);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
-      const before = getBoxes().map((b) => b.box.boxId);
+      const before = getBoxes().map((b) => b.boxId);
       const newSpentBox = createMockBox('newSpentBox');
       const newUnSpentBox = createMockBox('newUnspentBox');
       const txs: Transaction[] = [
@@ -141,7 +134,7 @@ describe('MockBoxTracker', () => {
         },
       ];
       await boxExtractor.processTransactions(txs, mockBlock);
-      const after = getBoxes().map((b) => b.box.boxId);
+      const after = getBoxes().map((b) => b.boxId);
       expect(after).not.toContain(before[0]);
       expect(after.at(-1)).toBe('newUnspentBox');
       expect(after).toHaveLength(MAX_BOX_LENGTH);
@@ -182,14 +175,12 @@ describe('MockBoxTracker', () => {
      * - No boxes are removed
      */
     it('should not change boxes when forked block has no matching boxes', async () => {
-      const boxes: BoxWithBlock[] = [
-        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
-      ];
+      const boxes: ErgoBox[] = [createMockBox('b1', 100n, 'H1')];
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('UNKNOWN_HASH');
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockInfo.hash).toBe('H1');
+      expect(getBoxes()[0].blockId).toBe('H1');
     });
 
     /**
@@ -206,16 +197,16 @@ describe('MockBoxTracker', () => {
      * - Box with H1 is removed, only H2 remains
      */
     it('should remove boxes from forked block', async () => {
-      const boxes: BoxWithBlock[] = [
-        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
-        { box: createMockBox('b2'), blockInfo: { height: 51, hash: 'H2' } },
+      const boxes: ErgoBox[] = [
+        createMockBox('b1', 100n, 'H1'),
+        createMockBox('b2', 100n, 'H2'),
       ];
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('H1');
 
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockInfo.hash).toBe('H2');
+      expect(getBoxes()[0].blockId).toBe('H2');
     });
   });
 
@@ -248,13 +239,13 @@ describe('MockBoxTracker', () => {
      * - Returns the last box in the array
      */
     it('should return the latest box when boxes exist', () => {
-      const boxList: BoxWithBlock[] = [
-        { box: createMockBox('b1'), blockInfo: { height: 10, hash: 'H1' } },
-        { box: createMockBox('b2'), blockInfo: { height: 11, hash: 'H2' } },
+      const boxList: ErgoBox[] = [
+        createMockBox('b1', 100n, 'H1'),
+        createMockBox('b2', 100n, 'H2'),
       ];
       setBoxes(boxList);
       const result = boxExtractor.getRecentBox();
-      expect(result?.box.boxId).toBe('b2');
+      expect(result?.boxId).toBe('b2');
     });
   });
 });

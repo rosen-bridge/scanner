@@ -1,4 +1,6 @@
-import { ErgoBox, TxDeserializer } from '../lib';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
+import { TxDeserializer } from '../lib';
 import * as boxHandler from '../lib/boxHandler';
 import { TxPotTracker } from '../lib/txPotTracker';
 
@@ -48,7 +50,7 @@ describe('TxPotTracker', () => {
       const tracker = new TxPotTracker(mockDeserialize);
 
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(
-        (box: ErgoBox) => box.boxId === 'out3',
+        (box: OutputBox) => box.boxId === 'out3',
       );
 
       const result = await tracker.track('addr', [], ['serializedTx']);

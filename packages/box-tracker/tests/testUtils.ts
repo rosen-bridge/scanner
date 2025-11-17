@@ -1,6 +1,10 @@
 import { ErgoBox } from '../lib';
 
-export const createMockBox = (boxId: string, value = 100n): ErgoBox => ({
+export const createMockBox = (
+  boxId: string,
+  value = 100n,
+  blockId: string = 'block-1',
+): ErgoBox => ({
   boxId,
   value,
   ergoTree: 'mockTree',
@@ -9,4 +13,5 @@ export const createMockBox = (boxId: string, value = 100n): ErgoBox => ({
   additionalRegisters: {},
   transactionId: 'tx-' + boxId,
   index: 0,
+  blockId: blockId,
 });

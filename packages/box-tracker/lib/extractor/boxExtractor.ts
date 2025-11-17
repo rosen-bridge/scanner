@@ -4,7 +4,7 @@ import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from '../boxHandler';
 import { MAX_BOX_LENGTH } from '../const';
-import { BoxWithBlock, Token } from '../interfaces';
+import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
@@ -17,7 +17,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   /**
    * List of tracked boxes along with their associated block information.
    */
-  private boxes: BoxWithBlock[] = [];
+  private boxes: ErgoBox[] = [];
 
   constructor(
     ergoNetworkType: string,
@@ -50,20 +50,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   init: () => Promise<void> = async () => {
     const box = await this.network.getBox();
     if (box) {
-      if (this.network instanceof NodeErgoNetwork) {
-        const blockHash = await this.network.getBlockByHeight(
-          box.creationHeight,
-        );
-        this.boxes.push({
-          box: box,
-          blockInfo: { height: box?.creationHeight, hash: blockHash },
-        });
-      } else {
-        this.boxes.push({
-          box: box,
-          blockInfo: { height: box?.creationHeight, hash: box.BlockId! },
-        });
-      }
+      this.boxes.push(box);
     }
   };
 
@@ -83,7 +70,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     block: Block,
   ): Promise<boolean> => {
     const spentBoxes = new Set<string>();
-    let candidateBoxes: BoxWithBlock[] = [];
+    let candidateBoxes: ErgoBox[] = [];
     this.logger.debug('processTransactions: start');
     try {
       if (this.boxes.length === 0) {
@@ -93,10 +80,11 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       for (const tx of txs) {
         for (const out of tx.outputs) {
           if (tracker(out)) {
-            candidateBoxes.push({
-              box: out,
-              blockInfo: { height: block.height, hash: block.hash },
-            });
+            const mapped = {
+              ...out,
+              blockId: block.hash,
+            };
+            candidateBoxes.push(mapped);
             this.logger.debug('Candidate matched by tracker', {
               boxId: out.boxId,
               txId: tx.id,
@@ -107,9 +95,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           spentBoxes.add(input.boxId);
         }
       }
-      candidateBoxes = candidateBoxes.filter(
-        (b) => !spentBoxes.has(b.box.boxId),
-      );
+      candidateBoxes = candidateBoxes.filter((b) => !spentBoxes.has(b.boxId));
       if (candidateBoxes.length > 1) {
         this.logger.info(
           'ImpossibleBehaviour: more than one candidateBox after filtering',
@@ -144,7 +130,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    * @param  hash - The hash of the forked block.
    */
   forkBlock = async (hash: string): Promise<void> => {
-    this.boxes = this.boxes.filter((b) => b.blockInfo.hash !== hash);
+    this.boxes = this.boxes.filter((b) => b.blockId !== hash);
   };
 
   /**
@@ -152,7 +138,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    *
    * @returns The latest tracked box, or undefined if none exist.
    */
-  getRecentBox = (): BoxWithBlock | undefined => {
+  getRecentBox = (): ErgoBox | undefined => {
     return this.boxes.at(-1);
   };
 }
