@@ -102,18 +102,21 @@ describe('AbstractRawDataProvider', () => {
 
   describe('fillObservationsRawData', () => {
     /**
-     * @target should call process transaction processor method successfully
+     * @target should process chain observations using observationProcessor
      * @dependencies
-     * - RawDataProvider mock
-     * - observationRepository mock
+     * - TestRawDataProvider instance
+     * - observationProcessor mock
+     * - fetchChainObservations mock
      * @scenario
-     * - create mock observation records for a specific chain
-     * - mock action.fetchChainObservations and extractor.processTransactions
-     * - call fillObservationsRawData with a mocked state
+     * - prepare mock observation entities with custom ids
+     * - mock observationProcessor to collect processed observations
+     * - mock fetchChainObservations to return prepared observations
+     * - call fillObservationsRawData on provider
      * @expected
-     * - each extractor.processTransactions should be call with expected data
+     * - observationProcessor should be called once for each fetched observation
+     * - processed observations should strictly match mock observations list
      */
-    it<TestInterface>('should call process transaction processor method successfully', async ({
+    it<TestInterface>('should process chain observations using observationProcessor', async ({
       dataSource,
     }) => {
       const mockObservations = mockObservationData.entities.map((e) => ({
@@ -134,7 +137,7 @@ describe('AbstractRawDataProvider', () => {
       // call the method under test
       await provider['fillObservationsRawData'](mockData.storedEntities[0]);
 
-      // verify rawData updates
+      // verify call processor by correct observations
       expect(processObservationsCalls).toStrictEqual(mockObservations);
     });
   });
