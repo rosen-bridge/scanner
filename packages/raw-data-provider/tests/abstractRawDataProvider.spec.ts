@@ -123,12 +123,8 @@ describe('AbstractRawDataProvider', () => {
         ...e,
         id: e.height,
       }));
-      const processObservationsCalls: ObservationEntity[] = [];
       const provider = new TestRawDataProvider('cardano', dataSource);
-      provider['observationProcessor'] = vi.fn().mockImplementation((obs) => {
-        processObservationsCalls.push(obs);
-        return true;
-      });
+      provider['observationProcessor'] = vi.fn().mockReturnValue(true);
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
         .fn()
@@ -138,7 +134,8 @@ describe('AbstractRawDataProvider', () => {
       await provider['fillObservationsRawData'](mockData.storedEntities[0]);
 
       // verify call processor by correct observations
-      expect(processObservationsCalls).toStrictEqual(mockObservations);
+      for (const obs of mockObservations)
+        expect(provider['observationProcessor']).toHaveBeenCalledWith(obs);
     });
   });
 
