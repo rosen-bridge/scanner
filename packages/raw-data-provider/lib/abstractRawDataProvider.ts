@@ -11,9 +11,6 @@ export abstract class AbstractRawDataProvider {
   constructor(
     protected chain: string,
     protected dataSource: DataSource,
-    protected observationProcessor: (
-      observation: ObservationEntity,
-    ) => Promise<boolean>,
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
     this.action = new RawDataProviderStateEntityAction(dataSource, logger);
@@ -83,6 +80,16 @@ export abstract class AbstractRawDataProvider {
   };
 
   /**
+   * Process observation and write rawData
+   *
+   * @param observation
+   * @return {boolean} determining result of process done successfully or no
+   */
+  protected abstract observationProcessor: (
+    observation: ObservationEntity,
+  ) => Promise<boolean>;
+
+  /**
    * Fills the raw data field for all ObservationEntity records of the current chain of input RawDataProviderStateEntity
    *
    * @param state
@@ -111,7 +118,7 @@ export abstract class AbstractRawDataProvider {
           `RawDataProvider successfully processed observation at height ${observation.height} for [${this.chain}] chain`,
         );
       } else {
-        this.logger.debug(
+        throw new Error(
           `RawDataProvider failed to process observation at height ${observation.height} for [${this.chain}] chain`,
         );
       }

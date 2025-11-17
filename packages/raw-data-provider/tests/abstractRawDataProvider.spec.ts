@@ -13,6 +13,10 @@ class TestRawDataProvider extends AbstractRawDataProvider {
   fetchRawData = vi.fn(async (observation: ObservationEntity) => {
     return `raw-${observation.id}`;
   });
+
+  protected observationProcessor = async () => {
+    return true;
+  };
 }
 
 interface TestInterface {
@@ -38,11 +42,7 @@ describe('AbstractRawDataProvider', () => {
    */
   beforeEach<TestInterface>(async (context) => {
     context.dataSource = await createDatabase();
-    context.provider = new TestRawDataProvider(
-      'cardano',
-      context.dataSource,
-      async (observation: ObservationEntity) => Boolean(observation),
-    );
+    context.provider = new TestRawDataProvider('cardano', context.dataSource);
     await Promise.all(
       mockData.storedEntities.map(
         async (entity) => await context.provider['action'].store(entity),
@@ -73,11 +73,7 @@ describe('AbstractRawDataProvider', () => {
     it<TestInterface>('should create new item if not found successfully', async ({
       dataSource,
     }) => {
-      const provider = new TestRawDataProvider(
-        'ergo',
-        dataSource,
-        async (observation) => Boolean(observation),
-      );
+      const provider = new TestRawDataProvider('ergo', dataSource);
       const result = await provider['fetchOrCreateStateForChain']();
       expect(result).toEqual(mockData.entities[0]);
     });
@@ -125,14 +121,11 @@ describe('AbstractRawDataProvider', () => {
         id: e.height,
       }));
       const processObservationsCalls: ObservationEntity[] = [];
-      const provider = new TestRawDataProvider(
-        'cardano',
-        dataSource,
-        async (observation) => {
-          processObservationsCalls.push(observation);
-          return true;
-        },
-      );
+      const provider = new TestRawDataProvider('cardano', dataSource);
+      provider['observationProcessor'] = vi.fn().mockImplementation((obs) => {
+        processObservationsCalls.push(obs);
+        return true;
+      });
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
         .fn()
