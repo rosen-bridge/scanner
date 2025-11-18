@@ -57,7 +57,7 @@ discord-announce:
   script:
     - |
       CHANGESET_LOG="$(cat .changeset_log)"
-      PATTERN_START='success packages published successfully:'
+      PATTERN_START='success.*packages published successfully:'
       PATTERN_END='Creating git tag...'
       published_versions=$(printf '%s\n' "${CHANGESET_LOG}" \
             | sed -n "/${PATTERN_START}/,/${PATTERN_END}/{/${PATTERN_START}/d;/${PATTERN_END}/d;p}")
