@@ -1,4 +1,3 @@
-import * as boxHandler from '../../lib/boxHandler';
 import { NodeErgoNetwork } from '../../lib/network/nodeErgoNetwork';
 import { mockedNodeBoxes, mockedNodeTxs } from './testData';
 
@@ -74,7 +73,6 @@ describe('NodeErgoNetwork', () => {
      * - should return the box with the expected boxId from the mock
      */
     it('should return the correct box when getBoxesByAddress is mocked', async () => {
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
       const box = await network.getBox();
       expect(box?.boxId).toBe('b1');
     });
@@ -92,7 +90,6 @@ describe('NodeErgoNetwork', () => {
         [{ tokenId: 't3', amount: 1n }],
         'url',
       );
-      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
       const box = await network2.getBox();
       expect(box).toBeUndefined();
     });

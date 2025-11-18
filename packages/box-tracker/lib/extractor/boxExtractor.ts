@@ -97,7 +97,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       }
       candidateBoxes = candidateBoxes.filter((b) => !spentBoxes.has(b.boxId));
       if (candidateBoxes.length > 1) {
-        this.logger.info(
+        throw Error(
           'ImpossibleBehaviour: more than one candidateBox after filtering',
         );
       }

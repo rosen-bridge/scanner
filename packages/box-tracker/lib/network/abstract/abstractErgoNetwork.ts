@@ -1,6 +1,5 @@
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
-import { generateTracker } from '../../boxHandler';
 import { ErgoBox, Token } from '../../interfaces';
 
 export abstract class AbstractErgoNetwork {
@@ -28,8 +27,11 @@ export abstract class AbstractErgoNetwork {
   async getBox(): Promise<ErgoBox | undefined> {
     const boxes = await this.getBoxesByAddress(this.address);
 
-    const tracker = generateTracker(this.address, this.tokens);
-
-    return boxes.find((box) => tracker(box));
+    return boxes.find((box) =>
+      this.tokens.every((t) => {
+        const asset = box.assets.find((a: Token) => a.tokenId === t.tokenId);
+        return asset !== undefined && asset.amount >= t.amount;
+      }),
+    );
   }
 }

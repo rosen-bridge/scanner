@@ -4,7 +4,7 @@ import { ErgoBox } from '../../lib';
 import * as boxHandler from '../../lib/boxHandler';
 import { MAX_BOX_LENGTH } from '../../lib/const';
 import { BoxExtractor } from '../../lib/extractor/boxExtractor';
-import { createMockBox } from '../testUtils';
+import { createMockErgoBox } from '../testUtils';
 
 describe('MockBoxTracker', () => {
   let boxExtractor: BoxExtractor;
@@ -53,11 +53,11 @@ describe('MockBoxTracker', () => {
      * - The stored boxes remain identical to the original array
      */
     it('should not modify boxes when no matching transaction is tracked', async () => {
-      const initialBoxes: ErgoBox[] = [createMockBox('boxA')];
+      const initialBoxes: ErgoBox[] = [createMockErgoBox('boxA')];
       setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => false);
-      const box1 = createMockBox('b1');
-      const box2 = createMockBox('b2');
+      const box1 = createMockErgoBox('b1');
+      const box2 = createMockErgoBox('b2');
 
       const txs: Transaction[] = [
         { id: 'tx1', inputs: [box1], outputs: [box2], dataInputs: [] },
@@ -82,13 +82,13 @@ describe('MockBoxTracker', () => {
      * - Only box3 remains in the tracked list
      */
     it('should track last unspent box in chained transactions', async () => {
-      const initialBoxes: ErgoBox[] = [createMockBox('boxA', 100n, 'block-0')];
+      const initialBoxes: ErgoBox[] = [createMockErgoBox('boxA', 'block-0')];
       setBoxes([...initialBoxes]);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
 
-      const box1 = createMockBox('b1');
-      const box2 = createMockBox('b2');
-      const box3 = createMockBox('b3');
+      const box1 = createMockErgoBox('b1');
+      const box2 = createMockErgoBox('b2');
+      const box3 = createMockErgoBox('b3');
 
       const txs: Transaction[] = [
         { id: 'tx1', inputs: [], outputs: [box1], dataInputs: [] },
@@ -119,12 +119,12 @@ describe('MockBoxTracker', () => {
     it('should remove oldest box when max capacity reached', async () => {
       const filledBoxes: ErgoBox[] = Array.from({
         length: MAX_BOX_LENGTH,
-      }).map((_, i) => createMockBox(`box${i}`, 100n, `block-${i}`));
+      }).map((_, i) => createMockErgoBox(`box${i}`, `block-${i}`));
       setBoxes(filledBoxes);
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
       const before = getBoxes().map((b) => b.boxId);
-      const newSpentBox = createMockBox('newSpentBox');
-      const newUnSpentBox = createMockBox('newUnspentBox');
+      const newSpentBox = createMockErgoBox('newSpentBox');
+      const newUnSpentBox = createMockErgoBox('newUnspentBox');
       const txs: Transaction[] = [
         {
           id: 'txX',
@@ -175,7 +175,7 @@ describe('MockBoxTracker', () => {
      * - No boxes are removed
      */
     it('should not change boxes when forked block has no matching boxes', async () => {
-      const boxes: ErgoBox[] = [createMockBox('b1', 100n, 'H1')];
+      const boxes: ErgoBox[] = [createMockErgoBox('b1', 'H1')];
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('UNKNOWN_HASH');
@@ -198,8 +198,8 @@ describe('MockBoxTracker', () => {
      */
     it('should remove boxes from forked block', async () => {
       const boxes: ErgoBox[] = [
-        createMockBox('b1', 100n, 'H1'),
-        createMockBox('b2', 100n, 'H2'),
+        createMockErgoBox('b1', 'H1'),
+        createMockErgoBox('b2', 'H2'),
       ];
       setBoxes(boxes);
 
@@ -240,8 +240,8 @@ describe('MockBoxTracker', () => {
      */
     it('should return the latest box when boxes exist', () => {
       const boxList: ErgoBox[] = [
-        createMockBox('b1', 100n, 'H1'),
-        createMockBox('b2', 100n, 'H2'),
+        createMockErgoBox('b1', 'H1'),
+        createMockErgoBox('b2', 'H2'),
       ];
       setBoxes(boxList);
       const result = boxExtractor.getRecentBox();

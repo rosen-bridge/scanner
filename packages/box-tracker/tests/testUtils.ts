@@ -1,12 +1,24 @@
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
 import { ErgoBox } from '../lib';
 
-export const createMockBox = (
+export const createMockBox = (boxId: string, value = 100n): OutputBox => ({
+  boxId,
+  value,
+  ergoTree: 'mockTree',
+  creationHeight: 0,
+  assets: [],
+  additionalRegisters: {},
+  transactionId: 'tx-' + boxId,
+  index: 0,
+});
+
+export const createMockErgoBox = (
   boxId: string,
-  value = 100n,
   blockId: string = 'block-1',
 ): ErgoBox => ({
   boxId,
-  value,
+  value: 1n,
   ergoTree: 'mockTree',
   creationHeight: 0,
   assets: [],
