@@ -4,5 +4,16 @@
     "rootDir": "./lib",
     "types": ["node", "vitest/globals"]
   },
-  "exclude": ["tests", "vitest.config.ts"]
+  "exclude": ["tests", "vitest.config.ts"],
+  "references": [
+    {
+      "path": "../abstract-observation-extractor"
+    },
+    {
+      "path": "../scanner-interfaces"
+    },
+    {
+      "path": "../observation-extractors/cardano-observation-extractor"
+    }
+  ]
 }
