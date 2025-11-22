@@ -8,12 +8,6 @@
   "references": [
     {
       "path": "../abstract-observation-extractor"
-    },
-    {
-      "path": "../scanner-interfaces"
-    },
-    {
-      "path": "../observation-extractors/cardano-observation-extractor"
     }
   ]
 }

@@ -2,18 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "./lib",
-    "types": ["node", "vitest/globals"]
+    "types": ["node"]
   },
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
     {
-      "path": "../abstract-observation-extractor"
-    },
-    {
-      "path": "../scanner-interfaces"
-    },
-    {
-      "path": "../observation-extractors/cardano-observation-extractor"
+      "path": "../abstract-observation-extractor/tsconfig.build.json"
     }
   ]
 }
