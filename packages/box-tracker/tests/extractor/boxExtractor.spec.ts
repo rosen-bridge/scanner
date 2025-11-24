@@ -69,7 +69,7 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @target processTransactions should track last unspent box in a chained transactions
+     * @target processTransactions should track last unspent box in chained transactions
      *
      * @scenario
      * - Ensures that when transactions form a spending chain,
@@ -101,7 +101,7 @@ describe('MockBoxTracker', () => {
 
       const after = getBoxes()?.map((b) => b.box.boxId) ?? [];
       expect(after.slice(0, -1)).toEqual(before);
-      expect(after[-1]).toBe('b3');
+      expect(after.at(-1)).toBe('b3');
     });
 
     /**
@@ -139,8 +139,8 @@ describe('MockBoxTracker', () => {
       ];
       await boxExtractor.processTransactions(txs, mockBlock);
       const after = getBoxes().map((b) => b.box.boxId);
-      expect(after).not.toContain(before[0]);
-      expect(after[-1]).toBe('newUnspentBox');
+      expect(after).not.toContain(before.at(0));
+      expect(after.at(-1)).toBe('newUnspentBox');
       expect(after).toHaveLength(MAX_BOX_LENGTH);
       expect(after.slice(0, -1)).toEqual(before.slice(1));
     });
@@ -148,8 +148,8 @@ describe('MockBoxTracker', () => {
     /**
      * @target processTransactions should call init when no boxes exist
      * @scenario
-     * When the internal box list is empty, `init`
-     * must be called with the provided block info.
+     * mock init in boxTracker
+     * call processTransactions with an empty list of transactions
      *
      * @expected
      * - init is called once
@@ -186,17 +186,17 @@ describe('MockBoxTracker', () => {
       await boxExtractor.forkBlock('UNKNOWN_HASH');
       const after = getBoxes().map((b) => b.box.boxId);
       expect(after).toHaveLength(1);
-      expect(after[0]).toBe('b1');
+      expect(after.at(0)).toBe('b1');
     });
 
     /**
      * @target forkBlock should remove boxes from forked block
-     * @scenario
+     *  @scenario
      * - Two boxes with hashes H1 and H2 exist
-     * - forkBlock is called with H1
-     *
+     * - forkBlock is called with H2
      * @expected
-     * - Box with H1 is removed, only H2 remains
+     * - Box with H2 is removed
+     * - Only box with H1 remains
      */
     it('should remove boxes from forked block', async () => {
       const boxes: BoxWithBlock[] = [
@@ -208,7 +208,7 @@ describe('MockBoxTracker', () => {
       await boxExtractor.forkBlock('H2');
 
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockInfo.hash).toBe('H1');
+      expect(getBoxes()[0].box.boxId).toBe('b1');
     });
   });
 
