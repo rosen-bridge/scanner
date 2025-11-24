@@ -1,5 +1,25 @@
 # @rosen-bridge/ergo-observation-extractor
 
+## 0.3.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.3
+  - @rosen-bridge/rosen-extractor@11.1.1
+
+## 0.3.0
+
+### Minor Changes
+
+- Add `storeRawData` option to store observations raw-data into the database
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.2
+  - @rosen-bridge/rosen-extractor@11.1.0
+
 ## 0.2.1
 
 ### Patch Changes

@@ -31,10 +31,12 @@ abstract class WebSocketScanner<
   protected tryRunningFunction = async (
     fn: () => Promise<boolean>,
     msg: string,
+    releaseMutex: () => void,
   ): Promise<boolean> => {
     for (let tryRound = 1; tryRound <= this.maxTryBlock; tryRound++) {
       if (await fn()) return true;
     }
+    releaseMutex();
     this.logger.error(
       `${msg} can not be proceed in ${this.maxTryBlock} try. scanner restarted automatically`,
     );
@@ -54,36 +56,43 @@ abstract class WebSocketScanner<
     transactions: Array<TransactionType>,
   ) => {
     const release = await this.mutex.acquire();
-    await this.tryRunningFunction(async () => {
-      try {
-        await this.forkBlock(block.height);
+    await this.tryRunningFunction(
+      async () => {
+        try {
+          await this.forkBlock(block.height);
 
-        const lastSavedBlock = await this.action.getLastSavedBlock();
-        if (lastSavedBlock && block.parentHash !== lastSavedBlock.hash) {
-          this.logger.error('It seems saved block is not valid in scanner.');
-          return false;
-        } else {
-          await this.verifyExtractorsInitialization({
-            height: block.height - 1,
-            hash: block.parentHash,
-          });
-          const res = await this.processBlockTransactions(block, transactions);
-          if (res === false) {
-            this.logger.error(
-              `Can not process block at height ${block.height}`,
-            );
+          const lastSavedBlock = await this.action.getLastSavedBlock();
+          if (lastSavedBlock && block.parentHash !== lastSavedBlock.hash) {
+            this.logger.error('It seems saved block is not valid in scanner.');
+            return false;
           } else {
-            return true;
+            await this.verifyExtractorsInitialization({
+              height: block.height - 1,
+              hash: block.parentHash,
+            });
+            const res = await this.processBlockTransactions(
+              block,
+              transactions,
+            );
+            if (res === false) {
+              this.logger.error(
+                `Can not process block at height ${block.height}`,
+              );
+            } else {
+              return true;
+            }
+          }
+        } catch (e) {
+          this.logger.warn(`unknown error occurred ${e}`);
+          if (e instanceof Error && e.stack) {
+            this.logger.warn(e.stack);
           }
         }
-      } catch (e) {
-        this.logger.warn(`unknown error occurred ${e}`);
-        if (e instanceof Error && e.stack) {
-          this.logger.warn(e.stack);
-        }
-      }
-      return false;
-    }, `Block at height ${block.height}`);
+        return false;
+      },
+      `Block at height ${block.height}`,
+      release,
+    );
     release();
   };
 
@@ -93,18 +102,22 @@ abstract class WebSocketScanner<
    */
   protected stepBackward = async (block: Block) => {
     const release = await this.mutex.acquire();
-    await this.tryRunningFunction(async () => {
-      try {
-        await this.forkBlock(block.height + 1);
-        return true;
-      } catch (e) {
-        this.logger.error(`unknown error occurred ${e}`);
-        if (e instanceof Error && e.stack) {
-          this.logger.warn(e.stack);
+    await this.tryRunningFunction(
+      async () => {
+        try {
+          await this.forkBlock(block.height + 1);
+          return true;
+        } catch (e) {
+          this.logger.error(`unknown error occurred ${e}`);
+          if (e instanceof Error && e.stack) {
+            this.logger.warn(e.stack);
+          }
         }
-      }
-      return false;
-    }, `Forking block at height ${block.height}`);
+        return false;
+      },
+      `Forking block at height ${block.height}`,
+      release,
+    );
     release();
   };
 }

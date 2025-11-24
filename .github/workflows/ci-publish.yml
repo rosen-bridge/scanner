@@ -26,6 +26,9 @@ jobs:
           node-version-file: .nvmrc
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup npm 11.6.2
+        run: npm i -g npm@11.6.2
+
       - name: Install Dependencies
         run: npm ci
 
@@ -42,7 +45,7 @@ jobs:
         run: npm run lint:check
 
       - name: Test
-        run: npm run test
+        run: npm run coverage
 
       - name: changeset
         run: |
@@ -63,7 +66,7 @@ jobs:
             | jq -r '.role_name'
           )
           if [[ "$PERM" == "admin" || "$PERM" == "maintain" ]]; then \
-            echo "is_admin=$is_admin" >> "$GITHUB_OUTPUT"; fi
+            echo "is_admin=true" >> "$GITHUB_OUTPUT"; fi
 
       - name: Publish to npm
         if: ${{ steps.perm.outputs.is_admin == 'true' }}
@@ -79,7 +82,7 @@ jobs:
         if: ${{ steps.publish.conclusion == 'success' }}
         shell: bash
         run: |
-          PATTERN_START='success packages published successfully:'
+          PATTERN_START='success.*packages published successfully:'
           PATTERN_END='Creating git tag...'
 
           released_versions=$(printf '%s\n' "$CHANGESET_LOG" \

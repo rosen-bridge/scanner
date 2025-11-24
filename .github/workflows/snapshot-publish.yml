@@ -48,6 +48,9 @@ jobs:
           node-version-file: .nvmrc
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup npm 11.6.2
+        run: npm i -g npm@11.6.2
+
       - name: Install Dependencies
         run: npm ci
 
@@ -68,7 +71,7 @@ jobs:
         if: ${{ steps.publish.conclusion == 'success' }}
         shell: bash
         run: |
-          PATTERN_START='success packages published successfully:'
+          PATTERN_START='success.*packages published successfully:'
           PATTERN_END='Creating git tag...'
 
           published_versions=$(printf '%s\n' "$CHANGESET_LOG" \
