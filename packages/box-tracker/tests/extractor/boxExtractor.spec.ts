@@ -40,14 +40,13 @@ describe('MockBoxTracker', () => {
 
   describe('processTransactions', () => {
     /**
-     * @test processTransactions should not modify boxes when no matching transaction is tracked
-     * @description
-     * Verifies that if no transaction matches the tracker,
-     * the box array remains unchanged.
+     * @target processTransactions should not modify boxes when no matching transaction is tracked
      *
      * @scenario
      * - One box is already stored
      * - Process a transaction that doesn’t produce or spend any tracked box
+     * - Verifies that if no transaction matches the tracker,
+     * - the box array remains unchanged.
      *
      * @expected
      * - The stored boxes remain identical to the original array
@@ -70,18 +69,19 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should track last unspent box in a chained transactions
-     * @description
-     * Ensures that when transactions form a spending chain,
-     * only the last unspent output is kept in the tracked boxes.
+     * @target processTransactions should track last unspent box in a chained transactions
      *
      * @scenario
+     * - Ensures that when transactions form a spending chain,
+     * - only the last unspent output is kept in the tracked boxes.
      * - tx1 creates box1
      * - tx2 spends box1 → creates box2
      * - tx3 spends box2 → creates box3
      *
      * @expected
-     * - Only box3 remains in the tracked list
+     * - Keeps all previously tracked boxes intact
+     * - Adds the final unspent box (b3) as the last element
+     * - Resulting list should have the same prefix as before, with b3 appended
      */
     it('should track last unspent box in chained transactions', async () => {
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
@@ -105,17 +105,17 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should remove oldest box when max capacity reached
-     * @description
-     * Ensures the extractor maintains a fixed capacity (10 items)
-     * by removing the oldest box when new ones are added.
+     * @target processTransactions should remove oldest box when max capacity reached
      *
      * @scenario
      * - Fill the list with 10 boxes
      * - Add one more transaction creating a new box
      *
      * @expected
-     * - The new box is appended to the end
+     * - Removes the oldest box when max capacity is reached
+     * - Appends the new unspent box at the end of the list
+     * - Keeps total length equal to MAX_BOX_LENGTH
+     * - Preserves the order of existing boxes except the removed first one
      */
     it('should remove oldest box when max capacity reached', async () => {
       const filledBoxes: BoxWithBlock[] = Array.from({
@@ -146,8 +146,8 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should call init when no boxes exist
-     * @description
+     * @target processTransactions should call init when no boxes exist
+     * @scenario
      * When the internal box list is empty, `init`
      * must be called with the provided block info.
      *
@@ -168,10 +168,7 @@ describe('MockBoxTracker', () => {
 
   describe('forkBlock', () => {
     /**
-     * @test forkBlock should not change boxes when forked block has no matching boxes
-     * @description
-     * Confirms that forkBlock leaves the state unchanged
-     * if no box belongs to the provided fork hash.
+     * @target forkBlock should not change boxes when forked block has no matching boxes
      *
      * @scenario
      * - Boxes exist with unrelated hashes
@@ -187,16 +184,13 @@ describe('MockBoxTracker', () => {
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('UNKNOWN_HASH');
-      expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockInfo.hash).toBe('H1');
+      const after = getBoxes().map((b) => b.box.boxId);
+      expect(after).toHaveLength(1);
+      expect(after[0]).toBe('b1');
     });
 
     /**
-     * @test forkBlock should remove boxes from forked block
-     * @description
-     * Ensures that boxes associated with the given
-     * block hash are removed correctly.
-     *
+     * @target forkBlock should remove boxes from forked block
      * @scenario
      * - Two boxes with hashes H1 and H2 exist
      * - forkBlock is called with H1
@@ -206,22 +200,22 @@ describe('MockBoxTracker', () => {
      */
     it('should remove boxes from forked block', async () => {
       const boxes: BoxWithBlock[] = [
-        { box: createMockBox('b1'), blockInfo: { height: 50, hash: 'H1' } },
-        { box: createMockBox('b2'), blockInfo: { height: 51, hash: 'H2' } },
+        { box: createMockBox('b1'), blockInfo: { height: 49, hash: 'H1' } },
+        { box: createMockBox('b2'), blockInfo: { height: 50, hash: 'H2' } },
       ];
       setBoxes(boxes);
 
-      await boxExtractor.forkBlock('H1');
+      await boxExtractor.forkBlock('H2');
 
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockInfo.hash).toBe('H2');
+      expect(getBoxes()[0].blockInfo.hash).toBe('H1');
     });
   });
 
   describe('getRecentBoxes', () => {
     /**
-     * @test getRecentBoxes should return undefined when boxes list is empty
-     * @description
+     * @target getRecentBoxes should return undefined when boxes list is empty
+     * @scenario
      * Ensures that when no boxes are tracked,
      * the method returns `undefined`.
      *
@@ -235,13 +229,11 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test getRecentBoxes should return the latest box when boxes exist
-     * @description
-     * Ensures that when boxes exist, the most
-     * recently added one is returned.
+     * @target getRecentBoxes should return the latest box when boxes exist
      *
      * @scenario
      * - Two boxes exist in the list
+     * - recently added one is returned.
      *
      * @expected
      * - Returns the last box in the array
