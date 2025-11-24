@@ -79,9 +79,8 @@ describe('MockBoxTracker', () => {
      * - tx3 spends box2 → creates box3
      *
      * @expected
-     * - Keeps all previously tracked boxes intact
-     * - Adds the final unspent box (b3) as the last element
-     * - Resulting list should have the same prefix as before, with b3 appended
+     * - All elements in list except last one must equal to previous list
+     * - Latest element must be new tracked box in list
      */
     it('should track last unspent box in chained transactions', async () => {
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(() => true);
@@ -148,8 +147,8 @@ describe('MockBoxTracker', () => {
     /**
      * @target processTransactions should call init when no boxes exist
      * @scenario
-     * mock init in boxTracker
-     * call processTransactions with an empty list of transactions
+     * - Mock init in boxTracker
+     * - Call processTransactions with an empty list of transactions
      *
      * @expected
      * - init is called once
