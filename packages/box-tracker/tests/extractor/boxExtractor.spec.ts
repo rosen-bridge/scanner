@@ -40,14 +40,13 @@ describe('MockBoxTracker', () => {
 
   describe('processTransactions', () => {
     /**
-     * @test processTransactions should not modify boxes when no matching transaction is tracked
-     * @description
-     * Verifies that if no transaction matches the tracker,
-     * the box array remains unchanged.
+     * @target processTransactions should not modify boxes when no matching transaction is tracked
      *
      * @scenario
      * - One box is already stored
      * - Process a transaction that doesn’t produce or spend any tracked box
+     * - Verifies that if no transaction matches the tracker,
+     * - the box array remains unchanged.
      *
      * @expected
      * - The stored boxes remain identical to the original array
@@ -68,18 +67,18 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should track last unspent box in a chained transactions
-     * @description
-     * Ensures that when transactions form a spending chain,
-     * only the last unspent output is kept in the tracked boxes.
+     * @target processTransactions should track last unspent box in chained transactions
      *
      * @scenario
+     * - Ensures that when transactions form a spending chain,
+     * - only the last unspent output is kept in the tracked boxes.
      * - tx1 creates box1
      * - tx2 spends box1 → creates box2
      * - tx3 spends box2 → creates box3
      *
      * @expected
-     * - Only box3 remains in the tracked list
+     * - All elements in list except last one must equal to previous list
+     * - Latest element must be new tracked box in list
      */
     it('should track last unspent box in chained transactions', async () => {
       const initialBoxes: ErgoBox[] = [createMockErgoBox('boxA', 'block-0')];
@@ -104,17 +103,17 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test processTransactions should remove oldest box when max capacity reached
-     * @description
-     * Ensures the extractor maintains a fixed capacity (10 items)
-     * by removing the oldest box when new ones are added.
+     * @target processTransactions should remove oldest box when max capacity reached
      *
      * @scenario
      * - Fill the list with 10 boxes
      * - Add one more transaction creating a new box
      *
      * @expected
-     * - The new box is appended to the end
+     * - Removes the oldest box when max capacity is reached
+     * - Appends the new unspent box at the end of the list
+     * - Keeps total length equal to MAX_BOX_LENGTH
+     * - Preserves the order of existing boxes except the removed first one
      */
     it('should remove oldest box when max capacity reached', async () => {
       const filledBoxes: ErgoBox[] = Array.from({
@@ -135,17 +134,17 @@ describe('MockBoxTracker', () => {
       ];
       await boxExtractor.processTransactions(txs, mockBlock);
       const after = getBoxes().map((b) => b.boxId);
-      expect(after).not.toContain(before[0]);
+      expect(after).not.toContain(before.at(0));
       expect(after.at(-1)).toBe('newUnspentBox');
       expect(after).toHaveLength(MAX_BOX_LENGTH);
       expect(after.slice(0, -1)).toEqual(before.slice(1));
     });
 
     /**
-     * @test processTransactions should call init when no boxes exist
-     * @description
-     * When the internal box list is empty, `init`
-     * must be called with the provided block info.
+     * @target processTransactions should call init when no boxes exist
+     * @scenario
+     * - Mock init in boxTracker
+     * - Call processTransactions with an empty list of transactions
      *
      * @expected
      * - init is called once
@@ -162,10 +161,7 @@ describe('MockBoxTracker', () => {
 
   describe('forkBlock', () => {
     /**
-     * @test forkBlock should not change boxes when forked block has no matching boxes
-     * @description
-     * Confirms that forkBlock leaves the state unchanged
-     * if no box belongs to the provided fork hash.
+     * @target forkBlock should not change boxes when forked block has no matching boxes
      *
      * @scenario
      * - Boxes exist with unrelated hashes
@@ -179,22 +175,19 @@ describe('MockBoxTracker', () => {
       setBoxes(boxes);
 
       await boxExtractor.forkBlock('UNKNOWN_HASH');
-      expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockId).toBe('H1');
+      const after = getBoxes().map((b) => b.boxId);
+      expect(after).toHaveLength(1);
+      expect(after.at(0)).toBe('b1');
     });
 
     /**
-     * @test forkBlock should remove boxes from forked block
-     * @description
-     * Ensures that boxes associated with the given
-     * block hash are removed correctly.
-     *
-     * @scenario
+     * @target forkBlock should remove boxes from forked block
+     *  @scenario
      * - Two boxes with hashes H1 and H2 exist
-     * - forkBlock is called with H1
-     *
+     * - forkBlock is called with H2
      * @expected
-     * - Box with H1 is removed, only H2 remains
+     * - Box with H2 is removed
+     * - Only box with H1 remains
      */
     it('should remove boxes from forked block', async () => {
       const boxes: ErgoBox[] = [
@@ -203,17 +196,17 @@ describe('MockBoxTracker', () => {
       ];
       setBoxes(boxes);
 
-      await boxExtractor.forkBlock('H1');
+      await boxExtractor.forkBlock('H2');
 
       expect(getBoxes()).toHaveLength(1);
-      expect(getBoxes()[0].blockId).toBe('H2');
+      expect(getBoxes()[0].boxId).toBe('b1');
     });
   });
 
   describe('getRecentBoxes', () => {
     /**
-     * @test getRecentBoxes should return undefined when boxes list is empty
-     * @description
+     * @target getRecentBoxes should return undefined when boxes list is empty
+     * @scenario
      * Ensures that when no boxes are tracked,
      * the method returns `undefined`.
      *
@@ -227,13 +220,11 @@ describe('MockBoxTracker', () => {
     });
 
     /**
-     * @test getRecentBoxes should return the latest box when boxes exist
-     * @description
-     * Ensures that when boxes exist, the most
-     * recently added one is returned.
+     * @target getRecentBoxes should return the latest box when boxes exist
      *
      * @scenario
      * - Two boxes exist in the list
+     * - recently added one is returned.
      *
      * @expected
      * - Returns the last box in the array
