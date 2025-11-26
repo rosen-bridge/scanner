@@ -33,8 +33,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
 
     if (ergoNetworkType == 'explorer') {
       this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
-    }
-    if (ergoNetworkType == 'node') {
+    } else {
       this.network = new NodeErgoNetwork(ergoNetworkType, [], networkUrl);
     }
   }
