@@ -20,7 +20,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   private boxes: ErgoBox[] = [];
 
   constructor(
-    ergoNetworkType: "node" | "explorer",
+    ergoNetworkType: 'node' | 'explorer',
     networkUrl: string,
     address: string,
     tokens: Array<Token>,
@@ -103,7 +103,9 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       this.boxes.push(...candidateBoxes);
       this.logger.debug('Boxes updated after push');
       if (this.boxes.length > MAX_BOX_LENGTH) {
-        this.logger.debug(`remove ${JSON.stringify(this.boxes.splice(1))} from tracked boxes`);
+        this.logger.debug(
+          `remove ${JSON.stringify(this.boxes.splice(0, 1))} from tracked boxes`,
+        );
       }
       this.logger.debug('processTransactions: completed successfully');
 
