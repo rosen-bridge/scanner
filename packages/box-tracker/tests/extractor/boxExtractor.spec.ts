@@ -182,7 +182,7 @@ describe('MockBoxTracker', () => {
 
     /**
      * @target forkBlock should remove boxes from forked block
-     *  @scenario
+     * @scenario
      * - Two boxes with hashes H1 and H2 exist
      * - forkBlock is called with H2
      * @expected
@@ -207,8 +207,7 @@ describe('MockBoxTracker', () => {
     /**
      * @target getRecentBoxes should return undefined when boxes list is empty
      * @scenario
-     * Ensures that when no boxes are tracked,
-     * the method returns `undefined`.
+     * - Call getRecentBox
      *
      * @expected
      * - getRecentBoxes must return undefined
