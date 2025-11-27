@@ -1,0 +1,86 @@
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import {
+  DataSource,
+  MoreThan,
+  Repository,
+} from '@rosen-bridge/extended-typeorm';
+
+import { OBSERVATION_BATCH_SIZE } from '../constants';
+import { RawDataProviderStateEntity } from '../entities';
+
+export class RawDataProviderStateEntityAction {
+  protected readonly repository: Repository<RawDataProviderStateEntity>;
+  protected readonly observationRepository: Repository<ObservationEntity>;
+
+  constructor(
+    protected dataSource: DataSource,
+    protected logger: AbstractLogger = new DummyLogger(),
+  ) {
+    this.repository = dataSource.getRepository(RawDataProviderStateEntity);
+    this.observationRepository = dataSource.getRepository(ObservationEntity);
+  }
+
+  /**
+   * Stores one RawDataProviderStateEntity in the database
+   *
+   * @param rawDataProviderEntities
+   * @returns {RawDataProviderStateEntity} saved instance
+   */
+  store = async (
+    rawDataProviderEntity: RawDataProviderStateEntity,
+  ): Promise<RawDataProviderStateEntity> => {
+    const state = await this.repository.save(rawDataProviderEntity);
+    this.logger.debug(
+      `raw-data for chain state [${JSON.stringify(rawDataProviderEntity)}] stored in database`,
+    );
+    return state;
+  };
+
+  /**
+   * Retrieves the RawDataProviderStateEntity of specific chain
+   *
+   * @param chain
+   * @returns {RawDataProviderStateEntity | null} Chain-related state, or null if not found
+   */
+  fetchByChain = async (
+    chain: string,
+  ): Promise<RawDataProviderStateEntity | null> => {
+    return await this.repository.findOne({ where: { chain: chain } });
+  };
+
+  /**
+   * Retrieves the latest ObservationEntity for the specified chain
+   *
+   * @param chain
+   * @returns {ObservationEntity | null} Latest related observation, or null if not found
+   */
+  fetchLatestObservationByChain = async (
+    chain: string,
+  ): Promise<ObservationEntity | null> => {
+    return await this.observationRepository.findOne({
+      where: { fromChain: chain, rawData: '' },
+      order: { height: 'DESC' },
+    });
+  };
+
+  /**
+   * Fetches a batch of ObservationEntity records for the given chain
+   *
+   * @param chain
+   * @param offsetHeight
+   * @param length
+   * @returns {ObservationEntity[]} Chain-related observations
+   */
+  fetchChainObservations = async (
+    chain: string,
+    offsetHeight: number,
+    length: number = OBSERVATION_BATCH_SIZE,
+  ): Promise<ObservationEntity[]> => {
+    return await this.observationRepository.find({
+      where: { fromChain: chain, height: MoreThan(offsetHeight) },
+      order: { height: 'ASC' },
+      take: length,
+    });
+  };
+}

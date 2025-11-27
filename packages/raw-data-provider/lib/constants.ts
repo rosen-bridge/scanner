@@ -1,0 +1,1 @@
+export const OBSERVATION_BATCH_SIZE = 10;

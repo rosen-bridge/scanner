@@ -1,5 +1,13 @@
 # @rosen-bridge/abstract-scanner
 
+## 0.2.3
+
+### Patch Changes
+
+- Fix Web-socket scanner mutex release after max retrials
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@11.1.1
+
 ## 0.2.2
 
 ### Patch Changes
