@@ -1,12 +1,7 @@
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from './boxHandler';
-import {
-  ErgoBox,
-  MempoolTrackResult,
-  Token,
-  TxDeserializer,
-} from './interfaces';
+import { MempoolTrackResult, Token, TxDeserializer } from './interfaces';
 
 export class TxPotTracker {
   /**
@@ -25,7 +20,7 @@ export class TxPotTracker {
     transactions: string[],
   ): Promise<MempoolTrackResult> {
     const tracker = generateTracker(address, tokens);
-    const boxes: ErgoBox[] = [];
+    const boxes: OutputBox[] = [];
     const spentBox = new Set<string>();
     const txs: Transaction[] = [];
     for (const tx of transactions) {

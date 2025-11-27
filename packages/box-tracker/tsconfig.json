@@ -5,5 +5,8 @@
     "types": ["node", "vitest/globals"]
   },
   "include": ["tests", "lib", "vitest.config.ts"],
-  "references": [{ "path": "../scanner-interfaces" }]
+  "references": [
+    { "path": "../scanner-interfaces" },
+    { "path": "../abstract-extractor" }
+  ]
 }
