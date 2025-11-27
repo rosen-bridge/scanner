@@ -1,6 +1,10 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  Block,
+  ErgoNetworkType,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from '../boxHandler';
 import { MAX_BOX_LENGTH } from '../const';
@@ -20,7 +24,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   private boxes: ErgoBox[] = [];
 
   constructor(
-    ergoNetworkType: 'node' | 'explorer',
+    ergoNetworkType: ErgoNetworkType,
     networkUrl: string,
     address: string,
     tokens: Array<Token>,
@@ -31,7 +35,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
 
-    if (ergoNetworkType == 'explorer') {
+    if (ergoNetworkType == ErgoNetworkType.Explorer) {
       this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
     } else {
       this.network = new NodeErgoNetwork(ergoNetworkType, [], networkUrl);

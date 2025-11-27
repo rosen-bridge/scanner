@@ -1,4 +1,8 @@
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  Block,
+  ErgoNetworkType,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 
 import { ErgoBox } from '../../lib';
 import * as boxHandler from '../../lib/boxHandler';
@@ -15,7 +19,12 @@ describe('MockBoxTracker', () => {
     hash: 'block-hash-1',
   };
   beforeEach(() => {
-    boxExtractor = new BoxExtractor('node', 'http', 'address', []);
+    boxExtractor = new BoxExtractor(
+      ErgoNetworkType.Node,
+      'http',
+      'address',
+      [],
+    );
     vi.clearAllMocks();
   });
 
