@@ -1,0 +1,45 @@
+{
+  "name": "@rosen-bridge/raw-data-provider",
+  "version": "0.1.0",
+  "description": "This package populates missing rawData values for extractors records stored in the database.",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosen-bridge/scanner.git"
+  },
+  "license": "MIT",
+  "author": "Rosen Team",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc --build tsconfig.build.json",
+    "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
+    "coverage": "npm run test -- --coverage",
+    "lint": "eslint --fix . && npm run prettify",
+    "lint:check": "eslint . && npm run prettify:check",
+    "prettify": "prettier --write . --ignore-path ../../.gitignore",
+    "prettify:check": "prettier --check . --ignore-path ../../.gitignore",
+    "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
+    "test": "NODE_OPTIONS='--import tsx' vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^0.2.1",
+    "@rosen-bridge/extended-typeorm": "^1.0.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-istanbul": "^3.1.4",
+    "tsx": "^4.19.4",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "npm": "11.6.2"
+  }
+}

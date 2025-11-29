@@ -1,39 +1,61 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   Block,
-  BlockInfo,
+  ErgoNetworkType,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
 import { generateTracker } from '../boxHandler';
-import { MAX_BOX_HEIGHT } from '../const';
-import { BoxWithHeight, ErgoBox, Token } from '../interfaces';
+import { MAX_BOX_LENGTH } from '../const';
+import { ErgoBox, Token } from '../interfaces';
 import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
 
 export class BoxExtractor extends AbstractExtractor<Transaction> {
-  private tracker: (box: ErgoBox) => boolean;
+  private address: string;
+  private tokens: Array<Token>;
+  readonly logger: AbstractLogger;
   private network: AbstractErgoNetwork;
-  private boxes: BoxWithHeight[] = [];
+  /**
+   * List of tracked boxes along with their associated block information.
+   */
+  private boxes: ErgoBox[] = [];
 
   constructor(
-    ergoNetworkType: string,
+    ergoNetworkType: ErgoNetworkType,
     networkUrl: string,
     address: string,
     tokens: Array<Token>,
+    logger?: AbstractLogger,
   ) {
     super();
-    this.tracker = generateTracker(address, tokens);
-    if (ergoNetworkType == 'explorer') {
+    this.address = address;
+    this.tokens = tokens;
+    this.logger = logger ? logger : new DummyLogger();
+
+    if (ergoNetworkType == ErgoNetworkType.Explorer) {
       this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
-    }
-    if (ergoNetworkType == 'node') {
+    } else {
       this.network = new NodeErgoNetwork(ergoNetworkType, [], networkUrl);
     }
   }
+
   /** @returns the unique ID of extractor */
   getId: () => 'BoxExtractor';
+
+  /**
+   * Initializes the extractor by fetching the initial box from the network.
+   * Stores it with its block information if available.
+   *
+   */
+  init: () => Promise<void> = async () => {
+    const box = await this.network.getBox();
+    if (box) {
+      this.boxes.push(box);
+    }
+  };
 
   /**
    * Processes transactions in a block to update the tracked boxes.
@@ -51,25 +73,24 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     block: Block,
   ): Promise<boolean> => {
     const spentBoxes = new Set<string>();
+    let candidateBoxes: ErgoBox[] = [];
+    this.logger.debug('processTransactions: start');
     try {
       if (this.boxes.length === 0) {
-        const lastBox = await this.network.getBox();
-        if (lastBox) {
-          this.boxes.push({
-            box: lastBox,
-            inclusionHeight: block.height,
-            hash: block.hash,
-          });
-        }
+        await this.init();
       }
-
+      const tracker = generateTracker(this.address, this.tokens);
       for (const tx of txs) {
         for (const out of tx.outputs) {
-          if (this.tracker(out)) {
-            this.boxes.push({
-              box: out,
-              inclusionHeight: block.height,
-              hash: block.hash,
+          if (tracker(out)) {
+            const mapped = {
+              ...out,
+              blockId: block.hash,
+            };
+            candidateBoxes.push(mapped);
+            this.logger.debug('Candidate matched by tracker', {
+              boxId: out.boxId,
+              txId: tx.id,
             });
           }
         }
@@ -77,38 +98,52 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
           spentBoxes.add(input.boxId);
         }
       }
+      candidateBoxes = candidateBoxes.filter((b) => !spentBoxes.has(b.boxId));
+      if (candidateBoxes.length > 1) {
+        throw Error(
+          'ImpossibleBehaviour: more than one candidateBox after filtering',
+        );
+      }
+      this.boxes.push(...candidateBoxes);
+      this.logger.debug('Boxes updated after push');
+      if (this.boxes.length > MAX_BOX_LENGTH) {
+        this.logger.debug(
+          `remove ${JSON.stringify(this.boxes.splice(0, 1))} from tracked boxes`,
+        );
+      }
+      this.logger.debug('processTransactions: completed successfully');
 
-      this.boxes = this.boxes.filter(
-        (b) =>
-          !spentBoxes.has(b.box.boxId) &&
-          b.inclusionHeight >= block.height - MAX_BOX_HEIGHT,
-      );
-      console.log(this.boxes);
       return true;
     } catch (error) {
-      console.error('BoxExtractor processTransactions failed:', error);
+      this.logger.error('BoxExtractor processTransactions failed:', error);
       return false;
     }
   };
 
   /**
-   * Initializes tracked boxes at the starting block height.
+   * No-op initialization.
    *
-   * @param initialBlock - Information about the initial block
    */
-  initializeBoxes: (initialBlock: BlockInfo) => Promise<void>;
-
-  /**
-   * Removes boxes that belong to a forked block height.
-   */
-  forkBlock = async (hash: string): Promise<void> => {
-    this.boxes = this.boxes.filter((b) => b.hash !== hash);
+  initializeBoxes = async (): Promise<void> => {
+    // intentionally empty; this extractor does not require initialization
   };
 
   /**
-   * Returns recent boxes.
+   * Handles blockchain forks by removing boxes belonging to the forked block hash.
+   * If no boxes remain, it reinitializes the extractor state.
+   *
+   * @param  hash - The hash of the forked block.
    */
-  getRecentBoxes = (): BoxWithHeight[] => {
-    return [...this.boxes];
+  forkBlock = async (hash: string): Promise<void> => {
+    this.boxes = this.boxes.filter((b) => b.blockId !== hash);
+  };
+
+  /**
+   * Retrieves the most recent tracked box.
+   *
+   * @returns The latest tracked box, or undefined if none exist.
+   */
+  getRecentBox = (): ErgoBox | undefined => {
+    return this.boxes.at(-1);
   };
 }

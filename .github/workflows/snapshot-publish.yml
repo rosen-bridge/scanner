@@ -1,0 +1,81 @@
+name: snapshot publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: 'Pull Request Number'
+        required: true
+jobs:
+  check-user-permission:
+    name: check permission
+    runs-on: ubuntu-latest
+    steps:
+      - name: check user permission
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          PERM=$(
+            curl -fsSL -H "Authorization: Bearer $TOKEN" \
+              "https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission" \
+            | jq -r '.role_name'
+          )
+          if [[ "$PERM" != "admin" && "$PERM" != "maintain" ]]; then \
+            echo "$ACTOR triggers snapshot publish: permission denied" && exit 1; fi
+
+  snapshot-publish:
+    name: snapshot publish
+    needs: check-user-permission
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout to PR
+        run: |
+          git fetch origin pull/${{ inputs.pr }}/head:pr-${{ inputs.pr }}
+          git checkout pr-${{ inputs.pr }}
+          git rev-parse --short=12 HEAD
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup npm 11.6.2
+        run: npm i -g npm@11.6.2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish snapshot to npm
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
+          npx changeset publish --no-git-tag --tag develop | tee .changeset_log
+          { echo 'CHANGESET_LOG<<_LOG_'; cat .changeset_log; echo '_LOG_'; } >> "$GITHUB_ENV"
+
+      - name: Discord Announce
+        if: ${{ steps.publish.conclusion == 'success' }}
+        shell: bash
+        run: |
+          PATTERN_START='success.*packages published successfully:'
+          PATTERN_END='Creating git tag...'
+
+          published_versions=$(printf '%s\n' "$CHANGESET_LOG" \
+            | sed -n "/$PATTERN_START/,/$PATTERN_END/{/$PATTERN_START/d;/$PATTERN_END/d;p}")
+
+          msg=$(printf '%s\n' "$published_versions" | grep -o '@.*')
+          [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${{ secrets.DISCORD_HOOK }}"

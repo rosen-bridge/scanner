@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib",
+    "types": ["node"]
+  },
+  "exclude": ["tests", "vitest.config.ts"],
+  "references": [
+    {
+      "path": "../abstract-observation-extractor/tsconfig.build.json"
+    }
+  ]
+}

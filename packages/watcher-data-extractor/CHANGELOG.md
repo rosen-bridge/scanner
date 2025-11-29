@@ -1,5 +1,12 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 12.3.0
+
+### Minor Changes
+
+- Fixed Sqlite migrations
+- Fixed type definitions in entities based migrations
+
 ## 12.2.2
 
 ### Patch Changes

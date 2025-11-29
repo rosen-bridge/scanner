@@ -18,7 +18,7 @@ class CollateralEntity {
   @Column({ type: 'varchar' })
   boxId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar' })
   boxSerialized: string;
 
   @Column({ type: 'varchar' })

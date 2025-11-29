@@ -1,0 +1,65 @@
+image: node:22.18.0
+
+default:
+  interruptible: true
+
+stages:
+  - check_permission
+  - publish
+  - announce
+
+variables:
+  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
+  NPM_VERSION: '11.6.2'
+
+check_user_permission:
+  stage: check_permission
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  before_script:
+    - apt-get update && apt-get install -y jq
+  script:
+    - |
+      ALLOWED_USERS=$(curl -fsSL -H "PRIVATE-TOKEN: ${GL_API_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/members/all" \
+        | jq -r ".[] | select(.access_level >= ${MIN_ACCESS_LEVEL}) |.username")
+
+      echo "${ALLOWED_USERS}" | grep -qw "${GITLAB_USER_LOGIN}" \
+        || (echo "${GITLAB_USER_LOGIN} trigger snapshot publish: permission denied" && exit 1)
+
+snapshot-publish:
+  stage: publish
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
+    policy: pull
+    paths:
+      - node_modules
+      - '**/node_modules'
+      - '**/dist'
+      - .npm
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  before_script:
+    - npm i -g npm@${NPM_VERSION}
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+  script:
+    - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
+    - npx changeset publish --no-git-tag --tag develop | tee .changeset_log
+  artifacts:
+    paths:
+      - .changeset_log
+    expire_in: 1 day
+
+discord-announce:
+  stage: announce
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
+  script:
+    - |
+      CHANGESET_LOG="$(cat .changeset_log)"
+      PATTERN_START='success.*packages published successfully:'
+      PATTERN_END='Creating git tag...'
+      published_versions=$(printf '%s\n' "${CHANGESET_LOG}" \
+            | sed -n "/${PATTERN_START}/,/${PATTERN_END}/{/${PATTERN_START}/d;/${PATTERN_END}/d;p}")
+      msg=$(printf '%s\n' "${published_versions}" | grep -o '@.*')
+      [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${DISCORD_HOOK}"

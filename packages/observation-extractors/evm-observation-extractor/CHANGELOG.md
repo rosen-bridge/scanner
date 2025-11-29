@@ -1,5 +1,33 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 5.4.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.3
+  - @rosen-bridge/rosen-extractor@11.1.1
+
+## 5.4.0
+
+### Minor Changes
+
+- Add `storeRawData` option to store observations raw-data into the database
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/rosen-extractor@11.1.0
+  - @rosen-bridge/abstract-observation-extractor@0.2.2
+
+## 5.3.1
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.1
+  - @rosen-bridge/rosen-extractor@11.0.0
+
 ## 5.3.0
 
 ### Minor Changes

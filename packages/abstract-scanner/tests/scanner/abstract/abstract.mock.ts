@@ -132,7 +132,7 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   }
 
   mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>
-    this.tryRunningFunction(fn, msg);
+    this.tryRunningFunction(fn, msg, () => {});
 
   start = async () => Promise.resolve();
 

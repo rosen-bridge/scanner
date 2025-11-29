@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/ergo-observation-extractor",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Event observation data extractor for Ergo chain",
   "repository": {
     "type": "git",
@@ -29,14 +29,14 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^3.0.1",
-    "@rosen-bridge/abstract-observation-extractor": "^0.2.0",
+    "@rosen-bridge/abstract-observation-extractor": "^0.2.3",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/rosen-extractor": "^10.1.1",
+    "@rosen-bridge/rosen-extractor": "^11.1.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "@rosen-bridge/tokens": "^4.0.1"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.1",
+    "@rosen-bridge/abstract-scanner": "^0.2.3",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@vitest/coverage-istanbul": "^3.1.4",
     "ergo-lib-wasm-nodejs": "^0.24.1",
@@ -44,6 +44,7 @@
     "vitest": "^3.1.4"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.18.0",
+    "npm": "11.6.2"
   }
 }

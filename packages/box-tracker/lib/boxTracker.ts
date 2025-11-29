@@ -1,8 +1,8 @@
-import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
+import { ErgoNetworkType, OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import { reduceTrack } from './boxHandler';
 import { BoxExtractor } from './extractor/boxExtractor';
-import { ErgoBox, Token, TxDeserializer } from './interfaces';
+import { Token, TxDeserializer } from './interfaces';
 import { MempoolTracker } from './mempoolTracker';
 import { AbstractErgoNetwork } from './network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from './network/explorerErgoNetwork';
@@ -45,13 +45,13 @@ export class BoxTracker {
     return this.extractor;
   }
 
-  async getBox(): Promise<ErgoBox | undefined> {
-    const extractorBox = await this.extractor.getRecentBoxes();
+  async getBox(): Promise<OutputBox | undefined> {
+    // const extractorBox = await this.extractor.getRecentBox();
     const mempool = new MempoolTracker(this.network);
     const mempoolTrackResult = await mempool.track(this.address, this.tokens);
     const mempoolUnspent = mempoolTrackResult.boxes;
     const mempoolSpentIds = mempoolTrackResult.spentBoxIds;
-    let txpotUnspent: ErgoBox[] = [];
+    let txpotUnspent: OutputBox[] = [];
     let txpotSpentIds: string[] = [];
     if (this.txPot && this.txDeserialization) {
       const txpotTracker = new TxPotTracker(this.txDeserialization);
@@ -67,7 +67,7 @@ export class BoxTracker {
     const allUnspent = [
       ...mempoolUnspent,
       ...txpotUnspent,
-      ...(extractorBox ? extractorBox.map((box) => box.box) : []),
+      // extractorBox,
     ];
 
     const allSpentIds = [...mempoolSpentIds, ...txpotSpentIds];

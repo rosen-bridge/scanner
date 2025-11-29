@@ -1,6 +1,6 @@
-import { ErgoBox } from '../lib/interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-export const mockBoxes: ErgoBox[] = [
+export const mockBoxes: OutputBox[] = [
   {
     boxId: 'box1',
     value: 1000n,

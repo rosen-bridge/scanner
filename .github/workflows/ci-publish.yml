@@ -1,0 +1,92 @@
+name: CI & Publish to npmjs
+
+on:
+  push:
+    branches: ['dev']
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ci:
+    name: CI and Publish
+    runs-on: ubuntu-latest
+
+    env:
+      PUBLISH_PREFIX: ${{ vars.PUBLISH_PREFIX != '' && vars.PUBLISH_PREFIX || 'rosen-version:' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup npm 11.6.2
+        run: npm i -g npm@11.6.2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Knip
+        run: npx knip --dependencies
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint:check
+
+      - name: Test
+        run: npm run coverage
+
+      - name: changeset
+        run: |
+          git fetch origin dev
+          npx changeset status --since=origin/dev
+
+      - name: Release Verification
+        if: ${{ startsWith(github.event.head_commit.message, env.PUBLISH_PREFIX) && github.ref == 'refs/heads/dev' }}
+        id: perm
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          PERM=$(
+            curl -fsSL -H "Authorization: Bearer $TOKEN" \
+              "https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission" \
+            | jq -r '.role_name'
+          )
+          if [[ "$PERM" == "admin" || "$PERM" == "maintain" ]]; then \
+            echo "is_admin=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Publish to npm
+        if: ${{ steps.perm.outputs.is_admin == 'true' }}
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          npx changeset publish | tee .changeset_log
+          { echo 'CHANGESET_LOG<<_LOG_'; cat .changeset_log; echo '_LOG_'; } >> "$GITHUB_ENV"
+
+      - name: Discord Announce
+        if: ${{ steps.publish.conclusion == 'success' }}
+        shell: bash
+        run: |
+          PATTERN_START='success.*packages published successfully:'
+          PATTERN_END='Creating git tag...'
+
+          released_versions=$(printf '%s\n' "$CHANGESET_LOG" \
+            | sed -n "/$PATTERN_START/,/$PATTERN_END/{/$PATTERN_START/d;/$PATTERN_END/d;p}")
+
+          msg=$(printf '%s\n' "$released_versions" | grep -o '@.*')
+          [[ -n "$msg" ]] && curl -s -X POST --form-string $'content=```text\n'"$msg"$'\n```' "${{ secrets.DISCORD_HOOK }}"

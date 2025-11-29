@@ -1,5 +1,6 @@
 import {
   AdditionalRegisters,
+  OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
@@ -27,12 +28,15 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    *
    */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.getBoxesByAddress(address)).items;
-    if (rawBoxes) {
-      return rawBoxes.map((b) => ({
+    const rawBoxes = await this.api.getBoxesByAddressUnspent(address);
+    if (!rawBoxes) return [];
+
+    return Promise.all(
+      rawBoxes.map(async (b) => ({
         boxId: b.boxId ?? '',
         value: BigInt(b.value),
         ergoTree: b.ergoTree,
+        blockId: await this.getBlockByHeight(b.creationHeight),
         creationHeight: b.creationHeight,
         assets: (b.assets || []).map((a) => ({
           tokenId: a.tokenId,
@@ -43,9 +47,17 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
         ) as AdditionalRegisters,
         transactionId: b.transactionId ?? '',
         index: b.index ?? 0,
-      }));
-    }
-    return [];
+      })),
+    );
+  }
+
+  /**
+   * Retrieves blockId of a block by height.
+   *
+   */
+  async getBlockByHeight(height: number): Promise<string> {
+    const blocks = await this.api.getFullBlockAt(height);
+    return blocks[0];
   }
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
@@ -57,7 +69,7 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       id: t.id,
       inputs: t.inputs.map((i) => ({ boxId: i.boxId })),
       dataInputs: t.dataInputs?.map((d) => ({ boxId: d.boxId })) ?? [],
-      outputs: t.outputs.map<ErgoBox>((o) => ({
+      outputs: t.outputs.map<OutputBox>((o) => ({
         boxId: o.boxId!,
         value: BigInt(o.value),
         ergoTree: o.ergoTree,

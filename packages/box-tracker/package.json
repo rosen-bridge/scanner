@@ -15,6 +15,7 @@
     "dist",
     "CHANGELOG.md"
   ],
+  "private": true,
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
@@ -28,7 +29,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "2.1.2",
+    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-extractor": "^2.1.2",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "@rosen-clients/ergo-explorer": "^2.1.0",
     "@rosen-clients/ergo-node": "^3.1.0"
@@ -39,6 +41,7 @@
     "vitest": "^3.1.4"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.18.0",
+    "npm": "11.6.2"
   }
 }

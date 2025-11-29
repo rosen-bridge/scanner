@@ -1,5 +1,6 @@
 import {
   AdditionalRegisters,
+  OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
@@ -28,14 +29,16 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
    *
    */
   protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.v1.getApiV1BoxesByaddressP1(address))
-      .items;
+    const rawBoxes = (
+      await this.api.v1.getApiV1BoxesUnspentByaddressP1(address)
+    ).items;
     if (rawBoxes) {
       return rawBoxes.map((b) => ({
         boxId: b.boxId,
         value: BigInt(b.value),
         ergoTree: b.ergoTree,
         creationHeight: b.creationHeight,
+        blockId: b.blockId,
         assets: (b.assets || []).map((a) => ({
           tokenId: a.tokenId,
           amount: BigInt(a.amount),
@@ -64,7 +67,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
         inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
         dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
         outputs:
-          t.outputs?.map<ErgoBox>((o) => ({
+          t.outputs?.map<OutputBox>((o) => ({
             boxId: o.id,
             value: BigInt(o.value),
             ergoTree: o.ergoTree,

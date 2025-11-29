@@ -1,4 +1,6 @@
-import { ErgoBox, Token } from './interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
+import { Token } from './interfaces';
 
 /**
  * Creates a tracker function to check if a given ErgoBox
@@ -9,7 +11,7 @@ import { ErgoBox, Token } from './interfaces';
  * @returns checks if the ErgoBox matches criteria.
  */
 export const generateTracker = (address: string, tokens: Token[]) => {
-  return (box: ErgoBox): boolean => {
+  return (box: OutputBox): boolean => {
     if (box.ergoTree !== address) return false;
 
     const assetMap = new Map(box.assets.map((a) => [a.tokenId, a.amount]));
@@ -29,8 +31,8 @@ export const generateTracker = (address: string, tokens: Token[]) => {
  * @returns The first unspent ErgoBox, or undefined if none found.
  */
 export const reduceTrack = (
-  boxes: ErgoBox[],
+  boxes: OutputBox[],
   spentBoxIds: string[],
-): ErgoBox | undefined => {
+): OutputBox | undefined => {
   return boxes.find((box) => !spentBoxIds.includes(box.boxId));
 };
