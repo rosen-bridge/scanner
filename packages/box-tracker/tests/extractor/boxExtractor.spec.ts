@@ -10,7 +10,16 @@ import { MAX_BOX_LENGTH } from '../../lib/const';
 import { BoxExtractor } from '../../lib/extractor/boxExtractor';
 import { createMockErgoBox } from '../testUtils';
 
-describe('MockBoxTracker', () => {
+vi.mock('../../lib/network/explorerErgoNetwork', () => {
+  return {
+    ExplorerErgoNetwork: vi.fn().mockImplementation(() => ({
+      getBox: async () => undefined,
+      getMempoolTxs: vi.fn().mockResolvedValue([]),
+    })),
+  };
+});
+
+describe('BoxExtractor', () => {
   let boxExtractor: BoxExtractor;
   const mockBlock: Block = {
     height: 100,
