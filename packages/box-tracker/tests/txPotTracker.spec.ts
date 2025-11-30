@@ -25,6 +25,9 @@ describe('TxPotTracker', () => {
         inputs: [{ boxId: 'box4' }],
         outputs: [{ boxId: 'out3' }],
       }));
+      vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(
+        (box: OutputBox) => box.boxId === 'out3',
+      );
       const tracker = new TxPotTracker(mockDeserialize);
 
       const result = await tracker.track('someAddress', [], ['serializedTx']);

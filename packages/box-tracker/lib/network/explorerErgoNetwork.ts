@@ -60,33 +60,48 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
    *
    */
   async getMempoolTxs(): Promise<Transaction[]> {
-    const rawTxs = (await this.api.v0.getApiV0TransactionsUnconfirmed()).items;
-    if (rawTxs) {
-      return rawTxs.map((t) => ({
-        id: t.id,
-        inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
-        dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
-        outputs:
-          t.outputs?.map<OutputBox>((o) => ({
-            boxId: o.id,
-            value: BigInt(o.value),
-            ergoTree: o.ergoTree,
-            creationHeight: o.creationHeight,
-            assets: (o.assets || []).map((a) => ({
-              tokenId: a.tokenId,
-              amount: BigInt(a.amount),
-            })),
-            additionalRegisters: Object.fromEntries(
-              Object.entries(o.additionalRegisters || {}).map(([k, v]) => [
-                k,
-                v,
-              ]),
-            ) as AdditionalRegisters,
-            transactionId: o.txId,
-            index: o.index,
-          })) ?? [],
-      }));
+    const allTxs: Transaction[] = [];
+    let offset = 0;
+    const limit = 100;
+    while (true) {
+      const response = await this.api.v0.getApiV0TransactionsUnconfirmed({
+        limit,
+        offset,
+      });
+      const rawTxs = response.items ?? [];
+
+      if (rawTxs.length === 0) break;
+
+      allTxs.push(
+        ...rawTxs.map((t) => ({
+          id: t.id,
+          inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
+          dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
+          outputs:
+            t.outputs?.map<OutputBox>((o) => ({
+              boxId: o.id,
+              value: BigInt(o.value),
+              ergoTree: o.ergoTree,
+              creationHeight: o.creationHeight,
+              assets: (o.assets || []).map((a) => ({
+                tokenId: a.tokenId,
+                amount: BigInt(a.amount),
+              })),
+              additionalRegisters: Object.fromEntries(
+                Object.entries(o.additionalRegisters || {}).map(([k, v]) => [
+                  k,
+                  v,
+                ]),
+              ) as AdditionalRegisters,
+              transactionId: o.txId,
+              index: o.index,
+            })) ?? [],
+        })),
+      );
+
+      offset += rawTxs.length;
     }
-    return [];
+
+    return allTxs;
   }
 }

@@ -64,26 +64,47 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    *
    */
   async getMempoolTxs(): Promise<Transaction[]> {
-    const rawTxs = await this.api.getUnconfirmedTransactions();
-    return rawTxs.map((t) => ({
-      id: t.id,
-      inputs: t.inputs.map((i) => ({ boxId: i.boxId })),
-      dataInputs: t.dataInputs?.map((d) => ({ boxId: d.boxId })) ?? [],
-      outputs: t.outputs.map<OutputBox>((o) => ({
-        boxId: o.boxId!,
-        value: BigInt(o.value),
-        ergoTree: o.ergoTree,
-        creationHeight: o.creationHeight,
-        assets: (o.assets || []).map((a) => ({
-          tokenId: a.tokenId,
-          amount: BigInt(a.amount),
+    const allTxs: Transaction[] = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (true) {
+      const rawTxs = await this.api.getUnconfirmedTransactions({
+        limit,
+        offset,
+      });
+
+      if (rawTxs.length === 0) break;
+
+      allTxs.push(
+        ...rawTxs.map((t) => ({
+          id: t.id,
+          inputs: t.inputs.map((i) => ({ boxId: i.boxId })),
+          dataInputs: t.dataInputs?.map((d) => ({ boxId: d.boxId })) ?? [],
+          outputs: t.outputs.map<OutputBox>((o) => ({
+            boxId: o.boxId!,
+            value: BigInt(o.value),
+            ergoTree: o.ergoTree,
+            creationHeight: o.creationHeight,
+            assets: (o.assets || []).map((a) => ({
+              tokenId: a.tokenId,
+              amount: BigInt(a.amount),
+            })),
+            additionalRegisters: Object.fromEntries(
+              Object.entries(o.additionalRegisters || {}).map(([k, v]) => [
+                k,
+                v,
+              ]),
+            ) as AdditionalRegisters,
+            transactionId: o.transactionId ?? t.id,
+            index: o.index!,
+          })),
         })),
-        additionalRegisters: Object.fromEntries(
-          Object.entries(o.additionalRegisters || {}).map(([k, v]) => [k, v]),
-        ) as AdditionalRegisters,
-        transactionId: o.transactionId ?? t.id,
-        index: o.index!,
-      })),
-    }));
+      );
+
+      offset += rawTxs.length;
+    }
+
+    return allTxs;
   }
 }

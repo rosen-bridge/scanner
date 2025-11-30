@@ -36,22 +36,23 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     this.logger = logger ? logger : new DummyLogger();
 
     if (ergoNetworkType == ErgoNetworkType.Explorer) {
-      this.network = new ExplorerErgoNetwork(ergoNetworkType, [], networkUrl);
+      this.network = new ExplorerErgoNetwork(address, tokens, networkUrl);
     } else {
-      this.network = new NodeErgoNetwork(ergoNetworkType, [], networkUrl);
+      this.network = new NodeErgoNetwork(address, tokens, networkUrl);
     }
   }
 
   /** @returns the unique ID of extractor */
-  getId: () => 'BoxExtractor';
-
+  getId = (): string => 'BoxExtractor';
   /**
    * Initializes the extractor by fetching the initial box from the network.
    * Stores it with its block information if available.
    *
    */
+
   init: () => Promise<void> = async () => {
     const box = await this.network.getBox();
+    this.logger.debug(`Initial box fetched: ${box ? box.boxId : 'none'}`);
     if (box) {
       this.boxes.push(box);
     }
@@ -78,8 +79,12 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     try {
       if (this.boxes.length === 0) {
         await this.init();
+        this.logger.debug('No boxes to track, skipping processing');
       }
       const tracker = generateTracker(this.address, this.tokens);
+      this.logger.debug(
+        `Tracker generated for address: ${this.address} with tokens: ${JSON.stringify(this.tokens.map((t) => t.tokenId))}`,
+      );
       for (const tx of txs) {
         for (const out of tx.outputs) {
           if (tracker(out)) {
