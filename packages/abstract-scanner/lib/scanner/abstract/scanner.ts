@@ -158,7 +158,7 @@ export abstract class AbstractScanner<TransactionType> {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
-    let success = true;
+    let error = undefined;
     const release = await this.initializeMutex.acquire();
     try {
       const extractorsStatus = await this.action.getExtractorsStatus([
@@ -203,14 +203,10 @@ export abstract class AbstractScanner<TransactionType> {
       this.extractors.push(...this.newExtractors);
       this.newExtractors = [];
     } catch (e) {
-      this.logger.warn(`Initialization for extractors failed with error ${e}`);
-      success = false;
+      error = e;
     } finally {
       release();
     }
-    if (!success)
-      throw new Error(
-        `Initialization failed for new extractors ${getIds(this.newExtractors)}`,
-      );
+    if (error) throw error;
   };
 }

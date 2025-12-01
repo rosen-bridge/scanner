@@ -176,6 +176,11 @@ export class ExplorerInitializationStrategy {
    * @param initialBlock
    */
   initialize = async (initialBlock: BlockInfo) => {
+    // TODO: fix explorer initialization
+    // local/ergo/rosen-bridge/scanner/-/issues/213
+    throw new Error(
+      'Initilization using explorer connection has been intentionally disabled, please turn off initialization or use node connection',
+    );
     this.workerManager.setup(initialBlock.height);
     const addWorkerJob = (i: number) =>
       this.promiseQueue.add(() => this.startWorker(i));
