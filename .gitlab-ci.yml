@@ -1,4 +1,7 @@
-image: node:22.18
+image: node:22.18.0
+
+default:
+  interruptible: true
 
 workflow:
   rules:
@@ -11,33 +14,40 @@ stages:
   - build
   - triggers
 
+variables:
+  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
+  NPM_VERSION: '11.6.2'
+
+before_script:
+  - npm i -g npm@${NPM_VERSION}
+
 installation:
   stage: installation
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: push
     paths:
       - node_modules
       - '**/node_modules'
+      - .npm
   script:
     - npm ci
 
 build:
   stage: build
-  needs: [installation]
   cache:
-    key: $CI_COMMIT_REF_NAME
+    key: ${CI_COMMIT_REF_NAME}
     policy: pull-push
     paths:
       - node_modules
       - '**/node_modules'
       - '**/dist'
+      - .npm
   script:
     - npm run build
 
 run_ci:
   stage: triggers
-  needs: [build]
   trigger:
     include:
       - local: .gitlab/workflows/ci.yml
@@ -45,7 +55,6 @@ run_ci:
 
 run_snapshot_publish:
   stage: triggers
-  needs: [build]
   rules:
     - when: manual
   allow_failure: true

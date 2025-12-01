@@ -14,13 +14,19 @@ export class BitcoinRunesEsploraObservationExtractor extends BitcoinRunesAbstrac
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       lockAddress,
       runesProtocolNetwork,
       dataSource,
       tokens,
-      new BitcoinRunesEsploraRosenExtractor(lockAddress, tokens, logger),
+      new BitcoinRunesEsploraRosenExtractor(
+        lockAddress,
+        tokens,
+        logger,
+        storeRawData,
+      ),
       logger,
     );
   }
