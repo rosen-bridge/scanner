@@ -213,10 +213,7 @@ export class WorkerManager {
     // avoid race condition when updating the shared `rangeList` variable
     const release = await this.mutex.acquire();
     // jump over small ranges to select the biggest processable range
-    while (
-      rangeList.length > 1 &&
-      (rangeList.at(-2)!.count <= rangeThreshold || lastRangeQuery.count == 0)
-    ) {
+    while (rangeList.length > 1 && rangeList.at(-2)!.count <= rangeThreshold) {
       rangeList.pop()!;
       lastRangeQuery = rangeList.at(-1)!;
     }
