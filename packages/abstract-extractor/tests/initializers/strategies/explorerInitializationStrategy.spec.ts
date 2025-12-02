@@ -321,7 +321,9 @@ describe('ExplorerInitializationStrategy', () => {
     });
   });
 
-  describe('initialize', () => {
+  // TODO: remove tests skip after explorer initialization fix
+  // local/ergo/rosen-bridge/scanner/-/issues/213
+  describe.skip('initialize', () => {
     const initialBlock: BlockInfo = {
       hash: 'initial-block-hash',
       height: 1320700,

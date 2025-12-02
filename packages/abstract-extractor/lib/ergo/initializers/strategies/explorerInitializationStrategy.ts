@@ -181,6 +181,7 @@ export class ExplorerInitializationStrategy {
     throw new Error(
       'Initilization using explorer connection has been intentionally disabled, please turn off initialization or use node connection',
     );
+    /* eslint-disable no-unreachable */
     this.workerManager.setup(initialBlock.height);
     const addWorkerJob = (i: number) =>
       this.promiseQueue.add(() => this.startWorker(i));
@@ -206,5 +207,6 @@ export class ExplorerInitializationStrategy {
     for (const block of this.extraLargeBlocks) {
       await this.processBlock(block);
     }
+    /* eslint-enable no-unreachable */
   };
 }
