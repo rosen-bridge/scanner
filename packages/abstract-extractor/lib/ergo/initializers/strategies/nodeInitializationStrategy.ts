@@ -7,10 +7,11 @@ import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction } from '../../interfaces';
 import { NodeNetwork } from '../../networks/nodeNetwork';
 import { delay, requestWithRetrial } from '../../utils';
-import { DELAY_BETWEEN_INIT_REQUESTS } from './constants';
+import { DELAY_BETWEEN_INIT_REQUESTS } from '../constants';
 
 export class NodeInitializationStrategy {
   private network: NodeNetwork;
+  private promiseQueue: PQueue;
 
   constructor(
     url: string,
@@ -21,6 +22,9 @@ export class NodeInitializationStrategy {
     ) => Promise<void>,
     private logger = new DummyLogger(),
   ) {
+    this.promiseQueue = new PQueue({
+      concurrency: this.maxParallelRequests,
+    });
     this.network = new NodeNetwork(url);
   }
 
@@ -48,7 +52,9 @@ export class NodeInitializationStrategy {
     limit: number,
     initialHeight: number,
   ) => {
-    this.logger.debug(`Requesting node getTxsByAddress with offset ${offset}`);
+    this.logger.debug(
+      `Requesting node getTxsByAddress with offset ${offset} and limit ${limit}`,
+    );
     const response = await requestWithRetrial(
       () =>
         this.network.getAddressTransactionsWithOffsetLimit(
@@ -76,20 +82,28 @@ export class NodeInitializationStrategy {
     try {
       let offset = 0;
       const total = await this.getTotalTxCount();
-      const promiseQueue = new PQueue({
-        concurrency: this.maxParallelRequests,
-      });
+
       while (offset < total) {
         await delay(DELAY_BETWEEN_INIT_REQUESTS);
-        ((offset: number) =>
-          promiseQueue.add(() =>
+        ((offset: number) => {
+          const newJob = this.promiseQueue.add(() =>
             this.processWithOffsetLimit(offset, API_LIMIT, initialBlock.height),
-          ))(offset);
+          );
+          // Although the error will be catched by awaiting promiseQueue.onError(),
+          // stil all task promises should have separate catch statement unless we
+          // will have unhandled rejections on service
+          newJob.catch(() => {});
+        })(offset);
         offset += API_LIMIT;
       }
-      await promiseQueue.onIdle();
-    } catch (error) {
-      throw new Error(`Error initializing extractor by node: ${error}`);
+      // await completion of all tasks or unexpected error in any
+      await Promise.race([
+        this.promiseQueue.onError(),
+        this.promiseQueue.onIdle(),
+      ]);
+    } catch (e) {
+      this.promiseQueue.pause();
+      throw e;
     }
   };
 }

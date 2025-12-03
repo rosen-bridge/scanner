@@ -7,7 +7,7 @@ import { API_LIMIT } from '../../../constants';
 import { ExtendedTransaction, RangeQuery } from '../../interfaces';
 import { ExplorerNetwork } from '../../networks/explorerNetwork';
 import { requestWithRetrial } from '../../utils';
-import { INIT_WORKERS_REASSIGN_INTERVAL } from './constants';
+import { INIT_WORKERS_REASSIGN_INTERVAL } from '../constants';
 import { WorkerManager } from './workerManager';
 
 export class ExplorerInitializationStrategy {
@@ -182,30 +182,43 @@ export class ExplorerInitializationStrategy {
       'Initilization using explorer connection has been intentionally disabled, please turn off initialization or use node connection',
     );
     /* eslint-disable no-unreachable */
-    this.workerManager.setup(initialBlock.height);
-    const addWorkerJob = (i: number) =>
-      this.promiseQueue.add(() => this.startWorker(i));
-    // Initialize the workers
-    await Promise.all(
-      Array.from({ length: this.maxWorkers }, async (_, i) => {
-        await this.workerManager.registerWorker(i);
-        addWorkerJob(i);
-      }),
-    );
-    // Periodically check for idle workers and reassign a new range to them
-    const reassignWorker = setInterval(async () => {
-      const newWorkers = await this.workerManager.reassignIdleWorkers();
-      if (newWorkers.length > 0) {
-        this.logger.debug(`Reassigned workers ${newWorkers}`);
-        newWorkers.forEach((workerIndex) => addWorkerJob(workerIndex));
+    try {
+      this.workerManager.setup(initialBlock.height);
+      const addWorkerJob = (i: number) => {
+        const newJob = this.promiseQueue.add(() => this.startWorker(i));
+        // Although the error will be catched by awaiting promiseQueue.onError(),
+        // stil all task promises should have separate catch statement unless we
+        // will have unhandled rejections on service
+        newJob.catch(() => {});
+      };
+      // Initialize the workers
+      await Promise.all(
+        Array.from({ length: this.maxWorkers }, async (_, i) => {
+          await this.workerManager.registerWorker(i);
+          addWorkerJob(i);
+        }),
+      );
+      // Periodically check for idle workers and reassign a new range to them
+      const reassignWorker = setInterval(async () => {
+        const newWorkers = await this.workerManager.reassignIdleWorkers();
+        if (newWorkers.length > 0) {
+          this.logger.debug(`Reassigned workers ${newWorkers}`);
+          newWorkers.forEach((workerIndex) => addWorkerJob(workerIndex));
+        }
+      }, INIT_WORKERS_REASSIGN_INTERVAL);
+      // Wait for all workers to finish their jobs
+      await Promise.race([
+        this.promiseQueue.onError(),
+        this.promiseQueue.onIdle(),
+      ]);
+      // Stop reassigning interval
+      clearInterval(reassignWorker);
+      for (const block of this.extraLargeBlocks) {
+        await this.processBlock(block);
       }
-    }, INIT_WORKERS_REASSIGN_INTERVAL);
-    // Wait for all workers to finish their jobs
-    await this.promiseQueue.onIdle();
-    // Stop reassigning interval
-    clearInterval(reassignWorker);
-    for (const block of this.extraLargeBlocks) {
-      await this.processBlock(block);
+    } catch (e) {
+      this.promiseQueue.pause();
+      throw e;
     }
     /* eslint-enable no-unreachable */
   };

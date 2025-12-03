@@ -108,18 +108,21 @@ export class ErgoBoxInitializer<
       `Spend records grouped to ${Object.keys(groupedRecords).length} blocks`,
     );
     const release = await this.dbMutex.acquire();
-    for (const blockId in groupedRecords) {
-      const blockRecords = groupedRecords[blockId];
-      const block = { hash: blockId, height: blockRecords[0].height };
-      this.logger.debug(
-        `Processing spend records at height ${blockRecords[0].height}`,
-      );
-      await this.actions.updateSpendingInfo(
-        blockRecords,
-        block,
-        this.extractorId,
-      );
+    try {
+      for (const blockId in groupedRecords) {
+        const blockRecords = groupedRecords[blockId];
+        const block = { hash: blockId, height: blockRecords[0].height };
+        this.logger.debug(
+          `Processing spend records at height ${blockRecords[0].height}`,
+        );
+        await this.actions.updateSpendingInfo(
+          blockRecords,
+          block,
+          this.extractorId,
+        );
+      }
+    } finally {
+      release();
     }
-    release();
   };
 }
