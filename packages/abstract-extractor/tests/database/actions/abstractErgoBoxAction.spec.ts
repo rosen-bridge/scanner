@@ -21,6 +21,7 @@ describe('AbstractErgoBoxAction', () => {
     /**
      * @target updateSpendingInfo should set spendBlock and spendHeight for a set of boxes
      * @dependencies
+     * - database
      * @scenario
      * - insert two boxes
      * - mock spending information for the first box
@@ -68,6 +69,7 @@ describe('AbstractErgoBoxAction', () => {
     /**
      * @target revertBlockUpdates should update the boxes spent in the specified block
      * @dependencies
+     * - database
      * @scenario
      * - insert four boxes created in a block
      * - spend one of the in the block2

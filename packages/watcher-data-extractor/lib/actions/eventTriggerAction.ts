@@ -112,7 +112,7 @@ class EventTriggerAction extends AbstractErgoBoxAction<
         );
         if (!spendInfo || !spendInfo.extras || !spendInfo.extras.result) {
           throw Error(
-            `Impossible case: spending information extras does not contain result, ${JsonBI.stringify(
+            `ImpossibleBehavior:: spending information extras does not contain result, ${JsonBI.stringify(
               spendInfo,
             )}`,
           );

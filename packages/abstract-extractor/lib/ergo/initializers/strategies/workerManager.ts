@@ -84,7 +84,7 @@ export class WorkerManager {
   limitLastRange = async (workerIndex: number) => {
     const lastRangeQuery = this.workersRangeList[workerIndex].at(-1);
     if (!lastRangeQuery)
-      throw Error('Impossible case, worker does not have any range query');
+      throw Error('ImpossibleBehavior: worker does not have any range query');
     const newQueryEnd =
       Math.floor((lastRangeQuery.end - lastRangeQuery.start) / 2) +
       lastRangeQuery.start;
@@ -105,7 +105,7 @@ export class WorkerManager {
     const release = await this.mutex.acquire();
     const lastRangeQuery = this.workersRangeList[workerIndex].pop();
     if (!lastRangeQuery)
-      throw Error('Impossible case, worker does not have any range query');
+      throw Error('ImpossibleBehavior: worker does not have any range query');
     this.workersRangeList[workerIndex].map((rangeQuery) => {
       rangeQuery.count -= lastRangeQuery.count;
       rangeQuery.start = lastRangeQuery.end + 1;
@@ -137,7 +137,7 @@ export class WorkerManager {
    * do nothing if all workers are active
    * do nothing if there is no incomplete range list
    * split the biggest range list between the current worker and the idle worker
-   * @returns
+   * @returns reassigned worker indexes
    */
   reassignIdleWorkers = async (): Promise<number[]> => {
     this.logger.debug('Checking idle workers to reassign');

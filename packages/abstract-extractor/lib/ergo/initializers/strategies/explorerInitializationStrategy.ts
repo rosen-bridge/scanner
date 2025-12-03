@@ -84,7 +84,7 @@ export class ExplorerInitializationStrategy {
     );
     if (txs.total != rangeQuery.count)
       this.logger.error(
-        `Impossible behavior: Range query count ${rangeQuery.count} differs from total ${txs.total} for range [${rangeQuery.start}, ${rangeQuery.end}]`,
+        `ImpossibleBehavior: Range query count ${rangeQuery.count} differs from total ${txs.total} for range [${rangeQuery.start}, ${rangeQuery.end}]`,
       );
     this.logger.debug(
       `Processing started for [${rangeQuery.start}, ${rangeQuery.end}] with ${txs.total} txs`,

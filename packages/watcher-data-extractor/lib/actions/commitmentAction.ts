@@ -111,7 +111,7 @@ class CommitmentAction {
         );
         if (!spendInfo)
           throw new Error(
-            `Impossible behavior: box [${commitment.boxId}] is not found in spending info list`,
+            `ImpossibleBehavior: box [${commitment.boxId}] is not found in spending info list`,
           );
 
         await this.commitmentRepository.update(

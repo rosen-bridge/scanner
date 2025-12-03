@@ -18,6 +18,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target storeEntities should save the passed entities to database
      * @dependencies
+     * - database
      * @scenario
      * - run test (call `storeEntities` with 2 new entities)
      * @expected
@@ -52,6 +53,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target storeEntities should correctly save entities with different extractors
      * @dependencies
+     * - database
      * @scenario
      * - insert 2 entities belonging to first-extractor
      * - run test (call `storeEntities` with same entities for the second-extractor)
@@ -101,6 +103,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target storeEntities should update entities correctly
      * @dependencies
+     * - database
      * @scenario
      * - insert 2 entities
      * - run test (call `storeEntities` with the same entities and updated info)
@@ -152,6 +155,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target deleteBlockData should delete the entities created in the specified block
      * @dependencies
+     * - database
      * @scenario
      * - insert four entities created in two different blocks
      * - run test(call `deleteBlockData` to delete block2)
@@ -188,6 +192,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target removeAllData should remove all available data related to this extractor
      * @dependencies
+     * - database
      * @scenario
      * - insert 4 entities related to this extractor
      * - run test (call `removeAllData`)
@@ -209,6 +214,7 @@ describe('AbstractErgoAction', () => {
     /**
      * @target removeAllData should not remove any data related to another extractor
      * @dependencies
+     * - database
      * @scenario
      * - insert 4 entities related to another extractor
      * - run test (call `removeAllData`)

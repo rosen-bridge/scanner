@@ -12,6 +12,8 @@ describe('AbstractErgoExtractor', () => {
     /**
      * @target forkBlock should remove all data extracted from the specified block
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - spy `deleteBlockData`

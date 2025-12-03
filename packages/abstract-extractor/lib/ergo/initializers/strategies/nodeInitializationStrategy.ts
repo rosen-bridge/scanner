@@ -53,7 +53,7 @@ export class NodeInitializationStrategy {
     initialHeight: number,
   ) => {
     this.logger.debug(
-      `Requesting node getTxsByAddress with offset ${offset} and limit ${limit}`,
+      `Requesting node txs by address with offset ${offset} and limit ${limit}`,
     );
     const response = await requestWithRetrial(
       () =>

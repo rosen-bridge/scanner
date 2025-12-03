@@ -15,6 +15,8 @@ describe('AbstractErgoBoxExtractor', () => {
     /**
      * @target processTransactions should process boxes with data and insert data into database
      * @dependencies
+     * - db action
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - mock `hasBoxData` to return true for one box
@@ -67,6 +69,8 @@ describe('AbstractErgoBoxExtractor', () => {
     /**
      * @target processTransactions should extract spending information of all input boxes
      * @dependencies
+     * - db action
+     * - triggerCallbacks
      * @scenario
      * - mock extractor (hasBoxData returns false as default)
      * - spy `extractBoxData`, `storeEntities` and `updateSpendingInfo`
@@ -119,6 +123,7 @@ describe('AbstractErgoBoxExtractor', () => {
     /**
      * @target processTransactions should return false if data insertion fails
      * @dependencies
+     * - db action
      * @scenario
      * - mock extractor
      * - mock `hasBoxData` to return true for one box

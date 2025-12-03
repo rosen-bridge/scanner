@@ -43,7 +43,8 @@ describe('NodeInitializationStrategy', () => {
      * - mock `getAddressTransactionsWithOffsetLimit` in node network
      * - run test (call `getTotalTxCount`)
      * @expected
-     * - return the total tx count
+     * - to return the total tx count
+     * - to call `getAddressTransactionsWithOffsetLimit` with correct parameters
      */
     it('should return the total tx count', async () => {
       mockNetwork.getAddressTransactionsWithOffsetLimit = vi
@@ -74,8 +75,8 @@ describe('NodeInitializationStrategy', () => {
      * - mock `processTransactionBatch`
      * - run test (call `processWithOffsetLimit`)
      * @expected
-     * - filter transactions below initial height
-     * - call processTransactionBatch with filtered transactions
+     * - to filter transactions below initial height
+     * - to call `processTransactionBatch` with filtered transactions
      */
     it('should process transactions below initial height', async () => {
       const mockTransactions = transactionBatch;

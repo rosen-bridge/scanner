@@ -53,7 +53,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `getAddressTransactionsWithHeight` in explorer network
      * - run test (call `getRangeTxCount`)
      * @expected
-     * - return the transaction count
+     * - to return the transaction count
+     * - to call the `getAddressTransactionsWithHeight` with the correct height range
      */
     it('should return transaction count for height range', async () => {
       mockNetwork.getAddressTransactionsWithHeight = vi.fn().mockResolvedValue({
@@ -83,7 +84,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processTransactionBatch`
      * - run test (call `processRange`)
      * @expected
-     * - call processTransactionBatch with transactions
+     * - to call the `getAddressTransactionsWithHeight` with the correct height range
+     * - to call `processTransactionBatch` with transactions
      */
     it('should process transactions when count is greater than 0', async () => {
       const mockTransactions = transactionBatch;
@@ -114,7 +116,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock range query with count 0
      * - run test (call `processRange` with count 0)
      * @expected
-     * - return 0 without making network calls
+     * - to return without making network calls
+     * - to return without calling `processTransactionBatch`
      */
     it('should skip processing when count is 0', async () => {
       const rangeQuery: RangeQuery = { start: 1000, end: 2000, count: 0 };
@@ -138,8 +141,9 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processBlock`
      * - run test (call `processBlockAtHeight`)
      * @expected
-     * - call processBlock with block info
-     * - add block to extraLargeBlocks
+     * - to get `blockId` with the block height
+     * - to call `processBlock` with block info
+     * - to add the block to extraLargeBlocks
      */
     it('should process block at specified height', async () => {
       const blockId = 'test-block-id';
@@ -170,7 +174,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processTransactions`
      * - run test (call `processBlock`)
      * @expected
-     * - call processTransactions with block transactions
+     * - to get the block transactions with the block hash
+     * - to call `processTransactions` with block transactions
      */
     it('should process block transactions', async () => {
       const block: BlockInfo = { hash: 'test-block-id', height: 1000 };
@@ -195,7 +200,9 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processRange`
      * - run test (call `startWorker`)
      * @expected
-     * - call processRange for processable range
+     * - to call `getLastRange` with worker index and API_LIMIT
+     * - to call `processRange` for processable range
+     * - to call `popLastRangeQuery` with worker index
      */
     it('should process range when count <= API_LIMIT', async () => {
       const workerIndex = 0;
@@ -230,7 +237,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processBlockAtHeight`
      * - run test (call `startWorker`)
      * @expected
-     * - call processBlockAtHeight for single block
+     * - to call `processBlockAtHeight` for single block
+     * - to call `popLastRangeQuery` with worker index
      */
     it('should process block when tx count > API_LIMIT and we limited the range to a single block', async () => {
       const workerIndex = 0;
@@ -261,7 +269,8 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `limitLastRange`
      * - run test (call `startWorker`)
      * @expected
-     * - call limitLastRange for non-processable range
+     * - to call `limitLastRange` for non-processable range
+     * - to not call `popLastRangeQuery`
      */
     it('should limit range when count > API_LIMIT and there are more than one block in the range', async () => {
       const workerIndex = 0;
@@ -288,11 +297,13 @@ describe('ExplorerInitializationStrategy', () => {
      * @dependencies
      * - worker manager
      * @scenario
-     * - mock worker manager to be active multiple times then inactive
+     * - mock worker manager to be active for 2 ranges then inactive
      * - mock `processRange`
      * - run test (call `startWorker`)
      * @expected
-     * - process multiple ranges
+     * - to call `getLastRange` twice
+     * - to call `processRange` twice with correct ranges
+     * - to call `popLastRangeQuery` twice
      */
     it('should continue until worker is inactive', async () => {
       const workerIndex = 0;
@@ -338,9 +349,9 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `startWorker`
      * - run test (call `initialize`)
      * @expected
-     * - setup worker manager
-     * - register and start all workers
-     * - wait for completion
+     * - to setup worker manager with initial block height
+     * - to register all workers
+     * - to start all workers with correct indices
      */
     it('should setup workers and process all ranges', async () => {
       mockWorkerManager.setup = vi.fn();
@@ -368,7 +379,7 @@ describe('ExplorerInitializationStrategy', () => {
      * - mock `processBlock`
      * - run test (call `initialize`)
      * @expected
-     * - process all extra large blocks
+     * - to process all extra large blocks
      */
     it('should process extra large blocks at the end', async () => {
       mockWorkerManager.setup = vi.fn();

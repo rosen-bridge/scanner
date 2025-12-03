@@ -59,7 +59,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
           if (result) status = EvmTxStatus.succeed;
           else
             throw Error(
-              `Impossible behavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
+              `ImpossibleBehavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
             );
         } catch (e) {
           if (isCallException(e)) status = EvmTxStatus.failed;

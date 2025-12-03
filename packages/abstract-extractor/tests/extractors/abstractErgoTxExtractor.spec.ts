@@ -14,6 +14,8 @@ describe('AbstractErgoTxExtractor', () => {
     /**
      * @target processTransactions should process transactions with data and insert data into database
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - mock `hasTxData` to return true for one transaction
@@ -60,6 +62,8 @@ describe('AbstractErgoTxExtractor', () => {
     /**
      * @target processTransactions should skip transactions without data
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor (hasTxData returns false as default)
      * - spy `extractTxData` and `storeEntities`
@@ -93,6 +97,8 @@ describe('AbstractErgoTxExtractor', () => {
     /**
      * @target processTransactions should skip transactions that return undefined from extractTxData
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - mock `hasTxData` to return true for one transaction
@@ -133,12 +139,16 @@ describe('AbstractErgoTxExtractor', () => {
     /**
      * @target processTransactions should return false if data insertion fails
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - mock `hasTxData` to return true for one transaction
      * - spy `extractTxData` and `storeEntities`
      * - run test (call `processTransactions`)
      * @expected
+     * - to call `extractTxData` for the specific transaction
+     * - to call `storeEntities` with the extracted data
      * - to return false when `storeEntities` returns false
      * - not to trigger any callbacks when insertion fails
      */
@@ -181,7 +191,6 @@ describe('AbstractErgoTxExtractor', () => {
      * - run test (call `processTransactions`)
      * @expected
      * - to catch the error and return false
-     * - to log the error message
      */
     it('should handle errors gracefully and return false', async () => {
       const extractor = new MockedErgoTxExtractor();
@@ -195,6 +204,8 @@ describe('AbstractErgoTxExtractor', () => {
     /**
      * @target processTransactions should process multiple transactions with mixed data
      * @dependencies
+     * - db actions
+     * - triggerCallbacks
      * @scenario
      * - mock extractor
      * - mock `hasTxData` to return true for some transactions

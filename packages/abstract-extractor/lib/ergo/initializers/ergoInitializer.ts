@@ -8,9 +8,9 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
-import { MAX_PARALLEL_REQUESTS } from '../../constants';
 import { AbstractErgoAction, AbstractErgoEntity } from '../database';
 import { AbstractEntityData, ExtendedTransaction } from '../interfaces';
+import { MAX_PARALLEL_REQUESTS } from './constants';
 import {
   ExplorerInitializationStrategy,
   NodeInitializationStrategy,

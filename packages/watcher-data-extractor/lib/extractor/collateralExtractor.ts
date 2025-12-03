@@ -125,7 +125,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older collaterals
    *
-   * @param {number} initialHeight
+   * @param {BlockInfo} initialBlock
    * @return {Promise<void>}
    * @memberof CollateralExtractor
    */

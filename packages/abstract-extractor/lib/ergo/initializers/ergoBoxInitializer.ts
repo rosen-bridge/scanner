@@ -9,13 +9,13 @@ import {
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 
-import { MAX_PARALLEL_REQUESTS } from '../../constants';
 import { AbstractErgoBoxAction, AbstractErgoEntity } from '../database';
 import {
   AbstractEntityData,
   ExtendedSpendInfo,
   ExtendedTransaction,
 } from '../interfaces';
+import { MAX_PARALLEL_REQUESTS } from './constants';
 import { ErgoInitializer } from './ergoInitializer';
 
 export class ErgoBoxInitializer<
