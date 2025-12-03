@@ -1,4 +1,4 @@
-image: node:22.18.0
+image: $GITLAB_CI_IMAGE
 
 default:
   interruptible: true
@@ -8,16 +8,10 @@ stages:
   - publish
   - announce
 
-variables:
-  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
-  NPM_VERSION: '11.6.2'
-
 check_user_permission:
   stage: check_permission
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
-  before_script:
-    - apt-get update && apt-get install -y jq
   script:
     - |
       ALLOWED_USERS=$(curl -fsSL -H "PRIVATE-TOKEN: ${GL_API_TOKEN}" \
@@ -36,11 +30,9 @@ snapshot-publish:
       - node_modules
       - '**/node_modules'
       - '**/dist'
-      - .npm
   rules:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
   before_script:
-    - npm i -g npm@${NPM_VERSION}
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   script:
     - npx changeset version --snapshot "$(git rev-parse --short=8 HEAD)"
