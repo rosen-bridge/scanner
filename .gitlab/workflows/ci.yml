@@ -1,4 +1,4 @@
-image: node:22.18.0
+image: $GITLAB_CI_IMAGE
 
 default:
   interruptible: true
@@ -10,13 +10,6 @@ workflow:
 stages:
   - ci
 
-variables:
-  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
-  NPM_VERSION: '11.6.2'
-
-before_script:
-  - npm i -g npm@${NPM_VERSION}
-
 knip:
   stage: ci
   cache:
@@ -24,7 +17,6 @@ knip:
     policy: pull
     paths:
       - node_modules
-      - .npm
   script:
     - npx knip --dependencies
 
@@ -37,7 +29,6 @@ type_check:
       - node_modules
       - '**/node_modules'
       - '**/dist'
-      - .npm
   script:
     - npm run type-check
 
@@ -48,7 +39,6 @@ lint:
     policy: pull
     paths:
       - node_modules
-      - .npm
   script:
     - npm run lint:check
 
@@ -61,7 +51,6 @@ test:
       - node_modules
       - '**/node_modules'
       - '**/dist'
-      - .npm
   script:
     - npm run coverage
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
@@ -78,9 +67,7 @@ changeset:
     policy: pull
     paths:
       - node_modules
-      - .npm
   before_script:
     - git fetch origin dev
-    - npm i -g npm@${NPM_VERSION}
   script:
     - npx changeset status --since=origin/dev

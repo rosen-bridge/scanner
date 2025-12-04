@@ -1,4 +1,4 @@
-image: node:22.18.0
+image: $GITLAB_CI_IMAGE
 
 default:
   interruptible: true
@@ -14,13 +14,6 @@ stages:
   - build
   - triggers
 
-variables:
-  npm_config_cache: '${CI_PROJECT_DIR}/.npm'
-  NPM_VERSION: '11.6.2'
-
-before_script:
-  - npm i -g npm@${NPM_VERSION}
-
 installation:
   stage: installation
   cache:
@@ -29,7 +22,6 @@ installation:
     paths:
       - node_modules
       - '**/node_modules'
-      - .npm
   script:
     - npm ci
 
@@ -42,7 +34,6 @@ build:
       - node_modules
       - '**/node_modules'
       - '**/dist'
-      - .npm
   script:
     - npm run build
 
