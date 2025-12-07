@@ -29,7 +29,7 @@ export class TxPotTracker {
   ): Promise<MempoolTrackResult> {
     const tracker = generateTracker(address, tokens);
     this.logger.debug(
-      `Tracking txPot for address: ${address} with tokens: ${tokens.map((t) => t.tokenId)}`,
+      `Tracking txPot for address: ${address} with tokens: ${tokens.map((token) => token.tokenId)}`,
     );
     const boxes: OutputBox[] = [];
     const spentBox = new Set<string>();
@@ -42,20 +42,17 @@ export class TxPotTracker {
       }
     }
     for (const tx of txs) {
-      for (const input of tx.inputs) {
-        this.logger.debug(`Found spent box in txPot: ${input.boxId}`);
-        spentBox.add(input.boxId);
+      for (const inputBox of tx.inputs) {
+        this.logger.debug(`Found spent box in txPot: ${inputBox.boxId}`);
+        spentBox.add(inputBox.boxId);
       }
-      for (const out of tx.outputs) {
-        this.logger.debug(`Checking output box in txPot: ${out.boxId}`);
-        if (tracker(out)) boxes.push(out);
+      for (const outputBox of tx.outputs) {
+        this.logger.debug(`Checking output box in txPot: ${outputBox.boxId}`);
+        if (tracker(outputBox)) boxes.push(outputBox);
       }
     }
     const spentBoxIds: string[] = Array.from(spentBox);
-    this.logger.debug(
-      `Total matched boxes: ${boxes.length}, Total spent boxes: ${spentBoxIds.length}`,
-    );
-    this.logger.info(`Matched box IDs: ${boxes.map((b) => b.boxId)}`);
+    this.logger.debug(`Matched box IDs: ${boxes.map((box) => box.boxId)}`);
 
     return { boxes, spentBoxIds };
   }

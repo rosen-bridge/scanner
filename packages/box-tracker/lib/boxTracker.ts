@@ -11,12 +11,12 @@ import { NodeErgoNetwork } from './network/nodeErgoNetwork';
 import { TxPotTracker } from './txPotTracker';
 
 export class BoxTracker {
-  private network: AbstractErgoNetwork;
-  private address: string;
-  private tokens: Token[];
-  private txPot?: string[];
-  private txDeserialization?: TxDeserializer;
-  private extractor: BoxExtractor;
+  private readonly network: AbstractErgoNetwork;
+  private readonly address: string;
+  private readonly tokens: Token[];
+  private readonly txPot?: string[];
+  private readonly txDeserialization?: TxDeserializer;
+  private readonly extractor: BoxExtractor;
   private logger: DummyLogger;
 
   /**
@@ -81,13 +81,13 @@ export class BoxTracker {
    * @returns The selected `OutputBox` or `undefined` if no suitable unspent box is found
    */
   async getBox(): Promise<OutputBox | undefined> {
-    const extractorBox = await this.extractor.getRecentBox();
+    const extractorBox = this.extractor.getRecentBox();
     const mempool = new MempoolTracker(this.network, this.logger);
     const mempoolTrackResult = await mempool.track(this.address, this.tokens);
-    const mempoolUnspent = mempoolTrackResult.boxes;
-    const mempoolSpentIds = mempoolTrackResult.spentBoxIds;
+    const mempoolUnspentBoxes = mempoolTrackResult.boxes;
+    const mempoolSpentBoxIds = mempoolTrackResult.spentBoxIds;
     this.logger.debug(
-      `BoxTracker: Mempool unspent boxes: ${mempoolUnspent.length}, spent box ids: ${mempoolSpentIds.length}`,
+      `BoxTracker: unspent boxIds: ${mempoolUnspentBoxes.map((box) => box.boxId)}`,
     );
 
     if (!extractorBox) {
@@ -96,8 +96,8 @@ export class BoxTracker {
     }
 
     this.logger.debug(`BoxTracker: Extractor box id: ${extractorBox.boxId}`);
-    let txpotUnspent: OutputBox[] = [];
-    let txpotSpentIds: string[] = [];
+    let txpotUnspentBoxes: OutputBox[] = [];
+    let txpotSpentBoxIds: string[] = [];
     if (this.txPot && this.txDeserialization) {
       const txpotTracker = new TxPotTracker(
         this.txDeserialization,
@@ -108,25 +108,30 @@ export class BoxTracker {
         this.tokens,
         this.txPot,
       );
-      txpotSpentIds = txpotResult.spentBoxIds;
-      txpotUnspent = txpotResult.boxes;
+      txpotSpentBoxIds = txpotResult.spentBoxIds;
+      txpotUnspentBoxes = txpotResult.boxes;
     }
     this.logger.debug(
-      `BoxTracker: TxPot unspent boxes: ${txpotUnspent.length}, spent box ids: ${txpotSpentIds.length}`,
+      `BoxTracker: TxPot unspent boxIds: ${txpotUnspentBoxes.map((box) => box.boxId)}, spent boxIds: ${txpotSpentBoxIds}`,
     );
-    const allUnspent = [...mempoolUnspent, ...txpotUnspent, extractorBox!];
 
-    const allSpentIds = [...mempoolSpentIds, ...txpotSpentIds];
+    const allUnspentBoxes = [
+      ...mempoolUnspentBoxes,
+      ...txpotUnspentBoxes,
+      extractorBox!,
+    ];
+
+    const allSpentBoxIds = [...mempoolSpentBoxIds, ...txpotSpentBoxIds];
     this.logger.debug(
-      `BoxTracker: Total unspent boxes: ${allUnspent.length}, total spent box ids: ${allSpentIds.length}`,
+      `BoxTracker: Total unspent boxIds: ${allUnspentBoxes.map((box) => box.boxId)}, total spent boxIds: ${allSpentBoxIds}`,
     );
 
-    if (allUnspent.length === 0) {
+    if (allUnspentBoxes.length === 0) {
       this.logger.debug('BoxTracker: No unspent boxes found');
       return undefined;
     }
-    const finalBox = reduceTrack(allUnspent, allSpentIds);
-
+    const finalBox = reduceTrack(allUnspentBoxes, allSpentBoxIds);
+    this.logger.info(`BoxTracker: Selected boxId: ${finalBox?.boxId}`);
     return finalBox;
   }
 }

@@ -44,12 +44,12 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
 
   /** @returns the unique ID of extractor */
   getId = (): string => 'BoxExtractor';
+
   /**
    * Initializes the extractor by fetching the initial box from the network.
    * Stores it with its block information if available.
    *
    */
-
   init: () => Promise<void> = async () => {
     const box = await this.network.getBox();
     this.logger.debug(`Initial box fetched: ${box ? box.boxId : 'none'}`);
@@ -83,7 +83,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
       }
       const tracker = generateTracker(this.address, this.tokens);
       this.logger.debug(
-        `Tracker generated for address: ${this.address} with tokens: ${JSON.stringify(this.tokens.map((t) => t.tokenId))}`,
+        `Tracker generated for address: ${this.address} with tokens: ${JSON.stringify(this.tokens.map((token) => token.tokenId))}`,
       );
       for (const tx of txs) {
         for (const out of tx.outputs) {
