@@ -1,5 +1,5 @@
 ---
-'@rosen-bridge/box-tracker': major
+'@rosen-bridge/box-tracker': minor
 ---
 
-Add the initial box-tracker core package.
+Add initial box-tracker package.

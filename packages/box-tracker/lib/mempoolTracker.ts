@@ -22,7 +22,10 @@ export class MempoolTracker {
    *
    * @returns MempoolTrackerResult containing matched boxes and spent box IDs.
    */
-  async track(address: string, tokens: Token[]): Promise<MempoolTrackResult> {
+  track = async (
+    address: string,
+    tokens: Token[],
+  ): Promise<MempoolTrackResult> => {
     const tracker = generateTracker(address, tokens);
     this.logger.debug(
       `Tracking mempool for address: ${address} with tokens: ${tokens.map((token) => token.tokenId)}`,
@@ -45,5 +48,5 @@ export class MempoolTracker {
     const spentBoxIds: string[] = Array.from(spentBox);
     this.logger.debug(`Matched box IDs: ${boxes.map((box) => box.boxId)}`);
     return { boxes, spentBoxIds };
-  }
+  };
 }

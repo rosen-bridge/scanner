@@ -22,11 +22,11 @@ export class TxPotTracker {
    *
    * @returns MempoolTrackerResult containing matched boxes and spent box IDs.
    */
-  async track(
+  track = async (
     address: string,
     tokens: Token[],
     transactions: string[],
-  ): Promise<MempoolTrackResult> {
+  ): Promise<MempoolTrackResult> => {
     const tracker = generateTracker(address, tokens);
     this.logger.debug(
       `Tracking txPot for address: ${address} with tokens: ${tokens.map((token) => token.tokenId)}`,
@@ -55,5 +55,5 @@ export class TxPotTracker {
     this.logger.debug(`Matched box IDs: ${boxes.map((box) => box.boxId)}`);
 
     return { boxes, spentBoxIds };
-  }
+  };
 }

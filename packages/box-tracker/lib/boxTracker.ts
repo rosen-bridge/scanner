@@ -14,9 +14,10 @@ export class BoxTracker {
   private readonly network: AbstractErgoNetwork;
   private readonly address: string;
   private readonly tokens: Token[];
-  private readonly txPot?: string[];
-  private readonly txDeserialization?: TxDeserializer;
-  private readonly extractor: BoxExtractor;
+  private readonly transactions?: string[];
+  private txPot?: TxPotTracker;
+  private extractor: BoxExtractor;
+  private mempool: MempoolTracker;
   private logger: DummyLogger;
 
   /**
@@ -37,7 +38,7 @@ export class BoxTracker {
     tokens: Token[],
     logger?: DummyLogger,
     options?: {
-      txPot?: string[];
+      transactions?: string[];
       txDeserialization?: TxDeserializer;
     },
   ) {
@@ -49,8 +50,10 @@ export class BoxTracker {
     this.address = address;
     this.tokens = tokens;
     this.logger = logger || new DummyLogger();
-    this.txPot = options?.txPot;
-    this.txDeserialization = options?.txDeserialization;
+    this.transactions = options?.transactions;
+    if (this.transactions && options?.txDeserialization) {
+      this.txPot = new TxPotTracker(options.txDeserialization, this.logger);
+    }
     this.extractor = new BoxExtractor(
       networkType,
       networkUrl,
@@ -58,6 +61,7 @@ export class BoxTracker {
       tokens,
       this.logger,
     );
+    this.mempool = new MempoolTracker(this.network, this.logger);
   }
 
   /**
@@ -65,9 +69,9 @@ export class BoxTracker {
    *
    * @returns BoxExtractor instance
    */
-  getExtractor(): BoxExtractor {
+  getExtractor = (): BoxExtractor => {
     return this.extractor;
-  }
+  };
 
   /**
    * Retrieves the unspent OutputBox for the tracked address and tokens
@@ -80,10 +84,12 @@ export class BoxTracker {
    *
    * @returns The selected `OutputBox` or `undefined` if no suitable unspent box is found
    */
-  async getBox(): Promise<OutputBox | undefined> {
+  getBox = async (): Promise<OutputBox | undefined> => {
     const extractorBox = this.extractor.getRecentBox();
-    const mempool = new MempoolTracker(this.network, this.logger);
-    const mempoolTrackResult = await mempool.track(this.address, this.tokens);
+    const mempoolTrackResult = await this.mempool.track(
+      this.address,
+      this.tokens,
+    );
     const mempoolUnspentBoxes = mempoolTrackResult.boxes;
     const mempoolSpentBoxIds = mempoolTrackResult.spentBoxIds;
     this.logger.debug(
@@ -98,15 +104,11 @@ export class BoxTracker {
     this.logger.debug(`BoxTracker: Extractor box id: ${extractorBox.boxId}`);
     let txpotUnspentBoxes: OutputBox[] = [];
     let txpotSpentBoxIds: string[] = [];
-    if (this.txPot && this.txDeserialization) {
-      const txpotTracker = new TxPotTracker(
-        this.txDeserialization,
-        this.logger,
-      );
-      const txpotResult = await txpotTracker.track(
+    if (this.txPot && this.transactions) {
+      const txpotResult = await this.txPot.track(
         this.address,
         this.tokens,
-        this.txPot,
+        this.transactions,
       );
       txpotSpentBoxIds = txpotResult.spentBoxIds;
       txpotUnspentBoxes = txpotResult.boxes;
@@ -133,5 +135,5 @@ export class BoxTracker {
     const finalBox = reduceTrack(allUnspentBoxes, allSpentBoxIds);
     this.logger.info(`BoxTracker: Selected boxId: ${finalBox?.boxId}`);
     return finalBox;
-  }
+  };
 }

@@ -50,7 +50,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    * Stores it with its block information if available.
    *
    */
-  init: () => Promise<void> = async () => {
+  init = async (): Promise<void> => {
     const box = await this.network.getBox();
     this.logger.debug(`Initial box fetched: ${box ? box.boxId : 'none'}`);
     if (box) {
@@ -79,7 +79,6 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
     try {
       if (this.boxes.length === 0) {
         await this.init();
-        this.logger.debug('No boxes to track, skipping processing');
       }
       const tracker = generateTracker(this.address, this.tokens);
       this.logger.debug(

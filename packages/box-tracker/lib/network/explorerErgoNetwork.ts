@@ -28,7 +28,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
    * by querying the Ergo Explorer API.
    *
    */
-  protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
+  protected getBoxesByAddress = async (address: string): Promise<ErgoBox[]> => {
     const rawBoxes = (
       await this.api.v1.getApiV1BoxesUnspentByaddressP1(address)
     ).items;
@@ -54,12 +54,13 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
       }));
     }
     return [];
-  }
+  };
+
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
    *
    */
-  async getMempoolTxs(): Promise<Transaction[]> {
+  getMempoolTxs = async (): Promise<Transaction[]> => {
     const allTxs: Transaction[] = [];
     let offset = 0;
     const limit = 100;
@@ -105,5 +106,5 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
     }
 
     return allTxs;
-  }
+  };
 }
