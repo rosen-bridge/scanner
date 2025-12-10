@@ -5,7 +5,7 @@ import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import { ObservationEntityAction } from '../actions/db';
@@ -52,7 +52,7 @@ export abstract class AbstractObservationExtractor<
    */
   protected preprocessTransactions = (
     txs: Array<TransactionType>,
-    block: Block, // eslint-disable-line @typescript-eslint/no-unused-vars
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => txs;
 
   /**
@@ -63,7 +63,7 @@ export abstract class AbstractObservationExtractor<
    */
   processTransactions = (
     txs: Array<TransactionType>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     const filteredTxs = this.preprocessTransactions(txs, block);
@@ -105,7 +105,7 @@ export abstract class AbstractObservationExtractor<
    * Extractor box initialization
    * No action needed in observation extractors
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

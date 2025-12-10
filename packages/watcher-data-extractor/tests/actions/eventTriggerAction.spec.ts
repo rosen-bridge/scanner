@@ -31,7 +31,7 @@ describe('EventTrigger', () => {
     it('should spend specified boxes and update spend block info', async () => {
       await repository.insert([
         sampleEventEntity,
-        { ...sampleEventEntity, boxId: 'boxId2', id: 2 },
+        { ...sampleEventEntity, identifier: 'boxId2', id: 2 },
       ]);
       const result = await action.spendBoxes(
         [
@@ -46,12 +46,14 @@ describe('EventTrigger', () => {
         'extractorId',
       );
       expect(
-        (await repository.findBy({ boxId: 'id', spendBlock: 'hash' })).length,
+        (await repository.findBy({ identifier: 'id', spendBlock: 'hash' }))
+          .length,
       ).toEqual(1);
       expect(
-        (await repository.findBy({ boxId: 'id2', spendBlock: 'hash' })).length,
+        (await repository.findBy({ identifier: 'id2', spendBlock: 'hash' }))
+          .length,
       ).toEqual(0);
-      expect(result).toEqual([{ boxId: 'id' }]);
+      expect(result).toEqual([{ identifier: 'id' }]);
     });
   });
 });

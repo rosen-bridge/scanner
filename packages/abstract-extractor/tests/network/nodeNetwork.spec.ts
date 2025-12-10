@@ -7,7 +7,7 @@ import {
   nodeSpendingTxInfo,
   nodeCreationTxInfo,
   nodeTx,
-  convertedTx,
+  convertedTxWithInputs,
 } from './testData';
 
 vitest.mock('@rosen-clients/ergo-node');
@@ -50,7 +50,7 @@ describe('NodeNetwork', () => {
     it('should properly convert node api tx to extractor transaction', async () => {
       const nodeNetwork = new NodeNetwork('node_url');
       const tx = await nodeNetwork['convertTransaction'](nodeTx);
-      expect(tx).toEqual(convertedTx);
+      expect(tx).toEqual(convertedTxWithInputs);
     });
   });
 });

@@ -10,7 +10,7 @@ import {
   AbstractRosenDataExtractor,
   TokenTransformation,
 } from '@rosen-bridge/rosen-extractor';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
@@ -41,7 +41,7 @@ export abstract class BitcoinRunesAbstractObservationExtractor<
    */
   processTransactions = async (
     txs: Array<TransactionType>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const observations: Array<ExtractedObservation> = [];
     for (const transaction of txs) {

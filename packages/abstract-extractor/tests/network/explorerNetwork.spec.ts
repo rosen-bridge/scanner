@@ -5,9 +5,11 @@ import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { ExplorerNetwork } from '../../lib';
 import {
   convertedBox,
-  explorerBox,
+  explorerInputBox,
+  explorerOutputBox,
   explorerTxInfo,
   convertedTx,
+  convertedTxWithInputs,
   explorerTx,
   explorerBlockTx,
 } from './testData';
@@ -15,24 +17,48 @@ import {
 vitest.mock('@rosen-clients/ergo-explorer');
 
 describe('ExplorerNetwork', () => {
-  describe('convertBox', () => {
+  describe('convertOutputBox', () => {
     /**
-     * @target covertBox should properly convert explorer api box to ergo box
+     * @target covertOutputBox should properly convert explorer api output box to ergo box
      * @dependencies
      * @scenario
      * - mock getApiV1TransactionsP1 to return spending transaction
-     * - run test (call `covertBox`)
+     * - run test (call `covertOutputBox`)
      * @expected
      * - to convert box properly
      */
-    it('should properly convert explorer api box to ergo box', async () => {
+    it('should properly convert explorer api output box to ergo box', async () => {
       vitest.mocked(ergoExplorerClientFactory).mockReturnValue({
         v1: {
           getApiV1TransactionsP1: async () => explorerTxInfo,
         },
       } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
       const explorerNetwork = new ExplorerNetwork('explorer_url');
-      const ergoBox = await explorerNetwork['convertBox'](explorerBox);
+      const ergoBox =
+        await explorerNetwork['convertOutputBox'](explorerOutputBox);
+      expect(ergoBox).toEqual(convertedBox);
+    });
+  });
+
+  describe('convertInputBox', () => {
+    /**
+     * @target covertInputBox should properly convert explorer api input box to ergo box
+     * @dependencies
+     * @scenario
+     * - mock getApiV1TransactionsP1 to return spending transaction
+     * - run test (call `covertInputBox`)
+     * @expected
+     * - to convert box properly
+     */
+    it('should properly convert explorer api input box to ergo box', async () => {
+      vitest.mocked(ergoExplorerClientFactory).mockReturnValue({
+        v1: {
+          getApiV1TransactionsP1: async () => explorerTxInfo,
+        },
+      } as unknown as ReturnType<typeof ergoExplorerClientFactory>);
+      const explorerNetwork = new ExplorerNetwork('explorer_url');
+      const ergoBox =
+        await explorerNetwork['convertInputBox'](explorerInputBox);
       expect(ergoBox).toEqual(convertedBox);
     });
   });
@@ -50,7 +76,7 @@ describe('ExplorerNetwork', () => {
     it('should properly convert explorer api tx to extractor transaction', async () => {
       const explorerNetwork = new ExplorerNetwork('explorer_url');
       const tx = await explorerNetwork['convertTransaction'](explorerTx);
-      expect(tx).toEqual(convertedTx);
+      expect(tx).toEqual(convertedTxWithInputs);
     });
   });
 

@@ -39,13 +39,7 @@ export abstract class AbstractScanner<TransactionType> {
         this.extractors.map((e) => e.getId()),
       );
       for (const extractor of this.extractors) {
-        try {
-          await extractor.forkBlock(lastBlock.hash);
-        } catch (e) {
-          this.logger.error(
-            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`,
-          );
-        }
+        await extractor.forkBlock(lastBlock.hash);
       }
       await this.action.removeBlocksFromHeight(lastBlock.height);
       lastBlock = await this.action.getBlockAtHeight(lastBlock.height - 1);
@@ -144,7 +138,7 @@ export abstract class AbstractScanner<TransactionType> {
     );
     for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
-      await extractor.initializeBoxes(block);
+      await extractor.initializeData(block);
       await this.action.updateOrInsertExtractorStatus(
         extractor.getId(),
         block.height,
@@ -164,7 +158,6 @@ export abstract class AbstractScanner<TransactionType> {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
-    let success = true;
     const release = await this.initializeMutex.acquire();
     try {
       const extractorsStatus = await this.action.getExtractorsStatus([
@@ -208,15 +201,8 @@ export abstract class AbstractScanner<TransactionType> {
       }
       this.extractors.push(...this.newExtractors);
       this.newExtractors = [];
-    } catch (e) {
-      this.logger.warn(`Initialization for extractors failed with error ${e}`);
-      success = false;
     } finally {
       release();
     }
-    if (!success)
-      throw new Error(
-        `Initialization failed for new extractors ${getIds(this.newExtractors)}`,
-      );
   };
 }

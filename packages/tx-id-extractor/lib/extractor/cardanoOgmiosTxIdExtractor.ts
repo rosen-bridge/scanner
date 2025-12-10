@@ -3,7 +3,7 @@ import { Transaction } from '@cardano-ogmios/schema';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { TxAction } from '../actions/db';
 
@@ -35,7 +35,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const txIds = txs.map((item) => item.id);
     await this.action.storeTxs(txIds, block, this.getId());
@@ -53,7 +53,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older boxes related to the address
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

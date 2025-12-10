@@ -3,7 +3,7 @@ import { isCallException, Transaction, TransactionResponse } from 'ethers';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { TxAction } from '../actions/db';
 import { EvmTxStatus, ExtractedTx } from '../interfaces/types';
@@ -42,7 +42,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
    */
   processTransactions = async (
     txs: Array<TransactionResponse>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const extractedTxs: Array<ExtractedTx> = [];
     for (const tx of txs) {
@@ -59,7 +59,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
           if (result) status = EvmTxStatus.succeed;
           else
             throw Error(
-              `Impossible behavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
+              `ImpossibleBehavior: Evm Tx [${tx.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
             );
         } catch (e) {
           if (isCallException(e)) status = EvmTxStatus.failed;
@@ -90,7 +90,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
   /**
    * Initializes the database with older boxes related to the address
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

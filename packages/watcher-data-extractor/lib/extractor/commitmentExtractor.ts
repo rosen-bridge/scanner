@@ -3,7 +3,7 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import CommitmentAction from '../actions/commitmentAction';
@@ -53,7 +53,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -151,7 +151,7 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
    * Extractor box initialization
    * No action needed for commitment extractor
    */
-  initializeBoxes = async () => {
+  initializeData = async () => {
     return;
   };
 }

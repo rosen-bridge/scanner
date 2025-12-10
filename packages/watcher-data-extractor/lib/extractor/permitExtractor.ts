@@ -6,11 +6,7 @@ import { difference } from 'lodash-es';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import {
-  Block,
-  BlockInfo,
-  Transaction,
-} from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 
 import PermitAction from '../actions/permitAction';
@@ -57,7 +53,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -135,7 +131,7 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older permits related to the address
    */
-  initializeBoxes = async (initialBlock: BlockInfo) => {
+  initializeData = async (initialBlock: BlockInfo) => {
     let allStoredBoxIds = await this.actions.getAllPermitBoxIds(this.getId());
     // Extract unspent permits
     const unspentPermits = await this.getAllUnspentPermits(initialBlock.height);

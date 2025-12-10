@@ -4,7 +4,6 @@ import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
-  Block,
   BlockInfo,
   OutputBox,
   Transaction,
@@ -55,7 +54,7 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Transaction[],
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     try {
       const boxes: Array<ExtractedCollateral> = [];
@@ -126,11 +125,11 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older collaterals
    *
-   * @param {number} initialHeight
+   * @param {BlockInfo} initialBlock
    * @return {Promise<void>}
    * @memberof CollateralExtractor
    */
-  initializeBoxes = async (initialBlock: BlockInfo): Promise<void> => {
+  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
     const unspentCollaterals = await this.getAllUnspentCollaterals(
       initialBlock.height,
     );

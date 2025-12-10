@@ -209,6 +209,9 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
+      if (e instanceof Error && e.stack) {
+        this.logger.error(`error stack: ${e.stack}`);
+      }
     }
   };
 }

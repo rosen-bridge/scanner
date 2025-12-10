@@ -2,7 +2,7 @@ import { Buffer } from 'buffer';
 import * as ergoLib from 'ergo-lib-wasm-nodejs';
 
 import {
-  AbstractInitializableErgoExtractor,
+  AbstractErgoBoxExtractor,
   boxHasToken,
 } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
@@ -14,7 +14,7 @@ import { BoxEntity } from '../entities/boxEntity';
 import { ExtractedBox } from '../interfaces/types';
 import { JsonBI } from '../utils';
 
-export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
+export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
   ExtractedBox,
   BoxEntity
 > {
@@ -35,7 +35,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
     logger?: AbstractLogger,
     initialize = true,
   ) {
-    super(type, url, address, logger, initialize);
+    super({ type, url, address, active: initialize }, logger);
     this.id = id;
     this.networkType = networkType;
     this.ergoTree = address
@@ -55,7 +55,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
    * @param box
    * @return true if the box has the required data and false otherwise
    */
-  hasData = (box: OutputBox): boolean => {
+  hasBoxData = (box: OutputBox): boolean => {
     return (
       (!this.ergoTree || box.ergoTree == this.ergoTree) &&
       (this.tokens.length == 0 || boxHasToken(box, this.tokens))
@@ -70,7 +70,7 @@ export class ErgoUTXOExtractor extends AbstractInitializableErgoExtractor<
   extractBoxData = (box: OutputBox): ExtractedBox | undefined => {
     const ergoBox = ergoLib.ErgoBox.from_json(JsonBI.stringify(box));
     return {
-      boxId: ergoBox.box_id().to_str(),
+      identifier: ergoBox.box_id().to_str(),
       address: ergoLib.Address.recreate_from_ergo_tree(
         ergoLib.ErgoTree.from_base16_bytes(
           ergoBox.ergo_tree().to_base16_bytes(),

@@ -1,5 +1,5 @@
 export interface ExtractedBox {
-  boxId: string;
+  identifier: string;
   address: string;
   serialized: string;
 }

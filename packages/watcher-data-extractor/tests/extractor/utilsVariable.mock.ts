@@ -35,7 +35,7 @@ export const sampleEventEntity: EventTriggerEntity = {
   txId: 'txId',
   eventId: 'eventId',
   extractor: 'extractorId',
-  boxId: 'id',
+  identifier: 'id',
   serialized: 'boxSerialized',
   block: 'hash',
   height: 10,

@@ -2,7 +2,7 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNodeRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { Block, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import { NUMBER_OF_BLOCKS_PER_YEAR } from '../const';
@@ -40,7 +40,7 @@ export class ErgoObservationExtractor extends AbstractObservationExtractor<Trans
    */
   protected preprocessTransactions = (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ) => {
     return txs.filter((transaction) => {
       for (let i = 0; i < transaction.outputs.length; i++) {

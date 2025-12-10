@@ -6,11 +6,7 @@ import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
-import {
-  Block,
-  BlockInfo,
-  Transaction,
-} from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
@@ -56,7 +52,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
    */
   processTransactions = (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       try {
@@ -145,7 +141,7 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
   /**
    * Initializes the database with older frauds
    */
-  initializeBoxes = async (initialBlock: BlockInfo) => {
+  initializeData = async (initialBlock: BlockInfo) => {
     // Getting unspent boxes
     this.logger.debug(
       `Initializing fraud table. storing fraud boxes created bellow height ${initialBlock.height}.`,

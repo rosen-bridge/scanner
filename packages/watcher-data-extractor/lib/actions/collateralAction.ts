@@ -9,7 +9,7 @@ import {
   Repository,
 } from '@rosen-bridge/extended-typeorm';
 import JsonBigInt from '@rosen-bridge/json-bigint';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import CollateralEntity from '../entities/collateralEntity';
 import { ExtractedCollateral } from '../interfaces/extractedCollateral';
@@ -74,7 +74,7 @@ class CollateralAction {
    */
   storeCollaterals = async (
     collaterals: Array<ExtractedCollateral>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ): Promise<boolean> => {
     if (collaterals.length == 0) {
@@ -176,7 +176,7 @@ class CollateralAction {
    */
   spendCollaterals = async (
     spendInfos: Array<SpendInfo>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ): Promise<void> => {
     for (const spendInfo of spendInfos) {

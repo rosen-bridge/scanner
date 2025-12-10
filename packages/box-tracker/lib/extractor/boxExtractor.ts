@@ -1,7 +1,7 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
-  Block,
+  BlockInfo,
   ErgoNetworkType,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
@@ -70,7 +70,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    */
   processTransactions = async (
     txs: Array<Transaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     const spentBoxes = new Set<string>();
     let candidateBoxes: ErgoBox[] = [];
@@ -124,7 +124,7 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
    * No-op initialization.
    *
    */
-  initializeBoxes = async (): Promise<void> => {
+  initializeData = async (): Promise<void> => {
     // intentionally empty; this extractor does not require initialization
   };
 
