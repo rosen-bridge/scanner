@@ -141,18 +141,11 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
 }
 
 export class FailExtractor extends AbstractExtractor<{ id: string }> {
-  forkBlock = async (
-    hash: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => {
-    /* empty */
-  };
+  forkBlock = async () => Promise.resolve();
 
   getId = () => 'fail extractor';
 
   initializeData = () => Promise.resolve();
 
-  processTransactions = async (
-    txs: Array<{ id: string }>, // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => false;
+  processTransactions = () => Promise.resolve(false);
 }

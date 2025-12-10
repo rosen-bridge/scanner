@@ -1,4 +1,4 @@
-import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import {
   AbstractErgoExtractor,
@@ -13,10 +13,7 @@ export class MockedErgoExtractor extends AbstractErgoExtractor<
 > {
   actions: AbstractErgoAction<AbstractEntityData, AbstractErgoEntity>;
 
-  processTransactions = (
-    txs: Transaction[], // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => Promise.resolve(true);
+  processTransactions = () => Promise.resolve(true);
 
   initializeData: (initialBlock: BlockInfo) => Promise<void>;
 

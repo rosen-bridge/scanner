@@ -16,8 +16,6 @@ export class MockedErgoTxExtractor extends AbstractErgoTxExtractor<
   hasTxData = (
     tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) => false;
-  extractTxData = (
-    tx: Transaction, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => undefined;
+  extractTxData = () => undefined;
   getId = () => 'TestErgoExtractor';
 }
