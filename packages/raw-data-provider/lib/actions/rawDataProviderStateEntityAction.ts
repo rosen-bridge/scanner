@@ -1,5 +1,6 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { BlockEntity, PROCEED } from '@rosen-bridge/abstract-scanner';
 import {
   DataSource,
   MoreThan,
@@ -11,6 +12,7 @@ import { RawDataProviderStateEntity } from '../entities';
 
 export class RawDataProviderStateEntityAction {
   protected readonly repository: Repository<RawDataProviderStateEntity>;
+  protected readonly blockRepository: Repository<BlockEntity>;
   protected readonly observationRepository: Repository<ObservationEntity>;
 
   constructor(
@@ -18,6 +20,7 @@ export class RawDataProviderStateEntityAction {
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
     this.repository = dataSource.getRepository(RawDataProviderStateEntity);
+    this.blockRepository = dataSource.getRepository(BlockEntity);
     this.observationRepository = dataSource.getRepository(ObservationEntity);
   }
 
@@ -87,5 +90,22 @@ export class RawDataProviderStateEntityAction {
       order: { height: 'ASC' },
       take: length,
     });
+  };
+
+  /**
+   * return saved block by scannerName & height if exists
+   *
+   * @param scannerName
+   * @param height
+   * @return Promise<BlockEntity or undefined>
+   */
+  getBlockOfHeight = async (
+    scannerName: string,
+    height: number,
+  ): Promise<BlockEntity | undefined> => {
+    const block = await this.blockRepository.findOne({
+      where: { status: PROCEED, scanner: scannerName, height: height },
+    });
+    return block || undefined;
   };
 }
