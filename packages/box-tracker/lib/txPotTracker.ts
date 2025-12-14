@@ -1,19 +1,25 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { TransactionStatus, TxPot } from '@rosen-bridge/tx-pot';
 
 import { generateTracker } from './boxHandler';
 import { MempoolTrackResult, Token, TxDeserializer } from './interfaces';
 
 export class TxPotTracker {
   readonly logger: AbstractLogger;
+  private deserializeTx: TxDeserializer;
+  private TxPot: TxPot;
 
   /**
    * Creates an instance of TxPotTracker.
    */
   constructor(
-    private deserializeTx: TxDeserializer,
+    deserializeTx: TxDeserializer,
+    TxPot: TxPot,
     logger?: AbstractLogger,
   ) {
+    this.deserializeTx = deserializeTx;
+    this.TxPot = TxPot;
     this.logger = logger ? logger : new DummyLogger();
   }
 
@@ -25,23 +31,19 @@ export class TxPotTracker {
   track = async (
     address: string,
     tokens: Token[],
-    transactions: string[],
   ): Promise<MempoolTrackResult> => {
     const tracker = generateTracker(address, tokens);
+    const activeTxs = [
+      ...(await this.TxPot.getTxsByStatus(TransactionStatus.SIGNED, false)),
+      ...(await this.TxPot.getTxsByStatus(TransactionStatus.SENT, false)),
+    ].map(this.deserializeTx);
+
     this.logger.debug(
       `Tracking txPot for address: ${address} with tokens: ${tokens.map((token) => token.tokenId)}`,
     );
     const boxes: OutputBox[] = [];
     const spentBox = new Set<string>();
-    const txs: Transaction[] = [];
-    for (const tx of transactions) {
-      try {
-        txs.push(this.deserializeTx(tx));
-      } catch {
-        /*empty*/
-      }
-    }
-    for (const tx of txs) {
+    for (const tx of activeTxs) {
       for (const inputBox of tx.inputs) {
         this.logger.debug(`Found spent box in txPot: ${inputBox.boxId}`);
         spentBox.add(inputBox.boxId);

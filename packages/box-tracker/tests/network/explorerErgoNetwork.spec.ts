@@ -11,11 +11,7 @@ vi.mock('@rosen-clients/ergo-explorer', () => ({
     v0: {
       getApiV0TransactionsUnconfirmed: vi
         .fn()
-        .mockImplementation(({ limit = 100, offset = 0 } = {}) => {
-          return Promise.resolve({
-            items: mockedExplorerTxs.slice(offset, offset + limit),
-          });
-        }),
+        .mockResolvedValue({ items: mockedExplorerTxs }),
     },
   })),
 }));

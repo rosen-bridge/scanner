@@ -1,9 +1,9 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ErgoNetworkType, OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import { reduceTrack } from './boxHandler';
 import { BoxExtractor } from './extractor/boxExtractor';
-import { Token, TxDeserializer } from './interfaces';
+import { Token, TxPotOptions } from './interfaces';
 import { MempoolTracker } from './mempoolTracker';
 import { AbstractErgoNetwork } from './network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from './network/explorerErgoNetwork';
@@ -14,11 +14,10 @@ export class BoxTracker {
   private readonly network: AbstractErgoNetwork;
   private readonly address: string;
   private readonly tokens: Token[];
-  private readonly transactions?: string[];
-  private txPot?: TxPotTracker;
+  private txPotTracker?: TxPotTracker;
   private extractor: BoxExtractor;
-  private mempool: MempoolTracker;
-  private logger: DummyLogger;
+  private mempoolTracker: MempoolTracker;
+  private logger: AbstractLogger;
 
   /**
    * Creates a new BoxTracker instance.
@@ -28,19 +27,16 @@ export class BoxTracker {
    * @param address - The Ergo address to track boxes for
    * @param tokens - List of tokens to track (tokenId + amount)
    * @param logger - Optional logger for debug/info messages
-   * @param options.txPot - Optional list of transaction IDs to track as part of a transaction pot
-   * @param options.txDeserialization - Optional deserializer to parse TxPot transactions
+   * @param txPot - Optional transaction pot
+   * @param txDeserialization - Optional deserializer to parse TxPot transactions
    */
   constructor(
     networkType: ErgoNetworkType,
     networkUrl: string,
     address: string,
     tokens: Token[],
-    logger?: DummyLogger,
-    options?: {
-      transactions?: string[];
-      txDeserialization?: TxDeserializer;
-    },
+    logger?: AbstractLogger,
+    txPotOptions?: TxPotOptions,
   ) {
     if (networkType == ErgoNetworkType.Explorer) {
       this.network = new ExplorerErgoNetwork(address, tokens, networkUrl);
@@ -49,10 +45,13 @@ export class BoxTracker {
     }
     this.address = address;
     this.tokens = tokens;
-    this.logger = logger || new DummyLogger();
-    this.transactions = options?.transactions;
-    if (this.transactions && options?.txDeserialization) {
-      this.txPot = new TxPotTracker(options.txDeserialization, this.logger);
+    this.logger = logger ? logger : new DummyLogger();
+    if (txPotOptions) {
+      this.txPotTracker = new TxPotTracker(
+        txPotOptions.txDeserializer,
+        txPotOptions.txPot,
+        this.logger,
+      );
     }
     this.extractor = new BoxExtractor(
       networkType,
@@ -61,7 +60,7 @@ export class BoxTracker {
       tokens,
       this.logger,
     );
-    this.mempool = new MempoolTracker(this.network, this.logger);
+    this.mempoolTracker = new MempoolTracker(this.network, this.logger);
   }
 
   /**
@@ -77,23 +76,23 @@ export class BoxTracker {
    * Retrieves the unspent OutputBox for the tracked address and tokens
    * The search considers:
    * - The most recent box from the BoxExtractor
-   * - Unspent boxes in the mempool (unconfirmed transactions)
+   * - Unspent boxes in the mempoolTracker (unconfirmed transactions)
    * - Optional transaction pot boxes (if txPot and txDeserialization are provided)
    *
-   * The function also filters out boxes that are spent according to the mempool and TxPot.
+   * The function also filters out boxes that are spent according to the mempoolTracker and TxPot.
    *
    * @returns The selected `OutputBox` or `undefined` if no suitable unspent box is found
    */
   getBox = async (): Promise<OutputBox | undefined> => {
     const extractorBox = this.extractor.getRecentBox();
-    const mempoolTrackResult = await this.mempool.track(
+    const mempoolTrackerTrackResult = await this.mempoolTracker.track(
       this.address,
       this.tokens,
     );
-    const mempoolUnspentBoxes = mempoolTrackResult.boxes;
-    const mempoolSpentBoxIds = mempoolTrackResult.spentBoxIds;
+    const mempoolTrackerUnspentBoxes = mempoolTrackerTrackResult.boxes;
+    const mempoolTrackerSpentBoxIds = mempoolTrackerTrackResult.spentBoxIds;
     this.logger.debug(
-      `BoxTracker: unspent boxIds: ${mempoolUnspentBoxes.map((box) => box.boxId)}`,
+      `BoxTracker: unspent boxIds: ${mempoolTrackerUnspentBoxes.map((box) => box.boxId)}`,
     );
 
     if (!extractorBox) {
@@ -104,11 +103,10 @@ export class BoxTracker {
     this.logger.debug(`BoxTracker: Extractor box id: ${extractorBox.boxId}`);
     let txpotUnspentBoxes: OutputBox[] = [];
     let txpotSpentBoxIds: string[] = [];
-    if (this.txPot && this.transactions) {
-      const txpotResult = await this.txPot.track(
+    if (this.txPotTracker) {
+      const txpotResult = await this.txPotTracker.track(
         this.address,
         this.tokens,
-        this.transactions,
       );
       txpotSpentBoxIds = txpotResult.spentBoxIds;
       txpotUnspentBoxes = txpotResult.boxes;
@@ -118,12 +116,12 @@ export class BoxTracker {
     );
 
     const allUnspentBoxes = [
-      ...mempoolUnspentBoxes,
+      ...mempoolTrackerUnspentBoxes,
       ...txpotUnspentBoxes,
       extractorBox!,
     ];
 
-    const allSpentBoxIds = [...mempoolSpentBoxIds, ...txpotSpentBoxIds];
+    const allSpentBoxIds = [...mempoolTrackerSpentBoxIds, ...txpotSpentBoxIds];
     this.logger.debug(
       `BoxTracker: Total unspent boxIds: ${allUnspentBoxes.map((box) => box.boxId)}, total spent boxIds: ${allSpentBoxIds}`,
     );

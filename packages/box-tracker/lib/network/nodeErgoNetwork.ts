@@ -105,6 +105,7 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       );
 
       offset += rawTxs.length;
+      if (rawTxs.length < limit) break;
     }
 
     return allTxs;

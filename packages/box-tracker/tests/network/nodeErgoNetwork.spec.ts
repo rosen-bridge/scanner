@@ -4,11 +4,7 @@ import { mockedNodeBoxes, mockedNodeTxs } from './testData';
 vi.mock('@rosen-clients/ergo-node', () => ({
   default: vi.fn(() => ({
     getBoxesByAddressUnspent: vi.fn().mockResolvedValue(mockedNodeBoxes),
-    getUnconfirmedTransactions: vi
-      .fn()
-      .mockImplementation(({ limit = 100, offset = 0 }) => {
-        return Promise.resolve(mockedNodeTxs.slice(offset, offset + limit));
-      }),
+    getUnconfirmedTransactions: vi.fn().mockResolvedValue(mockedNodeTxs),
     getFullBlockAt: vi.fn().mockResolvedValue(['block-id-1']),
   })),
 }));

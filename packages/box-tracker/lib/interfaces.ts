@@ -1,4 +1,5 @@
 import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { TransactionEntity, TxPot } from '@rosen-bridge/tx-pot';
 
 export type Token = {
   tokenId: string;
@@ -14,4 +15,9 @@ export interface MempoolTrackResult {
   spentBoxIds: string[];
 }
 
-export type TxDeserializer = (serializedTx: string) => Transaction;
+export type TxDeserializer = (serializedTx: TransactionEntity) => Transaction;
+
+export type TxPotOptions = {
+  txPot: TxPot;
+  txDeserializer: TxDeserializer;
+};

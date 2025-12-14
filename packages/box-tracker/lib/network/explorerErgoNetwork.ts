@@ -103,6 +103,7 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
       );
 
       offset += rawTxs.length;
+      if (rawTxs.length < limit) break;
     }
 
     return allTxs;
