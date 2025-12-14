@@ -52,6 +52,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
     const extractor = {
       processTransactions: vi.fn(),
+      getId: vi.fn().mockReturnValue('mocked-extractor'),
     } as unknown as CardanoOgmiosObservationExtractor;
 
     // mock interaction context
@@ -75,7 +76,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
       extractor,
       { host: 'localhost', port: 1337 },
       new DummyLogger(),
-      {} as any,
     );
   });
 
@@ -99,6 +99,9 @@ describe('CardanoOgmiosRawDataProvider', () => {
       let rollForwardHandler: any;
 
       provider['findIntersection'] = vi.fn().mockReturnValue({});
+      provider['action'].fetchChainObservations = vi
+        .fn()
+        .mockResolvedValue([{ height: 50 }]);
 
       (createChainSynchronizationClient as any).mockImplementation(
         async (_ctx: any, handlers: any) => {
@@ -157,6 +160,35 @@ describe('CardanoOgmiosRawDataProvider', () => {
       await expect(
         provider['fetchObservationTxs'](observation),
       ).rejects.toThrowError();
+    });
+
+    /**
+     * @target should return empty array when observation is the first stored record
+     * @dependencies
+     * - mocked fetchChainObservations action
+     * @scenario
+     * - mock first stored observation height equal to current observation height
+     * - call fetchObservationTxs with the first observation
+     * @expected
+     * - returned result should be an empty array
+     * - warning log should be emitted
+     */
+    it<TestInterface>('should return empty array when observation is the first stored record', async ({
+      provider,
+    }) => {
+      provider['action'].fetchChainObservations = vi
+        .fn()
+        .mockResolvedValue([{ height: 51 }]);
+
+      const observation: ObservationEntity = {
+        id: 'obs1',
+        sourceTxId: 'tx123',
+        height: 51,
+      } as any;
+
+      const result = await provider['fetchObservationTxs'](observation);
+
+      expect(result).toEqual([]);
     });
   });
 
@@ -341,7 +373,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
     }) => {
       provider['action'].getBlockOfHeight = vi.fn().mockResolvedValue({
         hash: 'block-hash',
-        extra: 50,
+        extra: 9,
       });
 
       const result = await provider['findIntersection'](intersectContext, 10);
@@ -372,50 +404,24 @@ describe('CardanoOgmiosRawDataProvider', () => {
     });
 
     /**
-     * @target should use initialSlotAndHash when no stored block exists
+     * @target should use origin when stored block height is equal to 1
      * @scenario
-     * - no stored block exists for given height
-     * - initialSlotAndHash is defined with slot and hash
-     * - ogmios findIntersection returns a valid intersection
-     * @expected
-     * - returned value should be the intersection point from ogmios
-     */
-    it<TestInterface>('should use initialSlotAndHash when no stored block exists', async ({
-      provider,
-      intersectContext,
-    }) => {
-      provider['initialSlotAndHash'] = {
-        slot: 20,
-        hash: 'initial-hash',
-      };
-      provider['action'].getBlockOfHeight = vi
-        .fn()
-        .mockResolvedValue(undefined);
-
-      const result = await provider['findIntersection'](intersectContext, 5);
-
-      expect(result).toEqual(cardanoSampleIntersection);
-    });
-
-    /**
-     * @target should use origin when no stored block and no initialSlotAndHash exist
-     * @scenario
-     * - no stored block exists for given height
      * - initialSlotAndHash is undefined
      * - ogmios findIntersection returns a valid intersection
      * @expected
      * - origin should be used as intersect point
      * - returned value should be the intersection point from ogmios
      */
-    it<TestInterface>('should use origin when no stored block and no initialSlotAndHash exist', async ({
+    it<TestInterface>('should use origin when stored block height is equal to 1', async ({
       provider,
       intersectContext,
     }) => {
       provider['action'].getBlockOfHeight = vi
         .fn()
         .mockResolvedValue(undefined);
+      provider['action'].fetchChainObservations = vi.fn().mockResolvedValue([]);
 
-      const result = await provider['findIntersection'](intersectContext, 3);
+      const result = await provider['findIntersection'](intersectContext, 1);
 
       expect(result).toEqual(cardanoSampleIntersection);
     });

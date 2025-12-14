@@ -15,21 +15,19 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 
 import { AbstractRawDataProvider } from '../../abstractRawDataProvider';
-import {
-  ForwardResponse,
-  OgmiosConnectionInfoInterface,
-  PointType,
-} from '../../types';
+import { ForwardResponse, OgmiosConnectionInfoInterface } from '../../types';
 
 export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transaction> {
+  protected firstHeight: number | undefined;
+
   constructor(
     protected dataSource: DataSource,
     protected extractor: CardanoOgmiosObservationExtractor,
     protected ogmiosConnectionInfo: OgmiosConnectionInfoInterface,
     protected logger: AbstractLogger,
-    protected initialSlotAndHash?: PointType,
   ) {
     super('cardano', dataSource, extractor, logger);
+    this.firstHeight = undefined;
   }
 
   /**
@@ -41,22 +39,25 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     height: number,
   ) => {
     const block = await this.action.getBlockOfHeight(this.chain, height);
+    if (!block && height != 1)
+      throw new Error(
+        `Block is undefined on ${this.chain} chain at height ${height}`,
+      );
     if (block && block.extra == undefined)
       throw new Error(
         `Slot value is undefined for block on ${this.chain} chain at height ${height}`,
       );
 
-    const point = !block
-      ? this.initialSlotAndHash?.slot && this.initialSlotAndHash?.hash
-        ? ({
-            slot: this.initialSlotAndHash.slot,
-            id: this.initialSlotAndHash.hash,
-          } as Point)
-        : 'origin'
-      : ({
-          slot: Number(block.extra),
-          id: block.hash,
-        } as Point);
+    let point: Point | 'origin' = 'origin';
+    if (block)
+      point = {
+        slot: Number(block.extra),
+        id: block.hash,
+      } as Point;
+    if (point == 'origin' && height != 1)
+      throw new Error(
+        `Can't provide point details for observation at [${height}] height, previous block details not exists.`,
+      );
     this.logger.debug(
       `RawDataProvider fetched point of cardano-ogmios block at [${height}] height is ${JSON.stringify(point)}`,
     );
@@ -130,6 +131,23 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
   protected fetchObservationTxs = async (observation: ObservationEntity) => {
     let tx;
     try {
+      if (!this.firstHeight)
+        this.firstHeight = (
+          await this.action.fetchChainObservations(
+            this.chain,
+            0,
+            this.extractor.getId(),
+            1,
+          )
+        ).at(0)?.height;
+
+      if (this.firstHeight && observation.height == this.firstHeight) {
+        this.logger.warn(
+          `No previous observation found for transaction ${observation.sourceTxId} at height ${observation.height}; this is the first stored record`,
+        );
+        return [];
+      }
+
       const context: InteractionContext = await createInteractionContext(
         (err) =>
           this.logger.error(`creating of Interaction-Context failed: ${err}`),
