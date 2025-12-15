@@ -2,4 +2,4 @@
 '@rosen-bridge/raw-data-provider': minor
 ---
 
-Initialize raw data provider implementation for chains
+Initialize raw-data-provider package

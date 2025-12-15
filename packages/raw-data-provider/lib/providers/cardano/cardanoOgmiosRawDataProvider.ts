@@ -41,11 +41,11 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     const block = await this.action.getBlockOfHeight(this.chain, height);
     if (!block && height != 1)
       throw new Error(
-        `Block is undefined on ${this.chain} chain at height ${height}`,
+        `Block is undefined on ${this.chain} chain at ${height} height`,
       );
     if (block && block.extra == undefined)
       throw new Error(
-        `Slot value is undefined for block on ${this.chain} chain at height ${height}`,
+        `Slot value is undefined for block on ${this.chain} chain at ${height} height`,
       );
 
     let point: Point | 'origin' = 'origin';
@@ -82,7 +82,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     observation: ObservationEntity,
   ) => {
     let tx;
-    let resolveDone!: () => void;
+    let resolveDone: () => void;
 
     const done = new Promise<void>((resolve) => {
       resolveDone = resolve;

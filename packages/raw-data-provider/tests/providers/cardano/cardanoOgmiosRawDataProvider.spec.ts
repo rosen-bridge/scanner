@@ -7,7 +7,6 @@ import {
   createInteractionContext,
   InteractionContext,
 } from '@cardano-ogmios/client/dist/Connection';
-import { Point } from '@cardano-ogmios/schema';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -40,7 +39,6 @@ interface TestInterface {
   provider: CardanoOgmiosRawDataProvider;
   mockClient: any;
   intersectContext: InteractionContext;
-  intersect: Point | 'origin';
 }
 
 describe('CardanoOgmiosRawDataProvider', () => {
@@ -48,7 +46,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
     const dataSource = await createDatabase();
 
     ctx.intersectContext = {} as any;
-    ctx.intersect = 'origin';
 
     const extractor = {
       processTransactions: vi.fn(),
@@ -125,7 +122,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
     });
 
     /**
-     * @target should throw when tx not found inside praos block
+     * @target should throw error when tx not found inside praos block
      * @dependencies
      * - mocked chainSync client with praos block without tx
      * @scenario
@@ -133,7 +130,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
      * @expected
      * - throws "Transaction not found"
      */
-    it<TestInterface>('should throw when tx not found inside praos block', async ({
+    it<TestInterface>('should throw error when tx not found inside praos block', async ({
       provider,
     }) => {
       const observation: ObservationEntity = cardanoSampleObservation2 as any;
@@ -171,7 +168,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
      * - call fetchObservationTxs with the first observation
      * @expected
      * - returned result should be an empty array
-     * - warning log should be emitted
      */
     it<TestInterface>('should return empty array when observation is the first stored record', async ({
       provider,
@@ -192,6 +188,34 @@ describe('CardanoOgmiosRawDataProvider', () => {
     });
   });
 
+  /**
+   * @target should throw error when observation is not the first stored record
+   * @dependencies
+   * - mocked fetchChainObservations action
+   * @scenario
+   * - mock first stored observation height equal to 50
+   * - call fetchObservationTxs with the not first observation
+   * @expected
+   * - function should throw an error
+   */
+  it<TestInterface>('should throw error when observation is not the first stored record', async ({
+    provider,
+  }) => {
+    provider['action'].fetchChainObservations = vi
+      .fn()
+      .mockResolvedValue([{ height: 50 }]);
+
+    const observation: ObservationEntity = {
+      id: 'obs1',
+      sourceTxId: 'tx123',
+      height: 100,
+    } as any;
+
+    await expect(
+      provider['fetchObservationTxs'](observation),
+    ).rejects.toThrowError();
+  });
+
   describe('fetchTx', () => {
     /**
      * @target should return the matched transaction when a praos block contains the source transaction id
@@ -205,7 +229,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
     it<TestInterface>('should return the matched transaction when a praos block contains the source transaction id', async ({
       provider,
       intersectContext,
-      intersect,
     }) => {
       let rollForwardHandler: any;
 
@@ -226,7 +249,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const result = await provider['fetchTx'](
         intersectContext,
-        intersect,
+        'origin',
         cardanoSampleObservation as any,
       );
 
@@ -246,7 +269,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
       provider,
       mockClient,
       intersectContext,
-      intersect,
     }) => {
       let rollForwardHandler: any;
 
@@ -259,7 +281,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const promise = provider['fetchTx'](
         intersectContext,
-        intersect,
+        {} as any,
         cardanoSampleObservation as any,
       );
 
@@ -293,7 +315,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
       provider,
       mockClient,
       intersectContext,
-      intersect,
     }) => {
       let rollForwardHandler: any;
 
@@ -306,7 +327,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const promise = provider['fetchTx'](
         intersectContext,
-        intersect,
+        {} as any,
         cardanoSampleObservation as any,
       );
 
@@ -332,7 +353,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
       provider,
       mockClient,
       intersectContext,
-      intersect,
     }) => {
       let rollForwardHandler: any;
 
@@ -345,7 +365,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const promise = provider['fetchTx'](
         intersectContext,
-        intersect,
+        {} as any,
         cardanoSampleObservation as any,
       );
 
