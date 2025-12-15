@@ -108,4 +108,20 @@ export class RawDataProviderStateEntityAction {
     });
     return block || undefined;
   };
+
+  /**
+   * return lowest height of saved block by chain if exists
+   *
+   * @param chain
+   * @return Promise<BlockEntity or undefined>
+   */
+  getFirstBlockOfChain = async (
+    chain: string,
+  ): Promise<BlockEntity | undefined> => {
+    const block = await this.blockRepository.find({
+      where: { status: PROCEED, scanner: chain, height: MoreThan(0) },
+      take: 1,
+    });
+    return block.at(0);
+  };
 }

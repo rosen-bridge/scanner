@@ -172,9 +172,9 @@ describe('CardanoOgmiosRawDataProvider', () => {
     it<TestInterface>('should return empty array when observation is the first stored record', async ({
       provider,
     }) => {
-      provider['action'].fetchChainObservations = vi
+      provider['action'].getFirstBlockOfChain = vi
         .fn()
-        .mockResolvedValue([{ height: 51 }]);
+        .mockReturnValue({ height: 51 });
 
       const observation: ObservationEntity = {
         id: 'obs1',
@@ -201,9 +201,9 @@ describe('CardanoOgmiosRawDataProvider', () => {
   it<TestInterface>('should throw error when observation is not the first stored record', async ({
     provider,
   }) => {
-    provider['action'].fetchChainObservations = vi
+    provider['action'].getFirstBlockOfChain = vi
       .fn()
-      .mockResolvedValue([{ height: 50 }]);
+      .mockReturnValue({ height: 50 });
 
     const observation: ObservationEntity = {
       id: 'obs1',
@@ -249,7 +249,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const result = await provider['fetchTx'](
         intersectContext,
-        'origin',
+        {} as any,
         cardanoSampleObservation as any,
       );
 
@@ -421,29 +421,6 @@ describe('CardanoOgmiosRawDataProvider', () => {
       await expect(
         provider['findIntersection'](intersectContext, 10),
       ).rejects.toThrowError();
-    });
-
-    /**
-     * @target should use origin when stored block height is equal to 1
-     * @scenario
-     * - initialSlotAndHash is undefined
-     * - ogmios findIntersection returns a valid intersection
-     * @expected
-     * - origin should be used as intersect point
-     * - returned value should be the intersection point from ogmios
-     */
-    it<TestInterface>('should use origin when stored block height is equal to 1', async ({
-      provider,
-      intersectContext,
-    }) => {
-      provider['action'].getBlockOfHeight = vi
-        .fn()
-        .mockResolvedValue(undefined);
-      provider['action'].fetchChainObservations = vi.fn().mockResolvedValue([]);
-
-      const result = await provider['findIntersection'](intersectContext, 1);
-
-      expect(result).toEqual(cardanoSampleIntersection);
     });
   });
 });

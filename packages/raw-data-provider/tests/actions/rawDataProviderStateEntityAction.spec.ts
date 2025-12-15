@@ -212,4 +212,38 @@ describe('RawDataProviderStateEntityAction', () => {
       expect(result).toEqual(undefined);
     });
   });
+
+  describe('getFirstBlockOfChain', () => {
+    /**
+     * @target should return first saved block for given chain when block exists
+     * @dependencies
+     * - BlockAction instance
+     * @scenario
+     * - call getFirstBlockOfChain with a chain that has at least one saved block
+     * @expected
+     * - the returned value should be the first saved block of the given chain
+     */
+    it<TestInterface>('should return first saved block for given chain when block exists', async ({
+      action,
+    }) => {
+      const result = await action.getFirstBlockOfChain('cardano');
+      expect(result).toBeDefined();
+    });
+
+    /**
+     * @target should return undefined when no block exists for given chain
+     * @dependencies
+     * - BlockAction instance
+     * @scenario
+     * - call getFirstBlockOfChain with a chain that has no saved blocks
+     * @expected
+     * - the returned value should be undefined
+     */
+    it<TestInterface>('should return undefined when no block exists for given chain', async ({
+      action,
+    }) => {
+      const result = await action.getFirstBlockOfChain('tron');
+      expect(result).toEqual(undefined);
+    });
+  });
 });

@@ -39,7 +39,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     height: number,
   ) => {
     const block = await this.action.getBlockOfHeight(this.chain, height);
-    if (!block && height != 1)
+    if (!block)
       throw new Error(
         `Block is undefined on ${this.chain} chain at ${height} height`,
       );
@@ -48,13 +48,13 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
         `Slot value is undefined for block on ${this.chain} chain at ${height} height`,
       );
 
-    let point: Point | 'origin' = 'origin';
+    let point: Point | undefined = undefined;
     if (block)
       point = {
         slot: Number(block.extra),
         id: block.hash,
       } as Point;
-    if (point == 'origin' && height != 1)
+    if (!point)
       throw new Error(
         `Can't provide point details for observation at [${height}] height, previous block details not exists.`,
       );
@@ -65,20 +65,20 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     this.logger.debug(
       `RawDataProvider cardano-ogmios returned intersection value is ${JSON.stringify({ point: intersect.intersection, height: height })}`,
     );
-    return intersect.intersection;
+    return intersect.intersection as Point;
   };
 
   /**
    * fetches a transaction from cardano-ogmios using the observation source transaction id
    *
    * @param context interaction context used to create the ogmios synchronization client
-   * @param intersect starting point for chain synchronization or origin
+   * @param intersect starting point for chain synchronization
    * @param observation observation entity containing the source transaction id
    * @returns the matched transaction or undefined if not found
    */
   protected fetchTx = async (
     context: InteractionContext,
-    intersect: Point | 'origin',
+    intersect: Point,
     observation: ObservationEntity,
   ) => {
     let tx;
@@ -133,13 +133,8 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     try {
       if (!this.firstHeight)
         this.firstHeight = (
-          await this.action.fetchChainObservations(
-            this.chain,
-            0,
-            this.extractor.getId(),
-            1,
-          )
-        ).at(0)?.height;
+          await this.action.getFirstBlockOfChain(this.chain)
+        )?.height;
 
       if (this.firstHeight && observation.height == this.firstHeight) {
         this.logger.warn(
