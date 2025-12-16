@@ -1,15 +1,10 @@
-interface ExtractedFraud {
-  boxId: string;
+export interface ExtractedFraud {
+  identifier: string;
   serialized: string;
   triggerBoxId: string;
   wid: string;
   rwtCount: string;
-  blockId?: string;
-  height?: number;
-  txId?: string;
-  spendBlock?: string;
-  spendHeight?: number;
-  spendTxId?: string;
+  spendBlock?: string | null;
+  spendHeight?: number | null;
+  spendTxId?: string | null;
 }
-
-export { ExtractedFraud };
