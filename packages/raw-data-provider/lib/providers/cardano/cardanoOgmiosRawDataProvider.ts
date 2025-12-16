@@ -1,7 +1,5 @@
-import {
-  createChainSynchronizationClient,
-  findIntersection,
-} from '@cardano-ogmios/client/dist/ChainSynchronization';
+import { createChainSynchronizationClient } from '@cardano-ogmios/client';
+import { findIntersection } from '@cardano-ogmios/client/dist/ChainSynchronization';
 import {
   createInteractionContext,
   InteractionContext,
@@ -31,13 +29,17 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
   }
 
   /**
-   * find intersect between stored blocks and blockchain.
+   * find intersect point related to the intersection-context and height
+   *
    * @param context: blockchain context
+   * @param height: block height
+   *
+   * @return {Point} intersection point
    */
   private findIntersection = async (
     context: InteractionContext,
     height: number,
-  ) => {
+  ): Promise<Point> => {
     const block = await this.action.getBlockOfHeight(this.chain, height);
     if (!block)
       throw new Error(
@@ -49,21 +51,16 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
       );
 
     let point: Point | undefined = undefined;
-    if (block)
-      point = {
-        slot: Number(block.extra),
-        id: block.hash,
-      } as Point;
-    if (!point)
-      throw new Error(
-        `Can't provide point details for observation at [${height}] height, previous block details not exists.`,
-      );
+    point = {
+      slot: Number(block.extra),
+      id: block.hash,
+    } as Point;
     this.logger.debug(
       `RawDataProvider fetched point of cardano-ogmios block at [${height}] height is ${JSON.stringify(point)}`,
     );
     const intersect = await findIntersection(context, [point]);
     this.logger.debug(
-      `RawDataProvider cardano-ogmios returned intersection value is ${JSON.stringify({ point: intersect.intersection, height: height })}`,
+      `RawDataProvider cardano-ogmios returned intersection point is ${point}`,
     );
     return intersect.intersection as Point;
   };
@@ -81,7 +78,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     intersect: Point,
     observation: ObservationEntity,
   ) => {
-    let tx;
+    let txs: Transaction[] = [];
     let resolveDone: () => void;
 
     const done = new Promise<void>((resolve) => {
@@ -100,11 +97,9 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
               this.logger.debug(
                 `The cardano-ogmios observation by ${observation?.id} id fetched`,
               );
-              tx = response.block.transactions
-                ?.filter((tx) => tx.id == observation?.sourceTxId)
-                .at(0);
+              txs = response.block.transactions || [];
               this.logger.debug(
-                `Content of cardano-ogmios fetched transaction by [${observation?.id}] id is: ${JsonBigInt.stringify(tx)}`,
+                `Content of cardano-ogmios fetched transaction by [${observation?.id}] id is: ${JsonBigInt.stringify(txs)}`,
               );
             }
           } finally {
@@ -119,17 +114,20 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     await done;
     await client.shutdown();
     this.logger.debug(`RawDataProvider cardano-ogmios client stopped`);
-    return tx;
+    return txs;
   };
 
   /**
    * fetch cardano-Ogmios transactions related to the input observation parameter
    *
    * @param observation
+   *
    * @returns { Promise<Transaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<Transaction[]> => {
+    let txs: Transaction[] = [];
     try {
       if (!this.firstHeight)
         this.firstHeight = (
@@ -138,7 +136,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
 
       if (this.firstHeight && observation.height == this.firstHeight) {
         this.logger.warn(
-          `No previous observation found for transaction ${observation.sourceTxId} at height ${observation.height}; this is the first stored record`,
+          `No earlier observation found in the database for transaction ${observation.sourceTxId} at height ${observation.height}`,
         );
         return [];
       }
@@ -157,17 +155,17 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
         this.logger.debug(
           `Initializing of new client for cardano-ogmios start`,
         );
-        tx = await this.fetchTx(context, intersect, observation);
+        txs = await this.fetchTx(context, intersect, observation);
       }
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!tx)
+    if (!txs || txs.length == 0)
       throw new Error(
         `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
       );
-    return [tx];
+    return txs;
   };
 }

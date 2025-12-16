@@ -227,7 +227,7 @@ describe('RawDataProviderStateEntityAction', () => {
       action,
     }) => {
       const result = await action.getFirstBlockOfChain('cardano');
-      expect(result).toBeDefined();
+      expect(result).toEqual(mockBlockData[0]);
     });
 
     /**

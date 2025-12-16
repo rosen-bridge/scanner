@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  createChainSynchronizationClient,
-  findIntersection,
-} from '@cardano-ogmios/client/dist/ChainSynchronization';
+import { createChainSynchronizationClient } from '@cardano-ogmios/client';
+import { findIntersection } from '@cardano-ogmios/client/dist/ChainSynchronization';
 import {
   createInteractionContext,
   InteractionContext,
 } from '@cardano-ogmios/client/dist/Connection';
+import { Block, Tip } from '@cardano-ogmios/schema';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { CardanoOgmiosObservationExtractor } from '@rosen-bridge/cardano-observation-extractor';
 
 import { CardanoOgmiosRawDataProvider } from '../../../lib/providers/cardano/cardanoOgmiosRawDataProvider';
+import { ForwardResponse } from '../../../lib/types';
 import {
   cardanoSampleBlock,
   cardanoSampleBlock2,
@@ -31,8 +30,11 @@ vi.mock('@cardano-ogmios/client/dist/Connection', () => ({
 }));
 
 vi.mock('@cardano-ogmios/client/dist/ChainSynchronization', () => ({
-  createChainSynchronizationClient: vi.fn(),
   findIntersection: vi.fn(),
+}));
+
+vi.mock('@cardano-ogmios/client', () => ({
+  createChainSynchronizationClient: vi.fn(),
 }));
 
 interface TestInterface {
@@ -45,7 +47,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
   beforeEach<TestInterface>(async (ctx) => {
     const dataSource = await createDatabase();
 
-    ctx.intersectContext = {} as any;
+    ctx.intersectContext = {} as InteractionContext;
 
     const extractor = {
       processTransactions: vi.fn(),
@@ -53,11 +55,12 @@ describe('CardanoOgmiosRawDataProvider', () => {
     } as unknown as CardanoOgmiosObservationExtractor;
 
     // mock interaction context
-    (createInteractionContext as any).mockResolvedValue({});
+    vi.mocked(createInteractionContext).mockResolvedValue(ctx.intersectContext);
 
     // mock findIntersection
-    (findIntersection as any).mockResolvedValue({
+    vi.mocked(findIntersection).mockResolvedValue({
       intersection: cardanoSampleIntersection,
+      tip: { slot: 0, id: '0123', height: 51 },
     });
 
     // mock Ogmios client
@@ -66,7 +69,9 @@ describe('CardanoOgmiosRawDataProvider', () => {
       shutdown: vi.fn().mockResolvedValue(undefined),
     };
 
-    (createChainSynchronizationClient as any).mockResolvedValue(ctx.mockClient);
+    vi.mocked(createChainSynchronizationClient).mockResolvedValue(
+      ctx.mockClient,
+    );
 
     ctx.provider = new CardanoOgmiosRawDataProvider(
       dataSource,
@@ -91,33 +96,61 @@ describe('CardanoOgmiosRawDataProvider', () => {
     it<TestInterface>('should fetch transaction successfully', async ({
       provider,
     }) => {
-      const observation: ObservationEntity = cardanoSampleObservation as any;
+      const observation = cardanoSampleObservation;
 
-      let rollForwardHandler: any;
+      let rollForwardHandler!: (
+        response: ForwardResponse,
+        fn: () => Promise<void>,
+      ) => Promise<void>;
 
+      // arrange
       provider['findIntersection'] = vi.fn().mockReturnValue({});
+
       provider['action'].fetchChainObservations = vi
         .fn()
         .mockResolvedValue([{ height: 50 }]);
 
-      (createChainSynchronizationClient as any).mockImplementation(
-        async (_ctx: any, handlers: any) => {
+      vi.mocked(createChainSynchronizationClient).mockImplementation(
+        async (_ctx, handlers) => {
           rollForwardHandler = handlers.rollForward;
 
           return {
-            resume: vi.fn(async () => {
-              // simulate receiving a block from Ogmios
-              await rollForwardHandler({
-                block: cardanoSampleBlock,
-              });
+            context: {} as InteractionContext,
+
+            resume: async () => ({
+              intersection: {
+                slot: 0,
+                id: 'genesis',
+                height: 0,
+              },
+              tip: {
+                slot: 0,
+                id: 'genesis',
+                height: 0,
+              },
             }),
-            shutdown: vi.fn(),
+
+            shutdown: async () => {},
           };
         },
       );
 
-      const result = await provider['fetchObservationTxs'](observation);
+      // act
+      const promise = provider['fetchObservationTxs'](observation);
 
+      await new Promise((r) => setTimeout(r, 50));
+
+      await rollForwardHandler(
+        {
+          block: cardanoSampleBlock,
+          tip: 'origin',
+        },
+        async () => undefined,
+      );
+
+      const result = await promise;
+
+      // assert
       expect(result).toEqual([cardanoSampleTx]);
     });
 
@@ -133,26 +166,29 @@ describe('CardanoOgmiosRawDataProvider', () => {
     it<TestInterface>('should throw error when tx not found inside praos block', async ({
       provider,
     }) => {
-      const observation: ObservationEntity = cardanoSampleObservation2 as any;
+      const observation = cardanoSampleObservation2;
 
       let rollForwardHandler: any;
 
       provider['findIntersection'] = vi.fn().mockReturnValue({});
 
-      (createChainSynchronizationClient as any).mockImplementation(
-        async (_ctx: any, handlers: any) => {
-          rollForwardHandler = handlers.rollForward;
-
+      vi.mocked(createChainSynchronizationClient).mockResolvedValue({
+        context: {} as InteractionContext,
+        resume: vi.fn(async () => {
+          await rollForwardHandler({
+            block: cardanoSampleBlock2,
+          });
           return {
-            resume: vi.fn(async () => {
-              await rollForwardHandler({
-                block: cardanoSampleBlock2,
-              });
-            }),
-            shutdown: vi.fn(),
+            intersection: { id: 'def', slot: 0, hash: 'abc' },
+            tip: {
+              slot: 0,
+              id: 'genesis',
+              height: 0,
+            },
           };
-        },
-      );
+        }),
+        shutdown: vi.fn(),
+      });
 
       await expect(
         provider['fetchObservationTxs'](observation),
@@ -176,11 +212,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
         .fn()
         .mockReturnValue({ height: 51 });
 
-      const observation: ObservationEntity = {
-        id: 'obs1',
-        sourceTxId: 'tx123',
-        height: 51,
-      } as any;
+      const observation = cardanoSampleObservation;
 
       const result = await provider['fetchObservationTxs'](observation);
 
@@ -205,11 +237,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
       .fn()
       .mockReturnValue({ height: 50 });
 
-    const observation: ObservationEntity = {
-      id: 'obs1',
-      sourceTxId: 'tx123',
-      height: 100,
-    } as any;
+    const observation = cardanoSampleObservation;
 
     await expect(
       provider['fetchObservationTxs'](observation),
@@ -230,30 +258,58 @@ describe('CardanoOgmiosRawDataProvider', () => {
       provider,
       intersectContext,
     }) => {
-      let rollForwardHandler: any;
+      let rollForwardHandler!: (
+        response: {
+          block: Block;
+          tip: Tip | 'origin';
+        },
+        fn: () => Promise<void>,
+      ) => Promise<void>;
 
-      (createChainSynchronizationClient as any).mockImplementation(
-        async (_ctx: any, handlers: any) => {
+      vi.mocked(createChainSynchronizationClient).mockImplementation(
+        async (ctx, handlers) => {
           rollForwardHandler = handlers.rollForward;
 
           return {
-            resume: vi.fn(async () => {
-              await rollForwardHandler({
-                block: cardanoSampleBlock,
-              });
+            context: ctx,
+
+            resume: async () => ({
+              intersection: 'origin',
+              tip: {
+                slot: 0,
+                id: 'genesis',
+                height: 0,
+              },
             }),
-            shutdown: vi.fn(),
+
+            shutdown: async () => {},
           };
         },
       );
 
-      const result = await provider['fetchTx'](
+      const promise = provider['fetchTx'](
         intersectContext,
-        {} as any,
-        cardanoSampleObservation as any,
+        { slot: 1, id: 'abc' },
+        cardanoSampleObservation,
       );
 
-      expect(result).toEqual(cardanoSampleTx);
+      await new Promise((r) => setTimeout(r, 50));
+
+      await rollForwardHandler(
+        {
+          block: cardanoSampleBlock,
+          tip: {
+            slot: 0,
+            id: 'genesis',
+            height: 0,
+          },
+        },
+        async () => undefined,
+      );
+
+      const result = await promise;
+
+      expect(result).toEqual([cardanoSampleTx]);
     });
 
     /**
@@ -267,25 +323,47 @@ describe('CardanoOgmiosRawDataProvider', () => {
      */
     it<TestInterface>('should wait until rollForward is executed before resolving', async ({
       provider,
-      mockClient,
       intersectContext,
     }) => {
-      let rollForwardHandler: any;
+      let rollForwardHandler!: (
+        response: {
+          block: Block;
+          tip: Tip | 'origin';
+        },
+        fn: () => Promise<void>,
+      ) => Promise<void>;
 
-      (createChainSynchronizationClient as any).mockImplementation(
-        async (_context: any, handlers: any) => {
+      vi.mocked(createChainSynchronizationClient).mockImplementation(
+        async (_ctx, handlers) => {
           rollForwardHandler = handlers.rollForward;
-          return mockClient;
+
+          return {
+            context: {} as InteractionContext,
+
+            resume: async () => ({
+              intersection: 'origin',
+              tip: {
+                slot: 0,
+                id: 'genesis',
+                height: 0,
+              },
+            }),
+
+            shutdown: async () => {},
+          };
         },
       );
 
       const promise = provider['fetchTx'](
         intersectContext,
-        {} as any,
-        cardanoSampleObservation as any,
+        {
+          slot: 0,
+          id: 'genesis',
+        },
+        cardanoSampleObservation,
       );
 
-      // give the event loop some time
+      // give event loop time
       await new Promise((r) => setTimeout(r, 100));
 
       let isResolved = false;
@@ -295,10 +373,18 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       expect(isResolved).toBe(false);
 
-      // cleanup to avoid hanging test
-      await rollForwardHandler({
-        block: { type: 'praos', transactions: [] },
-      });
+      await rollForwardHandler(
+        {
+          block: cardanoSampleBlock,
+          tip: {
+            slot: 0,
+            id: 'genesis',
+            height: 0,
+          },
+        },
+        async () => undefined,
+      );
+
       await promise;
     });
 
@@ -318,7 +404,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
     }) => {
       let rollForwardHandler: any;
 
-      (createChainSynchronizationClient as any).mockImplementation(
+      vi.mocked(createChainSynchronizationClient).mockImplementation(
         async (_context: any, handlers: any) => {
           rollForwardHandler = handlers.rollForward;
           return mockClient;
@@ -327,8 +413,11 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const promise = provider['fetchTx'](
         intersectContext,
-        {} as any,
-        cardanoSampleObservation as any,
+        {
+          slot: 0,
+          id: 'genesis',
+        },
+        cardanoSampleObservation,
       );
 
       await rollForwardHandler({
@@ -337,7 +426,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const result = await promise;
 
-      expect(result).toBeUndefined();
+      expect(result).toEqual([]);
     });
 
     /**
@@ -356,7 +445,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
     }) => {
       let rollForwardHandler: any;
 
-      (createChainSynchronizationClient as any).mockImplementation(
+      vi.mocked(createChainSynchronizationClient).mockImplementation(
         async (_context: any, handlers: any) => {
           rollForwardHandler = handlers.rollForward;
           return mockClient;
@@ -365,15 +454,18 @@ describe('CardanoOgmiosRawDataProvider', () => {
 
       const promise = provider['fetchTx'](
         intersectContext,
-        {} as any,
-        cardanoSampleObservation as any,
+        {
+          slot: 0,
+          id: 'genesis',
+        },
+        cardanoSampleObservation,
       );
 
       await rollForwardHandler({
         block: { type: 'byron', transactions: [] },
       });
 
-      await expect(promise).resolves.toBeUndefined();
+      await expect(promise).resolves.toEqual([]);
     });
   });
 

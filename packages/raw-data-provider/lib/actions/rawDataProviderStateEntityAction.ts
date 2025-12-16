@@ -118,10 +118,10 @@ export class RawDataProviderStateEntityAction {
   getFirstBlockOfChain = async (
     chain: string,
   ): Promise<BlockEntity | undefined> => {
-    const block = await this.blockRepository.find({
-      where: { status: PROCEED, scanner: chain, height: MoreThan(0) },
-      take: 1,
+    const block = await this.blockRepository.findOne({
+      where: { status: PROCEED, scanner: chain },
+      order: { height: 'ASC' },
     });
-    return block.at(0);
+    return block || undefined;
   };
 }
