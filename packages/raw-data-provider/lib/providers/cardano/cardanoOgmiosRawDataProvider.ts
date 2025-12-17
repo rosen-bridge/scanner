@@ -45,7 +45,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
       throw new Error(
         `Block is undefined on ${this.chain} chain at ${height} height`,
       );
-    if (block && block.extra == undefined)
+    if (block.extra == undefined)
       throw new Error(
         `Slot value is undefined for block on ${this.chain} chain at ${height} height`,
       );
@@ -77,7 +77,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     context: InteractionContext,
     intersect: Point,
     observation: ObservationEntity,
-  ) => {
+  ): Promise<Transaction[]> => {
     let txs: Transaction[] = [];
     let resolveDone: () => void;
 
