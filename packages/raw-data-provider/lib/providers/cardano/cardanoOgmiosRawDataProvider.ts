@@ -136,7 +136,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
 
       if (this.firstHeight && observation.height == this.firstHeight) {
         this.logger.warn(
-          `No earlier observation found in the database for transaction ${observation.sourceTxId} at height ${observation.height}`,
+          `No prior block data found in the database for transaction [${observation.sourceTxId}] at height ${observation.height}`,
         );
         return [];
       }
