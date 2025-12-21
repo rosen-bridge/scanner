@@ -1,9 +1,7 @@
 import { createChainSynchronizationClient } from '@cardano-ogmios/client';
+import { InteractionContext } from '@cardano-ogmios/client';
 import { findIntersection } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import {
-  createInteractionContext,
-  InteractionContext,
-} from '@cardano-ogmios/client/dist/Connection';
+import { createInteractionContext } from '@cardano-ogmios/client/dist/Connection';
 import { Point, Transaction } from '@cardano-ogmios/schema';
 
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
@@ -50,11 +48,10 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
         `Slot value is undefined for block on ${this.chain} chain at ${height} height`,
       );
 
-    let point: Point | undefined = undefined;
-    point = {
+    let point: Point = {
       slot: Number(block.extra),
       id: block.hash,
-    } as Point;
+    };
     this.logger.debug(
       `RawDataProvider fetched point of cardano-ogmios block at [${height}] height is ${JSON.stringify(point)}`,
     );

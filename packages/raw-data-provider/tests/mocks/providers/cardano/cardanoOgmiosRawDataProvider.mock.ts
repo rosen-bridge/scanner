@@ -69,8 +69,4 @@ export const cardanoSampleBlock: Block = {
     leaderValue: {},
   },
 };
-export const cardanoSampleBlock2 = {
-  type: 'non-praos',
-  transactions: [{ id: 'other' }],
-};
 export const cardanoSampleIntersection = { slot: 100, id: 'abc' };
