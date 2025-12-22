@@ -30,10 +30,11 @@ export class CardanoKoiosRawDataProvider extends AbstractRawDataProvider<KoiosTr
    * fetch cardano-koios transactions related to the input observation parameter
    *
    * @param observation
-   * @returns { Promise<Transaction[]> }
+   * @returns { Promise<KoiosTransaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<KoiosTransaction[] | undefined> => {
     try {
       const txCbor = (
         await this.client.txCbor({ _tx_hashes: [observation.sourceTxId] })
@@ -44,17 +45,12 @@ export class CardanoKoiosRawDataProvider extends AbstractRawDataProvider<KoiosTr
             new Uint8Array(Buffer.from(txCbor!.cbor!, 'hex')),
           ).to_json(),
         );
-        tx = { ...txCbor, ...txCborJson };
+        return [{ ...txCbor, ...txCborJson }];
       }
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!tx)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-    return [tx];
   };
 }

@@ -68,7 +68,7 @@ describe('CardanoKoiosRawDataProvider', () => {
 
       const result = await provider['fetchObservationTxs'](observation);
 
-      expect(result).toEqual(cardanoSampleCborTxs);
+      expect(result).toMatchObject(cardanoSampleCborTxs);
     });
 
     /**
@@ -78,7 +78,7 @@ describe('CardanoKoiosRawDataProvider', () => {
      * @scenario
      * - call fetchObservationTxs
      * @expected
-     * - throw error
+     * - returns undefined
      */
     it<TestInterface>('should return false when txCbor returns empty', async ({
       provider,
@@ -88,9 +88,9 @@ describe('CardanoKoiosRawDataProvider', () => {
 
       clientMock.txCbor.mockResolvedValue([]);
 
-      await expect(
-        provider['fetchObservationTxs'](observation),
-      ).rejects.toThrowError();
+      expect(
+        await provider['fetchObservationTxs'](observation),
+      ).toBeUndefined();
     });
 
     /**

@@ -26,34 +26,29 @@ export class ErgoNodeRawDataProvider extends AbstractRawDataProvider<Transaction
    * @param observation
    * @returns { Promise<Transaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<Transaction[]> => {
     try {
-      tx = await this.client.getTxById(observation.sourceTxId);
+      const tx = await this.client.getTxById(observation.sourceTxId);
+      return [
+        {
+          id: tx.id,
+          dataInputs: tx.dataInputs ?? [],
+          inputs: (tx.inputs ?? []).map((ib) => ({ ...ib, boxId: ib.boxId! })),
+          outputs: tx.outputs.map((ob) => ({
+            ...ob,
+            transactionId: ob.transactionId!,
+            index: ob.index!,
+            boxId: ob.boxId!,
+            assets: ob.assets ?? [],
+          })),
+        },
+      ];
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-
-    if (!tx)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-
-    return [
-      {
-        id: tx.id,
-        dataInputs: tx.dataInputs ?? [],
-        inputs: (tx.inputs ?? []).map((ib) => ({ ...ib, boxId: ib.boxId! })),
-        outputs: tx.outputs.map((ob) => ({
-          ...ob,
-          transactionId: ob.transactionId!,
-          index: ob.index!,
-          boxId: ob.boxId!,
-          assets: ob.assets ?? [],
-        })),
-      },
-    ];
   };
 }

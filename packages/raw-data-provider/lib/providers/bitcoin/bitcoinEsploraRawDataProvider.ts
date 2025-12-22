@@ -38,10 +38,11 @@ export class BitcoinEsploraRawDataProvider extends AbstractRawDataProvider<Bitco
    * fetch bitcoin transactions related to the input observation parameter
    *
    * @param observation
-   * @returns { Promise<Transaction[]> }
+   * @returns { Promise<BitcoinEsploraTransaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<BitcoinEsploraTransaction[] | undefined> => {
     try {
       const blockHash = observation.block;
       const txCount = (
@@ -56,13 +57,13 @@ export class BitcoinEsploraRawDataProvider extends AbstractRawDataProvider<Bitco
             `${this.esploraConnectionInfo.prefix ?? '/api'}/block/${blockHash}/txs/${offset}`,
           )
         ).data;
-        tx = txs
+        const tx = txs
           .filter(
             (item: BitcoinEsploraTransaction) =>
               item.txid == observation.sourceTxId,
           )
           .at(0);
-        if (tx) break;
+        if (tx) return [tx];
         offset += this.ESPLORA_BLOCK_TXS_LIMIT;
       }
     } catch (err) {
@@ -70,10 +71,5 @@ export class BitcoinEsploraRawDataProvider extends AbstractRawDataProvider<Bitco
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!tx)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-    return [tx];
   };
 }
