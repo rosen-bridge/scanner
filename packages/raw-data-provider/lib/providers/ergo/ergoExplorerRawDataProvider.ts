@@ -26,35 +26,33 @@ export class ErgoExplorerRawDataProvider extends AbstractRawDataProvider<Transac
    * @param observation
    * @returns { Promise<Transaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<Transaction[]> => {
     try {
-      tx = await this.client.v1.getApiV1TransactionsP1(observation.sourceTxId);
+      const tx = await this.client.v1.getApiV1TransactionsP1(
+        observation.sourceTxId,
+      );
+      return [
+        {
+          id: tx.id,
+          dataInputs: tx.dataInputs ?? [],
+          inputs: tx.inputs ?? [],
+          outputs: tx.outputs!.map((ob) => ({
+            ...ob,
+            assets: ob.assets ?? [],
+            additionalRegisters: Object.fromEntries(
+              Object.entries(ob.additionalRegisters).map((nr) => {
+                return [nr[0], nr[1].serializedValue];
+              }),
+            ),
+          })),
+        },
+      ];
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!tx)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-
-    return [
-      {
-        id: tx.id,
-        dataInputs: tx.dataInputs ?? [],
-        inputs: tx.inputs ?? [],
-        outputs: tx.outputs!.map((ob) => ({
-          ...ob,
-          assets: ob.assets ?? [],
-          additionalRegisters: Object.fromEntries(
-            Object.entries(ob.additionalRegisters).map((nr) => {
-              return [nr[0], nr[1].serializedValue];
-            }),
-          ),
-        })),
-      },
-    ];
   };
 }

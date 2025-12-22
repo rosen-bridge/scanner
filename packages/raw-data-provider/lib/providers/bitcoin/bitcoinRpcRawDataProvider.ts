@@ -44,25 +44,23 @@ export class BitcoinRpcRawDataProvider extends AbstractRawDataProvider<BitcoinRp
    * fetch bitcoin transactions related to the input observation parameter
    *
    * @param observation
-   * @returns { Promise<Transaction[]> }
+   * @returns { Promise<BitcoinRpcTransaction[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let tx;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<BitcoinRpcTransaction[]> => {
     try {
-      tx = await this.client.post('', {
-        method: 'getrawtransaction',
-        id: 0,
-        params: [observation.sourceTxId, true],
-      });
+      return (
+        await this.client.post('', {
+          method: 'getrawtransaction',
+          id: 0,
+          params: [observation.sourceTxId, true],
+        })
+      ).data?.result;
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!tx?.data?.result)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-    return [tx.data.result];
   };
 }

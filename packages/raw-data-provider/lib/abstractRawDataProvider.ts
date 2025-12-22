@@ -91,8 +91,7 @@ export abstract class AbstractRawDataProvider<TxType> {
    */
   protected abstract fetchObservationTxs: (
     observation: ObservationEntity,
-  ) => Promise<TxType[]>;
-
+  ) => Promise<TxType[] | undefined>;
   /**
    * Process observation and write rawData
    *
@@ -103,6 +102,10 @@ export abstract class AbstractRawDataProvider<TxType> {
     try {
       const block = { height: observation.height, hash: observation.block };
       const txs = await this.fetchObservationTxs(observation);
+      if (!txs)
+        throw new Error(
+          `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
+        );
       this.extractor.processTransactions(txs, block);
     } catch (err) {
       this.logger.error(

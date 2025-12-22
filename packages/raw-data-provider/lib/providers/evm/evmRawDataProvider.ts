@@ -43,22 +43,19 @@ export class EvmRawDataProvider extends AbstractRawDataProvider<TransactionRespo
    * fetch evm transactions related to the input observation parameter
    *
    * @param observation
-   * @returns { Promise<Transaction[]> }
+   * @returns { Promise<TransactionResponse[]> }
    */
-  protected fetchObservationTxs = async (observation: ObservationEntity) => {
-    let txs;
+  protected fetchObservationTxs = async (
+    observation: ObservationEntity,
+  ): Promise<TransactionResponse[] | undefined> => {
     try {
-      txs = (await this.client.getBlock(observation.height, true))
+      const txs = (await this.client.getBlock(observation.height, true))
         ?.prefetchedTransactions;
+      if (txs) return txs;
     } catch (err) {
       throw new Error(
         `Fetch transactions by [${observation.sourceTxId}] id of related observation for [${this.chain}] chain failed: ${err}`,
       );
     }
-    if (!txs)
-      throw new Error(
-        `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
-      );
-    return txs;
   };
 }
