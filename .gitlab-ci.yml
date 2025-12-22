@@ -14,28 +14,8 @@ stages:
   - build
   - triggers
 
-installation:
-  stage: installation
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: push
-    paths:
-      - node_modules
-      - '**/node_modules'
-  script:
-    - npm ci
-
-build:
-  stage: build
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull-push
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run build
+include:
+  - component: $CI_SERVER_FQDN/${INSTALL_BUILD_COMPONENT}
 
 run_ci:
   stage: triggers

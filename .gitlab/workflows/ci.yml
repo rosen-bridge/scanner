@@ -10,64 +10,11 @@ workflow:
 stages:
   - ci
 
-knip:
-  stage: ci
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull
-    paths:
-      - node_modules
-  script:
-    - npx knip --dependencies
+include:
+  - component: $CI_SERVER_FQDN/${CI_COMPONENT}
 
-type_check:
-  stage: ci
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run type-check
-
-lint:
-  stage: ci
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull
-    paths:
-      - node_modules
-  script:
-    - npm run lint:check
-
-test:
-  stage: ci
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run coverage
-  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: '**/coverage/cobertura-coverage.xml'
-
-changeset:
-  stage: ci
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull
-    paths:
-      - node_modules
-  before_script:
-    - git fetch origin dev
-  script:
-    - npx changeset status --since=origin/dev
+    inputs:
+      enable_knip: true
+      enable_lint: true
+      enable_test: true
+      enable_changeset: true
