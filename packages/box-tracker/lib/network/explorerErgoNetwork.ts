@@ -28,65 +28,84 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
    * by querying the Ergo Explorer API.
    *
    */
-  protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
+  protected getBoxesByAddress = async (address: string): Promise<ErgoBox[]> => {
     const rawBoxes = (
       await this.api.v1.getApiV1BoxesUnspentByaddressP1(address)
     ).items;
     if (rawBoxes) {
-      return rawBoxes.map((b) => ({
-        boxId: b.boxId,
-        value: BigInt(b.value),
-        ergoTree: b.ergoTree,
-        creationHeight: b.creationHeight,
-        blockId: b.blockId,
-        assets: (b.assets || []).map((a) => ({
-          tokenId: a.tokenId,
-          amount: BigInt(a.amount),
+      return rawBoxes.map((box) => ({
+        boxId: box.boxId,
+        value: BigInt(box.value),
+        ergoTree: box.ergoTree,
+        creationHeight: box.creationHeight,
+        blockId: box.blockId,
+        assets: (box.assets || []).map((asset) => ({
+          tokenId: asset.tokenId,
+          amount: BigInt(asset.amount),
         })),
         additionalRegisters: Object.fromEntries(
-          Object.entries(b.additionalRegisters || {}).map(([k, v]) => [
+          Object.entries(box.additionalRegisters || {}).map(([k, v]) => [
             k,
             v.serializedValue,
           ]),
         ) as AdditionalRegisters,
-        transactionId: b.transactionId,
-        index: b.index,
+        transactionId: box.transactionId,
+        index: box.index,
       }));
     }
     return [];
-  }
+  };
+
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
    *
    */
-  async getMempoolTxs(): Promise<Transaction[]> {
-    const rawTxs = (await this.api.v0.getApiV0TransactionsUnconfirmed()).items;
-    if (rawTxs) {
-      return rawTxs.map((t) => ({
-        id: t.id,
-        inputs: t.inputs?.map((e) => ({ boxId: e.id })) ?? [],
-        dataInputs: t.dataInputs?.map((e) => ({ boxId: e.id })) ?? [],
-        outputs:
-          t.outputs?.map<OutputBox>((o) => ({
-            boxId: o.id,
-            value: BigInt(o.value),
-            ergoTree: o.ergoTree,
-            creationHeight: o.creationHeight,
-            assets: (o.assets || []).map((a) => ({
-              tokenId: a.tokenId,
-              amount: BigInt(a.amount),
-            })),
-            additionalRegisters: Object.fromEntries(
-              Object.entries(o.additionalRegisters || {}).map(([k, v]) => [
-                k,
-                v,
-              ]),
-            ) as AdditionalRegisters,
-            transactionId: o.txId,
-            index: o.index,
-          })) ?? [],
-      }));
+  getMempoolTxs = async (): Promise<Transaction[]> => {
+    const allTxs: Transaction[] = [];
+    let offset = 0;
+    const limit = 100;
+    while (true) {
+      const response = await this.api.v0.getApiV0TransactionsUnconfirmed({
+        limit,
+        offset,
+      });
+      const rawTxs = response.items ?? [];
+
+      if (rawTxs.length === 0) break;
+
+      allTxs.push(
+        ...rawTxs.map((tx) => ({
+          id: tx.id,
+          inputs: tx.inputs?.map((inputBox) => ({ boxId: inputBox.id })) ?? [],
+          dataInputs:
+            tx.dataInputs?.map((dataInputBox) => ({
+              boxId: dataInputBox.id,
+            })) ?? [],
+          outputs:
+            tx.outputs?.map<OutputBox>((outputBox) => ({
+              boxId: outputBox.id,
+              value: BigInt(outputBox.value),
+              ergoTree: outputBox.ergoTree,
+              creationHeight: outputBox.creationHeight,
+              assets: (outputBox.assets || []).map((asset) => ({
+                tokenId: asset.tokenId,
+                amount: BigInt(asset.amount),
+              })),
+              additionalRegisters: Object.fromEntries(
+                Object.entries(outputBox.additionalRegisters || {}).map(
+                  ([k, v]) => [k, v],
+                ),
+              ) as AdditionalRegisters,
+              transactionId: outputBox.txId,
+              index: outputBox.index,
+            })) ?? [],
+        })),
+      );
+
+      offset += rawTxs.length;
+      if (rawTxs.length < limit) break;
     }
-    return [];
-  }
+
+    return allTxs;
+  };
 }

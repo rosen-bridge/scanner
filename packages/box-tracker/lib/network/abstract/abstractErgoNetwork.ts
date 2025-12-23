@@ -14,17 +14,17 @@ export abstract class AbstractErgoNetwork {
   /**
    * Should return all boxes for the given address.
    */
-  protected abstract getBoxesByAddress(address: string): Promise<ErgoBox[]>;
+  protected abstract getBoxesByAddress: (address: string) => Promise<ErgoBox[]>;
 
   /**
    * Should return mempool transactions.
    */
-  abstract getMempoolTxs(): Promise<Transaction[]>;
+  abstract getMempoolTxs: () => Promise<Transaction[]>;
 
   /**
    * Retrieve first box matching this.address and tokens.
    */
-  async getBox(): Promise<ErgoBox | undefined> {
+  getBox = async (): Promise<ErgoBox | undefined> => {
     const boxes = await this.getBoxesByAddress(this.address);
 
     return boxes.find((box) =>
@@ -33,5 +33,5 @@ export abstract class AbstractErgoNetwork {
         return asset !== undefined && asset.amount >= t.amount;
       }),
     );
-  }
+  };
 }
