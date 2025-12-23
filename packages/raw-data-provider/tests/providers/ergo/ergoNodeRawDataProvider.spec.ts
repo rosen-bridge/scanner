@@ -42,7 +42,7 @@ describe('ErgoNodeRawDataProvider', () => {
       new DummyLogger(),
     );
 
-    ctx.clientMock = (ergoNodeClientFactory as any).mock.results[0].value;
+    ctx.clientMock = vi.mocked(ergoNodeClientFactory).mock.results[0].value;
   });
 
   describe('fetchObservationTxs', () => {
@@ -63,7 +63,7 @@ describe('ErgoNodeRawDataProvider', () => {
     }) => {
       clientMock.getTxById.mockResolvedValue(ergoNodeApiTx);
 
-      const observation: ObservationEntity = ergoNodeSampleObservation as any;
+      const observation = ergoNodeSampleObservation as ObservationEntity;
 
       const result = await provider['fetchObservationTxs'](observation);
 
@@ -90,7 +90,7 @@ describe('ErgoNodeRawDataProvider', () => {
     }) => {
       clientMock.getTxById.mockRejectedValue(new Error('node fail'));
 
-      const observation: ObservationEntity = ergoNodeSampleObservation as any;
+      const observation = ergoNodeSampleObservation as ObservationEntity;
 
       await expect(
         async () => await provider['fetchObservationTxs'](observation),
