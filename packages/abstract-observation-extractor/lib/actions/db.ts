@@ -74,6 +74,7 @@ export class ObservationEntityAction {
           await repository.update(
             {
               requestId: observation.requestId,
+              extractor: extractor,
             },
             entity,
           );

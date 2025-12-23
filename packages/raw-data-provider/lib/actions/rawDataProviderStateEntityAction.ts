@@ -75,10 +75,15 @@ export class RawDataProviderStateEntityAction {
   fetchChainObservations = async (
     chain: string,
     offsetHeight: number,
+    extractorId: string,
     length: number = OBSERVATION_BATCH_SIZE,
   ): Promise<ObservationEntity[]> => {
     return await this.observationRepository.find({
-      where: { fromChain: chain, height: MoreThan(offsetHeight) },
+      where: {
+        fromChain: chain,
+        height: MoreThan(offsetHeight),
+        extractor: extractorId,
+      },
       order: { height: 'ASC' },
       take: length,
     });

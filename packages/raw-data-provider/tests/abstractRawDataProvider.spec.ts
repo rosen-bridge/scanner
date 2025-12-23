@@ -1,4 +1,6 @@
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import { CardanoKoiosObservationExtractor } from '@rosen-bridge/cardano-observation-extractor';
+import { KoiosTransaction } from '@rosen-bridge/cardano-observation-extractor/dist/interfaces/koiosTransaction';
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { RawDataProviderStateEntity } from '../lib';
@@ -9,13 +11,13 @@ import {
 } from './mocks/abstractRawDataProvider.mock';
 import { createDatabase } from './utils';
 
-class TestRawDataProvider extends AbstractRawDataProvider {
+class TestRawDataProvider extends AbstractRawDataProvider<KoiosTransaction> {
   fetchRawData = vi.fn(async (observation: ObservationEntity) => {
     return `raw-${observation.id}`;
   });
 
-  protected processObservation = async () => {
-    return true;
+  protected fetchObservationTxs = async () => {
+    return [];
   };
 }
 
@@ -24,6 +26,7 @@ interface TestInterface {
   provider: TestRawDataProvider;
   repository: Repository<RawDataProviderStateEntity>;
   observationRepository: Repository<ObservationEntity>;
+  extractor: CardanoKoiosObservationExtractor;
 }
 
 describe('AbstractRawDataProvider', () => {
@@ -42,7 +45,15 @@ describe('AbstractRawDataProvider', () => {
    */
   beforeEach<TestInterface>(async (context) => {
     context.dataSource = await createDatabase();
-    context.provider = new TestRawDataProvider('cardano', context.dataSource);
+    context.extractor = {
+      processTransactions: vi.fn(),
+      getId: () => 'mocked-extractor-id',
+    } as unknown as CardanoKoiosObservationExtractor;
+    context.provider = new TestRawDataProvider(
+      'cardano',
+      context.dataSource,
+      context.extractor,
+    );
     await Promise.all(
       mockData.storedEntities.map(
         async (entity) => await context.provider['action'].store(entity),
@@ -72,8 +83,9 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should create new item if not found successfully', async ({
       dataSource,
+      extractor,
     }) => {
-      const provider = new TestRawDataProvider('ergo', dataSource);
+      const provider = new TestRawDataProvider('ergo', dataSource, extractor);
       const result = await provider['fetchOrCreateStateForChain']();
       expect(result).toEqual(mockData.entities[0]);
     });
@@ -118,12 +130,17 @@ describe('AbstractRawDataProvider', () => {
      */
     it<TestInterface>('should process chain observations using processObservation', async ({
       dataSource,
+      extractor,
     }) => {
       const mockObservations = mockObservationData.entities.map((e) => ({
         ...e,
         id: e.height,
       }));
-      const provider = new TestRawDataProvider('cardano', dataSource);
+      const provider = new TestRawDataProvider(
+        'cardano',
+        dataSource,
+        extractor,
+      );
       provider['processObservation'] = vi.fn().mockReturnValue(true);
       // mock action methods
       provider['action']['fetchChainObservations'] = vi
@@ -161,6 +178,79 @@ describe('AbstractRawDataProvider', () => {
       expect((await repository.find())[0]!.syncedHeight).toEqual(
         mockObservationData.entities[1].height,
       );
+    });
+  });
+
+  describe('processObservation', () => {
+    /**
+     * @target should process observation successfully
+     * @dependencies
+     * - observationRepository instance
+     * - provider instance
+     * @scenario
+     * - fetch first observation from repository
+     * - call provider.processObservation on the observation
+     * @expected
+     * - result should be truthy
+     */
+    it<TestInterface>('should process observation successfully', async ({
+      observationRepository,
+      provider,
+    }) => {
+      const result = await provider['processObservation'](
+        (await observationRepository.find())[0],
+      );
+      expect(result).toBeTruthy();
+    });
+
+    /**
+     * @target should return false when fetch transactions of Observation throws an error
+     * @dependencies
+     * - observationRepository instance
+     * - provider instance with mocked fetchObservationTxs
+     * @scenario
+     * - mock fetchObservationTxs to throw error
+     * - call processObservation with a valid observation
+     * @expected
+     * - result should be falsy
+     */
+    it<TestInterface>('should return false when fetch transactions of Observation throws an error', async ({
+      observationRepository,
+      provider,
+    }) => {
+      provider['fetchObservationTxs'] = vi.fn().mockImplementation(() => {
+        throw new Error('Mocked Error');
+      });
+      const result = await provider['processObservation'](
+        (await observationRepository.find())[0],
+      );
+      expect(result).toBeFalsy();
+    });
+
+    /**
+     * @target should return false when extractor throws an error
+     * @dependencies
+     * - observationRepository instance
+     * - provider instance with mocked extractor.processTransactions
+     * @scenario
+     * - mock extractor.processTransactions to throw error
+     * - call processObservation with a valid observation
+     * @expected
+     * - result should be falsy
+     */
+    it<TestInterface>('should return false when extractor throws an error', async ({
+      observationRepository,
+      provider,
+    }) => {
+      provider['extractor']['processTransactions'] = vi
+        .fn()
+        .mockImplementation(() => {
+          throw new Error('Mocked Error');
+        });
+      const result = await provider['processObservation'](
+        (await observationRepository.find())[0],
+      );
+      expect(result).toBeFalsy();
     });
   });
 });

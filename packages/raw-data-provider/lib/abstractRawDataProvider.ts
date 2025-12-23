@@ -1,16 +1,20 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
+import {
+  AbstractObservationExtractor,
+  ObservationEntity,
+} from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { RawDataProviderStateEntityAction } from './actions/rawDataProviderStateEntityAction';
 import { RawDataProviderStateEntity } from './entities';
 
-export abstract class AbstractRawDataProvider {
+export abstract class AbstractRawDataProvider<TxType> {
   protected action: RawDataProviderStateEntityAction;
 
   constructor(
     protected chain: string,
     protected dataSource: DataSource,
+    protected extractor: AbstractObservationExtractor<TxType>,
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
     this.action = new RawDataProviderStateEntityAction(dataSource, logger);
@@ -80,14 +84,37 @@ export abstract class AbstractRawDataProvider {
   };
 
   /**
+   * fetch transactions related to the input observation parameter
+   *
+   * @param observation
+   * @returns { Promise<TxType[]> }
+   */
+  protected abstract fetchObservationTxs: (
+    observation: ObservationEntity,
+  ) => Promise<TxType[] | undefined>;
+  /**
    * Process observation and write rawData
    *
    * @param observation
    * @return {boolean} determining result of process done successfully or no
    */
-  protected abstract processObservation: (
-    observation: ObservationEntity,
-  ) => Promise<boolean>;
+  protected processObservation = async (observation: ObservationEntity) => {
+    try {
+      const block = { height: observation.height, hash: observation.block };
+      const txs = await this.fetchObservationTxs(observation);
+      if (!txs)
+        throw new Error(
+          `Transaction [${observation.sourceTxId}] not found or invalid response from ${this.chain} chain.`,
+        );
+      this.extractor.processTransactions(txs, block);
+    } catch (err) {
+      this.logger.error(
+        `Processing of observation for ${this.chain} failed: ${err}`,
+      );
+      return false;
+    }
+    return true;
+  };
 
   /**
    * Fills the raw data field for all ObservationEntity records of the current chain of input RawDataProviderStateEntity
@@ -101,6 +128,7 @@ export abstract class AbstractRawDataProvider {
     const observations = await this.action.fetchChainObservations(
       this.chain,
       state.syncedHeight,
+      this.extractor.getId(),
     );
 
     if (observations.length === 0)

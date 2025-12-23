@@ -117,7 +117,11 @@ describe('RawDataProviderStateEntityAction', () => {
     it<TestInterface>('should fetch batch of Observation by chain and offset successfully', async ({
       action,
     }) => {
-      const result = await action.fetchChainObservations('ergo', 99);
+      const result = await action.fetchChainObservations(
+        'ergo',
+        99,
+        'extractor',
+      );
       expect(result.length).toEqual(2);
       expect(result).toEqual(mockObservationData.storedEntities);
     });
@@ -135,7 +139,11 @@ describe('RawDataProviderStateEntityAction', () => {
     it<TestInterface>('should fetch observations above a specific height successfully', async ({
       action,
     }) => {
-      const result = await action.fetchChainObservations('ergo', 100);
+      const result = await action.fetchChainObservations(
+        'ergo',
+        100,
+        'extractor',
+      );
       expect(result.length).toEqual(1);
       expect(result).toEqual(mockObservationData.storedEntities.slice(1));
     });
@@ -153,7 +161,12 @@ describe('RawDataProviderStateEntityAction', () => {
     it<TestInterface>('should fetch limited number of observations starting from a given height', async ({
       action,
     }) => {
-      const result = await action.fetchChainObservations('ergo', 99, 1);
+      const result = await action.fetchChainObservations(
+        'ergo',
+        99,
+        'extractor',
+        1,
+      );
       expect(result.length).toEqual(1);
       expect(result).toEqual(mockObservationData.storedEntities.slice(0, 1));
     });

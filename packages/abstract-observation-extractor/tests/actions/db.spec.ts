@@ -229,6 +229,54 @@ describe('ObservationEntityAction', () => {
         }),
       );
     });
+
+    /**
+     * @target should not raise duplicate data error when storing an observation that already exists with a different extractor value
+     * @dependencies
+     * - dataSource
+     * @scenario
+     * - insert two observations with identical fields except extractor
+     * - call storeObservations with an observation matching the existing one for 'first-extractor' but with new rawData
+     * @expected
+     * - storeObservations should return true
+     * - repository should still contain exactly two records
+     * - the record with extractor 'first-extractor' should be updated with the new rawData
+     */
+    it('should not raise duplicate data error when storing an observation that already exists with a different extractor value', async () => {
+      const repository = dataSource.getRepository(ObservationEntity);
+      await repository.insert([
+        {
+          ...firstObservations[0],
+          extractor: 'first-extractor',
+          block: '1',
+          height: 1,
+        },
+        {
+          ...firstObservations[0],
+          extractor: 'second-extractor',
+          block: '1',
+          height: 1,
+        },
+      ]);
+      const res = await action.storeObservations(
+        [{ ...firstObservations[0], rawData: 'override-mocked-raw-data' }],
+        generateBlockEntity(dataSource, '1'),
+        'first-extractor',
+      );
+      expect(res).toEqual(true);
+      const [newRows, count] = await repository.findAndCount();
+      expect(count).toEqual(2);
+      expect(newRows[0]).toEqual(
+        expect.objectContaining({
+          ...firstObservations[0],
+          block: '1',
+          extractor: 'first-extractor',
+          height: 1,
+          rawData: 'override-mocked-raw-data',
+        }),
+      );
+      expect(newRows[1]).toEqual(expect.objectContaining(firstObservations[0]));
+    });
   });
 
   /**
