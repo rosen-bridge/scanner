@@ -7,9 +7,6 @@ workflow:
   auto_cancel:
     on_job_failure: all
 
-stages:
-  - ci
-
 include:
   - component: $CI_SERVER_FQDN/${CI_COMPONENT}
 

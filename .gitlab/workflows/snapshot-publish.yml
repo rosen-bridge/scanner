@@ -3,11 +3,6 @@ image: $GITLAB_CI_IMAGE
 default:
   interruptible: true
 
-stages:
-  - check_permission
-  - publish
-  - announce
-
 include:
   - component: $CI_SERVER_FQDN/${SNAPSHOT_COMPONENT}
 

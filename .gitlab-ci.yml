@@ -15,21 +15,8 @@ stages:
   - triggers
 
 include:
-  - component: $CI_SERVER_FQDN/${INSTALL_BUILD_COMPONENT}
+  - component: $CI_SERVER_FQDN/${ROOT_COMPONENT}
 
-run_ci:
-  stage: triggers
-  trigger:
-    include:
-      - local: .gitlab/workflows/ci.yml
-    strategy: mirror
-
-run_snapshot_publish:
-  stage: triggers
-  rules:
-    - when: manual
-  allow_failure: true
-  trigger:
-    include:
-      - local: .gitlab/workflows/snapshot-publish.yml
-    strategy: mirror
+    inputs:
+      enable_ci_child: true
+      enable_snapshot_publish_child: true
