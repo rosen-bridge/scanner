@@ -19,6 +19,7 @@ export class FraudAction extends AbstractErgoBoxAction<
    * @param frauds
    * @param block
    * @param extractor
+   * @returns the fraud entities (without the id)
    */
   protected createEntity = (
     frauds: ExtractedFraud[],
@@ -26,14 +27,10 @@ export class FraudAction extends AbstractErgoBoxAction<
     extractor: string,
   ): Array<Omit<FraudEntity, 'id'>> => {
     return frauds.map((fraud) => ({
-      identifier: fraud.identifier,
+      ...fraud,
       block: block.hash,
       height: block.height,
-      serialized: fraud.serialized,
       extractor,
-      triggerBoxId: fraud.triggerBoxId,
-      wid: fraud.wid,
-      rwtCount: fraud.rwtCount,
       spendBlock: fraud.spendBlock ?? null,
       spendHeight: fraud.spendHeight ?? null,
       spendTxId: fraud.spendTxId ?? null,
@@ -43,19 +40,11 @@ export class FraudAction extends AbstractErgoBoxAction<
   /**
    * convert the database entity back to raw data
    * @param entities
+   * @returns the extracted fraud data
    */
   protected convertEntityToData = (
     entities: FraudEntity[],
   ): ExtractedFraud[] => {
-    return entities.map((entity) => ({
-      identifier: entity.identifier,
-      serialized: entity.serialized,
-      triggerBoxId: entity.triggerBoxId,
-      wid: entity.wid,
-      rwtCount: entity.rwtCount,
-      spendBlock: entity.spendBlock ?? null,
-      spendHeight: entity.spendHeight ?? null,
-      spendTxId: entity.spendTxId ?? null,
-    }));
+    return entities;
   };
 }

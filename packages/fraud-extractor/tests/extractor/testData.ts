@@ -195,6 +195,7 @@ export const fraudTx: Transaction = {
 const parsedBox = wasm.ErgoBox.from_json(JsonBI.stringify(fraudTx.outputs[0]));
 
 export const extractedFraud = {
+  txId: '5f9e7ea97cfc83ed671d95d8ae8579c53949108e551b2a807283864597a1f2fe',
   identifier:
     '69be519ff4336011f2747391572eda0025f4869cde816dfe79573cc22703b008',
   triggerBoxId:

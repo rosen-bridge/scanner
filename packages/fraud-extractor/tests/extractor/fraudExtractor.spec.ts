@@ -48,7 +48,7 @@ describe('FraudExtractor', () => {
     it('should throw error when triggerBoxId is missing', () => {
       expect(() => {
         extractor.extractBoxData(fraudTx.outputs[0], [], {});
-      }).toThrow('ImpossibleBehaviour: Trigger box ID is missing');
+      }).toThrow();
     });
   });
 

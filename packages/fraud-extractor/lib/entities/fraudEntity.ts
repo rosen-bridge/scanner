@@ -7,6 +7,9 @@ export class FraudEntity extends AbstractErgoBoxEntity {
   triggerBoxId: string;
 
   @Column({ type: 'varchar' })
+  txId: string;
+
+  @Column({ type: 'varchar' })
   wid: string;
 
   @Column({ type: 'varchar' })

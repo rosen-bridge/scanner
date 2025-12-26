@@ -1,7 +1,10 @@
 import { Buffer } from 'buffer';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 
-import { AbstractErgoBoxExtractor } from '@rosen-bridge/abstract-extractor';
+import {
+  AbstractErgoBoxExtractor,
+  TxExtra,
+} from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
@@ -69,7 +72,7 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
       const r4 = ergoBox
         .register_value(wasm.NonMandatoryRegisterId.R4)
         ?.to_byte_array();
-      return r4 !== undefined && r4 !== null;
+      return r4 != null;
     } catch {
       return false;
     }
@@ -80,8 +83,8 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
    * @param tx
    * @returns transaction extra data containing trigger box id
    */
-  getTransactionExtraData = (tx: Transaction) => ({
-    triggerBoxId: tx.inputs[0]?.boxId,
+  getTransactionExtraData = (tx: Transaction): TxExtra => ({
+    triggerBoxId: tx.inputs[0].boxId,
   });
 
   /**
@@ -93,13 +96,13 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
    */
   extractBoxData = (
     box: OutputBox,
-    inputExtensions: InputExtension[],
-    txExtra?: { triggerBoxId?: string },
+    inputExtensions: InputExtension[],  
+    txExtra?: TxExtra,
   ): ExtractedFraud | undefined => {
     const triggerBoxId = txExtra?.triggerBoxId;
     if (!triggerBoxId) {
       throw new Error(
-        `ImpossibleBehaviour: Trigger box ID is missing for box ${box.boxId}, txExtra: ${JSON.stringify(txExtra)}`,
+        `ImpossibleBehaviour: Trigger boxId is missing for box ${box.boxId}, txExtra: ${JSON.stringify(txExtra)}`,
       );
     }
 
@@ -111,6 +114,7 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
     return {
       identifier: ergoBox.box_id().to_str(),
       triggerBoxId,
+      txId: box.transactionId,
       wid: Buffer.from(r4!).toString('hex'),
       rwtCount: box.assets[0].amount.toString(),
       serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
