@@ -14,7 +14,4 @@ export class FraudEntity extends AbstractErgoBoxEntity {
 
   @Column({ type: 'varchar' })
   rwtCount: string;
-
-  @Column({ nullable: true, type: 'varchar' })
-  spendTxId?: string | null;
 }

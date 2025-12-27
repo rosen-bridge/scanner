@@ -20,7 +20,6 @@ export class Migration1766226220592 implements MigrationInterface {
                 "rwtCount" varchar NOT NULL,
                 "spendBlock" varchar,
                 "spendHeight" integer,
-                "spendTxId" varchar,
                 "extractor" varchar NOT NULL,
                 CONSTRAINT "UQ_255733ddd78b7ff6784a94892c1" UNIQUE ("identifier", "extractor")
             )
@@ -38,7 +37,6 @@ export class Migration1766226220592 implements MigrationInterface {
                     "rwtCount",
                     "spendBlock",
                     "spendHeight",
-                    "spendTxId",
                     "extractor"
                 )
             SELECT "id",
@@ -52,7 +50,6 @@ export class Migration1766226220592 implements MigrationInterface {
                 "rwtCount",
                 "spendBlock",
                 "spendHeight",
-                "spendTxId",
                 "extractor"
             FROM "fraud_entity"
         `);
@@ -100,7 +97,6 @@ export class Migration1766226220592 implements MigrationInterface {
                     "rwtCount",
                     "spendBlock",
                     "spendHeight",
-                    "spendTxId",
                     "extractor"
                 )
             SELECT "id",
@@ -114,7 +110,6 @@ export class Migration1766226220592 implements MigrationInterface {
                 "rwtCount",
                 "spendBlock",
                 "spendHeight",
-                "spendTxId",
                 "extractor"
             FROM "temporary_fraud_entity"
         `);

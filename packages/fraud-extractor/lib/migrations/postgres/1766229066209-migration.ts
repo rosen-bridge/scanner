@@ -27,16 +27,16 @@ export class Migration1766229066209 implements MigrationInterface {
             ALTER TABLE "fraud_entity" ALTER COLUMN "spendBlock" TYPE character varying;
         `);
     await queryRunner.query(`
-            ALTER TABLE "fraud_entity" ALTER COLUMN "spendTxId" TYPE character varying;
+            ALTER TABLE "fraud_entity" DROP COLUMN "spendTxId"
         `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            ALTER TABLE "fraud_entity" ALTER COLUMN "spendTxId" TYPE text;
+            ALTER TABLE "fraud_entity" ADD COLUMN "spendTxId" TYPE text
         `);
     await queryRunner.query(`
-            ALTER TABLE "fraud_entity" ALTER COLUMN "spendBlock" TYPE text;
+            ALTER TABLE "fraud_entity" ALTER COLUMN "spendBlock" TYPE text
         `);
     await queryRunner.query(`
             ALTER TABLE "fraud_entity"

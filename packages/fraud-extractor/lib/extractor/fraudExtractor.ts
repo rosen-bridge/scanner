@@ -96,7 +96,7 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
    */
   extractBoxData = (
     box: OutputBox,
-    inputExtensions: InputExtension[],  
+    _inputExtensions: InputExtension[],
     txExtra?: TxExtra,
   ): ExtractedFraud | undefined => {
     const triggerBoxId = txExtra?.triggerBoxId;
