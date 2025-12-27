@@ -1,12 +1,9 @@
-export interface ExtractedCollateral {
-  boxId: string;
-  boxSerialized: string;
+import { AbstractEntityData } from '@rosen-bridge/abstract-extractor';
+
+export interface ExtractedCollateral extends AbstractEntityData {
+  txId: string;
   wid: string;
   rwtCount: bigint;
-  txId: string;
-  block: string;
-  height: number;
   spendBlock?: string | null;
   spendHeight?: number | null;
-  spendTxId?: string | null;
 }
