@@ -6,7 +6,7 @@ import {
   extractedCollateral,
   collateralBox,
 } from './collateralExtarctorTestData';
-import { createDatabase } from './utilsFunctions.mock';
+import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;
 let extractor: CollateralExtractor;
@@ -17,10 +17,14 @@ describe('CollateralExtractor', () => {
     extractor = new CollateralExtractor(
       dataSource,
       'extractor1',
-      'https://explorer.ergoplatform.com/',
-      ErgoNetworkType.Explorer,
-      'ChTbcUHgBNqNMVjzUp9HtAxHMFLTWkVzMDWgkptiyNxaQXzwfEjEoUjXkcL81JRowPLk6j7UFSdUWYqbnTXJUzT9tJmiESe4y4e4QqHwMesAzFMmT13oyrLA5QZa8c6ySKeyVQnVnDKDJp92qhSNWrDmeD6n9ca2JSrWFpdYhyzfiPh3zvJk58Mo61YNKiKoF5XPRfNabzZgsm8fU3sBg7ehYrGA4p385HQza768HbzFNTfuUVa8nuuEVKzWbNPfJPPyGaHy3fCqQRaUyRGQbjg7rk1c3eb1Fv3QY4BEJBEmBcGRTfLTbatnV36gmFGJagbjYfRpYvHoZqkEzgpF8JBtcE9Jx4DwnxD75smUqANfMwYctUakhgNdMBv6gJgL7SuKnWYgYE9ohptFf258UjLVfi5yN7nRhpSt3FXdrnXbAZkL485ATxViMeC4Mz4MjMTftuPFFE9fByY1VAPM6jLtevn8J6hGJWft9gMeBfaXAjs5iiVWQyRBDbdtpSAyu4vUPpEfekextUSwnb35dVr99ayKDpBPuViUfHsqxYMAxDhQAVFatHcjRW4dPT7oCLg5He9T2YTA56zx',
       'fb2a47295e30289f3748eb35a325c11db5202b7420ee9588c67f7486de2662db',
+      {
+        active: true,
+        type: ErgoNetworkType.Explorer,
+        url: 'https://explorer.ergoplatform.com/',
+        address:
+          'ChTbcUHgBNqNMVjzUp9HtAxHMFLTWkVzMDWgkptiyNxaQXzwfEjEoUjXkcL81JRowPLk6j7UFSdUWYqbnTXJUzT9tJmiESe4y4e4QqHwMesAzFMmT13oyrLA5QZa8c6ySKeyVQnVnDKDJp92qhSNWrDmeD6n9ca2JSrWFpdYhyzfiPh3zvJk58Mo61YNKiKoF5XPRfNabzZgsm8fU3sBg7ehYrGA4p385HQza768HbzFNTfuUVa8nuuEVKzWbNPfJPPyGaHy3fCqQRaUyRGQbjg7rk1c3eb1Fv3QY4BEJBEmBcGRTfLTbatnV36gmFGJagbjYfRpYvHoZqkEzgpF8JBtcE9Jx4DwnxD75smUqANfMwYctUakhgNdMBv6gJgL7SuKnWYgYE9ohptFf258UjLVfi5yN7nRhpSt3FXdrnXbAZkL485ATxViMeC4Mz4MjMTftuPFFE9fByY1VAPM6jLtevn8J6hGJWft9gMeBfaXAjs5iiVWQyRBDbdtpSAyu4vUPpEfekextUSwnb35dVr99ayKDpBPuViUfHsqxYMAxDhQAVFatHcjRW4dPT7oCLg5He9T2YTA56zx',
+      },
     );
   });
 

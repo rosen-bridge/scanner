@@ -1,11 +1,14 @@
 import { Buffer } from 'buffer';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 
-import { AbstractErgoBoxExtractor } from '@rosen-bridge/abstract-extractor';
+import {
+  AbstractErgoBoxExtractor,
+  InitializeOptions,
+} from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
-import { ErgoNetworkType, OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import CollateralAction from '../actions/collateralAction';
 import CollateralEntity from '../entities/collateralEntity';
@@ -23,16 +26,13 @@ export class CollateralExtractor extends AbstractErgoBoxExtractor<
   constructor(
     dataSource: DataSource,
     id: string,
-    url: string,
-    type: ErgoNetworkType,
-    address: string,
     awcNft: string,
+    initializeOptions: InitializeOptions,
     logger?: AbstractLogger,
-    initialize = true,
   ) {
-    super({ type, url, address, active: initialize }, logger);
+    super(initializeOptions, logger);
     this.id = id;
-    this.ergoTree = wasm.Address.from_base58(address)
+    this.ergoTree = wasm.Address.from_base58(initializeOptions.address)
       .to_ergo_tree()
       .to_base16_bytes();
     this.awcNft = awcNft;

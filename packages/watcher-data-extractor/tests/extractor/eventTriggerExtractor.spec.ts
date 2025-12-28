@@ -6,14 +6,14 @@ import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 import EventTriggerEntity from '../../lib/entities/eventTriggerEntity';
 import EventTriggerExtractor from '../../lib/extractor/eventTriggerExtractor';
 import { JsonBI } from '../../lib/utils';
-import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import {
   block,
   eventTriggerAddress,
   RWTId,
   spendTriggerTx,
   spendTriggerTxOldFormat,
-} from './utilsVariable.mock';
+} from './testData';
+import { eventTriggerTxGenerator, createDatabase } from './testUtils';
 
 let dataSource: DataSource;
 const sampleEventData = [

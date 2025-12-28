@@ -2,8 +2,8 @@ import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { EventResult, EventTriggerEntity } from '../../lib';
 import EventTriggerAction from '../../lib/actions/eventTriggerAction';
-import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { block } from '../extractor/utilsVariable.mock';
+import { block } from '../extractor/testData';
+import { createDatabase } from '../extractor/testUtils';
 import { sampleEventEntity } from './eventTriggerActionData';
 
 let dataSource: DataSource;
