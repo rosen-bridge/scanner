@@ -1,8 +1,6 @@
-import {
-  DataSource,
-  ObjectLiteral,
-  SelectQueryBuilder,
-} from '@rosen-bridge/extended-typeorm';
+import { aC } from 'vitest/dist/chunks/reporters.d.BFLkQcL6';
+
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import {
   BlockEntity,
@@ -12,6 +10,7 @@ import {
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 import { BlockDbAction } from '../../lib/scanner/action';
 import { createDatabase } from './abstract/abstract.mock';
+import { sampleBlocks } from './scannerActionData';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -632,6 +631,7 @@ describe('action', () => {
      */
     it('', async () => {
       const repository = dataSource.getRepository(BlockEntity);
+
       const query1 = repository
         .createQueryBuilder('block')
         .select('block.height', 'height')
@@ -642,21 +642,42 @@ describe('action', () => {
         .select('block.height', 'height')
         .where('height = :height', { height: 250 });
 
-      const prefix = 'query';
       const { queryParts, parameters } = action.generateQueriesWithUniqueParams(
         [query1, query2],
-        prefix,
       );
 
       const expectQueryParts = [
-        'SELECT "block"."height" AS "height" FROM "block_entity" "block" WHERE height = :query0height',
         'SELECT "block"."height" AS "height" FROM "block_entity" "block" WHERE height = :query1height',
+        'SELECT "block"."height" AS "height" FROM "block_entity" "block" WHERE height = :query2height',
       ];
 
-      const expectParameters = { query0height: 200, query1height: 250 };
+      const expectParameters = { query1height: 200, query2height: 250 };
 
       expect(expectQueryParts).toEqual(queryParts);
       expect(expectParameters).toEqual(parameters);
+    });
+  });
+
+  describe('removeUnusedBlocksInBatches', () => {
+    /**
+     */
+    it('', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
+      await repository.insert(sampleBlocks);
+
+      vi.spyOn(action, 'generateQueriesWithUniqueParams').mockImplementation(
+        () => {
+          const queryParts = [
+            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height >= :query1height',
+            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height <= :query2height',
+          ];
+          const parameters = { query1height: 15, query2height: 13 };
+          return { queryParts, parameters };
+        },
+      );
+
+      await action.removeUnusedBlocksInBatches([], 10, 'scanner');
+      console.log(await repository.find());
     });
   });
 });

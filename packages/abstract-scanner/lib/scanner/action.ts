@@ -9,6 +9,7 @@ import {
   In,
   SelectQueryBuilder,
   ObjectLiteral,
+  Not,
 } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
@@ -328,24 +329,23 @@ export class BlockDbAction {
    */
   generateQueriesWithUniqueParams = (
     queryBuilders: SelectQueryBuilder<ObjectLiteral>[],
-    prefix: string,
   ): { queryParts: string[]; parameters: Record<string, unknown> } => {
     let queryParts: string[] = [],
       parameters: Record<string, unknown> = {};
 
     queryBuilders.forEach((queryBuilder, index) => {
-      const queryPrefix = `${prefix}${index}`;
+      const prefix = uniqueId('query');
 
       const queryWithUniqueParams = queryBuilder
         .getQuery()
-        .replace(/:(\w+)/g, (match, key) => `:${queryPrefix}${key}`);
+        .replace(/:(\w+)/g, (match, key) => `:${prefix}${key}`);
 
       queryParts.push(queryWithUniqueParams);
 
       const queryParams = queryBuilder.getParameters();
       const prefixedParams = Object.fromEntries(
         Object.entries(queryParams).map(([key, value]) => [
-          `${queryPrefix}${key}`,
+          `${prefix}${key}`,
           value,
         ]),
       );
@@ -364,6 +364,7 @@ export class BlockDbAction {
   removeUnusedBlocksInBatches = async (
     extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
     deletedBlockCount: number,
+    scannerName: string,
   ) => {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
@@ -371,19 +372,21 @@ export class BlockDbAction {
 
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
 
-    const blockToDelete = this.blockRepository
+    const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')
-      .select('blockEntity.id', 'id')
-      .addSelect('blockEntity.height', 'height')
       .addSelect('blockEntity.hash', 'hash')
       .where(`blockEntity.hash NOT IN (${unionQuery})`)
+      .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
       .setParameters({ ...parameters })
       .distinct(true)
       .orderBy('blockEntity.height', 'ASC')
-      .take(deletedBlockCount);
+      .take(deletedBlockCount)
+      .getRawMany();
 
-    const blocks = await blockToDelete.getRawMany();
+    const unusedBlockHashes = blocksToDelete.map((row) => row.hash);
 
-    blocks.map((row) => console.log(`delete ${row.block}`));
+    await this.blockRepository.delete({
+      hash: In(unusedBlockHashes),
+    });
   };
 }

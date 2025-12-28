@@ -4,7 +4,6 @@ import { difference, remove } from 'lodash-es';
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
-  ObjectLiteral,
   SelectQueryBuilder,
 } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
@@ -222,6 +221,7 @@ export abstract class AbstractScanner<TransactionType> {
     await this.action.removeUnusedBlocksInBatches(
       extractorUsedBlocksQueries,
       deletedBlockCount,
+      this.name()
     );
   };
 }

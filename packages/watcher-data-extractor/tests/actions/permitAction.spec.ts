@@ -501,6 +501,7 @@ describe('PermitEntityAction', () => {
 
       const extractorId = samplePermit1.extractor;
 
+
       const executeUsedBlocksQuery = await action
         .createUsedBlocksQuery(extractorId)
         .getRawMany();

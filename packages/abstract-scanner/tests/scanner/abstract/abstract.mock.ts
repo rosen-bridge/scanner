@@ -54,7 +54,7 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
     return Promise.resolve();
   };
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -155,5 +155,5 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
 
   processTransactions = () => Promise.resolve(false);
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
 }

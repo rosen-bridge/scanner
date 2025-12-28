@@ -379,4 +379,35 @@ describe('AbstractScanner', () => {
       expect(mockedInit).not.toHaveBeenCalled();
     });
   });
+
+  describe('removeOldUnusedBlocksInBatches', () => {
+    /**
+     */
+    it('removeOldUnusedBlocksInBatches', async () => {
+      const scanner = new TestAbstractScanner('scanner', dataSource);
+      const extractor1 = new ExtractorTest('extractor1');
+      const extractor2 = new ExtractorTest('extractor2');
+      scanner['extractors'] = [extractor1, extractor2];
+
+      const query1 = dataSource.createQueryBuilder();
+      vi.spyOn(extractor1, 'createUsedBlocksQuery').mockImplementation(
+        () => undefined,
+      );
+      vi.spyOn(extractor2, 'createUsedBlocksQuery').mockImplementation(
+        () => query1,
+      );
+
+      const removeUnusedBlocksInBatchesSpy = vi
+        .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
+        .mockResolvedValue();
+
+      await scanner.removeOldUnusedBlocksInBatches(100);
+
+      expect(removeUnusedBlocksInBatchesSpy).toHaveBeenCalledWith(
+        [query1],
+        100,
+        scanner.name(),
+      );
+    });
+  });
 });
