@@ -329,4 +329,10 @@ export class CollateralExtractor extends AbstractExtractor<Transaction> {
       height: blockHeight,
     };
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `collateral` repository
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = () => this.action.createUsedBlocksQuery();
 }

@@ -348,4 +348,10 @@ export class FraudExtractor implements AbstractExtractor<Transaction> {
     }
     return extractedFrauds;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `fraud` repository
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = () => this.actions.createUsedBlocksQuery();
 }

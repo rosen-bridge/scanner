@@ -150,4 +150,10 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   getRecentBox = (): ErgoBox | undefined => {
     return this.boxes.at(-1);
   };
+
+  /**
+   * Create a query for blocks that are already used
+   * No action needed in box-tracker extractors
+   */
+  createUsedBlocksQuery = (): undefined => undefined;
 }

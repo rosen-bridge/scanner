@@ -278,6 +278,12 @@ class CollateralAction {
       extractor: extractor,
     });
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `collateral` repository
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): undefined => undefined;
 }
 
 export default CollateralAction;

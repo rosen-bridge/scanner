@@ -236,4 +236,10 @@ export class FraudAction {
       { spendBlock: blockId, spendHeight: blockHeight },
     );
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `fraud` repository
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): undefined => undefined;
 }

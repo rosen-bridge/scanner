@@ -3,12 +3,13 @@ import { Buffer } from 'buffer';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { AbstractRosenDataExtractor } from '@rosen-bridge/rosen-extractor';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import { ObservationEntityAction } from '../actions/db';
+import { ObservationEntity } from '../entities/observationEntity';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
 
 export abstract class AbstractObservationExtractor<
@@ -108,4 +109,13 @@ export abstract class AbstractObservationExtractor<
   initializeData = async () => {
     return;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<ObservationEntity> =>
+    this.actions.createUsedBlocksQuery(this.getId());
 }

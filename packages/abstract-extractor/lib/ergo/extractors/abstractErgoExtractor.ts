@@ -2,6 +2,10 @@ import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import {
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
@@ -121,4 +125,15 @@ export abstract class AbstractErgoExtractor<
     if (result.updatedData.length > 0)
       this.triggerCallbacks(CallbackType.Update, result.updatedData);
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `ExtractorEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<ObjectLiteral> =>
+    this.actions.createUsedBlocksQuery(
+      this.getId(),
+    ) as SelectQueryBuilder<ObjectLiteral>;
 }

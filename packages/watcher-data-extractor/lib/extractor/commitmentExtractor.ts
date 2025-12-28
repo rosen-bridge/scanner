@@ -2,11 +2,12 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import CommitmentAction from '../actions/commitmentAction';
+import CommitmentEntity from '../entities/commitmentEntity';
 import { extractedCommitment } from '../interfaces/extractedCommitment';
 import { SpendInfo } from '../interfaces/types';
 import { JsonBI } from '../utils';
@@ -154,6 +155,15 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
   initializeData = async () => {
     return;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<CommitmentEntity> =>
+    this.actions.createUsedBlocksQuery(this.getId());
 }
 
 export default CommitmentExtractor;

@@ -1,7 +1,12 @@
 import { chunk } from 'lodash-es';
 
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { dbIdChunkSize } from '../constants';
@@ -156,6 +161,22 @@ class CommitmentAction {
         spendIndex: null,
       },
     );
+  };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<CommitmentEntity> => {
+    return this.commitmentRepository
+      .createQueryBuilder('commitmentEntity')
+      .select('commitmentEntity.block', 'block')
+      .where('commitmentEntity.extractor = :extractorId', { extractorId });
   };
 }
 

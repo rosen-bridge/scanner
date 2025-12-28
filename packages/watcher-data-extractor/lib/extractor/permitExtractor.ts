@@ -5,12 +5,13 @@ import { difference } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory, { V1 } from '@rosen-clients/ergo-explorer';
 
 import PermitAction from '../actions/permitAction';
 import { DefaultApiLimit } from '../constants';
+import PermitEntity from '../entities/permitEntity';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 import { JsonBI } from '../utils';
 
@@ -285,6 +286,15 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
     }
     return extractedBoxes;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<PermitEntity> =>
+    this.actions.createUsedBlocksQuery(this.getId());
 }
 
 export default PermitExtractor;

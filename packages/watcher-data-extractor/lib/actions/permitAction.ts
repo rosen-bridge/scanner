@@ -1,7 +1,12 @@
 import { chunk } from 'lodash-es';
 
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { dbIdChunkSize } from '../constants';
@@ -212,6 +217,22 @@ class PermitAction {
       { boxId: boxId, extractor: extractor },
       { spendBlock: blockId, spendHeight: blockHeight },
     );
+  };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<PermitEntity> => {
+    return this.permitRepository
+      .createQueryBuilder('permitEntity')
+      .select('permitEntity.block', 'block')
+      .where('permitEntity.extractor = :extractorId', { extractorId });
   };
 }
 

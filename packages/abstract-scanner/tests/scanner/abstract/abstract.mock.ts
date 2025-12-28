@@ -1,5 +1,9 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import {
   BlockInfo,
   Block,
@@ -49,6 +53,8 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   initializeData = () => {
     return Promise.resolve();
   };
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -148,4 +154,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
   initializeData = () => Promise.resolve();
 
   processTransactions = () => Promise.resolve(false);
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }

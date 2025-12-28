@@ -8,6 +8,7 @@ import {
   In,
   QueryRunner,
   Repository,
+  SelectQueryBuilder,
 } from '@rosen-bridge/extended-typeorm';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
@@ -259,5 +260,21 @@ export abstract class AbstractErgoAction<
     await this.repository.delete({
       extractor: extractorId,
     } as FindOptionsWhere<ExtractorEntity>);
+  };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `ExtractorEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<ExtractorEntity> => {
+    return this.repository
+      .createQueryBuilder('extractorEntity')
+      .select('extractorEntity.block', 'block')
+      .where('extractorEntity.extractor = :extractorId', { extractorId });
   };
 }
