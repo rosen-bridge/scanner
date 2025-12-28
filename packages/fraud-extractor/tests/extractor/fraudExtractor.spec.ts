@@ -2,8 +2,8 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import { FraudExtractor } from '../../lib';
-import { createDatabase } from './fraudExtractor.mock';
 import { extractedFraud, fraudTx } from './testData';
+import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;
 let extractor: FraudExtractor;
@@ -14,10 +14,14 @@ describe('FraudExtractor', () => {
     extractor = new FraudExtractor(
       dataSource,
       'extractor1',
-      'https://explorer.ergoplatform.com/',
-      ErgoNetworkType.Explorer,
-      '2U1Bm1VfBKJQzNr6Zu6yAh2ZUvdj3LbyQDqtkC3KWmmMoHNwSRTTF1xZ54auFAShAe9Rh1HGkWnGgFiWvGjyYjDjen8j1Qn5mDQGvvrRtR5msj5kbZtiTkLAQ2SB8WBJvW9e4QHdWa2wPnyfe9KMFHMYtcEgdUA2wD4NyvyWNe31R2bxsMykcaxi49WdbWYENRK3WfZ7udYGcsJyKNN2kwpWyyC3ErnLuJNbmeNGFy4QxvKMtcpfZSg',
       '34529f875cad2bf58c5ffb4a9056d26c590f0c35f77958a68dcdb4aa39b437aa',
+      {
+        active: true,
+        type: ErgoNetworkType.Explorer,
+        url: 'https://explorer.ergoplatform.com/',
+        address:
+          '2U1Bm1VfBKJQzNr6Zu6yAh2ZUvdj3LbyQDqtkC3KWmmMoHNwSRTTF1xZ54auFAShAe9Rh1HGkWnGgFiWvGjyYjDjen8j1Qn5mDQGvvrRtR5msj5kbZtiTkLAQ2SB8WBJvW9e4QHdWa2wPnyfe9KMFHMYtcEgdUA2wD4NyvyWNe31R2bxsMykcaxi49WdbWYENRK3WfZ7udYGcsJyKNN2kwpWyyC3ErnLuJNbmeNGFy4QxvKMtcpfZSg',
+      },
     );
   });
 
