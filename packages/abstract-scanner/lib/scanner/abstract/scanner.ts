@@ -3,9 +3,7 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import {
-  SelectQueryBuilder,
-} from '@rosen-bridge/extended-typeorm';
+import { SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
@@ -16,12 +14,14 @@ export abstract class AbstractScanner<TransactionType> {
   newExtractors: Array<AbstractExtractor<TransactionType>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
+  threshold: number;
 
-  constructor(logger?: AbstractLogger) {
+  constructor(threshold: number, logger?: AbstractLogger) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
     this.initializeMutex = new Mutex();
+    this.threshold = threshold;
   }
 
   abstract name: () => string;
@@ -221,7 +221,9 @@ export abstract class AbstractScanner<TransactionType> {
     await this.action.removeUnusedBlocksInBatches(
       extractorUsedBlocksQueries,
       deletedBlockCount,
-      this.name()
+      this.name(),
+      this.threshold
     );
   };
 }
+

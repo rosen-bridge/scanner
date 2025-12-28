@@ -365,18 +365,23 @@ export class BlockDbAction {
     extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
     deletedBlockCount: number,
     scannerName: string,
+    threshold: number,
   ) => {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
     );
 
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
+    const now = new Date();
+    const thresholdTime = now.getTime() - threshold;
+
 
     const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')
       .addSelect('blockEntity.hash', 'hash')
       .where(`blockEntity.hash NOT IN (${unionQuery})`)
       .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
+      .where('block.timestamp < :thresholdTime', { thresholdTime })
       .setParameters({ ...parameters })
       .distinct(true)
       .orderBy('blockEntity.height', 'ASC')
