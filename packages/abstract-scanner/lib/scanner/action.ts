@@ -321,25 +321,31 @@ export class BlockDbAction {
     });
   };
 
+  /**
+   *
+   * @param queryBuilders
+   * @returns
+   */
   generateQueriesWithUniqueParams = (
     queryBuilders: SelectQueryBuilder<ObjectLiteral>[],
+    prefix: string,
   ): { queryParts: string[]; parameters: Record<string, unknown> } => {
     let queryParts: string[] = [],
       parameters: Record<string, unknown> = {};
 
-    queryBuilders.forEach((queryBuilder) => {
-      const prefix = uniqueId('query');
+    queryBuilders.forEach((queryBuilder, index) => {
+      const queryPrefix = `${prefix}${index}`;
 
       const queryWithUniqueParams = queryBuilder
         .getQuery()
-        .replace(/:(\w+)/g, (match, key) => `:${prefix}${key}`);
+        .replace(/:(\w+)/g, (match, key) => `:${queryPrefix}${key}`);
 
       queryParts.push(queryWithUniqueParams);
 
       const queryParams = queryBuilder.getParameters();
       const prefixedParams = Object.fromEntries(
         Object.entries(queryParams).map(([key, value]) => [
-          `${prefix}${key}`,
+          `${queryPrefix}${key}`,
           value,
         ]),
       );
@@ -349,7 +355,13 @@ export class BlockDbAction {
     return { queryParts, parameters };
   };
 
-  combineQueriesAndDeleteBlocksInBatches = async (
+  /**
+   *
+   * @param extractorUsedBlocksQueries
+   * @param deletedBlockCount
+   * @returns
+   */
+  removeUnusedBlocksInBatches = async (
     extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
     deletedBlockCount: number,
   ) => {
@@ -357,9 +369,9 @@ export class BlockDbAction {
       extractorUsedBlocksQueries,
     );
 
-    const unionQuery = queryParts.map((sql) => `(${sql})`).join(' UNION ');
+    const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
 
-    return await this.blockRepository
+    const blockToDelete = this.blockRepository
       .createQueryBuilder('blockEntity')
       .select('blockEntity.id', 'id')
       .addSelect('blockEntity.height', 'height')
@@ -368,7 +380,10 @@ export class BlockDbAction {
       .setParameters({ ...parameters })
       .distinct(true)
       .orderBy('blockEntity.height', 'ASC')
-      .take(deletedBlockCount)
-      .getRawMany();
+      .take(deletedBlockCount);
+
+    const blocks = await blockToDelete.getRawMany();
+
+    blocks.map((row) => console.log(`delete ${row.block}`));
   };
 }

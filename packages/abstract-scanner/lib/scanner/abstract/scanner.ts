@@ -3,6 +3,10 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import {
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
@@ -206,19 +210,18 @@ export abstract class AbstractScanner<TransactionType> {
     }
   };
 
-    /**
+  /**
    *
    * @param deletedBlockCount
    */
-    removeOldUnusedBlocksInBatches = async (deletedBlockCount: number = 500) => {
+  removeOldUnusedBlocksInBatches = async (deletedBlockCount: number = 500) => {
+    const extractorUsedBlocksQueries = this.extractors
+      .map((extracor) => extracor.createUsedBlocksQuery())
+      .filter((value) => value instanceof SelectQueryBuilder);
 
-      const extractorUsedBlocksQueries = this.extractors.map((extracor) =>
-        extracor.createUsedBlocksQuery(extracor.getId()),
-      );
-  
-      await this.action.combineQueriesAndDeleteBlocksInBatches(
-        extractorUsedBlocksQueries,
-        deletedBlockCount,
-      );
-    };
+    await this.action.removeUnusedBlocksInBatches(
+      extractorUsedBlocksQueries,
+      deletedBlockCount,
+    );
+  };
 }
