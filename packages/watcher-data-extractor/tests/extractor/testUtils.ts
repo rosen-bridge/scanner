@@ -16,7 +16,7 @@ import {
   last10BlockHeader,
   permitAddress,
   RWTId,
-} from './utilsVariable.mock';
+} from './testData';
 
 /**
  * generates a dataSource with filename passed to the function for database file name

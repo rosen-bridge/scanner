@@ -11,17 +11,17 @@ import PermitExtractor from '../../lib/extractor/permitExtractor';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
 import { JsonBI } from '../../lib/utils';
 import {
-  permitTxGenerator,
-  createDatabase,
-  insertPermitEntity,
-} from './utilsFunctions.mock';
-import {
   addressBoxes,
   block,
   permitAddress,
   RWTId,
   sampleExtractedPermit,
-} from './utilsVariable.mock';
+} from './testData';
+import {
+  permitTxGenerator,
+  createDatabase,
+  insertPermitEntity,
+} from './testUtils';
 
 vi.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
