@@ -205,4 +205,20 @@ export abstract class AbstractScanner<TransactionType> {
       release();
     }
   };
+
+    /**
+   *
+   * @param deletedBlockCount
+   */
+    removeOldUnusedBlocksInBatches = async (deletedBlockCount: number = 500) => {
+
+      const extractorUsedBlocksQueries = this.extractors.map((extracor) =>
+        extracor.createUsedBlocksQuery(extracor.getId()),
+      );
+  
+      await this.action.combineQueriesAndDeleteBlocksInBatches(
+        extractorUsedBlocksQueries,
+        deletedBlockCount,
+      );
+    };
 }

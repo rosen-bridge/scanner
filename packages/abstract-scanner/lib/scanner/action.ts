@@ -1,3 +1,5 @@
+import { uniqueId, values } from 'lodash-es';
+
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   DataSource,
@@ -5,6 +7,8 @@ import {
   MoreThanOrEqual,
   Repository,
   In,
+  SelectQueryBuilder,
+  ObjectLiteral,
 } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
@@ -315,5 +319,56 @@ export class BlockDbAction {
       scannerId: this.name(),
       extractorId: In(extractorIds),
     });
+  };
+
+  generateQueriesWithUniqueParams = (
+    queryBuilders: SelectQueryBuilder<ObjectLiteral>[],
+  ): { queryParts: string[]; parameters: Record<string, unknown> } => {
+    let queryParts: string[] = [],
+      parameters: Record<string, unknown> = {};
+
+    queryBuilders.forEach((queryBuilder) => {
+      const prefix = uniqueId('query');
+
+      const queryWithUniqueParams = queryBuilder
+        .getQuery()
+        .replace(/:(\w+)/g, (match, key) => `:${prefix}${key}`);
+
+      queryParts.push(queryWithUniqueParams);
+
+      const queryParams = queryBuilder.getParameters();
+      const prefixedParams = Object.fromEntries(
+        Object.entries(queryParams).map(([key, value]) => [
+          `${prefix}${key}`,
+          value,
+        ]),
+      );
+      parameters = { ...parameters, ...prefixedParams };
+    });
+
+    return { queryParts, parameters };
+  };
+
+  combineQueriesAndDeleteBlocksInBatches = async (
+    extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
+    deletedBlockCount: number,
+  ) => {
+    const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
+      extractorUsedBlocksQueries,
+    );
+
+    const unionQuery = queryParts.map((sql) => `(${sql})`).join(' UNION ');
+
+    return await this.blockRepository
+      .createQueryBuilder('blockEntity')
+      .select('blockEntity.id', 'id')
+      .addSelect('blockEntity.height', 'height')
+      .addSelect('blockEntity.hash', 'hash')
+      .where(`blockEntity.hash NOT IN (${unionQuery})`)
+      .setParameters({ ...parameters })
+      .distinct(true)
+      .orderBy('blockEntity.height', 'ASC')
+      .take(deletedBlockCount)
+      .getRawMany();
   };
 }

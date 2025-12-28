@@ -109,7 +109,7 @@ export const createDatabase = async () => {
     entities: [BlockEntity, ExtractorStatusEntity],
     synchronize: false,
     migrations: migrations.sqlite,
-    logging: false,
+    logging: true,
   });
   await dataSource.initialize();
   await dataSource.runMigrations();
