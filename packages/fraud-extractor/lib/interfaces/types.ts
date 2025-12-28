@@ -1,15 +1,11 @@
-interface ExtractedFraud {
-  boxId: string;
-  serialized: string;
+import { AbstractEntityData } from '@rosen-bridge/abstract-extractor';
+
+export interface ExtractedFraud extends AbstractEntityData {
+  txId: string;
   triggerBoxId: string;
   wid: string;
   rwtCount: string;
-  blockId?: string;
-  height?: number;
-  txId?: string;
-  spendBlock?: string;
-  spendHeight?: number;
-  spendTxId?: string;
+  spendBlock?: string | null;
+  spendHeight?: number | null;
+  spendTxId?: string | null;
 }
-
-export { ExtractedFraud };
