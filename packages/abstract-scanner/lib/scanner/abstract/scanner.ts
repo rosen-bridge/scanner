@@ -210,10 +210,13 @@ export abstract class AbstractScanner<TransactionType> {
   };
 
   /**
+   * Removes unused blocks based on the query retrieving used blocks
    *
    * @param deletedBlockCount
    */
-  removeOldUnusedBlocksInBatches = async (deletedBlockCount: number = 500) => {
+  removeOldUnusedBlocksInBatches = async (
+    deletedBlockCount: number = 500,
+  ): Promise<void> => {
     const extractorUsedBlocksQueries = this.extractors
       .map((extracor) => extracor.createUsedBlocksQuery())
       .filter((value) => value instanceof SelectQueryBuilder);
@@ -222,8 +225,7 @@ export abstract class AbstractScanner<TransactionType> {
       extractorUsedBlocksQueries,
       deletedBlockCount,
       this.name(),
-      this.threshold
+      this.threshold,
     );
   };
 }
-

@@ -382,8 +382,19 @@ describe('AbstractScanner', () => {
 
   describe('removeOldUnusedBlocksInBatches', () => {
     /**
+     * @target removeOldUnusedBlocksInBatches should filters the output of the extracor.createUsedBlocksQuery and
+     * calls the `removeOldUnusedBlocksInBatches` with the correct parameters
+     * @dependencies
+     * @scenario
+     * - mock scanner and two extractor
+     * - mock scanner extractors to include the mocked extractors
+     * - Mocks the `createUsedBlocksQuery` to return `undefined` for a extractor1
+     * - Mocks the `createUsedBlocksQuery` to return a value of type `SelectQueryBuilder` for a extractor2
+     * - Run test (call `removeOldUnusedBlocksInBatches`)
+     * @expected
+     * - Ensures that the `removeUnusedBlocksInBatches` is called with the correct parameters
      */
-    it('removeOldUnusedBlocksInBatches', async () => {
+    it('should filters the output of the extracor.createUsedBlocksQuery and calls the `removeOldUnusedBlocksInBatches` with the correct parameters', async () => {
       const scanner = new TestAbstractScanner('scanner', dataSource);
       const extractor1 = new ExtractorTest('extractor1');
       const extractor2 = new ExtractorTest('extractor2');
@@ -399,15 +410,16 @@ describe('AbstractScanner', () => {
 
       const removeUnusedBlocksInBatchesSpy = vi
         .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
-        .mockResolvedValue();
+        .mockResolvedValue([]);
 
       await scanner.removeOldUnusedBlocksInBatches(100);
 
-      // expect(removeUnusedBlocksInBatchesSpy).toHaveBeenCalledWith(
-      //   [query1],
-      //   100,
-      //   scanner.name(),
-      // );
+      expect(removeUnusedBlocksInBatchesSpy).toHaveBeenCalledWith(
+        [query1],
+        100,
+        scanner.name(),
+        scanner.threshold,
+      );
     });
   });
 });

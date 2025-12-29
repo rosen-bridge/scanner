@@ -1,4 +1,4 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import {
   BlockEntity,
@@ -626,8 +626,17 @@ describe('action', () => {
 
   describe('generateQueriesWithUniqueParams', () => {
     /**
+     * @target generateQueriesWithUniqueParams should generates unique parameters for the input queries
+     *  and returns both the queries and the generated parameters
+     * @dependencies
+     * - Database
+     * @scenario
+     * - Creates two queries with the same parameters
+     * - Run test (call `generateQueriesWithUniqueParams`)
+     * @expected
+     * - Ensures that the parameters inside the queries are unique
      */
-    it('', async () => {
+    it('should generates unique parameters for the input queries and returns both the queries and the generated parameters', async () => {
       const repository = dataSource.getRepository(BlockEntity);
 
       const query1 = repository
@@ -657,7 +666,9 @@ describe('action', () => {
   });
 
   describe('removeUnusedBlocksInBatches', () => {
+    let blockRepository: Repository<BlockEntity>;
     beforeEach(() => {
+      blockRepository = dataSource.getRepository(BlockEntity);
       vi.spyOn(action, 'generateQueriesWithUniqueParams').mockImplementation(
         () => {
           const queryParts = [
@@ -669,10 +680,20 @@ describe('action', () => {
         },
       );
     });
+
     /**
+     * @target removeUnusedBlocksInBatches should filter all unused blocks using the combined queries that fetch used blocks
+     * @dependencies
+     * - generateQueriesWithUniqueParams
+     * - Database
+     * @scenario
+     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
+     * - Insert 4 BlockEntities related to this scanner
+     * - Run test (call `removeUnusedBlocksInBatches`)
+     * @expected
+     * - Ensures that the blocks being removed are correctly filtered
      */
-    it('', async () => {
-      const blockRepository = dataSource.getRepository(BlockEntity);
+    it('should filter all unused blocks using the combined queries that fetch used blocks', async () => {
       await blockRepository.insert(sampleBlocks1);
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
@@ -693,8 +714,20 @@ describe('action', () => {
       expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
-    it('', async () => {
-      const blockRepository = dataSource.getRepository(BlockEntity);
+    /**
+     * @target removeUnusedBlocksInBatches should filter all unused blocks associated with the given `scannerName`
+     * @dependencies
+     * - generateQueriesWithUniqueParams
+     * - Database
+     * @scenario
+     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
+     * - Insert 4 BlockEntities related to this scanner
+     * - Insert 3 BlockEntities related to the same scanner, but with a different scannerName
+     * - Run test (call `removeUnusedBlocksInBatches`)
+     * @expected
+     * - Ensures that the blocks being removed are correctly filtered
+     */
+    it('should filter all unused blocks associated with the given `scannerName`', async () => {
       const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
       await blockRepository.insert(sampleBlocks);
 
@@ -717,10 +750,21 @@ describe('action', () => {
       expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
-    it('', async () => {
-      const blockRepository = dataSource.getRepository(BlockEntity);
-      const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
-      await blockRepository.insert(sampleBlocks);
+    /**
+     * @target removeUnusedBlocksInBatches should filters all unused blocks based on the block lifetime threshold provided as input
+     * @dependencies
+     * - generateQueriesWithUniqueParams
+     * - Database
+     * @scenario
+     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
+     * - Insert 4 BlockEntities related to this scanner
+     * - Defines a thresholdTime for executing the test
+     * - Run test (call `removeUnusedBlocksInBatches`)
+     * @expected
+     * - Ensures that the blocks being removed are correctly filtered
+     */
+    it('should filters all unused blocks based on the block lifetime threshold provided as input', async () => {
+      await blockRepository.insert(sampleBlocks1);
 
       const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
       const threshold = tenDaysInMs;
@@ -733,47 +777,95 @@ describe('action', () => {
         threshold,
       );
 
-      const expectBlockHashesToDelete = sampleBlocks
+      const expectBlockHashesToDelete = sampleBlocks1
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
             !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
-            sampleBlock.scanner == sampleBlocks1[0].scanner &&
             sampleBlock.timestamp < thresholdTime,
         )
         .map((block) => block.hash);
 
       expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
-  });
 
-  it('', async () => {
-    const blockRepository = dataSource.getRepository(BlockEntity);
-    const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
-    await blockRepository.insert(sampleBlocks);
+    /**
+     * @target removeUnusedBlocksInBatches should returns the specified number of unused blocks provided in the input
+     * @dependencies
+     * - generateQueriesWithUniqueParams
+     * - Database
+     * @scenario
+     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
+     * - Insert 4 BlockEntities related to this scanner
+     * - Defines a thresholdTime for executing the test
+     * - call `removeUnusedBlocksInBatches` with deletedBlockCount = 1
+     * @expected
+     * - Ensures that the blocks being removed are correct
+     */
+    it('should returns the specified number of unused blocks provided in the input', async () => {
+      await blockRepository.insert(sampleBlocks1);
 
-    const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
-    const threshold = tenDaysInMs;
-    const thresholdTime = Date.now() - threshold;
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        1,
+        sampleBlocks1[0].scanner,
+        1,
+      );
 
-    const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
-      [],
-      1,
-      sampleBlocks1[0].scanner,
-      threshold,
-    );
+      const expectBlockHashesToDelete = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) =>
+            !(sampleBlock.height >= 15 || sampleBlock.height < 12),
+        )
+        .map((block) => block.hash);
 
-    const expectBlockHashesToDelete = sampleBlocks
-      .sort((block1, block2) => block1.height - block2.height)
-      .filter(
-        (sampleBlock) =>
-          !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
-          sampleBlock.scanner == sampleBlocks1[0].scanner &&
-          sampleBlock.timestamp < thresholdTime,
-      )
-      .map((block) => block.hash);
+      expect(blockHashesToDelete.length).toEqual(1);
+      expect(blockHashesToDelete).toEqual([expectBlockHashesToDelete[0]]);
+    });
 
-    expect(blockHashesToDelete.length).toEqual(1);
-    expect(blockHashesToDelete).toEqual([expectBlockHashesToDelete[0]]);
+    /**
+     * @target removeUnusedBlocksInBatches should filter all unused blocks when all conditions are applied 
+     * @dependencies
+     * - generateQueriesWithUniqueParams
+     * - Database
+     * @scenario
+     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
+     * - Insert 4 BlockEntities related to this scanner
+     * - Insert 3 BlockEntities related to the same scanner, but with a different scannerName
+     * - Defines a thresholdTime for executing the test
+     * - call `removeUnusedBlocksInBatches` with deletedBlockCount = 1
+     * @expected
+     * - Ensures that the blocks being removed are correctly filtered
+     */
+    it('should filter all unused blocks when all conditions are applied', async () => {
+      const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
+
+      await blockRepository.insert(sampleBlocks);
+
+      const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
+      const threshold = tenDaysInMs;
+      const thresholdTime = Date.now() - threshold;
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        1,
+        sampleBlocks1[0].scanner,
+        threshold,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) =>
+            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+            sampleBlock.scanner == sampleBlocks1[0].scanner &&
+            sampleBlock.timestamp < thresholdTime
+        )
+        .map((block) => block.hash);
+
+      expect(blockHashesToDelete.length).toEqual(1);
+      expect(blockHashesToDelete).toEqual([expectBlockHashesToDelete[0]]);
+    });
   });
 });

@@ -323,9 +323,10 @@ export class BlockDbAction {
   };
 
   /**
-   *
+   * Generates queries with unique parameters
+   * 
    * @param queryBuilders
-   * @returns
+   * @returns queries and their unique parameters
    */
   generateQueriesWithUniqueParams = (
     queryBuilders: SelectQueryBuilder<ObjectLiteral>[],
@@ -356,10 +357,13 @@ export class BlockDbAction {
   };
 
   /**
-   *
-   * @param extractorUsedBlocksQueries
-   * @param deletedBlockCount
-   * @returns
+   * Removes unused blocks based on the queries retrieving used blocks
+   * 
+   * @param extractorUsedBlocksQueries 
+   * @param deletedBlockCount 
+   * @param scannerName 
+   * @param threshold 
+   * @returns The hashes of the removed unused blocks
    */
   removeUnusedBlocksInBatches = async (
     extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
