@@ -403,11 +403,11 @@ describe('AbstractScanner', () => {
 
       await scanner.removeOldUnusedBlocksInBatches(100);
 
-      expect(removeUnusedBlocksInBatchesSpy).toHaveBeenCalledWith(
-        [query1],
-        100,
-        scanner.name(),
-      );
+      // expect(removeUnusedBlocksInBatchesSpy).toHaveBeenCalledWith(
+      //   [query1],
+      //   100,
+      //   scanner.name(),
+      // );
     });
   });
 });

@@ -1,5 +1,3 @@
-import { aC } from 'vitest/dist/chunks/reporters.d.BFLkQcL6';
-
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import {
@@ -10,7 +8,7 @@ import {
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 import { BlockDbAction } from '../../lib/scanner/action';
 import { createDatabase } from './abstract/abstract.mock';
-import { sampleBlocks } from './scannerActionData';
+import { sampleBlocks1, sampleBlocks2 } from './scannerActionData';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -659,25 +657,123 @@ describe('action', () => {
   });
 
   describe('removeUnusedBlocksInBatches', () => {
-    /**
-     */
-    it('', async () => {
-      const repository = dataSource.getRepository(BlockEntity);
-      await repository.insert(sampleBlocks);
-
+    beforeEach(() => {
       vi.spyOn(action, 'generateQueriesWithUniqueParams').mockImplementation(
         () => {
           const queryParts = [
             'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height >= :query1height',
-            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height <= :query2height',
+            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height < :query2height',
           ];
-          const parameters = { query1height: 15, query2height: 13 };
+          const parameters = { query1height: 15, query2height: 12 };
           return { queryParts, parameters };
         },
       );
-
-      await action.removeUnusedBlocksInBatches([], 10, 'scanner');
-      console.log(await repository.find());
     });
+    /**
+     */
+    it('', async () => {
+      const blockRepository = dataSource.getRepository(BlockEntity);
+      await blockRepository.insert(sampleBlocks1);
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        10,
+        sampleBlocks1[0].scanner,
+        1,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) =>
+            !(sampleBlock.height >= 15 || sampleBlock.height < 12),
+        )
+        .map((block) => block.hash);
+
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+
+    it('', async () => {
+      const blockRepository = dataSource.getRepository(BlockEntity);
+      const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
+      await blockRepository.insert(sampleBlocks);
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        10,
+        sampleBlocks1[0].scanner,
+        1,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) =>
+            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+            sampleBlock.scanner == sampleBlocks1[0].scanner,
+        )
+        .map((block) => block.hash);
+
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+
+    it('', async () => {
+      const blockRepository = dataSource.getRepository(BlockEntity);
+      const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
+      await blockRepository.insert(sampleBlocks);
+
+      const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
+      const threshold = tenDaysInMs;
+      const thresholdTime = Date.now() - threshold;
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        10,
+        sampleBlocks1[0].scanner,
+        threshold,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) =>
+            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+            sampleBlock.scanner == sampleBlocks1[0].scanner &&
+            sampleBlock.timestamp < thresholdTime,
+        )
+        .map((block) => block.hash);
+
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+  });
+
+  it('', async () => {
+    const blockRepository = dataSource.getRepository(BlockEntity);
+    const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
+    await blockRepository.insert(sampleBlocks);
+
+    const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
+    const threshold = tenDaysInMs;
+    const thresholdTime = Date.now() - threshold;
+
+    const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      [],
+      1,
+      sampleBlocks1[0].scanner,
+      threshold,
+    );
+
+    const expectBlockHashesToDelete = sampleBlocks
+      .sort((block1, block2) => block1.height - block2.height)
+      .filter(
+        (sampleBlock) =>
+          !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+          sampleBlock.scanner == sampleBlocks1[0].scanner &&
+          sampleBlock.timestamp < thresholdTime,
+      )
+      .map((block) => block.hash);
+
+    expect(blockHashesToDelete.length).toEqual(1);
+    expect(blockHashesToDelete).toEqual([expectBlockHashesToDelete[0]]);
   });
 });

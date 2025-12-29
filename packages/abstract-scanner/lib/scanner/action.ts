@@ -366,22 +366,20 @@ export class BlockDbAction {
     deletedBlockCount: number,
     scannerName: string,
     threshold: number,
-  ) => {
+  ): Promise<string[]> => {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
     );
 
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
-    const now = new Date();
-    const thresholdTime = now.getTime() - threshold;
-
+    const thresholdTime = Date.now() - threshold;
 
     const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')
       .addSelect('blockEntity.hash', 'hash')
       .where(`blockEntity.hash NOT IN (${unionQuery})`)
       .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
-      .where('block.timestamp < :thresholdTime', { thresholdTime })
+      .andWhere('blockEntity.timestamp < :thresholdTime', { thresholdTime })
       .setParameters({ ...parameters })
       .distinct(true)
       .orderBy('blockEntity.height', 'ASC')
@@ -393,5 +391,7 @@ export class BlockDbAction {
     await this.blockRepository.delete({
       hash: In(unusedBlockHashes),
     });
+
+    return unusedBlockHashes;
   };
 }
