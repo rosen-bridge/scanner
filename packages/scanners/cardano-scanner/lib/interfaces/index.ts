@@ -6,6 +6,12 @@ interface OgmiosReconnectionConfig {
   maxAttempts?: number;
 }
 
+interface BlockTimeConfig {
+  blockTime: number;
+  blockAgeThreshold?: number;
+  blockTrimCountInRound?: number;
+}
+
 interface CardanoOgmiosConfig {
   nodeHostOrIp: string;
   nodePort: number;
@@ -13,6 +19,7 @@ interface CardanoOgmiosConfig {
   initialHash: string;
   maxTryBlock?: number;
   dataSource: DataSource;
+  blockTimeConfig: BlockTimeConfig;
   useTls?: boolean;
   reconnectionConfig?: OgmiosReconnectionConfig;
   suffix?: string;

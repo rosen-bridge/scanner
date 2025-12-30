@@ -17,7 +17,7 @@ export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld3',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: Date.now() - oneDayInMs,
+    timestamp: Math.floor(Date.now() / 1000) - oneDayInMs,
   },
   {
     height: 15,

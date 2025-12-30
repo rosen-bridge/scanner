@@ -10,6 +10,7 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
+      config.blockTimeConfig,
       config.logger,
       config.suffix,
     );

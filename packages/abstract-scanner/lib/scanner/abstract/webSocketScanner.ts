@@ -3,6 +3,7 @@ import { Mutex } from 'await-semaphore';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
+import { BlockTimeConfig } from '../interfaces';
 import { AbstractScanner } from './scanner';
 
 const DEFAULT_MAX_TRY_BLOCK = 10;
@@ -16,11 +17,12 @@ abstract class WebSocketScanner<
 
   protected constructor(
     protected scannerName: string,
+    blockTimeConfig: BlockTimeConfig,
     logger?: AbstractLogger,
     maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
     protected suffix?: string,
   ) {
-    super(logger);
+    super(blockTimeConfig, logger);
     this.maxTryBlock = maxTryBlock;
   }
   name = () => this.scannerName + (this.suffix ? `-${this.suffix}` : '');
@@ -56,6 +58,7 @@ abstract class WebSocketScanner<
     transactions: Array<TransactionType>,
   ) => {
     const release = await this.mutex.acquire();
+    await this.removeOldUnusedBlocks();
     await this.tryRunningFunction(
       async () => {
         try {

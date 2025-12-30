@@ -1,5 +1,6 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
+import { Seven_Days_InSeconds } from '../../lib/constants';
 import {
   BlockEntity,
   PROCEED,
@@ -758,7 +759,7 @@ describe('action', () => {
      * @scenario
      * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
      * - Insert 4 BlockEntities related to this scanner
-     * - Defines a thresholdTime for executing the test
+     * - Defines a thresholdTime for run the test
      * - Run test (call `removeUnusedBlocksInBatches`)
      * @expected
      * - Ensures that the blocks being removed are correctly filtered
@@ -766,15 +767,14 @@ describe('action', () => {
     it('should filters all unused blocks based on the block lifetime threshold provided as input', async () => {
       await blockRepository.insert(sampleBlocks1);
 
-      const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
-      const threshold = tenDaysInMs;
-      const thresholdTime = Date.now() - threshold;
+      const thresholdTime =
+        Math.floor(Date.now() / 1000) - Seven_Days_InSeconds;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
-        threshold,
+        Seven_Days_InSeconds,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
@@ -825,7 +825,7 @@ describe('action', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should filter all unused blocks when all conditions are applied 
+     * @target removeUnusedBlocksInBatches should filter all unused blocks when all conditions are applied
      * @dependencies
      * - generateQueriesWithUniqueParams
      * - Database
@@ -843,15 +843,14 @@ describe('action', () => {
 
       await blockRepository.insert(sampleBlocks);
 
-      const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
-      const threshold = tenDaysInMs;
-      const thresholdTime = Date.now() - threshold;
+      const thresholdTime =
+        Math.floor(Date.now() / 1000) - Seven_Days_InSeconds;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         1,
         sampleBlocks1[0].scanner,
-        threshold,
+        Seven_Days_InSeconds,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
@@ -860,7 +859,7 @@ describe('action', () => {
           (sampleBlock) =>
             !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
             sampleBlock.scanner == sampleBlocks1[0].scanner &&
-            sampleBlock.timestamp < thresholdTime
+            sampleBlock.timestamp < thresholdTime,
         )
         .map((block) => block.hash);
 
