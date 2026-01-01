@@ -1,5 +1,5 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import JsonBI from '@rosen-bridge/json-bigint';
 import {
   AbstractNetworkConnector,
@@ -12,7 +12,8 @@ import { AbstractScanner } from './scanner';
 
 abstract class GeneralScanner<
   TransactionType,
-> extends AbstractScanner<TransactionType> {
+  ExtractorEntity extends ObjectLiteral,
+> extends AbstractScanner<TransactionType, ExtractorEntity> {
   private readonly initialHeight: number;
   protected blockChainLastHeight: number | undefined = undefined;
 

@@ -1,8 +1,12 @@
 import { TransactionResponse } from 'ethers';
 
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
+import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 
-export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
+export class EvmRpcScanner extends GeneralScanner<
+  TransactionResponse,
+  ObjectLiteral
+> {
   readonly chain: string;
 
   constructor(chain: string, config: ScannerConfig<TransactionResponse>) {

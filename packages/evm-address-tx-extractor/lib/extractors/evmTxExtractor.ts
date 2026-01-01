@@ -2,13 +2,17 @@ import { isCallException, Transaction, TransactionResponse } from 'ethers';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { TxAction } from '../actions/db';
+import { AddressTxsEntity } from '../entities/addressTxsEntity';
 import { EvmTxStatus, ExtractedTx } from '../interfaces/types';
 
-export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
+export class EvmTxExtractor extends AbstractExtractor<
+  TransactionResponse,
+  AddressTxsEntity
+> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
@@ -93,4 +97,13 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
   initializeData = async () => {
     return;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<AddressTxsEntity> =>
+    this.action.createUsedBlocksQuery(this.getId());
 }

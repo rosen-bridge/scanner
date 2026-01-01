@@ -1,5 +1,9 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import {
   BlockInfo,
   Block,
@@ -19,7 +23,10 @@ export interface TestTransaction {
   blockHash: string;
 }
 
-export class ExtractorTest extends AbstractExtractor<TestTransaction> {
+export class ExtractorTest extends AbstractExtractor<
+  TestTransaction,
+  ObjectLiteral
+> {
   id: string;
   forked: Array<string>;
   txs: Array<{ txs: Array<TestTransaction>; block: BlockInfo }>;
@@ -49,6 +56,8 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   initializeData = () => {
     return Promise.resolve();
   };
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -70,7 +79,10 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
   };
 }
 
-export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
+export class TestAbstractScanner extends AbstractScanner<
+  TestTransaction,
+  ObjectLiteral
+> {
   constructor(
     private scannerName: string,
     dataSource: DataSource,
@@ -82,7 +94,10 @@ export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
   name = (): string => this.scannerName;
 }
 
-export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
+export class TestGeneralScanner extends GeneralScanner<
+  TestTransaction,
+  ObjectLiteral
+> {
   constructor(
     name: string,
     dataSource: DataSource,
@@ -111,7 +126,7 @@ export const createDatabase = async () => {
 };
 
 export const insertBlocks = async (
-  scanner: AbstractScanner<TestTransaction>,
+  scanner: AbstractScanner<TestTransaction, ObjectLiteral>,
   count: number,
 ) => {
   for (let index = 1; index <= count; index++) {
@@ -126,7 +141,10 @@ export const insertBlocks = async (
   }
 };
 
-export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
+export class TestWebSocketScanner extends WebSocketScanner<
+  { id: string },
+  ObjectLiteral
+> {
   constructor(dataSource: DataSource) {
     super('test scanner');
     this.action = new BlockDbAction(dataSource, this.name());
@@ -140,7 +158,10 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   stop = async () => Promise.resolve();
 }
 
-export class FailExtractor extends AbstractExtractor<{ id: string }> {
+export class FailExtractor extends AbstractExtractor<
+  { id: string },
+  ObjectLiteral
+> {
   forkBlock = async () => Promise.resolve();
 
   getId = () => 'fail extractor';
@@ -148,4 +169,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
   initializeData = () => Promise.resolve();
 
   processTransactions = () => Promise.resolve(false);
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }

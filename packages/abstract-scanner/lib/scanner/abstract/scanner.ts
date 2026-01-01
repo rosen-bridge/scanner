@@ -3,14 +3,18 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
 
-export abstract class AbstractScanner<TransactionType> {
+export abstract class AbstractScanner<
+  TransactionType,
+  ExtractorEntity extends ObjectLiteral,
+> {
   action: BlockDbAction;
-  extractors: Array<AbstractExtractor<TransactionType>>;
-  newExtractors: Array<AbstractExtractor<TransactionType>>;
+  extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>;
+  newExtractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
 
@@ -85,10 +89,10 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   registerExtractor = async (
-    extractor: AbstractExtractor<TransactionType>,
+    extractor: AbstractExtractor<TransactionType, ExtractorEntity>,
   ): Promise<void> => {
     const notRegisteredIn = (
-      extractors: Array<AbstractExtractor<TransactionType>>,
+      extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>,
     ) =>
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId(),
@@ -112,10 +116,11 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   removeExtractor = async (
-    extractor: AbstractExtractor<TransactionType>,
+    extractor: AbstractExtractor<TransactionType, ExtractorEntity>,
   ): Promise<void> => {
-    const removeFn = (ex: AbstractExtractor<TransactionType>) =>
-      ex.getId() === extractor.getId();
+    const removeFn = (
+      ex: AbstractExtractor<TransactionType, ExtractorEntity>,
+    ) => ex.getId() === extractor.getId();
 
     const release = await this.initializeMutex.acquire();
     remove(this.extractors, removeFn);
@@ -154,7 +159,9 @@ export abstract class AbstractScanner<TransactionType> {
    * @param block
    */
   protected verifyExtractorsInitialization = async (block: BlockInfo) => {
-    const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
+    const getIds = (
+      extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>,
+    ) => {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
