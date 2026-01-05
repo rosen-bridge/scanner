@@ -9,11 +9,6 @@ workflow:
       when: always
     - when: never
 
-stages:
-  - installation
-  - build
-  - triggers
-
 include:
   - component: $CI_SERVER_FQDN/${ROOT_COMPONENT}
 
