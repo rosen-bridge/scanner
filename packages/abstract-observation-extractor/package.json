@@ -29,11 +29,11 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-extractor": "^2.1.2",
-    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/rosen-extractor": "^11.1.1",
+    "@rosen-bridge/rosen-extractor": "^11.1.2",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
-    "@rosen-bridge/tokens": "^4.0.1",
+    "@rosen-bridge/tokens": "^5.0.0",
     "blakejs": "^1.2.1"
   },
   "devDependencies": {
