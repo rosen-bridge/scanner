@@ -9,47 +9,9 @@ workflow:
       when: always
     - when: never
 
-stages:
-  - installation
-  - build
-  - triggers
+include:
+  - component: $CI_SERVER_FQDN/${ROOT_COMPONENT}
 
-installation:
-  stage: installation
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: push
-    paths:
-      - node_modules
-      - '**/node_modules'
-  script:
-    - npm ci
-
-build:
-  stage: build
-  cache:
-    key: ${CI_COMMIT_REF_NAME}
-    policy: pull-push
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run build
-
-run_ci:
-  stage: triggers
-  trigger:
-    include:
-      - local: .gitlab/workflows/ci.yml
-    strategy: mirror
-
-run_snapshot_publish:
-  stage: triggers
-  rules:
-    - when: manual
-  allow_failure: true
-  trigger:
-    include:
-      - local: .gitlab/workflows/snapshot-publish.yml
-    strategy: mirror
+    inputs:
+      enable_ci_child: true
+      enable_snapshot_publish_child: true
