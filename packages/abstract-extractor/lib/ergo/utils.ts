@@ -1,6 +1,6 @@
 import { intersection } from 'lodash-es';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import { RETRIAL_COUNT } from '../constants';
@@ -35,7 +35,7 @@ export const delay = async (time: number) =>
  */
 export const requestWithRetrial = async <returnT>(
   request: () => Promise<returnT>,
-  logger = new DummyLogger(),
+  logger: AbstractLogger = new DummyLogger(),
 ): Promise<returnT> => {
   let trial = 0;
   let lastErrorMessage: string | undefined;

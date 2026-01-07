@@ -1,4 +1,4 @@
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import JsonBigInt from '@rosen-bridge/json-bigint';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
@@ -30,11 +30,8 @@ export abstract class AbstractErgoTxExtractor<
   ExtractedData extends AbstractEntityData,
   ExtractorEntity extends AbstractErgoEntity,
 > extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
-  constructor(
-    protected initializeOptions?: InitializeOptions,
-    protected logger = new DummyLogger(),
-  ) {
-    super();
+  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
+    super(initializeOptions, logger);
   }
 
   /**

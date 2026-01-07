@@ -1,6 +1,6 @@
 import PQueue from 'p-queue';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockInfo, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { API_LIMIT } from '../../../constants';
@@ -27,7 +27,7 @@ export class ExplorerInitializationStrategy {
     private processTransactionBatch: (
       txs: ExtendedTransaction[],
     ) => Promise<void>,
-    private logger = new DummyLogger(),
+    private logger: AbstractLogger = new DummyLogger(),
   ) {
     this.network = new ExplorerNetwork(url);
     this.extraLargeBlocks = [];

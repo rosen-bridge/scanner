@@ -1,6 +1,6 @@
 import { Mutex } from 'await-semaphore';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
 
 import { RangeList, RangeQuery } from '../../interfaces';
 
@@ -13,7 +13,7 @@ export class WorkerManager {
   constructor(
     private workerCount: number,
     private getRangeTxCount: (start: number, end: number) => Promise<number>,
-    private logger = new DummyLogger(),
+    private logger: AbstractLogger = new DummyLogger(),
   ) {}
 
   /**

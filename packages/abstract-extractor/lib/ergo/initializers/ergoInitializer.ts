@@ -1,7 +1,7 @@
 import { Mutex } from 'await-semaphore';
 import { groupBy, sortBy } from 'lodash-es';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
 import {
   BlockInfo,
   ErgoNetworkType,
@@ -36,7 +36,7 @@ export class ErgoInitializer<
     ) => Promise<boolean>,
     protected actions: AbstractErgoAction<ExtractedData, ExtractorEntity>,
     maxParallelRequests = MAX_PARALLEL_REQUESTS,
-    protected logger = new DummyLogger(),
+    protected logger: AbstractLogger = new DummyLogger(),
   ) {
     if (networkType == ErgoNetworkType.Explorer) {
       this.initializationStrategy = new ExplorerInitializationStrategy(

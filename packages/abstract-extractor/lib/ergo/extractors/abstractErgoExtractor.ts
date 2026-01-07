@@ -1,7 +1,7 @@
 import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractExtractor } from '../../abstractExtractor';
@@ -44,7 +44,7 @@ export abstract class AbstractErgoExtractor<
 
   constructor(
     protected initializeOptions?: InitializeOptions,
-    protected logger = new DummyLogger(),
+    protected logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
   }
