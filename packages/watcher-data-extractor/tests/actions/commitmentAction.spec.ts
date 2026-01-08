@@ -2,8 +2,8 @@ import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { CommitmentEntity } from '../../lib';
 import CommitmentAction from '../../lib/actions/commitmentAction';
-import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { block, block2 } from '../extractor/utilsVariable.mock';
+import { block, block2 } from '../extractor/testData';
+import { createDatabase } from '../extractor/testUtils';
 
 const commitment1 = {
   txId: 'txId1',

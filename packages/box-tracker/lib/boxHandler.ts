@@ -1,3 +1,5 @@
+import * as ergoLib from 'ergo-lib-wasm-nodejs';
+
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import { Token } from './interfaces';
@@ -12,10 +14,12 @@ import { Token } from './interfaces';
  */
 export const generateTracker = (address: string, tokens: Token[]) => {
   return (box: OutputBox): boolean => {
-    if (box.ergoTree !== address) return false;
-
+    if (
+      box.ergoTree !==
+      ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
+    )
+      return false;
     const assetMap = new Map(box.assets.map((a) => [a.tokenId, a.amount]));
-
     return tokens.every((t) => {
       const amount = assetMap.get(t.tokenId);
       return amount !== undefined && amount >= t.amount;
