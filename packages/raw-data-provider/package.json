@@ -28,8 +28,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "^6.14.0",
-    "@cardano-ogmios/schema": "^6.14.0",
+    "@cardano-ogmios/client": "^6.6.1",
+    "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-logger": "^3.0.1",
     "@rosen-bridge/abstract-observation-extractor": "^0.2.1",

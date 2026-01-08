@@ -1,7 +1,7 @@
 import { createChainSynchronizationClient } from '@cardano-ogmios/client';
 import { InteractionContext } from '@cardano-ogmios/client';
+import { createInteractionContext } from '@cardano-ogmios/client';
 import { findIntersection } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { createInteractionContext } from '@cardano-ogmios/client/dist/Connection';
 import { Point, Transaction } from '@cardano-ogmios/schema';
 
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
@@ -59,7 +59,11 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
     this.logger.debug(
       `RawDataProvider cardano-ogmios returned intersection point is ${point}`,
     );
-    return intersect.intersection as Point;
+    if (intersect.intersection == 'origin')
+      throw new Error(
+        'The intersection value "origin" is not allowed in this context.',
+      );
+    return intersect.intersection;
   };
 
   /**
@@ -94,7 +98,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
               this.logger.debug(
                 `The cardano-ogmios observation by ${observation?.id} id fetched`,
               );
-              txs = response.block.transactions || [];
+              txs = txs.concat(response.block.transactions || []);
               this.logger.debug(
                 `Content of cardano-ogmios fetched transaction by [${observation?.id}] id is: ${JsonBigInt.stringify(txs)}`,
               );
@@ -107,7 +111,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
       { sequential: true },
     );
 
-    await client.resume([intersect], 2);
+    await client.resume([intersect]);
     await done;
     await client.shutdown();
     this.logger.debug(`RawDataProvider cardano-ogmios client stopped`);

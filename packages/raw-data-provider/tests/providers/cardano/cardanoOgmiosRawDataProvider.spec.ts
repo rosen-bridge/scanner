@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createChainSynchronizationClient } from '@cardano-ogmios/client';
 import { InteractionContext } from '@cardano-ogmios/client';
-import { findIntersection } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { createInteractionContext } from '@cardano-ogmios/client/dist/Connection';
 import { Block, Tip, Transaction } from '@cardano-ogmios/schema';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -22,16 +20,16 @@ import {
 } from '../../mocks/providers/cardano/cardanoOgmiosRawDataProvider.mock';
 import { createDatabase } from '../../utils';
 
-vi.mock('@cardano-ogmios/client/dist/Connection', () => ({
-  createInteractionContext: vi.fn(),
-}));
-
+const createInteractionContextMocked = vi.fn().mockReturnValue({});
 vi.mock('@cardano-ogmios/client/dist/ChainSynchronization', () => ({
-  findIntersection: vi.fn(),
+  findIntersection: vi
+    .fn()
+    .mockReturnValue({ intersection: { id: 'abc', slot: 100 } }),
 }));
 
 vi.mock('@cardano-ogmios/client', () => ({
   createChainSynchronizationClient: vi.fn(),
+  createInteractionContext: vi.fn(),
 }));
 
 interface TestInterface {
@@ -51,13 +49,7 @@ describe('CardanoOgmiosRawDataProvider', () => {
     } as unknown as CardanoOgmiosObservationExtractor;
 
     // mock interaction context
-    vi.mocked(createInteractionContext).mockResolvedValue(intersectContext);
-
-    // mock findIntersection
-    vi.mocked(findIntersection).mockResolvedValue({
-      intersection: cardanoSampleIntersection,
-      tip: { slot: 0, id: '0123', height: 51 },
-    });
+    createInteractionContextMocked.mockResolvedValue(intersectContext);
 
     // mock Ogmios client
     ctx.mockClient = {

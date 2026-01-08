@@ -2,11 +2,11 @@ import {
   createChainSynchronizationClient,
   InteractionContext,
 } from '@cardano-ogmios/client';
+import { createInteractionContext } from '@cardano-ogmios/client';
 import {
   ChainSynchronizationClient,
   findIntersection,
 } from '@cardano-ogmios/client/dist/ChainSynchronization';
-import { createInteractionContext } from '@cardano-ogmios/client/dist/Connection';
 import {
   Block,
   BlockPraos,
