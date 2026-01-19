@@ -45,7 +45,7 @@ export class ErgoInitializer<
         maxParallelRequests,
         this.processTransactions,
         this.processTransactionBatch,
-        logger,
+        logger.child('ExplorerInitializationStrategy'),
       );
     } else if (networkType == ErgoNetworkType.Node) {
       this.initializationStrategy = new NodeInitializationStrategy(
@@ -53,7 +53,7 @@ export class ErgoInitializer<
         address,
         maxParallelRequests,
         this.processTransactionBatch,
-        logger,
+        logger.child('NodeInitializationStrategy'),
       );
     } else throw new Error(`Network type ${networkType} is not supported`);
   }

@@ -23,7 +23,7 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
         tokens,
         'ethereum',
         'eth',
-        logger,
+        logger?.child('EvmEthersRosenExtractor'),
         storeRawData,
       ),
       logger,

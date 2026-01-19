@@ -36,7 +36,10 @@ export class CollateralExtractor extends AbstractErgoBoxExtractor<
       .to_ergo_tree()
       .to_base16_bytes();
     this.awcNft = awcNft;
-    this.actions = new CollateralAction(dataSource, this.logger);
+    this.actions = new CollateralAction(
+      dataSource,
+      this.logger?.child('CollateralAction'),
+    );
   }
 
   /**

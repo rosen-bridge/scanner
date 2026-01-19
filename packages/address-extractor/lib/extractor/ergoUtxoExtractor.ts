@@ -42,7 +42,10 @@ export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
       ? ergoLib.Address.from_base58(address).to_ergo_tree().to_base16_bytes()
       : undefined;
     this.tokens = tokens ? tokens : [];
-    this.actions = new BoxEntityAction(dataSource, this.logger);
+    this.actions = new BoxEntityAction(
+      dataSource,
+      this.logger?.child('BoxEntityAction'),
+    );
   }
 
   /**

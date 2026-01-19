@@ -56,7 +56,10 @@ class EventTriggerExtractor extends AbstractErgoBoxExtractor<
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
-    this.actions = new EventTriggerAction(dataSource, this.logger);
+    this.actions = new EventTriggerAction(
+      dataSource,
+      this.logger.child('EventTriggerAction'),
+    );
   }
 
   /**

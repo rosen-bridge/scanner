@@ -22,7 +22,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
       new CardanoOgmiosRosenExtractor(
         lockAddress,
         tokens,
-        logger,
+        logger?.child('CardanoOgmiosRosenExtractor'),
         storeRawData,
       ),
       logger,

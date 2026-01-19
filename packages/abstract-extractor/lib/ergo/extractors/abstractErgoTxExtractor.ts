@@ -121,7 +121,7 @@ export abstract class AbstractErgoTxExtractor<
         this.processTransactions,
         this.actions,
         this.initializeOptions.maxParallelRequests,
-        this.logger,
+        this.logger?.child('ErgoInitializer'),
       );
       await initializer.initializeData(initialBlock);
     } else

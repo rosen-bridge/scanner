@@ -39,7 +39,10 @@ class PermitExtractor extends AbstractExtractor<Transaction> {
       .to_base16_bytes();
     this.RWT = RWT;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new PermitAction(dataSource, this.logger);
+    this.actions = new PermitAction(
+      dataSource,
+      this.logger.child('PermitAction'),
+    );
     this.explorerApi = ergoExplorerClientFactory(explorerUrl);
   }
 

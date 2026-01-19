@@ -50,7 +50,7 @@ export class BoxTracker {
       this.txPotTracker = new TxPotTracker(
         txPotOptions.txDeserializer,
         txPotOptions.txPot,
-        this.logger,
+        this.logger?.child('TxPotTracker'),
       );
     }
     this.extractor = new BoxExtractor(
@@ -58,9 +58,12 @@ export class BoxTracker {
       networkUrl,
       address,
       tokens,
-      this.logger,
+      this.logger?.child('BoxExtractor'),
     );
-    this.mempoolTracker = new MempoolTracker(this.network, this.logger);
+    this.mempoolTracker = new MempoolTracker(
+      this.network,
+      this.logger?.child('MempoolTracker'),
+    );
   }
 
   /**
