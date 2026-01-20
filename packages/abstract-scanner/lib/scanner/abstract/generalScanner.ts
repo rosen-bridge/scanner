@@ -34,7 +34,11 @@ abstract class GeneralScanner<
      */
     this.initialHeight = initialHeight + 1;
     this.suffix = suffix;
-    this.action = new BlockDbAction(this.dataSource, this.name(), this.logger);
+    this.action = new BlockDbAction(
+      this.dataSource,
+      this.name(),
+      this.logger.child('BlockDbAction'),
+    );
   }
 
   /**

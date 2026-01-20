@@ -31,7 +31,10 @@ export abstract class AbstractObservationExtractor<
     this.dataSource = dataSource;
     this.tokens = tokens;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new ObservationEntityAction(dataSource, this.logger);
+    this.actions = new ObservationEntityAction(
+      dataSource,
+      this.logger.child('ObservationEntityAction'),
+    );
     this.extractor = extractor;
   }
 

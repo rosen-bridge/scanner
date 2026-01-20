@@ -36,7 +36,10 @@ class CommitmentExtractor extends AbstractExtractor<Transaction> {
     );
     this.RWTId = RWTId;
     this.logger = logger ? logger : new DummyLogger();
-    this.actions = new CommitmentAction(dataSource, this.logger);
+    this.actions = new CommitmentAction(
+      dataSource,
+      this.logger.child('CommitmentAction'),
+    );
     this.tokenMap = tokens;
   }
 

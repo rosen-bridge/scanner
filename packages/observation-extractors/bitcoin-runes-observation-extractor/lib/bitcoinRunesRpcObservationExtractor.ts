@@ -24,7 +24,7 @@ export class BitcoinRunesRpcObservationExtractor extends BitcoinRunesAbstractObs
       new BitcoinRunesRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger,
+        logger?.child('BitcoinRunesRpcRosenExtractor'),
         storeRawData,
       ),
       logger,
