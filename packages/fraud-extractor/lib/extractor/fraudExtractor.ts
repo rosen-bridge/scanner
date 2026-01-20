@@ -43,7 +43,7 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
     this.rwt = rwt;
     this.actions = new FraudAction(
       dataSource,
-      this.logger?.child('FraudAction'),
+      this.logger.child('FraudAction'),
     );
   }
 

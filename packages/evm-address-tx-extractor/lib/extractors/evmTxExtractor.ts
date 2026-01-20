@@ -27,7 +27,7 @@ export class EvmTxExtractor extends AbstractExtractor<TransactionResponse> {
     this.id = id;
     this.address = address;
     this.logger = logger;
-    this.action = new TxAction(dataSource, this.logger?.child('TxAction'));
+    this.action = new TxAction(dataSource, this.logger.child('TxAction'));
   }
 
   /**

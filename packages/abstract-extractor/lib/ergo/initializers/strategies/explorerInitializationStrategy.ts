@@ -35,7 +35,7 @@ export class ExplorerInitializationStrategy {
     this.workerManager = new WorkerManager(
       this.maxWorkers,
       this.getRangeTxCount,
-      this.logger?.child('ExplorerInitializationStrategy'),
+      this.logger.child('ٌWorkerManager'),
     );
   }
 

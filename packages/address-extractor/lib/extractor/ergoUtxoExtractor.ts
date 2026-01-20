@@ -44,7 +44,7 @@ export class ErgoUTXOExtractor extends AbstractErgoBoxExtractor<
     this.tokens = tokens ? tokens : [];
     this.actions = new BoxEntityAction(
       dataSource,
-      this.logger?.child('BoxEntityAction'),
+      this.logger.child('BoxEntityAction'),
     );
   }
 

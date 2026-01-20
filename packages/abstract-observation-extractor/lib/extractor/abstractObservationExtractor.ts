@@ -33,7 +33,7 @@ export abstract class AbstractObservationExtractor<
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new ObservationEntityAction(
       dataSource,
-      this.logger?.child('ObservationEntityAction'),
+      this.logger.child('ObservationEntityAction'),
     );
     this.extractor = extractor;
   }

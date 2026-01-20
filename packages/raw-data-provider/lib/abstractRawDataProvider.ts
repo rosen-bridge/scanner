@@ -17,7 +17,10 @@ export abstract class AbstractRawDataProvider<TxType> {
     protected extractor: AbstractObservationExtractor<TxType>,
     protected logger: AbstractLogger = new DummyLogger(),
   ) {
-    this.action = new RawDataProviderStateEntityAction(dataSource, logger);
+    this.action = new RawDataProviderStateEntityAction(
+      dataSource,
+      logger.child('RawDataProviderStateEntityAction'),
+    );
   }
 
   /**
