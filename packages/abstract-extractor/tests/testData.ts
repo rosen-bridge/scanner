@@ -136,3 +136,20 @@ export const sampleEntities: Omit<TestEntity, 'id'>[] = [
     height: 400,
   },
 ];
+
+export const sampleEntities2: Omit<TestEntity, 'id'>[] = [
+  {
+    extractor: 'extractor2',
+    identifier: '5',
+    serialized: 'serialized5',
+    block: 'blockId5',
+    height: 500,
+  },
+  {
+    extractor: 'extractor2',
+    identifier: '6',
+    serialized: 'serialized6',
+    block: 'blockId6',
+    height: 600,
+  },
+];

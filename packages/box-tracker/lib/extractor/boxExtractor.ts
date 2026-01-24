@@ -1,5 +1,6 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import {
   BlockInfo,
   ErgoNetworkType,
@@ -13,7 +14,10 @@ import { AbstractErgoNetwork } from '../network/abstract/abstractErgoNetwork';
 import { ExplorerErgoNetwork } from '../network/explorerErgoNetwork';
 import { NodeErgoNetwork } from '../network/nodeErgoNetwork';
 
-export class BoxExtractor extends AbstractExtractor<Transaction> {
+export class BoxExtractor extends AbstractExtractor<
+  Transaction,
+  ObjectLiteral
+> {
   private address: string;
   private tokens: Array<Token>;
   readonly logger: AbstractLogger;
@@ -150,4 +154,10 @@ export class BoxExtractor extends AbstractExtractor<Transaction> {
   getRecentBox = (): ErgoBox | undefined => {
     return this.boxes.at(-1);
   };
+
+  /**
+   * Create a query for blocks that are already used
+   * No action needed in box-tracker extractors
+   */
+  createUsedBlocksQuery = (): undefined => undefined;
 }
