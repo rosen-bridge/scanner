@@ -6,6 +6,7 @@ export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransact
   constructor(config: ScannerConfig<BitcoinEsploraTransaction>) {
     super(
       'bitcoin',
+      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,

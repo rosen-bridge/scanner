@@ -8,6 +8,7 @@ import {
 
 import { BlockEntity } from '../../entities/blockEntity';
 import { BlockDbAction } from '../action';
+import { BlockTimeConfig } from '../interfaces';
 import { AbstractScanner } from './scanner';
 
 abstract class GeneralScanner<
@@ -20,6 +21,7 @@ abstract class GeneralScanner<
 
   constructor(
     private scannerName: string,
+    blockTimeConfig: BlockTimeConfig,
     private dataSource: DataSource,
     initialHeight: number,
     private network: AbstractNetworkConnector<TransactionType>,
@@ -27,7 +29,7 @@ abstract class GeneralScanner<
     logger?: AbstractLogger,
     private suffix?: string,
   ) {
-    super(logger);
+    super(blockTimeConfig, logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
      * `initialHeight` by one so that it matches how other scanners work.
@@ -195,6 +197,7 @@ abstract class GeneralScanner<
    */
   update = async () => {
     try {
+      await this.removeOldUnusedBlocks();
       const latestHeight = await this.network.getCurrentHeight();
       if (
         !this.blockChainLastHeight ||

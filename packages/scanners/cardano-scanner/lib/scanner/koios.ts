@@ -6,6 +6,7 @@ class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   constructor(config: ScannerConfig<KoiosTransaction>) {
     super(
       'cardano',
+      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,

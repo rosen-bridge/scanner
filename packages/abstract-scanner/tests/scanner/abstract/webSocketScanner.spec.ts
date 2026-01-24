@@ -1,6 +1,7 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { BlockEntity, PROCEED } from '../../../lib';
+import { BlockTimeConfig } from '../../../lib/scanner/interfaces';
 import {
   createDatabase,
   FailExtractor,
@@ -13,8 +14,11 @@ let repository: Repository<BlockEntity>;
 
 describe('webSocketScanner', () => {
   beforeEach(async () => {
+    const blockTimeConfig: BlockTimeConfig = {
+      blockTime: 12,
+    };
     dataSource = await createDatabase();
-    scanner = new TestWebSocketScanner(dataSource);
+    scanner = new TestWebSocketScanner(dataSource, blockTimeConfig);
     repository = dataSource.getRepository(BlockEntity);
     await repository.insert({
       hash: 'block 1',
@@ -73,6 +77,7 @@ describe('webSocketScanner', () => {
      * - no block inserted to database
      */
     it('should not insert block in database if current block hash not equals last inserted one', async () => {
+      vi.spyOn(scanner, 'removeOldUnusedBlocks').mockResolvedValue();
       await scanner['stepForward'](
         {
           hash: 'block 2',
@@ -99,6 +104,7 @@ describe('webSocketScanner', () => {
      */
     it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
+      vi.spyOn(scanner, 'removeOldUnusedBlocks').mockResolvedValue();
       await scanner['stepForward'](
         {
           hash: 'block 2',

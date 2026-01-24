@@ -1,3 +1,5 @@
+import { uniqueId } from 'lodash-es';
+
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   DataSource,
@@ -5,6 +7,8 @@ import {
   MoreThanOrEqual,
   Repository,
   In,
+  ObjectLiteral,
+  SelectQueryBuilder,
 } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
@@ -315,5 +319,82 @@ export class BlockDbAction {
       scannerId: this.name(),
       extractorId: In(extractorIds),
     });
+  };
+
+  /**
+   * Generates queries with unique parameters
+   *
+   * @param queryBuilders
+   * @returns queries and their unique parameters
+   */
+  generateQueriesWithUniqueParams = (
+    queryBuilders: SelectQueryBuilder<ObjectLiteral>[],
+  ): { queryParts: string[]; parameters: Record<string, unknown> } => {
+    let queryParts: string[] = [],
+      parameters: Record<string, unknown> = {};
+
+    queryBuilders.forEach((queryBuilder) => {
+      const prefix = uniqueId('query');
+
+      const queryWithUniqueParams = queryBuilder
+        .getQuery()
+        .replace(/:(\w+)/g, (_, key) => `:${prefix}${key}`);
+
+      queryParts.push(queryWithUniqueParams);
+
+      const queryParams = queryBuilder.getParameters();
+      const prefixedParams = Object.fromEntries(
+        Object.entries(queryParams).map(([key, value]) => [
+          `${prefix}${key}`,
+          value,
+        ]),
+      );
+      parameters = { ...parameters, ...prefixedParams };
+    });
+
+    return { queryParts, parameters };
+  };
+
+  /**
+   * Removes unused blocks based on the queries retrieving used blocks
+   *
+   * @param extractorUsedBlocksQueries
+   * @param deletedBlockCount
+   * @param scannerName
+   * @param threshold
+   * @returns The hashes of the removed unused blocks
+   */
+  removeUnusedBlocksInBatches = async (
+    extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
+    deletedBlockCount: number,
+    scannerName: string,
+    blockAgeThreshold: number,
+  ): Promise<string[]> => {
+    const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
+      extractorUsedBlocksQueries,
+    );
+
+    const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
+    const thresholdTime = Math.floor(Date.now() / 1000) - blockAgeThreshold;
+
+    const blocksToDelete = await this.blockRepository
+      .createQueryBuilder('blockEntity')
+      .addSelect('blockEntity.hash', 'hash')
+      .where(`blockEntity.hash NOT IN (${unionQuery})`)
+      .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
+      .andWhere('blockEntity.timestamp < :thresholdTime', { thresholdTime })
+      .setParameters({ ...parameters })
+      .distinct(true)
+      .orderBy('blockEntity.height', 'ASC')
+      .take(deletedBlockCount)
+      .getRawMany();
+
+    const unusedBlockHashes = blocksToDelete.map((row) => row.hash);
+
+    await this.blockRepository.delete({
+      hash: In(unusedBlockHashes),
+    });
+
+    return unusedBlockHashes;
   };
 }

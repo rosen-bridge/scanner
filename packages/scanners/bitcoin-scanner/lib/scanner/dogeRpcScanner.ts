@@ -6,6 +6,7 @@ export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
   constructor(config: ScannerConfig<DogeRpcTransaction>) {
     super(
       'doge',
+      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,

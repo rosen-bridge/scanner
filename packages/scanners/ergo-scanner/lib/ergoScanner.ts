@@ -5,6 +5,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
   constructor(config: ScannerConfig<Transaction>) {
     super(
       'ergo',
+      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,

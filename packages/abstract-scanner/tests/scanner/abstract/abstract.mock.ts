@@ -17,6 +17,7 @@ import { migrations } from '../../../lib/migrations';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
 import { BlockDbAction } from '../../../lib/scanner/action';
+import { BlockTimeConfig } from '../../../lib/scanner/interfaces';
 
 export interface TestTransaction {
   height: number;
@@ -57,7 +58,7 @@ export class ExtractorTest extends AbstractExtractor<
     return Promise.resolve();
   };
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -83,8 +84,9 @@ export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
   constructor(
     private scannerName: string,
     dataSource: DataSource,
+    blockTimeConfig: BlockTimeConfig,
   ) {
-    super();
+    super(blockTimeConfig);
     this.action = new BlockDbAction(dataSource, scannerName);
   }
 
@@ -96,8 +98,17 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
     name: string,
     dataSource: DataSource,
     networkConnector: NetworkConnectorTest,
+    blockTimeConfig: BlockTimeConfig,
   ) {
-    super(name, dataSource, 0, networkConnector, 100, undefined);
+    super(
+      name,
+      blockTimeConfig,
+      dataSource,
+      0,
+      networkConnector,
+      100,
+      undefined,
+    );
   }
 
   getFirstBlock = async (): Promise<Block> => {
@@ -136,8 +147,8 @@ export const insertBlocks = async (
 };
 
 export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
-  constructor(dataSource: DataSource) {
-    super('test scanner');
+  constructor(dataSource: DataSource, blockTimeConfig: BlockTimeConfig) {
+    super('test scanner', blockTimeConfig);
     this.action = new BlockDbAction(dataSource, this.name());
   }
 
@@ -161,5 +172,5 @@ export class FailExtractor extends AbstractExtractor<
 
   processTransactions = () => Promise.resolve(false);
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
 }

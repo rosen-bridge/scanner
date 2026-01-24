@@ -2,6 +2,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
+import { BlockTimeConfig } from '../../../lib/scanner/interfaces';
 import {
   ExtractorTest,
   TestAbstractScanner,
@@ -12,8 +13,12 @@ import {
 let dataSource: DataSource;
 
 describe('AbstractScanner', () => {
+  let blockTimeConfig: BlockTimeConfig;
   beforeEach(async () => {
     dataSource = await createDatabase();
+    blockTimeConfig = {
+      blockTime: 12,
+    };
   });
 
   describe('registerExtractor', () => {
@@ -24,7 +29,11 @@ describe('AbstractScanner', () => {
      * Expected: extractors length must be 1
      */
     it('should register extractor', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
       await scanner.registerExtractor(extractor);
@@ -44,7 +53,11 @@ describe('AbstractScanner', () => {
      * Expected: extractors size must be 1
      */
     it('remove registered extractor', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor1 = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
       await scanner.registerExtractor(extractor1);
@@ -62,7 +75,11 @@ describe('AbstractScanner', () => {
      * Expected: It must 2 block available in database
      */
     it('should remove all blocks to fork point for specific scanner', async () => {
-      const scanner1 = new TestAbstractScanner('first', dataSource);
+      const scanner1 = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       await insertBlocks(scanner1, 10);
       await scanner1['forkBlock'](3);
       expect(await dataSource.getRepository(BlockEntity).count()).toEqual(2);
@@ -75,8 +92,16 @@ describe('AbstractScanner', () => {
      * Expected: It must 2 block available for first scanner and 10 block for second scanner in database.
      */
     it('should delete only its own blocks when forked', async () => {
-      const scanner1 = new TestAbstractScanner('first', dataSource);
-      const scanner2 = new TestAbstractScanner('second', dataSource);
+      const scanner1 = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
+      const scanner2 = new TestAbstractScanner(
+        'second',
+        dataSource,
+        blockTimeConfig,
+      );
       await insertBlocks(scanner1, 10);
       await insertBlocks(scanner2, 10);
       await scanner1['forkBlock'](3);
@@ -104,7 +129,11 @@ describe('AbstractScanner', () => {
      * Expected: It must call extractor fork function with blockId = 10
      */
     it('should call extractor fork function for forking block', async () => {
-      const scanner1 = new TestAbstractScanner('first', dataSource);
+      const scanner1 = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('extractor');
       scanner1.extractors.push(extractor);
       await insertBlocks(scanner1, 10);
@@ -122,7 +151,11 @@ describe('AbstractScanner', () => {
      * Expected: must insert a block in database
      */
     it('should insert block into database', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [],
@@ -145,7 +178,11 @@ describe('AbstractScanner', () => {
      * Expected: extractor processTransaction function must be called once
      */
     it('should call extractor processTransactionFunction', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
       await scanner['processBlockTransactions'](
@@ -162,7 +199,11 @@ describe('AbstractScanner', () => {
      * Expected: throw exception
      */
     it('should rethrow when extractor raise exception', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       vi.spyOn(extractor, 'processTransactions').mockImplementation(() =>
         Promise.reject('this is my error on save'),
@@ -192,7 +233,11 @@ describe('AbstractScanner', () => {
      * - empty the new extractors list
      */
     it('should initialize new registered extractors with no status in database', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
       const mockedInitFn = vi.fn();
@@ -217,7 +262,11 @@ describe('AbstractScanner', () => {
      * - not to call `initializeExtractors`
      */
     it('should not initialize new registered extractors with updated db information', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
         scannerId: scanner.name(),
@@ -246,7 +295,11 @@ describe('AbstractScanner', () => {
      * - call `initializeExtractors` with extractor id
      */
     it('should initialize new registered extractors with old db information', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
         scannerId: scanner.name(),
@@ -275,7 +328,11 @@ describe('AbstractScanner', () => {
      * - call `initializeExtractors` with extractor id
      */
     it('should initialize old registered extractors with old db information', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
         scannerId: scanner.name(),
@@ -304,7 +361,11 @@ describe('AbstractScanner', () => {
      * - not to call `initializeExtractors`
      */
     it('should not initialize old registered extractor with updated db information', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
         scannerId: scanner.name(),
@@ -336,7 +397,11 @@ describe('AbstractScanner', () => {
      * - initialize the registered extractor and update its status
      */
     it('should initialize extractor with specified id and insert status into db', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
       const mockedInit = vi
@@ -366,7 +431,11 @@ describe('AbstractScanner', () => {
      * - not to initialize extractors
      */
     it('should not initialize other not specified extractors', async () => {
-      const scanner = new TestAbstractScanner('first', dataSource);
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
       const mockedInit = vi

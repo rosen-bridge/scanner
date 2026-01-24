@@ -6,6 +6,7 @@ export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
   constructor(config: ScannerConfig<BitcoinRpcTransaction>) {
     super(
       'bitcoin',
+      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,
