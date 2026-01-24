@@ -1,12 +1,8 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
-import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 
 import { BitcoinEsploraTransaction } from '../types';
 
-export class DogeEsploraScanner extends GeneralScanner<
-  BitcoinEsploraTransaction,
-  ObjectLiteral
-> {
+export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction> {
   constructor(config: ScannerConfig<BitcoinEsploraTransaction>) {
     super(
       'doge',

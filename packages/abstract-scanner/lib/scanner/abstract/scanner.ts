@@ -8,13 +8,10 @@ import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
 
-export abstract class AbstractScanner<
-  TransactionType,
-  ExtractorEntity extends ObjectLiteral,
-> {
+export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
-  extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>;
-  newExtractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>;
+  extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
+  newExtractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
 
@@ -89,10 +86,10 @@ export abstract class AbstractScanner<
    * @param extractor
    */
   registerExtractor = async (
-    extractor: AbstractExtractor<TransactionType, ExtractorEntity>,
+    extractor: AbstractExtractor<TransactionType, ObjectLiteral>,
   ): Promise<void> => {
     const notRegisteredIn = (
-      extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>,
+      extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>,
     ) =>
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId(),
@@ -116,11 +113,10 @@ export abstract class AbstractScanner<
    * @param extractor
    */
   removeExtractor = async (
-    extractor: AbstractExtractor<TransactionType, ExtractorEntity>,
+    extractor: AbstractExtractor<TransactionType, ObjectLiteral>,
   ): Promise<void> => {
-    const removeFn = (
-      ex: AbstractExtractor<TransactionType, ExtractorEntity>,
-    ) => ex.getId() === extractor.getId();
+    const removeFn = (ex: AbstractExtractor<TransactionType, ObjectLiteral>) =>
+      ex.getId() === extractor.getId();
 
     const release = await this.initializeMutex.acquire();
     remove(this.extractors, removeFn);
@@ -160,7 +156,7 @@ export abstract class AbstractScanner<
    */
   protected verifyExtractorsInitialization = async (block: BlockInfo) => {
     const getIds = (
-      extractors: Array<AbstractExtractor<TransactionType, ExtractorEntity>>,
+      extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>,
     ) => {
       return extractors.map((extractor) => extractor.getId());
     };

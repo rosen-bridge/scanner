@@ -79,10 +79,7 @@ export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransacti
   };
 }
 
-export class TestAbstractScanner extends AbstractScanner<
-  TestTransaction,
-  ObjectLiteral
-> {
+export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
   constructor(
     private scannerName: string,
     dataSource: DataSource,
@@ -94,10 +91,7 @@ export class TestAbstractScanner extends AbstractScanner<
   name = (): string => this.scannerName;
 }
 
-export class TestGeneralScanner extends GeneralScanner<
-  TestTransaction,
-  ObjectLiteral
-> {
+export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
   constructor(
     name: string,
     dataSource: DataSource,
@@ -126,7 +120,7 @@ export const createDatabase = async () => {
 };
 
 export const insertBlocks = async (
-  scanner: AbstractScanner<TestTransaction, ObjectLiteral>,
+  scanner: AbstractScanner<TestTransaction>,
   count: number,
 ) => {
   for (let index = 1; index <= count; index++) {
@@ -141,10 +135,7 @@ export const insertBlocks = async (
   }
 };
 
-export class TestWebSocketScanner extends WebSocketScanner<
-  { id: string },
-  ObjectLiteral
-> {
+export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   constructor(dataSource: DataSource) {
     super('test scanner');
     this.action = new BlockDbAction(dataSource, this.name());

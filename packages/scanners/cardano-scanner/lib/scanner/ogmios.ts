@@ -22,7 +22,6 @@ import {
   BlockDbAction,
   WebSocketScanner,
 } from '@rosen-bridge/abstract-scanner';
-import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 
 import {
   RECONNECTION_INITIAL_DELAY,
@@ -42,10 +41,7 @@ interface ForwardResponse {
   tip: TipOrOrigin;
 }
 
-class CardanoOgmiosScanner extends WebSocketScanner<
-  Transaction,
-  ObjectLiteral
-> {
+class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   client: ChainSynchronizationClient;
   initPoint: Point;
   host: string;

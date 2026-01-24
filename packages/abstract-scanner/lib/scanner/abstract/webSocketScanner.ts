@@ -1,7 +1,6 @@
 import { Mutex } from 'await-semaphore';
 
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block } from '@rosen-bridge/scanner-interfaces';
 
 import { AbstractScanner } from './scanner';
@@ -10,8 +9,7 @@ const DEFAULT_MAX_TRY_BLOCK = 10;
 
 abstract class WebSocketScanner<
   TransactionType,
-  ExtractorEntity extends ObjectLiteral,
-> extends AbstractScanner<TransactionType, ExtractorEntity> {
+> extends AbstractScanner<TransactionType> {
   readonly maxTryBlock: number;
 
   protected mutex = new Mutex();

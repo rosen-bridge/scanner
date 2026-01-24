@@ -1,12 +1,8 @@
 import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
-import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 
 import { KoiosTransaction } from '../interfaces/koios';
 
-class CardanoKoiosScanner extends GeneralScanner<
-  KoiosTransaction,
-  ObjectLiteral
-> {
+class CardanoKoiosScanner extends GeneralScanner<KoiosTransaction> {
   constructor(config: ScannerConfig<KoiosTransaction>) {
     super(
       'cardano',
