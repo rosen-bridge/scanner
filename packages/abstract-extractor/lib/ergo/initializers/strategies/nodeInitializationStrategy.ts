@@ -1,6 +1,6 @@
 import PQueue from 'p-queue';
 
-import { DummyLogger } from '@rosen-bridge/abstract-logger';
+import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { API_LIMIT } from '../../../constants';
@@ -20,7 +20,7 @@ export class NodeInitializationStrategy {
     private processTransactionBatch: (
       txs: ExtendedTransaction[],
     ) => Promise<void>,
-    private logger = new DummyLogger(),
+    private logger: AbstractLogger = new DummyLogger(),
   ) {
     this.promiseQueue = new PQueue({
       concurrency: this.maxParallelRequests,

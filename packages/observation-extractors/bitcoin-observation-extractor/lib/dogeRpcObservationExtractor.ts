@@ -18,7 +18,12 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
     super(
       dataSource,
       tokens,
-      new DogeRpcRosenExtractor(lockAddress, tokens, logger, storeRawData),
+      new DogeRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('DogeRpcRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

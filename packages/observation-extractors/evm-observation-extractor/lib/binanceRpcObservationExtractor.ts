@@ -23,7 +23,7 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
         tokens,
         'binance',
         'bnb',
-        logger,
+        logger?.child('EvmEthersRosenExtractor'),
         storeRawData,
       ),
       logger,

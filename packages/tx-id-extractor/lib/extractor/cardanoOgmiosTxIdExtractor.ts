@@ -24,7 +24,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<
     super();
     this.id = id;
     this.logger = logger;
-    this.action = new TxAction(dataSource, this.logger);
+    this.action = new TxAction(dataSource, this.logger.child('TxAction'));
   }
 
   /**

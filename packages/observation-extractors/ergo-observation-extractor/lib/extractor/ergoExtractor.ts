@@ -20,7 +20,12 @@ export class ErgoObservationExtractor extends AbstractObservationExtractor<Trans
     super(
       dataSource,
       tokens,
-      new ErgoNodeRosenExtractor(lockAddress, tokens, logger, storeRawData),
+      new ErgoNodeRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('ErgoNodeRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }
