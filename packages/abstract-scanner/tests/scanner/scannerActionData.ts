@@ -1,7 +1,5 @@
 import { BlockEntity, PROCEED } from '../../lib';
 
-const oneDayInMs = 24 * 60 * 60 * 1000;
-
 export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
   {
     height: 13,
@@ -17,12 +15,20 @@ export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld3',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: Math.floor(Date.now() / 1000) - oneDayInMs,
+    timestamp: 1,
   },
   {
     height: 15,
     hash: 'blockhashOld4',
     parentHash: 'parentHashOld4',
+    scanner: 'scanner1',
+    status: PROCEED,
+    timestamp: 1,
+  },
+  {
+    height: 16,
+    hash: 'blockhashOld5',
+    parentHash: 'parentHashOld5',
     scanner: 'scanner1',
     status: PROCEED,
     timestamp: 1,

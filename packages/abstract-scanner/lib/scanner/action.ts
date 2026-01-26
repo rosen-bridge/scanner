@@ -374,15 +374,23 @@ export class BlockDbAction {
       extractorUsedBlocksQueries,
     );
 
+    const lastBlock = await this.blockRepository.find({
+      where: { status: PROCEED, scanner: this.name() },
+      order: { height: 'ASC' },
+      take: 1,
+    });
+
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
-    const thresholdTime = Math.floor(Date.now() / 1000) - blockAgeThreshold;
+    const thresholdHeight = lastBlock.length
+      ? lastBlock[0].height - blockAgeThreshold
+      : 0;
 
     const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')
       .addSelect('blockEntity.hash', 'hash')
       .where(`blockEntity.hash NOT IN (${unionQuery})`)
       .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
-      .andWhere('blockEntity.timestamp < :thresholdTime', { thresholdTime })
+      .andWhere('blockEntity.height > :thresholdHeight', { thresholdHeight })
       .setParameters({ ...parameters })
       .distinct(true)
       .orderBy('blockEntity.height', 'ASC')

@@ -241,11 +241,16 @@ export abstract class AbstractScanner<TransactionType> {
           this.blockTimeConfig.blockTime,
       );
 
+      const blockAgeThreshold = Math.floor(
+        this.blockTimeConfig.blockAgeThreshold! /
+          this.blockTimeConfig.blockTime,
+      );
+
       const unusedBlockHashes = await this.action.removeUnusedBlocksInBatches(
         extractorUsedBlocksQueries,
         deletedBlockCount,
         this.name(),
-        this.blockTimeConfig.blockAgeThreshold!,
+        blockAgeThreshold,
       );
       this.logger.debug(
         `Successfully removed old unused block hashes: ${unusedBlockHashes.join(', ')}`,

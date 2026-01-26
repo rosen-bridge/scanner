@@ -1,6 +1,5 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
-import { Seven_Days_InSeconds } from '../../lib/constants';
 import {
   BlockEntity,
   PROCEED,
@@ -670,13 +669,26 @@ describe('action', () => {
     let blockRepository: Repository<BlockEntity>;
     beforeEach(() => {
       blockRepository = dataSource.getRepository(BlockEntity);
+
+      vi.spyOn(action.blockRepository, 'find').mockResolvedValue([
+        {
+          id: 2,
+          height: 16,
+          hash: 'blockhashOld5',
+          parentHash: 'parentHashOld5',
+          scanner: 'scanner1',
+          status: PROCEED,
+          timestamp: 1,
+        },
+      ]);
+
       vi.spyOn(action, 'generateQueriesWithUniqueParams').mockImplementation(
         () => {
           const queryParts = [
-            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height >= :query1height',
+            'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height > :query1height',
             'SELECT "blockEntity"."hash" AS "hash" FROM "block_entity" "blockEntity" WHERE height < :query2height',
           ];
-          const parameters = { query1height: 15, query2height: 12 };
+          const parameters = { query1height: 16, query2height: 12 };
           return { queryParts, parameters };
         },
       );
@@ -701,14 +713,14 @@ describe('action', () => {
         [],
         10,
         sampleBlocks1[0].scanner,
-        1,
+        10,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
-            !(sampleBlock.height >= 15 || sampleBlock.height < 12),
+            !(sampleBlock.height > 16 || sampleBlock.height < 12),
         )
         .map((block) => block.hash);
 
@@ -736,14 +748,14 @@ describe('action', () => {
         [],
         10,
         sampleBlocks1[0].scanner,
-        1,
+        10,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
-            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+            !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
             sampleBlock.scanner == sampleBlocks1[0].scanner,
         )
         .map((block) => block.hash);
@@ -759,7 +771,7 @@ describe('action', () => {
      * @scenario
      * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
      * - Insert 4 BlockEntities related to this scanner
-     * - Defines a thresholdTime for run the test
+     * - Defines a thresholdHeight for run the test
      * - Run test (call `removeUnusedBlocksInBatches`)
      * @expected
      * - Ensures that the blocks being removed are correctly filtered
@@ -767,61 +779,30 @@ describe('action', () => {
     it('should filters all unused blocks based on the block lifetime threshold provided as input', async () => {
       await blockRepository.insert(sampleBlocks1);
 
-      const thresholdTime =
-        Math.floor(Date.now() / 1000) - Seven_Days_InSeconds;
+      const lastBlock = await blockRepository.find();
+      const blockAgeThreshold = 1;
+
+      const thresholdHeight = lastBlock.length
+        ? lastBlock[0].height - blockAgeThreshold
+        : 0;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
-        Seven_Days_InSeconds,
+        blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
-            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
-            sampleBlock.timestamp < thresholdTime,
+            !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
+            sampleBlock.height > thresholdHeight,
         )
         .map((block) => block.hash);
 
       expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
-    });
-
-    /**
-     * @target removeUnusedBlocksInBatches should returns the specified number of unused blocks provided in the input
-     * @dependencies
-     * - generateQueriesWithUniqueParams
-     * - Database
-     * @scenario
-     * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
-     * - Insert 4 BlockEntities related to this scanner
-     * - Defines a thresholdTime for executing the test
-     * - call `removeUnusedBlocksInBatches` with deletedBlockCount = 1
-     * @expected
-     * - Ensures that the blocks being removed are correct
-     */
-    it('should returns the specified number of unused blocks provided in the input', async () => {
-      await blockRepository.insert(sampleBlocks1);
-
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
-        [],
-        1,
-        sampleBlocks1[0].scanner,
-        1,
-      );
-
-      const expectBlockHashesToDelete = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter(
-          (sampleBlock) =>
-            !(sampleBlock.height >= 15 || sampleBlock.height < 12),
-        )
-        .map((block) => block.hash);
-
-      expect(blockHashesToDelete.length).toEqual(1);
-      expect(blockHashesToDelete).toEqual([expectBlockHashesToDelete[0]]);
     });
 
     /**
@@ -833,7 +814,7 @@ describe('action', () => {
      * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
      * - Insert 4 BlockEntities related to this scanner
      * - Insert 3 BlockEntities related to the same scanner, but with a different scannerName
-     * - Defines a thresholdTime for executing the test
+     * - Defines a thresholdHeight for executing the test
      * - call `removeUnusedBlocksInBatches` with deletedBlockCount = 1
      * @expected
      * - Ensures that the blocks being removed are correctly filtered
@@ -843,23 +824,27 @@ describe('action', () => {
 
       await blockRepository.insert(sampleBlocks);
 
-      const thresholdTime =
-        Math.floor(Date.now() / 1000) - Seven_Days_InSeconds;
+      const lastBlock = await blockRepository.find();
+      const blockAgeThreshold = 2;
+
+      const thresholdHeight = lastBlock.length
+        ? lastBlock[0].height - blockAgeThreshold
+        : 0;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         1,
         sampleBlocks1[0].scanner,
-        Seven_Days_InSeconds,
+        blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
-            !(sampleBlock.height >= 15 || sampleBlock.height < 12) &&
+            !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
             sampleBlock.scanner == sampleBlocks1[0].scanner &&
-            sampleBlock.timestamp < thresholdTime,
+            sampleBlock.height > thresholdHeight,
         )
         .map((block) => block.hash);
 
