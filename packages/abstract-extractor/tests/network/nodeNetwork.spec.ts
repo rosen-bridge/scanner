@@ -13,9 +13,9 @@ import {
 vitest.mock('@rosen-clients/ergo-node');
 
 describe('NodeNetwork', () => {
-  describe('convertBox', () => {
+  describe('convertInputBox', () => {
     /**
-     * @target covertBox should properly convert node api box to ergo box
+     * @target covertBox should properly convert node api input box to ergo box
      * @dependencies
      * @scenario
      * - mock getTxById to return creation and spending transaction
@@ -23,7 +23,7 @@ describe('NodeNetwork', () => {
      * @expected
      * - to convert box properly
      */
-    it('should properly convert node api box to ergo box', async () => {
+    it('should properly convert node api input box to ergo box', async () => {
       vitest.mocked(ergoNodeClientFactory).mockReturnValue({
         getTxById: async (txId: string) => {
           if (txId == nodeSpendingTxInfo.id) return nodeSpendingTxInfo;
@@ -31,7 +31,36 @@ describe('NodeNetwork', () => {
         },
       } as unknown as ReturnType<typeof ergoNodeClientFactory>);
       const nodeNetwork = new NodeNetwork('node_url');
-      const ergoBox = await nodeNetwork['convertBox'](nodeBox);
+      const ergoBox = await nodeNetwork['convertInputBox'](nodeBox);
+      expect(ergoBox).toEqual({
+        ...convertedBox,
+        spendingProof: {
+          proofBytes: '',
+          extension: {},
+        },
+      });
+    });
+  });
+
+  describe('convertOutputBox', () => {
+    /**
+     * @target covertBox should properly convert node api output box to ergo box
+     * @dependencies
+     * @scenario
+     * - mock getTxById to return creation and spending transaction
+     * - run test (call `covertBox`)
+     * @expected
+     * - to convert box properly
+     */
+    it('should properly convert node api output box to ergo box', async () => {
+      vitest.mocked(ergoNodeClientFactory).mockReturnValue({
+        getTxById: async (txId: string) => {
+          if (txId == nodeSpendingTxInfo.id) return nodeSpendingTxInfo;
+          else return nodeCreationTxInfo;
+        },
+      } as unknown as ReturnType<typeof ergoNodeClientFactory>);
+      const nodeNetwork = new NodeNetwork('node_url');
+      const ergoBox = await nodeNetwork['convertOutputBox'](nodeBox);
       expect(ergoBox).toEqual(convertedBox);
     });
   });

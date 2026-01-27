@@ -53,6 +53,7 @@ export class ExplorerNetwork {
         box.additionalRegisters,
         'serializedValue',
       ),
+      spendingProof: { proofBytes: box.spendingProof ?? '', extension: {} },
       assets:
         box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
     };

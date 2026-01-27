@@ -43,6 +43,7 @@ export type OutputBox = {
   assets: Array<Asset>;
   additionalRegisters: AdditionalRegisters;
   transactionId: string;
+  spendingProof?: { proofBytes: string; extension: { [k: string]: string } };
   index: number;
 };
 

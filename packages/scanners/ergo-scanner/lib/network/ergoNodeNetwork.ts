@@ -53,6 +53,7 @@ export class ErgoNodeNetwork extends AbstractNetworkConnector<Transaction> {
       })),
       inputs: tx.inputs.map((input) => ({
         boxId: input.boxId,
+        spendingProof: { proofBytes: input.spendingProof.proofBytes },
         extension: input.spendingProof.extension,
       })),
       dataInputs: tx.dataInputs,

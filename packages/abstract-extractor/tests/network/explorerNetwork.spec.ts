@@ -59,7 +59,13 @@ describe('ExplorerNetwork', () => {
       const explorerNetwork = new ExplorerNetwork('explorer_url');
       const ergoBox =
         await explorerNetwork['convertInputBox'](explorerInputBox);
-      expect(ergoBox).toEqual(convertedBox);
+      expect(ergoBox).toEqual({
+        ...convertedBox,
+        spendingProof: {
+          proofBytes: '',
+          extension: {},
+        },
+      });
     });
   });
 
