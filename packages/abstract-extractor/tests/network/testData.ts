@@ -49,7 +49,7 @@ export const explorerInputBox: V1.InputInfo = {
   boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
   value: 300000n,
   index: 0,
-  spendingProof: undefined,
+  spendingProof: '',
   outputBlockId:
     '8a95fbe64b202e1829800f16b06ab413efb396370a57bfbd104a0e3f428fd0e9',
   outputTransactionId:
@@ -1807,9 +1807,11 @@ export const convertedTx = {
   inputs: [
     {
       boxId: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
+      spendingProof: "",
     },
     {
       boxId: '4af30f9c715a7e2bc5f05ad8eedfab1592a320f3c7dd3ca6093902f5207b5c05',
+      spendingProof: "9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66",
     },
   ],
   dataInputs: [],
@@ -1824,10 +1826,8 @@ export const convertedTxWithInputs = {
       ergoTree:
         '100904000580ade204040c0e2077dffd47b690caa52fe13345aaf64ecdf7d55f2e7e3496e8206311f491aa46cd04080404040004000e20720978c041239e7d6eb249d801f380557126f6324e12c5ba9172d820be2e1dded806d601b2a5730000d602c67201060ed603e4c6a70504d604c1a7d6059272047301d6069aa37302d1ec95e67202d801d607ed93e47202cbc2a793cbc272017303ecededededededed8fa3720391a39972037304720593db63087201db6308a792c17201720493e4c672010405e4c6a7040593e4c67201050472037207ededededededededed92a37203720593db63087201db6308a792c17201720493db63087201db6308a792c17201720493e4c672010405e4c6a7040592e4c672010504720690e4c6720105049a720673057207edededed93c27201c2a793db63087201db6308a791c17201720493e4c672010405e4c6a7040593e4c6720105047203938cb2db6308b2a4730600730700017308',
       index: 0,
-      spendingProof: {
-        proofBytes: '',
-        extension: {},
-      },
+      spendingProof: '',
+      extension: {},
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       value: 5810250000n,
@@ -1849,11 +1849,9 @@ export const convertedTxWithInputs = {
       ergoTree:
         '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
       index: 6,
-      spendingProof: {
-        proofBytes:
-          '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
-        extension: {},
-      },
+      spendingProof:
+        '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
+      extension: {},
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       value: 23326478571n,

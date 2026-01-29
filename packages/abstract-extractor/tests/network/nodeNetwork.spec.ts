@@ -34,10 +34,8 @@ describe('NodeNetwork', () => {
       const ergoBox = await nodeNetwork['convertInputBox'](nodeBox);
       expect(ergoBox).toEqual({
         ...convertedBox,
-        spendingProof: {
-          proofBytes: '',
-          extension: {},
-        },
+        spendingProof: '',
+        extension: {},
       });
     });
   });

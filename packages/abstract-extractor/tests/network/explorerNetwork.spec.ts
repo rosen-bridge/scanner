@@ -61,10 +61,8 @@ describe('ExplorerNetwork', () => {
         await explorerNetwork['convertInputBox'](explorerInputBox);
       expect(ergoBox).toEqual({
         ...convertedBox,
-        spendingProof: {
-          proofBytes: '',
-          extension: {},
-        },
+        spendingProof: '',
+        extension: {},
       });
     });
   });

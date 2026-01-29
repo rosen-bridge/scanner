@@ -1,4 +1,4 @@
-import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { InputBox, OutputBox } from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory, {
   IndexedErgoBox,
   IndexedErgoTransaction,
@@ -18,7 +18,7 @@ export class NodeNetwork {
    * @param box
    * @returns ErgoBox
    */
-  private convertInputBox = (box: IndexedErgoBox): OutputBox => {
+  private convertInputBox = (box: IndexedErgoBox): OutputBox & InputBox => {
     return {
       transactionId: box.transactionId || '',
       index: box.index || 0,
@@ -28,10 +28,8 @@ export class NodeNetwork {
       assets: box.assets || [],
       additionalRegisters: box.additionalRegisters,
       boxId: box.boxId || '',
-      spendingProof: {
-        proofBytes: box.spendingProof?.proofBytes ?? '',
-        extension: box.spendingProof?.extension ?? {},
-      },
+      extension: box.spendingProof?.extension,
+      spendingProof: box.spendingProof?.proofBytes,
     };
   };
 
@@ -65,7 +63,6 @@ export class NodeNetwork {
       inclusionHeight: tx.inclusionHeight,
       blockId: tx.blockId,
       outputs: tx.outputs.map((output) => this.convertOutputBox(output)),
-      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
       inputs: tx.inputs.map((input) => this.convertInputBox(input)),
       dataInputs: tx.dataInputs,
     };

@@ -14,6 +14,7 @@ export type InputExtension = {
 
 export type InputBox = {
   boxId: string;
+  spendingProof?: string;
   extension?: InputExtension;
 };
 
@@ -43,7 +44,6 @@ export type OutputBox = {
   assets: Array<Asset>;
   additionalRegisters: AdditionalRegisters;
   transactionId: string;
-  spendingProof?: { proofBytes: string; extension: { [k: string]: string } };
   index: number;
 };
 

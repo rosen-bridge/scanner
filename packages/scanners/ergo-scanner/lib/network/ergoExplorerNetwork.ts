@@ -43,7 +43,7 @@ export class ErgoExplorerNetwork extends AbstractNetworkConnector<Transaction> {
       inputs:
         tx.inputs?.map((input) => ({
           boxId: input.id,
-          spendingProof: { proofBytes: input.spendingProof ?? '' },
+          spendingProof: input.spendingProof,
         })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({

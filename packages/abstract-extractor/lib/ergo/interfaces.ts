@@ -1,5 +1,6 @@
 import {
   ErgoNetworkType,
+  InputBox,
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
@@ -7,7 +8,7 @@ import {
 export interface ExtendedTransaction extends Transaction {
   inclusionHeight: number;
   blockId: string;
-  inputs: OutputBox[];
+  inputs: (OutputBox & InputBox)[];
 }
 
 export interface SpendInfo {

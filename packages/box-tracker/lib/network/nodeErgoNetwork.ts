@@ -79,7 +79,10 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
       allTxs.push(
         ...rawTxs.map((tx) => ({
           id: tx.id,
-          inputs: tx.inputs.map((inputBox) => ({ boxId: inputBox.boxId })),
+          inputs: tx.inputs.map((inputBox) => ({
+            boxId: inputBox.boxId,
+            spendingProof: inputBox.spendingProof.proofBytes,
+          })),
           dataInputs:
             tx.dataInputs?.map((dataInputBox) => ({
               boxId: dataInputBox.boxId,
