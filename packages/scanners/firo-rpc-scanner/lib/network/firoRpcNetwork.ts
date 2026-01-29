@@ -1,46 +1,36 @@
-import axios, { AxiosInstance } from 'axios';
 import { randomBytes } from 'crypto';
-import * as http from 'http';
-import * as https from 'https';
 
 import {
   AbstractNetworkConnector,
   Block,
 } from '@rosen-bridge/scanner-interfaces';
+import axios, { Axios } from '@rosen-clients/rate-limited-axios';
 
 import { FiroRpcBlock, FiroRpcTransaction, JsonRpcResult } from '../types';
 
 class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
-  protected readonly networkName: string;
-  private readonly client: AxiosInstance;
+  private readonly url: string;
+  private readonly timeout: number;
+  private client: Axios;
 
   constructor(
     url: string,
-    auth?: { user: string; pass: string },
-    timeout?: number,
-    networkName = 'firo',
+    timeout: number,
+    auth?: {
+      username: string;
+      password: string;
+    },
   ) {
     super();
-    this.networkName = networkName;
 
     // Create axios instance with compression headers explicitly disabled
+    this.url = url;
+    this.timeout = timeout;
     this.client = axios.create({
-      baseURL: url,
-      timeout: timeout || 30000,
-      auth: auth
-        ? {
-            username: auth.user,
-            password: auth.pass,
-          }
-        : undefined,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-Encoding': 'identity',
-      },
-      httpAgent: new http.Agent({ keepAlive: true }),
-      httpsAgent: new https.Agent({ keepAlive: true }),
-      // proxy: isLocalhost ? false : undefined,
-      proxy: false,
+      baseURL: this.url,
+      timeout: this.timeout,
+      headers: { 'Content-Type': 'application/json' },
+      auth: auth,
     });
   }
 

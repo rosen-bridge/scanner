@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from 'axios';
 import { vi } from 'vitest';
+
+import axios from '@rosen-clients/rate-limited-axios';
 
 export const axiosInstance = {
   get: vi.fn(),

@@ -6,6 +6,6 @@
   "include": ["tests", "lib"],
   "references": [
     { "path": "../../abstract-observation-extractor" },
-    { "path": "../../scanners/bitcoin-scanner" }
+    { "path": "../../scanners/firo-rpc-scanner" }
   ]
 }

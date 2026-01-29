@@ -13,11 +13,17 @@ export class FiroRpcObservationExtractor extends AbstractObservationExtractor<Fi
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new FiroRpcRosenExtractor(lockAddress, tokens, logger),
+      new FiroRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('FiroRpcRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

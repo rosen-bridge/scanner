@@ -13,7 +13,10 @@ describe('FiroRpcNetwork', () => {
 
   beforeEach(() => {
     resetAxiosMock();
-    network = new FiroRpcNetwork('', { user: 'testuser', pass: 'testpass' }, 1);
+    network = new FiroRpcNetwork('', 1, {
+      username: 'testuser',
+      password: 'testpass',
+    });
     network['generateRandomId'] = () =>
       '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e';
   });
