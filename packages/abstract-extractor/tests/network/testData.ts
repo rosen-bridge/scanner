@@ -1807,11 +1807,12 @@ export const convertedTx = {
   inputs: [
     {
       boxId: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
-      spendingProof: "",
+      spendingProof: '',
     },
     {
       boxId: '4af30f9c715a7e2bc5f05ad8eedfab1592a320f3c7dd3ca6093902f5207b5c05',
-      spendingProof: "9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66",
+      spendingProof:
+        '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
     },
   ],
   dataInputs: [],

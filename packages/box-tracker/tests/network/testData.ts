@@ -24,7 +24,7 @@ export const mockedNodeBoxes = [
 export const mockedNodeTxs = [
   {
     id: 'tx1',
-    inputs: [{ boxId: 'in1' , spendingProof: { proofBytes: 'proof1' } }],
+    inputs: [{ boxId: 'in1', spendingProof: { proofBytes: 'proof1' } }],
     dataInputs: [{ boxId: 'data1' }],
     outputs: [
       {
