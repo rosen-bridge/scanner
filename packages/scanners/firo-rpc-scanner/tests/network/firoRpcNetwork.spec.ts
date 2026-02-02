@@ -73,13 +73,8 @@ describe('FiroRpcNetwork', () => {
      */
     it('should return current height successfully', async () => {
       // Create a response that matches Firo's getblockcount RPC format
-      const getBlockCountResponse = {
-        result: testData.currentBlockHeight,
-        error: null,
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
-      };
 
-      mockAxiosPost(getBlockCountResponse);
+      mockAxiosPost(testData.getBlockCountResponse);
 
       const result = await network.getCurrentHeight();
 
@@ -147,13 +142,13 @@ describe('FiroRpcNetwork', () => {
     });
   });
 
-  describe('getBlockTxInfo', () => {
+  describe('getBlockInfo', () => {
     /**
-     * @target `FiroRpcNetwork.getBlockTxInfo` should return complete Firo block structure
+     * @target `FiroRpcNetwork.getBlockInfo` should return complete Firo block structure
      * @dependencies Mock axios response for getblock RPC call
      * @scenario
      * - Mock axios to return complete Firo block data
-     * - Call getBlockTxInfo with test block hash
+     * - Call getBlockInfo with test block hash
      * - Verify returned block structure matches expected format
      * - Verify correct RPC method call and parameters
      * @expected
@@ -165,7 +160,7 @@ describe('FiroRpcNetwork', () => {
     it('should return complete Firo block structure', async () => {
       mockAxiosPost(testData.getBlockResponse);
 
-      const result = await network.getBlockTxInfo(testData.blockHash);
+      const result = await network.getBlockInfo(testData.blockHash);
 
       expect(result).toEqual(testData.getBlockResponse.result);
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
@@ -180,12 +175,12 @@ describe('FiroRpcNetwork', () => {
   describe('getBlockTxIds', () => {
     /**
      * @target `FiroRpcNetwork.getBlockTxIds` should return transaction ID array from block
-     * @dependencies Mock axios response for getblock RPC call via getBlockTxInfo
+     * @dependencies Mock axios response for getblock RPC call via getBlockInfo
      * @scenario
      * - Mock axios to return block data containing transaction IDs
      * - Call getBlockTxIds with test block hash
      * - Verify returned array contains expected transaction IDs
-     * - Verify correct RPC method call through getBlockTxInfo
+     * - Verify correct RPC method call through getBlockInfo
      * @expected
      * - Should return array of transaction ID strings
      * - Array should match tx field from getblock response
@@ -238,47 +233,6 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getrawtransaction',
         params: [testTxId, true],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
-      });
-    });
-  });
-
-  describe('getAddressBalance', () => {
-    /**
-     * @target `FiroRpcNetwork.getAddressBalance` should return address balance in duffs
-     * @dependencies Mock axios response for getaddressbalance RPC call
-     * @scenario
-     * - Mock axios to return address balance data
-     * - Call getAddressBalance with test address
-     * - Verify returned balance is in duffs (satoshis)
-     * - Verify correct RPC method call and parameters
-     * @expected
-     * - Should return balance as number in duffs (satoshis)
-     * - Balance should be converted from string to integer
-     * - axios.post should be called once with getaddressbalance method
-     * - RPC call should include address wrapped in addresses array
-     */
-    it('should return address balance in duffs', async () => {
-      const testAddress = 'aLgRaYSFk6iVw2FqY1oei8Tdn2aTsGPVmP';
-      const balanceResponse = {
-        result: {
-          balance: '150000000', // 1.5 FIRO in duffs
-          received: '200000000',
-        },
-        error: null,
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
-      };
-
-      mockAxiosPost(balanceResponse);
-
-      const result = await network.getAddressBalance(testAddress);
-
-      expect(result).toBe(150000000);
-      expect(typeof result).toBe('number');
-      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getaddressbalance',
-        params: [{ addresses: [testAddress] }],
         id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
       });
     });

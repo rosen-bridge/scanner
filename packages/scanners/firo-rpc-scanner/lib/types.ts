@@ -1,8 +1,8 @@
 // Core RPC Response Types
-export type JsonRpcResult = {
-  id: string;
-  result: unknown;
-};
+export interface JsonRpcResult<T> {
+  id: string | number;
+  result: T;
+}
 
 export type JsonRpcError = {
   id: string;

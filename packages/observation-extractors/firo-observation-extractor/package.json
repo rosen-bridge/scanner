@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/firo-observation-extractor",
-  "version": "6.4.1",
+  "version": "0.0.0",
   "description": "Event observation data extractor for Firo chain",
   "repository": {
     "type": "git",
@@ -18,13 +18,11 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
-    "coverage": "npm run test -- --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "lint:check": "eslint . && npm run prettify:check",
     "prettify": "prettier --write . --ignore-path ../../../.gitignore",
     "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
     "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
-    "test": "NODE_OPTIONS='--import tsx' vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -34,11 +32,6 @@
     "@rosen-bridge/firo-rpc-scanner": "^0.0.0",
     "@rosen-bridge/rosen-extractor": "^11.2.0",
     "@rosen-bridge/tokens": "^5.0.0"
-  },
-  "devDependencies": {
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0",

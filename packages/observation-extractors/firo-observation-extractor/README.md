@@ -1,4 +1,4 @@
-# @rosen-bridge/bitcoin-observation-extractor
+# @rosen-bridge/firo-observation-extractor
 
 ## Table of contents
 

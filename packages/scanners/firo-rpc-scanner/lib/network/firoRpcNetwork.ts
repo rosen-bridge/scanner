@@ -48,7 +48,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
       const blockHashResponse = await this.makeRpcCall<string>('getblockhash', [
         height,
       ]);
-      const firoBlock = await this.getBlockTxInfo(blockHashResponse);
+      const firoBlock = await this.getBlockInfo(blockHashResponse);
 
       // Convert to abstract Block format
       return {
@@ -84,7 +84,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
     blockHash: string,
   ): Promise<Array<FiroRpcTransaction>> => {
     try {
-      const blockResponse = await this.getBlockTxInfo(blockHash);
+      const blockResponse = await this.getBlockInfo(blockHash);
 
       const txids: Array<string> = blockResponse.tx;
       const transactions: Array<FiroRpcTransaction> = [];
@@ -114,7 +114,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
    * @param blockHash
    * @returns FiroRpcBlock
    */
-  getBlockTxInfo = async (blockHash: string): Promise<FiroRpcBlock> => {
+  getBlockInfo = async (blockHash: string): Promise<FiroRpcBlock> => {
     try {
       const block = await this.makeRpcCall<FiroRpcBlock>('getblock', [
         blockHash,
@@ -134,7 +134,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
    */
   getBlockTxIds = async (blockHash: string): Promise<Array<string>> => {
     try {
-      const blockInfo = await this.getBlockTxInfo(blockHash);
+      const blockInfo = await this.getBlockInfo(blockHash);
       return blockInfo.tx;
     } catch (error) {
       throw new Error(
@@ -161,25 +161,6 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
   };
 
   /**
-   * Get balance for a specific address
-   * @param address
-   * @returns balance in satoshis (duffs)
-   */
-  getAddressBalance = async (address: string): Promise<number> => {
-    try {
-      const result = await this.makeRpcCall<{
-        balance: string;
-        received: string;
-      }>('getaddressbalance', [{ addresses: [address] }]);
-
-      // Balance is already in duffs (satoshis), just convert string to number
-      return parseInt(result.balance, 10);
-    } catch (error) {
-      throw new Error(`Failed to get balance for address ${address}: ${error}`);
-    }
-  };
-
-  /**
    * Make RPC call using axios with 503 error handling
    * @param method RPC method name
    * @param params RPC method parameters
@@ -191,7 +172,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
   ): Promise<T> => {
     const randomId = this.generateRandomId();
     try {
-      const response = await this.client.post<JsonRpcResult>('', {
+      const response = await this.client.post<JsonRpcResult<T>>('', {
         method,
         params,
         id: randomId,
@@ -203,7 +184,7 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
         );
       }
 
-      return response.data.result as T;
+      return response.data.result;
     } catch (error: unknown) {
       const baseError = `Failed to make RPC call [${method}]: `;
       if (error && typeof error === 'object' && 'response' in error) {
@@ -221,4 +202,3 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
 }
 
 export { FiroRpcNetwork };
-export default FiroRpcNetwork;
