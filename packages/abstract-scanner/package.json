@@ -37,10 +37,7 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "vitest": "^3.1.4"
+    "@types/lodash-es": "^4.17.12"
   },
   "engines": {
     "node": ">=22.18.0",
