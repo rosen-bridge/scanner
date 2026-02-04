@@ -6,4 +6,4 @@
 '@rosen-bridge/ergo-scanner': patch
 ---
 
-Add support for spendingProof in signed boxes
+Add `spendingProof` to input box interface
