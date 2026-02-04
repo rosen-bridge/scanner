@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-observation-extractor",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "Event observation data extractor for Cardano chain",
   "repository": {
     "type": "git",
@@ -30,9 +30,9 @@
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^0.2.3",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/rosen-extractor": "^11.1.2",
+    "@rosen-bridge/rosen-extractor": "^11.2.0",
     "@rosen-bridge/tokens": "^5.0.0"
   },
   "engines": {

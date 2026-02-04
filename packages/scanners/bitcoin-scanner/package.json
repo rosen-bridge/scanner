@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-scanner",
-  "version": "0.2.3",
+  "version": "1.0.0",
   "description": "A Bitcoin blockchain scanner based on Esplora or Rpc Block Explorer API",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.3",
+    "@rosen-bridge/abstract-scanner": "^1.0.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
     "@rosen-clients/rate-limited-axios": "^1.1.1"
   },
