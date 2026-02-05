@@ -1,5 +1,17 @@
 # @rosen-bridge/ergo-scanner
 
+## 1.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-scanner@1.0.0
+
 ## 0.1.4
 
 ### Patch Changes
