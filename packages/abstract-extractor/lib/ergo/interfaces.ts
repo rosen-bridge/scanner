@@ -8,8 +8,12 @@ import {
 export interface ExtendedTransaction extends Transaction {
   inclusionHeight: number;
   blockId: string;
-  inputs: (OutputBox & InputBox)[];
+  inputs: ExtendedInputBox[];
 }
+
+// Extended input boxes contain all data as an outputbox in network
+// along with the spending proof and extension as an input box
+type ExtendedInputBox = OutputBox & InputBox;
 
 export interface SpendInfo {
   boxId: string;
