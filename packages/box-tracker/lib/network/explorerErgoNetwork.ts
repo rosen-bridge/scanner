@@ -76,7 +76,11 @@ export class ExplorerErgoNetwork extends AbstractErgoNetwork {
       allTxs.push(
         ...rawTxs.map((tx) => ({
           id: tx.id,
-          inputs: tx.inputs?.map((inputBox) => ({ boxId: inputBox.id })) ?? [],
+          inputs:
+            tx.inputs?.map((inputBox) => ({
+              boxId: inputBox.id,
+              spendingProof: inputBox.spendingProof.proofBytes,
+            })) ?? [],
           dataInputs:
             tx.dataInputs?.map((dataInputBox) => ({
               boxId: dataInputBox.id,

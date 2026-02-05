@@ -1,6 +1,10 @@
 import { mapValues, pick } from 'lodash-es';
 
-import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
+import {
+  InputBox,
+  OutputBox,
+  Transaction,
+} from '@rosen-bridge/scanner-interfaces';
 import ergoExplorerClientFactory from '@rosen-clients/ergo-explorer';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
@@ -41,7 +45,7 @@ export class ExplorerNetwork {
    * @param box
    * @returns OutputBox
    */
-  private convertInputBox = (box: V1.InputInfo): OutputBox => {
+  private convertInputBox = (box: V1.InputInfo): OutputBox & InputBox => {
     return {
       boxId: box.boxId,
       creationHeight: box.outputCreatedAt,
@@ -53,6 +57,8 @@ export class ExplorerNetwork {
         box.additionalRegisters,
         'serializedValue',
       ),
+      spendingProof: box.spendingProof,
+      extension: {},
       assets:
         box.assets?.map((asset) => pick(asset, ['tokenId', 'amount'])) ?? [],
     };
@@ -91,7 +97,11 @@ export class ExplorerNetwork {
           boxId: dataInput.id,
         })) ?? [],
       // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
-      inputs: tx.inputs?.map((input) => ({ boxId: input.id })) ?? [],
+      inputs:
+        tx.inputs?.map((input) => ({
+          boxId: input.id,
+          spendingProof: input.spendingProof,
+        })) ?? [],
       outputs:
         tx.outputs?.map((output) => ({
           boxId: output.id,

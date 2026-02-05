@@ -49,7 +49,7 @@ export const explorerInputBox: V1.InputInfo = {
   boxId: '789df69216741bcb15f4714c7a5fd9f3df9a0e7e52b227bac2f51896aa17d929',
   value: 300000n,
   index: 0,
-  spendingProof: undefined,
+  spendingProof: '',
   outputBlockId:
     '8a95fbe64b202e1829800f16b06ab413efb396370a57bfbd104a0e3f428fd0e9',
   outputTransactionId:
@@ -113,6 +113,10 @@ export const nodeBox = {
   transactionId:
     'f15985efc66ad527a2917bb73a39a65c91b6b93b5fe6b41f50931e7995b74a25',
   index: 2,
+  spendingProof: {
+    proofBytes: '',
+    extension: {},
+  },
   spendingHeight: null,
 };
 
@@ -152,6 +156,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         'b847b4e979fe79f9ab0d07e49e35bcc6bf4242e319ee77a274cc95f82a861e1c',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792191,
@@ -178,6 +186,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '3d48557e6f96c4c900a09d5427bb159a9cbf520a7d1db92514fe35d95de787f4',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792188,
@@ -204,6 +216,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '01a4a55ddab657419e9f2108d66cd6917f82e5c02962845f74b0414b849c9f4e',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792185,
@@ -230,6 +246,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '163e1ec6b93b22136e9a2fff1a2a5599b17a0d41c9815c45374405be9838b743',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792172,
@@ -256,6 +276,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '10fe06ef94703cdb673f0651fd8d029fabbb8798d17b85bdff06206e1eccc159',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792169,
@@ -282,6 +306,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '67cdf6f746fff0a12cf664747b0cda78d3ee35235ab724bc23dc7cb5e80438d9',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23789961,
@@ -308,6 +336,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         'f84989ef7cf819f3a4205a33082ee33684676633df5a8e30bff86b67dd54e6ff',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23761359,
@@ -334,6 +366,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         'b90eee3b4a5843ae5591089358f563053c584d572ab6a63d6bb2e34eaa04b6ab',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23761354,
@@ -360,6 +396,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '1a4ad82e0e9b6c5d8a9666f647f0cb9124ad9802a914e47db5c71e69127b17a7',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23761351,
@@ -386,6 +426,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '7bdaa4eaf09b900caedcccc1d39ad45d52ce99168bf52da5fdee58d1547683bd',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23736618,
@@ -412,6 +456,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '5ddabf5d599d9c2755a9d8509afb81e5428aa189293fb4e74c32c8f8d870a26f',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23694772,
@@ -441,6 +489,10 @@ export const nodeCreationTxInfo = {
       transactionId:
         '50b0d414919639c48f325c76ea660156a9d725d4399b9c17cf46d06cd0edfd93',
       index: 12,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
   ],
   dataInputs: [
@@ -812,6 +864,10 @@ export const nodeSpendingTxInfo = {
       transactionId:
         'f15985efc66ad527a2917bb73a39a65c91b6b93b5fe6b41f50931e7995b74a25',
       index: 2,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23822791,
@@ -835,6 +891,10 @@ export const nodeSpendingTxInfo = {
       transactionId:
         'de170f87218f59f5790284a3b14972efcf7e8eeb81ef67f54d86da736b6f45da',
       index: 1,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
     {
       globalIndex: 23792546,
@@ -862,6 +922,10 @@ export const nodeSpendingTxInfo = {
       transactionId:
         'c96e734d95fbb75d6f2fe4d0a8d8f634ca68dbb3df0e5bd72b4cb56c42b598b3',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
     },
   ],
   dataInputs: [],
@@ -1303,6 +1367,10 @@ export const nodeTx = {
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       index: 0,
+      spendingProof: {
+        proofBytes: '',
+        extension: {},
+      },
       spendingHeight: null,
     },
     {
@@ -1321,6 +1389,11 @@ export const nodeTx = {
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       index: 6,
+      spendingProof: {
+        proofBytes:
+          '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
+        extension: {},
+      },
       spendingHeight: null,
     },
   ],
@@ -1409,7 +1482,7 @@ export const explorerTx = {
       boxId: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
       value: 5810250000n,
       index: 0,
-      spendingProof: undefined,
+      spendingProof: '',
       outputBlockId:
         '3d7785c4b7fe6ba9f216fa24a5e643161e848c01d197057cd5aec885ae40005a',
       outputTransactionId:
@@ -1590,7 +1663,7 @@ export const explorerBlockTx = {
       id: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
       value: 5810250000n,
       index: 0,
-      spendingProof: undefined,
+      spendingProof: '',
       transactionId:
         '4e7c782db6525e7d59a28df3b72a16d26fcb64ceae535dfec3936e61d8feddf2',
       outputTransactionId:
@@ -1734,9 +1807,12 @@ export const convertedTx = {
   inputs: [
     {
       boxId: '2cb98908f0ec1172dec463be397ee8c32e7b567908ad14af9c0d4ecfaa536b35',
+      spendingProof: '',
     },
     {
       boxId: '4af30f9c715a7e2bc5f05ad8eedfab1592a320f3c7dd3ca6093902f5207b5c05',
+      spendingProof:
+        '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
     },
   ],
   dataInputs: [],
@@ -1751,6 +1827,8 @@ export const convertedTxWithInputs = {
       ergoTree:
         '100904000580ade204040c0e2077dffd47b690caa52fe13345aaf64ecdf7d55f2e7e3496e8206311f491aa46cd04080404040004000e20720978c041239e7d6eb249d801f380557126f6324e12c5ba9172d820be2e1dded806d601b2a5730000d602c67201060ed603e4c6a70504d604c1a7d6059272047301d6069aa37302d1ec95e67202d801d607ed93e47202cbc2a793cbc272017303ecededededededed8fa3720391a39972037304720593db63087201db6308a792c17201720493e4c672010405e4c6a7040593e4c67201050472037207ededededededededed92a37203720593db63087201db6308a792c17201720493db63087201db6308a792c17201720493e4c672010405e4c6a7040592e4c672010504720690e4c6720105049a720673057207edededed93c27201c2a793db63087201db6308a791c17201720493e4c672010405e4c6a7040593e4c6720105047203938cb2db6308b2a4730600730700017308',
       index: 0,
+      spendingProof: '',
+      extension: {},
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       value: 5810250000n,
@@ -1772,6 +1850,9 @@ export const convertedTxWithInputs = {
       ergoTree:
         '0008cd02c1d434dac8765fc1269af82958d8aa350da53907096b35f7747cc372a7e6e69d',
       index: 6,
+      spendingProof:
+        '9b8d1011510b3f62632d421818a18e913fccd81d4f0b1117f873e169f4e0bad88111309f1b8d3f4b6768580c963d749e0f9f50fb881d3b66',
+      extension: {},
       transactionId:
         'c1625b2f26935514d9cc47ce3acedb75e7b51595c1a26cc2fe0b6eadeeb205d8',
       value: 23326478571n,
