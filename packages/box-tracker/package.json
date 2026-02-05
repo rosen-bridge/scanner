@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/box-tracker",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Tracking specific boxes where only one instance should exist at any time with the specified parameters.",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.1.2",
+    "@rosen-bridge/abstract-extractor": "^3.0.0",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",

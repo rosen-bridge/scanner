@@ -1,5 +1,19 @@
 # @rosen-bridge/ergo-observation-extractor
 
+## 1.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/tokens@5.0.0
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/rosen-extractor@11.2.0
+  - @rosen-bridge/abstract-observation-extractor@1.0.0
+
 ## 0.3.1
 
 ### Patch Changes
