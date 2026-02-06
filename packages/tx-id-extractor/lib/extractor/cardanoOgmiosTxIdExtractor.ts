@@ -2,12 +2,16 @@ import { Transaction } from '@cardano-ogmios/schema';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { TxAction } from '../actions/db';
+import { TxIdEntity } from '../entities/txIdEntity';
 
-export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
+export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<
+  Transaction,
+  TxIdEntity
+> {
   readonly logger: AbstractLogger;
   readonly action: TxAction;
   private readonly id: string;
@@ -20,7 +24,7 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
     super();
     this.id = id;
     this.logger = logger;
-    this.action = new TxAction(dataSource, this.logger);
+    this.action = new TxAction(dataSource, this.logger.child('TxAction'));
   }
 
   /**
@@ -56,4 +60,13 @@ export class CardanoOgmiosTxIdExtractor extends AbstractExtractor<Transaction> {
   initializeData = async () => {
     return;
   };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `cardanoOgmiosTxIdEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (): SelectQueryBuilder<TxIdEntity> =>
+    this.action.createUsedBlocksQuery(this.getId());
 }

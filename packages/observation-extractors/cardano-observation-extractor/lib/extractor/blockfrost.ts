@@ -27,7 +27,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractObservationEx
       new CardanoBlockFrostRosenExtractor(
         lockAddress,
         tokens,
-        logger,
+        logger?.child('CardanoBlockFrostRosenExtractor'),
         storeRawData,
       ),
       logger,

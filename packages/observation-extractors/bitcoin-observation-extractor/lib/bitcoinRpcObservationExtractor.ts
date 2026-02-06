@@ -18,7 +18,12 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
     super(
       dataSource,
       tokens,
-      new BitcoinRpcRosenExtractor(lockAddress, tokens, logger, storeRawData),
+      new BitcoinRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('BitcoinRpcRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

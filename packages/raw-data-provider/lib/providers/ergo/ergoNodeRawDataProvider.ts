@@ -35,7 +35,10 @@ export class ErgoNodeRawDataProvider extends AbstractRawDataProvider<Transaction
         {
           id: tx.id,
           dataInputs: tx.dataInputs ?? [],
-          inputs: (tx.inputs ?? []).map((ib) => ({ ...ib, boxId: ib.boxId! })),
+          inputs: (tx.inputs ?? []).map((ib) => ({
+            boxId: ib.boxId!,
+            spendingProof: ib.spendingProof?.proofBytes,
+          })),
           outputs: tx.outputs.map((ob) => ({
             ...ob,
             transactionId: ob.transactionId!,

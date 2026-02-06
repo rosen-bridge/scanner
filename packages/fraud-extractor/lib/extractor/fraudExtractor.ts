@@ -41,7 +41,10 @@ export class FraudExtractor extends AbstractErgoBoxExtractor<
       .to_ergo_tree()
       .to_base16_bytes();
     this.rwt = rwt;
-    this.actions = new FraudAction(dataSource, this.logger);
+    this.actions = new FraudAction(
+      dataSource,
+      this.logger.child('FraudAction'),
+    );
   }
 
   /**

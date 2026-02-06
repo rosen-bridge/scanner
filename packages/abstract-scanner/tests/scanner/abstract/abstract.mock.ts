@@ -1,5 +1,9 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import {
   BlockInfo,
   Block,
@@ -19,7 +23,10 @@ export interface TestTransaction {
   blockHash: string;
 }
 
-export class ExtractorTest extends AbstractExtractor<TestTransaction> {
+export class ExtractorTest extends AbstractExtractor<
+  TestTransaction,
+  ObjectLiteral
+> {
   id: string;
   forked: Array<string>;
   txs: Array<{ txs: Array<TestTransaction>; block: BlockInfo }>;
@@ -49,6 +56,8 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
   initializeData = () => {
     return Promise.resolve();
   };
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -140,7 +149,10 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   stop = async () => Promise.resolve();
 }
 
-export class FailExtractor extends AbstractExtractor<{ id: string }> {
+export class FailExtractor extends AbstractExtractor<
+  { id: string },
+  ObjectLiteral
+> {
   forkBlock = async () => Promise.resolve();
 
   getId = () => 'fail extractor';
@@ -148,4 +160,6 @@ export class FailExtractor extends AbstractExtractor<{ id: string }> {
   initializeData = () => Promise.resolve();
 
   processTransactions = () => Promise.resolve(false);
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }

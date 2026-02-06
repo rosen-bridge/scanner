@@ -14,6 +14,7 @@ export type InputExtension = {
 
 export type InputBox = {
   boxId: string;
+  spendingProof?: string;
   extension?: InputExtension;
 };
 

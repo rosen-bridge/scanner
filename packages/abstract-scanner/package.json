@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-scanner",
-  "version": "0.2.3",
+  "version": "1.0.0",
   "description": "Abstract scanner toolkit for blockchain scanning with logging.",
   "repository": {
     "type": "git",
@@ -28,8 +28,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^2.1.2",
-    "@rosen-bridge/abstract-logger": "^3.0.1",
+    "@rosen-bridge/abstract-extractor": "^3.0.0",
+    "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
@@ -37,10 +37,7 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "vitest": "^3.1.4"
+    "@types/lodash-es": "^4.17.12"
   },
   "engines": {
     "node": ">=22.18.0",

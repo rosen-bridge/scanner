@@ -21,7 +21,7 @@ export class BitcoinEsploraObservationExtractor extends AbstractObservationExtra
       new BitcoinEsploraRosenExtractor(
         lockAddress,
         tokens,
-        logger,
+        logger?.child('BitcoinEsploraRosenExtractor'),
         storeRawData,
       ),
       logger,

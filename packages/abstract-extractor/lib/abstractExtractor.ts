@@ -1,6 +1,13 @@
+import {
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-export abstract class AbstractExtractor<TransactionType> {
+export abstract class AbstractExtractor<
+  TransactionType,
+  ExtractorEntity extends ObjectLiteral,
+> {
   /**
    * Process a list of transactions (or other blockchain data) in a block and store required information.
    * This method is the core of the extraction process and should be implemented to handle
@@ -40,4 +47,15 @@ export abstract class AbstractExtractor<TransactionType> {
    * @param initialBlock - The block from which to start scanning (initial height)
    */
   abstract initializeData: (initialBlock: BlockInfo) => Promise<void>;
+
+  /**
+   * Create a query for used blocks associated with the given `extractorId`
+   * This method only builds the query and does not execute it
+   *
+   * @returns A TypeORM SelectQueryBuilder that selects used block values or
+   * `undefined` if the extractor has no associated entity
+   */
+  abstract createUsedBlocksQuery: () =>
+    | SelectQueryBuilder<ExtractorEntity>
+    | undefined;
 }
