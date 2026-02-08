@@ -1,5 +1,14 @@
 # @rosen-bridge/ergo-scanner
 
+## 1.0.1
+
+### Patch Changes
+
+- Add `spendingProof` to input box interface
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - @rosen-bridge/abstract-scanner@1.0.1
+
 ## 1.0.0
 
 ### Major Changes
