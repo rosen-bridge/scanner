@@ -1,5 +1,13 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.0.1
+
+### Patch Changes
+
+- Add `spendingProof` to input box interface
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+
 ## 3.0.0
 
 ### Major Changes

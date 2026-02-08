@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner-interfaces
 
+## 0.2.2
+
+### Patch Changes
+
+- Add `spendingProof` to input box interface
+
 ## 0.2.1
 
 ### Patch Changes

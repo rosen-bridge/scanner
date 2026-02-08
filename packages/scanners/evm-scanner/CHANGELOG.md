@@ -1,5 +1,14 @@
 # @rosen-bridge/evm-scanner
 
+## 1.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - @rosen-bridge/abstract-scanner@1.0.1
+  - ethers@6.16.0
+
 ## 1.0.0
 
 ### Major Changes
