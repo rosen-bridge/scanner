@@ -31,11 +31,11 @@
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/abstract-observation-extractor": "^1.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/rosen-extractor": "^11.2.0",
+    "@rosen-bridge/rosen-extractor": "^11.2.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.1",
-    "@rosen-bridge/tokens": "^5.0.0",
+    "@rosen-bridge/tokens": "^5.0.1",
     "blakejs": "^1.2.1",
-    "ethers": "6.13.2"
+    "ethers": "6.16.0"
   },
   "devDependencies": {
     "@rosen-bridge/abstract-scanner": "^1.0.0"
