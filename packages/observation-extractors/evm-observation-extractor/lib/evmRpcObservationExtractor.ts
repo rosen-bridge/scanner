@@ -46,7 +46,7 @@ export abstract class EvmRpcObservationExtractor extends AbstractObservationExtr
             });
           } else
             throw Error(
-              `ImpossibleBehavior: Evm Tx [${transaction.hash}] is included in block [${block.hash}] but waiting resulted in null or undefined`,
+              `ImpossibleBehavior: Evm Tx [${transaction.hash}] is included in block [${block.hash}] but waiting resulted is null or undefined`,
             );
         } catch (e) {
           if (isCallException(e))
