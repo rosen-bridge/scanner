@@ -111,7 +111,7 @@ export class CardanoOgmiosRawDataProvider extends AbstractRawDataProvider<Transa
       { sequential: true },
     );
 
-    await client.resume([intersect]);
+    await client.resume([intersect], 1);
     await done;
     await client.shutdown();
     this.logger.debug(`RawDataProvider cardano-ogmios client stopped`);
