@@ -29,9 +29,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@cardano-ogmios/client": "^6.6.1",
+    "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/abstract-observation-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-scanner": "^1.0.0",
     "@rosen-bridge/bitcoin-observation-extractor": "^7.0.1",
     "@rosen-bridge/bitcoin-runes-observation-extractor": "^2.0.1",
     "@rosen-bridge/bitcoin-scanner": "^1.0.1",
