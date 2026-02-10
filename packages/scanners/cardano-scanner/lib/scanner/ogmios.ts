@@ -1,8 +1,8 @@
 import {
-  createInteractionContext,
   createChainSynchronizationClient,
   InteractionContext,
 } from '@cardano-ogmios/client';
+import { createInteractionContext } from '@cardano-ogmios/client';
 import {
   ChainSynchronizationClient,
   findIntersection,

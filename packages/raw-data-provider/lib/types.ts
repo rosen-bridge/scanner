@@ -1,3 +1,4 @@
+import { Block, TipOrOrigin } from '@cardano-ogmios/schema';
 import { TransactionJSON } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export interface ConnectionByAuthInfoInterface {
@@ -18,6 +19,12 @@ export interface EsploraConnectionInfoInterface {
   timeout?: number;
 }
 
+export interface OgmiosConnectionInfoInterface {
+  host: string;
+  port: number;
+  tls?: boolean;
+}
+
 interface KoiosCborTx {
   tx_hash: string;
   block_hash: string;
@@ -29,3 +36,13 @@ interface KoiosCborTx {
 }
 
 export type KoiosTransaction = KoiosCborTx & TransactionJSON;
+
+export interface ForwardResponse {
+  block: Block;
+  tip: TipOrOrigin;
+}
+
+export interface PointType {
+  slot: number;
+  hash: string;
+}

@@ -1,5 +1,28 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.0.1
+
+### Patch Changes
+
+- Add `spendingProof` to input box interface
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+
+## 3.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+- Update abstract entities and actions to have a new abstraction level, seperating box-based logic from general extraction
+- Update `AbstractErgoExtractor` to use a tx-based data extraction method and add `AbstractErgoBoxExtractor` for box-based data extraction
+- Update AbstractExtractor interface; add `createUsedBlocksQuery` method that returns the query for used blocks
+- Update abstract database entity to be general; rename `boxId` columnt to `identifier`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+
 ## 2.1.2
 
 ### Patch Changes

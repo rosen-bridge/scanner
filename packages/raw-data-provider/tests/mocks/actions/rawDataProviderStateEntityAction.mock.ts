@@ -85,3 +85,34 @@ export const mockObservationData = {
     },
   ],
 };
+
+export const mockBlockData = [
+  {
+    id: 1,
+    height: 12247526,
+    hash: 'c24ca64fc5bd39419cfdac4fadf235ec22140a7f5b85671232d98a3ee151a8eb',
+    parentHash:
+      '44268730b046ec52cc69e562c35828e6a0b344331fe388804fc78f098a8fd88c',
+    status: 'PROCEED',
+    extra: '163430747',
+    scanner: 'cardano',
+    timestamp: 1754997038,
+    year: 2025,
+    month: 8,
+    day: 12,
+  },
+  {
+    id: 2,
+    height: 12247527,
+    hash: 'af0df2f2f2af52d49156a82943a6f4fb30ca98866881ad522f3c38d02a5534d4',
+    parentHash:
+      'c24ca64fc5bd39419cfdac4fadf235ec22140a7f5b85671232d98a3ee151a8eb',
+    status: 'PROCEED',
+    extra: '163430748',
+    scanner: 'cardano',
+    timestamp: 1754997039,
+    year: 2025,
+    month: 8,
+    day: 12,
+  },
+];

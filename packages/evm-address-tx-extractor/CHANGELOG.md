@@ -1,5 +1,30 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 2.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.0.1
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - ethers@6.16.0
+
+## 2.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Minor Changes
+
+- Update AbstractExtractor interface; add `createUsedBlocksQuery` method that returns the query for used blocks
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-extractor@3.0.0
+
 ## 1.2.3
 
 ### Patch Changes

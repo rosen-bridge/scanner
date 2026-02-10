@@ -1,4 +1,4 @@
-import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { InputBox, OutputBox } from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory, {
   IndexedErgoBox,
   IndexedErgoTransaction,
@@ -14,11 +14,31 @@ export class NodeNetwork {
   }
 
   /**
-   * convert node api boxes to OutputBox interface
+   * convert node api input boxes to OutputBox interface
    * @param box
    * @returns ErgoBox
    */
-  private convertBox = (box: IndexedErgoBox): OutputBox => {
+  private convertInputBox = (box: IndexedErgoBox): OutputBox & InputBox => {
+    return {
+      transactionId: box.transactionId || '',
+      index: box.index || 0,
+      value: box.value || 0n,
+      ergoTree: box.ergoTree || '',
+      creationHeight: box.creationHeight || 0,
+      assets: box.assets || [],
+      additionalRegisters: box.additionalRegisters,
+      boxId: box.boxId || '',
+      extension: box.spendingProof?.extension,
+      spendingProof: box.spendingProof?.proofBytes,
+    };
+  };
+
+  /**
+   * convert node api output boxes to OutputBox interface
+   * @param box
+   * @returns ErgoBox
+   */
+  private convertOutputBox = (box: IndexedErgoBox): OutputBox => {
     return {
       transactionId: box.transactionId || '',
       index: box.index || 0,
@@ -42,9 +62,8 @@ export class NodeNetwork {
       id: tx.id || '',
       inclusionHeight: tx.inclusionHeight,
       blockId: tx.blockId,
-      outputs: tx.outputs.map((output) => this.convertBox(output)),
-      // TODO: Add input extension local/ergo/rosen-bridge/scanner/-/issues/156
-      inputs: tx.inputs.map((input) => this.convertBox(input)),
+      outputs: tx.outputs.map((output) => this.convertOutputBox(output)),
+      inputs: tx.inputs.map((input) => this.convertInputBox(input)),
       dataInputs: tx.dataInputs,
     };
   };

@@ -1,6 +1,7 @@
 {
   "name": "@rosen-bridge/raw-data-provider",
   "version": "0.0.0",
+  "private": true,
   "description": "This package populates missing rawData values for extractors records stored in the database.",
   "repository": {
     "type": "git",
@@ -28,28 +29,26 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@cardano-ogmios/client": "^6.6.1",
+    "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^0.2.1",
-    "@rosen-bridge/bitcoin-observation-extractor": "^6.4.1",
-    "@rosen-bridge/bitcoin-runes-observation-extractor": "^1.0.3",
-    "@rosen-bridge/bitcoin-scanner": "^0.2.3",
-    "@rosen-bridge/cardano-observation-extractor": "^1.0.0",
-    "@rosen-bridge/ergo-observation-extractor": "^0.3.1",
-    "@rosen-bridge/evm-observation-extractor": "^5.3.1",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-scanner": "^1.0.0",
+    "@rosen-bridge/bitcoin-observation-extractor": "^7.0.1",
+    "@rosen-bridge/bitcoin-runes-observation-extractor": "^2.0.1",
+    "@rosen-bridge/bitcoin-scanner": "^1.0.1",
+    "@rosen-bridge/cardano-observation-extractor": "^2.0.1",
+    "@rosen-bridge/ergo-observation-extractor": "^1.0.1",
+    "@rosen-bridge/evm-observation-extractor": "^6.0.1",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
-    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.2",
     "@rosen-clients/cardano-koios": "^3.1.1",
     "@rosen-clients/ergo-explorer": "^2.1.1",
     "@rosen-clients/ergo-node": "^3.1.1",
     "@rosen-clients/rate-limited-axios": "^1.1.1",
-    "ethers": "6.13.2"
-  },
-  "devDependencies": {
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "vitest": "^3.1.4"
+    "ethers": "6.16.0"
   },
   "engines": {
     "node": ">=22.18.0",
