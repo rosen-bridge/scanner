@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-observation-extractor",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "Event observation data extractor for EVM-compatible chains",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.2",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/rosen-extractor": "^11.2.2",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
