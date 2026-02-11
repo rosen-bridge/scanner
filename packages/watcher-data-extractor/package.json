@@ -33,7 +33,7 @@
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-bridge/tokens": "^5.0.1",
+    "@rosen-bridge/tokens": "^6.0.0",
     "@rosen-clients/ergo-explorer": "^2.1.1",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
