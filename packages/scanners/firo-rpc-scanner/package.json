@@ -27,14 +27,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^0.2.3",
-    "@rosen-bridge/scanner-interfaces": "^0.2.1",
+    "@rosen-bridge/abstract-scanner": "^1.0.1",
+    "@rosen-bridge/scanner-interfaces": "^0.2.2",
     "@rosen-clients/rate-limited-axios": "^1.1.1"
-  },
-  "devDependencies": {
-    "@vitest/coverage-istanbul": "^3.1.4",
-    "tsx": "^4.19.4",
-    "vitest": "^3.1.4"
   },
   "engines": {
     "node": ">=22.18.0",

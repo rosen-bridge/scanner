@@ -187,16 +187,8 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
       return response.data.result;
     } catch (error: unknown) {
       const baseError = `Failed to make RPC call [${method}]: `;
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data: unknown } };
-        throw new Error(baseError + JSON.stringify(axiosError.response?.data));
-      } else if (error && typeof error === 'object' && 'request' in error) {
-        const requestError = error as { message?: string };
-        throw new Error(baseError + (requestError.message || 'Request failed'));
-      } else {
-        const genericError = error as { message?: string };
-        throw new Error(baseError + (genericError.message || 'Unknown error'));
-      }
+      const genericError = error as { message?: string };
+      throw new Error(baseError + (genericError.message || 'Unknown error'));
     }
   };
 }

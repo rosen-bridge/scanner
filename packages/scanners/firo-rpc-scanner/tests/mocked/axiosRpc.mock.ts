@@ -12,9 +12,16 @@ export const axiosInstance = {
  * mocks axios.post function
  * @param result
  */
-export const mockAxiosPost = (result: unknown) => {
-  axiosInstance.post.mockResolvedValueOnce({
-    data: result,
+export const mockAxiosPost = (result: any) => {
+  axiosInstance.post.mockImplementationOnce(async (_url, requestData) => {
+    // Copy the request ID to the response to satisfy ID validation
+    const responseData = { ...result };
+    if (requestData?.id && responseData.id) {
+      responseData.id = requestData.id;
+    }
+    return {
+      data: responseData,
+    };
   });
 };
 

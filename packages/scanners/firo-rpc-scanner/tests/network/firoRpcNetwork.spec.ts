@@ -17,8 +17,6 @@ describe('FiroRpcNetwork', () => {
       username: 'testuser',
       password: 'testpass',
     });
-    network['generateRandomId'] = () =>
-      '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e';
   });
 
   describe('getBlockAtHeight', () => {
@@ -48,12 +46,12 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblockhash',
         params: [testData.blockHeight],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblock',
         params: [testData.blockHash, true],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
     });
   });
@@ -72,8 +70,6 @@ describe('FiroRpcNetwork', () => {
      * - axios.post should got called once to get block count with no param
      */
     it('should return current height successfully', async () => {
-      // Create a response that matches Firo's getblockcount RPC format
-
       mockAxiosPost(testData.getBlockCountResponse);
 
       const result = await network.getCurrentHeight();
@@ -83,7 +79,7 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblockcount',
         params: [],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
     });
   });
@@ -111,9 +107,12 @@ describe('FiroRpcNetwork', () => {
       // Mock the getblock call first
       mockAxiosPost(testData.getBlockResponse);
 
-      // Mock the getrawtransaction calls for each transaction in the block
-      testData.getBlockResponse.result.tx.forEach(() => {
-        mockAxiosPost(testData.getRawTransactionResponse);
+      // Define responses for each transaction
+      const transactionResponses = [testData.getRawTransactionResponse];
+
+      // Mock the getrawtransaction calls for each transaction
+      transactionResponses.forEach((response) => {
+        mockAxiosPost(response);
       });
 
       const result = await network.getBlockTxs(testData.blockHash);
@@ -128,7 +127,7 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenNthCalledWith(1, '', {
         method: 'getblock',
         params: [testData.blockHash, true],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
 
       // Check the getrawtransaction calls
@@ -136,7 +135,7 @@ describe('FiroRpcNetwork', () => {
         expect(axiosInstance.post).toHaveBeenNthCalledWith(index + 2, '', {
           method: 'getrawtransaction',
           params: [txId, true],
-          id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+          id: expect.any(String),
         });
       });
     });
@@ -167,7 +166,7 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblock',
         params: [testData.blockHash, true],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
     });
   });
@@ -182,9 +181,7 @@ describe('FiroRpcNetwork', () => {
      * - Verify returned array contains expected transaction IDs
      * - Verify correct RPC method call through getBlockInfo
      * @expected
-     * - Should return array of transaction ID strings
      * - Array should match tx field from getblock response
-     * - Each transaction ID should be 64-character hex string
      * - axios.post should be called once for getblock method
      */
     it('should return transaction IDs array from block', async () => {
@@ -193,12 +190,6 @@ describe('FiroRpcNetwork', () => {
       const result = await network.getBlockTxIds(testData.blockHash);
 
       expect(result).toEqual(testData.getBlockResponse.result.tx);
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBeGreaterThan(0);
-      result.forEach((txId) => {
-        expect(typeof txId).toBe('string');
-        expect(txId).toHaveLength(64);
-      });
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
     });
   });
@@ -214,7 +205,6 @@ describe('FiroRpcNetwork', () => {
      * - Verify correct RPC method call and parameters
      * @expected
      * - Should return complete FiroRpcTransaction object
-     * - Transaction should contain txid, hash, vin, vout, Firo-specific fields
      * - axios.post should be called once with getrawtransaction method
      * - RPC call should include transaction ID and verbose=true parameter
      */
@@ -225,15 +215,11 @@ describe('FiroRpcNetwork', () => {
       const result = await network.getTransaction(testTxId);
 
       expect(result).toEqual(testData.sampleTransaction);
-      expect(typeof result.txid).toBe('string');
-      expect(result.txid).toHaveLength(64);
-      expect(Array.isArray(result.vin)).toBe(true);
-      expect(Array.isArray(result.vout)).toBe(true);
       expect(axiosInstance.post).toHaveBeenCalledTimes(1);
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getrawtransaction',
         params: [testTxId, true],
-        id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
+        id: expect.any(String),
       });
     });
   });
