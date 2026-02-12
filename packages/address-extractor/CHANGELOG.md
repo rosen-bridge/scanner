@@ -1,5 +1,32 @@
 # @rosen-bridge/address-extractor
 
+## 7.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.0.1
+  - @rosen-bridge/scanner-interfaces@0.2.2
+
+## 7.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+- Update abstract database entity to be general; rename `boxId` columnt to `identifier`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-extractor@3.0.0
+
+## 6.3.0
+
+### Minor Changes
+
+- Move `@rosen-bridge/json-bigint` to dependencies to ensure it's available at runtime
+
 ## 6.2.2
 
 ### Patch Changes

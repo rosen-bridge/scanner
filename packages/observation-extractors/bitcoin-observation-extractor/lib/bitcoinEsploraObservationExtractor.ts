@@ -13,11 +13,17 @@ export class BitcoinEsploraObservationExtractor extends AbstractObservationExtra
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new BitcoinEsploraRosenExtractor(lockAddress, tokens, logger),
+      new BitcoinEsploraRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('BitcoinEsploraRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

@@ -3,8 +3,8 @@ import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import PermitAction from '../../lib/actions/permitAction';
 import PermitEntity from '../../lib/entities/permitEntity';
 import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
-import { createDatabase } from '../extractor/utilsFunctions.mock';
-import { block, block2 } from '../extractor/utilsVariable.mock';
+import { block, block2 } from '../extractor/testData';
+import { createDatabase } from '../extractor/testUtils';
 
 const samplePermit1 = {
   boxId: '1',
@@ -32,6 +32,26 @@ const samplePermit3 = {
 const samplePermit4 = {
   ...samplePermit2,
   boxId: '4',
+};
+
+const samplePermit5 = {
+  boxId: '5',
+  boxSerialized: 'serialized5',
+  WID: 'wid5',
+  txId: 'txId5',
+  extractor: 'extractor2',
+  block: 'blockId5',
+  height: 110,
+};
+
+const samplePermit6 = {
+  boxId: '6',
+  boxSerialized: 'serialized6',
+  WID: 'wid6',
+  txId: 'txId6',
+  extractor: 'extractor2',
+  block: 'blockId6',
+  height: 110,
 };
 
 let dataSource: DataSource;
@@ -456,6 +476,41 @@ describe('PermitEntityAction', () => {
       const stored = (await repository.find())[0];
       expect(stored.spendBlock).toEqual('spendBlock-new');
       expect(stored.spendHeight).toEqual(110);
+    });
+  });
+
+  describe('createUsedBlocksQuery', () => {
+    /**
+     * @target createUsedBlocksQuery should return only the used blocks associated with the input `extractorId`
+     * @dependencies
+     * - Database
+     * @scenario
+     * - Insert 4 PermitEntities with two different `extractorId‍‍` into the table
+     * - call `createUsedBlocksQuery` with the specific extractorId
+     * @expected
+     * - the returned blocks match those associated with the input `extractorId`
+     */
+    it('should return only the used blocks associated with the input `extractorId`', async () => {
+      const samplePermitEntities1 = [samplePermit1, samplePermit2];
+      const samplePermitEntities2 = [samplePermit5, samplePermit6];
+      await repository.insert([
+        ...samplePermitEntities1,
+        ...samplePermitEntities2,
+      ]);
+
+      const extractorId = samplePermit1.extractor;
+
+      const executeUsedBlocksQuery = await action
+        .createUsedBlocksQuery(extractorId)
+        .getRawMany();
+
+      const usedBlocks = executeUsedBlocksQuery.map((row) => row.block);
+
+      const sampleBlocks = samplePermitEntities1.map(
+        (sampleEntity) => sampleEntity.block,
+      );
+
+      expect(sampleBlocks).toEqual(usedBlocks);
     });
   });
 });

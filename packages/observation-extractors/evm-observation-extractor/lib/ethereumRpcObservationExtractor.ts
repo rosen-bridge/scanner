@@ -13,6 +13,7 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
@@ -22,7 +23,8 @@ export class EthereumRpcObservationExtractor extends EvmRpcObservationExtractor 
         tokens,
         'ethereum',
         'eth',
-        logger,
+        logger?.child('EvmEthersRosenExtractor'),
+        storeRawData,
       ),
       logger,
     );

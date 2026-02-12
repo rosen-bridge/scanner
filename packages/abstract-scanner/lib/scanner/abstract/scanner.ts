@@ -3,14 +3,15 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockDbAction } from '../action';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
-  extractors: Array<AbstractExtractor<TransactionType>>;
-  newExtractors: Array<AbstractExtractor<TransactionType>>;
+  extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
+  newExtractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
 
@@ -39,13 +40,7 @@ export abstract class AbstractScanner<TransactionType> {
         this.extractors.map((e) => e.getId()),
       );
       for (const extractor of this.extractors) {
-        try {
-          await extractor.forkBlock(lastBlock.hash);
-        } catch (e) {
-          this.logger.error(
-            `An error occurred during fork block in extractor ${extractor.getId()}: ${e}`,
-          );
-        }
+        await extractor.forkBlock(lastBlock.hash);
       }
       await this.action.removeBlocksFromHeight(lastBlock.height);
       lastBlock = await this.action.getBlockAtHeight(lastBlock.height - 1);
@@ -91,10 +86,10 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   registerExtractor = async (
-    extractor: AbstractExtractor<TransactionType>,
+    extractor: AbstractExtractor<TransactionType, ObjectLiteral>,
   ): Promise<void> => {
     const notRegisteredIn = (
-      extractors: Array<AbstractExtractor<TransactionType>>,
+      extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>,
     ) =>
       extractors.filter(
         (extractorItem) => extractorItem.getId() === extractor.getId(),
@@ -118,9 +113,9 @@ export abstract class AbstractScanner<TransactionType> {
    * @param extractor
    */
   removeExtractor = async (
-    extractor: AbstractExtractor<TransactionType>,
+    extractor: AbstractExtractor<TransactionType, ObjectLiteral>,
   ): Promise<void> => {
-    const removeFn = (ex: AbstractExtractor<TransactionType>) =>
+    const removeFn = (ex: AbstractExtractor<TransactionType, ObjectLiteral>) =>
       ex.getId() === extractor.getId();
 
     const release = await this.initializeMutex.acquire();
@@ -144,7 +139,7 @@ export abstract class AbstractScanner<TransactionType> {
     );
     for (const extractor of initRequiredExtractors) {
       this.logger.info(`Initializing [${extractor.getId()}] boxes`);
-      await extractor.initializeBoxes(block);
+      await extractor.initializeData(block);
       await this.action.updateOrInsertExtractorStatus(
         extractor.getId(),
         block.height,
@@ -160,11 +155,12 @@ export abstract class AbstractScanner<TransactionType> {
    * @param block
    */
   protected verifyExtractorsInitialization = async (block: BlockInfo) => {
-    const getIds = (extractors: Array<AbstractExtractor<TransactionType>>) => {
+    const getIds = (
+      extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>,
+    ) => {
       return extractors.map((extractor) => extractor.getId());
     };
     this.logger.debug(`Initializing extractors for block [${block.height}]`);
-    let success = true;
     const release = await this.initializeMutex.acquire();
     try {
       const extractorsStatus = await this.action.getExtractorsStatus([
@@ -208,15 +204,8 @@ export abstract class AbstractScanner<TransactionType> {
       }
       this.extractors.push(...this.newExtractors);
       this.newExtractors = [];
-    } catch (e) {
-      this.logger.warn(`Initialization for extractors failed with error ${e}`);
-      success = false;
     } finally {
       release();
     }
-    if (!success)
-      throw new Error(
-        `Initialization failed for new extractors ${getIds(this.newExtractors)}`,
-      );
   };
 }

@@ -1,6 +1,11 @@
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import {
+  DataSource,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
+import {
+  BlockInfo,
   Block,
   AbstractNetworkConnector,
 } from '@rosen-bridge/scanner-interfaces';
@@ -18,10 +23,13 @@ export interface TestTransaction {
   blockHash: string;
 }
 
-export class ExtractorTest extends AbstractExtractor<TestTransaction> {
+export class ExtractorTest extends AbstractExtractor<
+  TestTransaction,
+  ObjectLiteral
+> {
   id: string;
   forked: Array<string>;
-  txs: Array<{ txs: Array<TestTransaction>; block: Block }>;
+  txs: Array<{ txs: Array<TestTransaction>; block: BlockInfo }>;
 
   constructor(id: string) {
     super();
@@ -32,7 +40,7 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
 
   processTransactions = (
     txs: Array<TestTransaction>,
-    block: Block,
+    block: BlockInfo,
   ): Promise<boolean> => {
     this.txs.push({ txs, block });
     return Promise.resolve(true);
@@ -45,9 +53,11 @@ export class ExtractorTest extends AbstractExtractor<TestTransaction> {
     this.forked.push(hash);
     return Promise.resolve();
   };
-  initializeBoxes = () => {
+  initializeData = () => {
     return Promise.resolve();
   };
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -132,26 +142,24 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
   }
 
   mockedTryFnCall = (fn: () => Promise<boolean>, msg: string) =>
-    this.tryRunningFunction(fn, msg);
+    this.tryRunningFunction(fn, msg, () => {});
 
   start = async () => Promise.resolve();
 
   stop = async () => Promise.resolve();
 }
 
-export class FailExtractor extends AbstractExtractor<{ id: string }> {
-  forkBlock = async (
-    hash: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => {
-    /* empty */
-  };
+export class FailExtractor extends AbstractExtractor<
+  { id: string },
+  ObjectLiteral
+> {
+  forkBlock = async () => Promise.resolve();
 
   getId = () => 'fail extractor';
 
-  initializeBoxes = () => Promise.resolve();
+  initializeData = () => Promise.resolve();
 
-  processTransactions = async (
-    txs: Array<{ id: string }>, // eslint-disable-line @typescript-eslint/no-unused-vars
-    block: Block, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ) => false;
+  processTransactions = () => Promise.resolve(false);
+
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }

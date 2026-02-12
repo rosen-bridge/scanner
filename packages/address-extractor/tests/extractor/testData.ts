@@ -1,5 +1,6 @@
 export const extractedBox = {
-  boxId: '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542',
+  identifier:
+    '03a6b9d06c50e8895a1e1c02365d1e2e4becd71efe188b341ca84b228ee26542',
   address: '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
   serialized:
     'gJTr3AMACM0DmfVyS7xNCMbhRtYUScBaPgVGhosdT4NBHzJRh9XKT4WSgBACPfc7KSBP+iCFw4qVjTIshr7gRxpaEpawMfE3I24DjG1kummMPJQ+Bq0iTULHNoJvjcOJgfuSgU9XeonArZNhw2dQADuR+9K29PP5cQmGVf+jIIQQAbBxkI3gV834xCXNOz5hAA==',

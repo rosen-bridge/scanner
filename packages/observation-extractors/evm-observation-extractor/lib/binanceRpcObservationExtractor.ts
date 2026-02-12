@@ -13,6 +13,7 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
@@ -22,7 +23,8 @@ export class BinanceRpcObservationExtractor extends EvmRpcObservationExtractor {
         tokens,
         'binance',
         'bnb',
-        logger,
+        logger?.child('EvmEthersRosenExtractor'),
+        storeRawData,
       ),
       logger,
     );

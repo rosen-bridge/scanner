@@ -4,7 +4,7 @@ import { mockedExplorerBoxes, mockedExplorerTxs } from './testData';
 vi.mock('@rosen-clients/ergo-explorer', () => ({
   default: vi.fn(() => ({
     v1: {
-      getApiV1BoxesByaddressP1: vi
+      getApiV1BoxesUnspentByaddressP1: vi
         .fn()
         .mockResolvedValue({ items: mockedExplorerBoxes }),
     },

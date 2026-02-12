@@ -1,5 +1,6 @@
 import {
   AdditionalRegisters,
+  OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
 import ergoNodeClientFactory from '@rosen-clients/ergo-node';
@@ -26,52 +27,90 @@ export class NodeErgoNetwork extends AbstractErgoNetwork {
    * Retrieves all unspent boxes associated with a given Ergo address.
    *
    */
-  protected async getBoxesByAddress(address: string): Promise<ErgoBox[]> {
-    const rawBoxes = (await this.api.getBoxesByAddress(address)).items;
-    if (rawBoxes) {
-      return rawBoxes.map((b) => ({
-        boxId: b.boxId ?? '',
-        value: BigInt(b.value),
-        ergoTree: b.ergoTree,
-        creationHeight: b.creationHeight,
-        assets: (b.assets || []).map((a) => ({
-          tokenId: a.tokenId,
-          amount: BigInt(a.amount),
+  protected getBoxesByAddress = async (address: string): Promise<ErgoBox[]> => {
+    const rawBoxes = await this.api.getBoxesByAddressUnspent(address);
+    if (!rawBoxes) return [];
+
+    return Promise.all(
+      rawBoxes.map(async (box) => ({
+        boxId: box.boxId ?? '',
+        value: BigInt(box.value),
+        ergoTree: box.ergoTree,
+        blockId: await this.getBlockByHeight(box.creationHeight),
+        creationHeight: box.creationHeight,
+        assets: (box.assets || []).map((asset) => ({
+          tokenId: asset.tokenId,
+          amount: BigInt(asset.amount),
         })),
         additionalRegisters: Object.fromEntries(
-          Object.entries(b.additionalRegisters || {}).map(([k, v]) => [k, v]),
+          Object.entries(box.additionalRegisters || {}).map(([k, v]) => [k, v]),
         ) as AdditionalRegisters,
-        transactionId: b.transactionId ?? '',
-        index: b.index ?? 0,
-      }));
-    }
-    return [];
-  }
+        transactionId: box.transactionId ?? '',
+        index: box.index ?? 0,
+      })),
+    );
+  };
+
+  /**
+   * Retrieves blockId of a block by height.
+   *
+   */
+  getBlockByHeight = async (height: number): Promise<string> => {
+    const blocks = await this.api.getFullBlockAt(height);
+    return blocks[0];
+  };
   /**
    * Fetches all unconfirmed transactions currently in the mempool.
    *
    */
-  async getMempoolTxs(): Promise<Transaction[]> {
-    const rawTxs = await this.api.getUnconfirmedTransactions();
-    return rawTxs.map((t) => ({
-      id: t.id,
-      inputs: t.inputs.map((i) => ({ boxId: i.boxId })),
-      dataInputs: t.dataInputs?.map((d) => ({ boxId: d.boxId })) ?? [],
-      outputs: t.outputs.map<ErgoBox>((o) => ({
-        boxId: o.boxId!,
-        value: BigInt(o.value),
-        ergoTree: o.ergoTree,
-        creationHeight: o.creationHeight,
-        assets: (o.assets || []).map((a) => ({
-          tokenId: a.tokenId,
-          amount: BigInt(a.amount),
+  getMempoolTxs = async (): Promise<Transaction[]> => {
+    const allTxs: Transaction[] = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (true) {
+      const rawTxs = await this.api.getUnconfirmedTransactions({
+        limit,
+        offset,
+      });
+
+      if (rawTxs.length === 0) break;
+
+      allTxs.push(
+        ...rawTxs.map((tx) => ({
+          id: tx.id,
+          inputs: tx.inputs.map((inputBox) => ({
+            boxId: inputBox.boxId,
+            spendingProof: inputBox.spendingProof.proofBytes,
+          })),
+          dataInputs:
+            tx.dataInputs?.map((dataInputBox) => ({
+              boxId: dataInputBox.boxId,
+            })) ?? [],
+          outputs: tx.outputs.map<OutputBox>((outputBox) => ({
+            boxId: outputBox.boxId!,
+            value: BigInt(outputBox.value),
+            ergoTree: outputBox.ergoTree,
+            creationHeight: outputBox.creationHeight,
+            assets: (outputBox.assets || []).map((asset) => ({
+              tokenId: asset.tokenId,
+              amount: BigInt(asset.amount),
+            })),
+            additionalRegisters: Object.fromEntries(
+              Object.entries(outputBox.additionalRegisters || {}).map(
+                ([k, v]) => [k, v],
+              ),
+            ) as AdditionalRegisters,
+            transactionId: outputBox.transactionId ?? tx.id,
+            index: outputBox.index!,
+          })),
         })),
-        additionalRegisters: Object.fromEntries(
-          Object.entries(o.additionalRegisters || {}).map(([k, v]) => [k, v]),
-        ) as AdditionalRegisters,
-        transactionId: o.transactionId ?? t.id,
-        index: o.index!,
-      })),
-    }));
-  }
+      );
+
+      offset += rawTxs.length;
+      if (rawTxs.length < limit) break;
+    }
+
+    return allTxs;
+  };
 }

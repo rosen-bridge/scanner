@@ -1,5 +1,60 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 7.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.1
+  - @rosen-bridge/bitcoin-scanner@1.0.1
+  - @rosen-bridge/rosen-extractor@11.2.1
+  - @rosen-bridge/tokens@5.0.1
+
+## 7.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-observation-extractor@1.0.0
+  - @rosen-bridge/bitcoin-scanner@1.0.0
+  - @rosen-bridge/rosen-extractor@11.2.0
+  - @rosen-bridge/tokens@5.0.0
+
+## 6.4.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.3
+  - @rosen-bridge/bitcoin-scanner@0.2.3
+  - @rosen-bridge/rosen-extractor@11.1.1
+
+## 6.4.0
+
+### Minor Changes
+
+- Add `storeRawData` option to store observations raw-data into the database
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.2
+  - @rosen-bridge/rosen-extractor@11.1.0
+
+## 6.3.1
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/abstract-observation-extractor@0.2.1
+  - @rosen-bridge/bitcoin-scanner@0.2.2
+  - @rosen-bridge/rosen-extractor@11.0.0
+
 ## 6.3.0
 
 ### Minor Changes

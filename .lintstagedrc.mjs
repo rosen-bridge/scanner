@@ -20,18 +20,30 @@ const perPackage = (resolver) => (files) => {
   );
 };
 
-let tasks = {
-  '**/{*.ts,*.js,package.json}': perPackage((directory) => {
-    return `npx depcheck ${path.relative(process.cwd(), directory)}`;
-  }),
+const getKnipCommand = (dir) => {
+  const posixRelative = path.posix.relative(process.cwd(), dir);
+  return `knip --dependencies --workspace ${posixRelative}`;
 };
+
+const runKnipConditional = (files) => {
+  const rootChanged = files.some((f) => {
+    const relative = path.relative(process.cwd(), path.resolve(f));
+    return !relative.includes(path.sep);
+  });
+  if (rootChanged) {
+    return ['knip --dependencies'];
+  } else {
+    return perPackage(getKnipCommand)(files);
+  }
+};
+
+let tasks = {};
 
 if (!process.env.CI) {
   tasks = {
     '*.ts': () => 'npm run type-check',
-    '*.{js,ts}': ['eslint --fix', 'npm run test -- related --run'],
-    '*': 'prettier --ignore-unknown --write',
-    ...tasks,
+    '*.{js,ts}': ['eslint --fix'],
+    '*': ['prettier --ignore-unknown --write', runKnipConditional],
   };
 }
 

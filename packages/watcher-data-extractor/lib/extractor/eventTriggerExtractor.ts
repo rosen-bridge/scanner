@@ -2,7 +2,7 @@ import { blake2b } from 'blakejs';
 import * as wasm from 'ergo-lib-wasm-nodejs';
 
 import {
-  AbstractInitializableErgoExtractor,
+  AbstractErgoBoxExtractor,
   CallbackType,
   SpendInfo,
 } from '@rosen-bridge/abstract-extractor';
@@ -21,7 +21,7 @@ import { ExtractedEventTrigger } from '../interfaces/extractedEventTrigger';
 import { EventResult } from '../types';
 import { JsonBI } from '../utils';
 
-class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
+class EventTriggerExtractor extends AbstractErgoBoxExtractor<
   ExtractedEventTrigger,
   EventTriggerEntity
 > {
@@ -44,7 +44,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
     logger?: AbstractLogger,
     initialize = true,
   ) {
-    super(type, url, address, logger, initialize);
+    super({ type, url, address, active: initialize }, logger);
     this.id = id;
     this.eventTriggerErgoTree = wasm.Address.from_base58(address)
       .to_ergo_tree()
@@ -56,7 +56,10 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       .to_ergo_tree()
       .to_base16_bytes();
     this.RWT = RWT;
-    this.actions = new EventTriggerAction(dataSource, this.logger);
+    this.actions = new EventTriggerAction(
+      dataSource,
+      this.logger.child('EventTriggerAction'),
+    );
   }
 
   /**
@@ -74,7 +77,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
    * @param box
    * @return true if the box has the required data and false otherwise
    */
-  hasData = (box: OutputBox): boolean => {
+  hasBoxData = (box: OutputBox): boolean => {
     try {
       if (
         box.additionalRegisters &&
@@ -131,7 +134,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
       return {
         eventId: eventId,
         txId: box.transactionId,
-        boxId: box.boxId,
+        identifier: box.boxId,
         serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString(
           'base64',
         ),
@@ -186,7 +189,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
         const { result, paymentTxId } = this.extractEventResult(transaction);
         for (const output of transaction.outputs) {
           // extract output box data
-          if (this.hasData(output)) {
+          if (this.hasBoxData(output)) {
             this.logger.debug(
               `Trying to extract data from box ${output.boxId} at height ${block.height}`,
             );
@@ -211,7 +214,7 @@ class EventTriggerExtractor extends AbstractInitializableErgoExtractor<
           });
       });
       if (boxes.length > 0) {
-        if (!(await this.actions.storeBoxes(boxes, block, this.getId()))) {
+        if (!(await this.actions.storeEntities(boxes, block, this.getId()))) {
           this.logger.warn(
             `Data insertion failed at height ${block.height} for extractor ${this.id}`,
           );

@@ -6,14 +6,14 @@ import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 import EventTriggerEntity from '../../lib/entities/eventTriggerEntity';
 import EventTriggerExtractor from '../../lib/extractor/eventTriggerExtractor';
 import { JsonBI } from '../../lib/utils';
-import { eventTriggerTxGenerator, createDatabase } from './utilsFunctions.mock';
 import {
   block,
   eventTriggerAddress,
   RWTId,
   spendTriggerTx,
   spendTriggerTxOldFormat,
-} from './utilsVariable.mock';
+} from './testData';
+import { eventTriggerTxGenerator, createDatabase } from './testUtils';
 
 let dataSource: DataSource;
 const sampleEventData = [
@@ -93,7 +93,7 @@ describe('EventTriggerExtractor', () => {
         eventId:
           '1e379d551cf0aed106c21a9f4b42ddd3b36349a93de799ed54d600acbe05d313',
         extractor: 'extractorId',
-        boxId: box.box_id().to_str(),
+        identifier: box.box_id().to_str(),
         serialized: Buffer.from(box.sigma_serialize_bytes()).toString('base64'),
         block: 'hash',
         height: 10,

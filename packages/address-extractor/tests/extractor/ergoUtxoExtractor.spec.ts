@@ -38,41 +38,41 @@ describe('AddressExtractor', () => {
     });
   });
 
-  describe('hasData', () => {
+  describe('hasBoxData', () => {
     /**
-     * @target hasData should return true when the box address is the same
+     * @target hasBoxData should return true when the box address is the same
      * @dependencies
      * @scenario
      * - mock extractor with required address
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return true
      */
     it('should return true when the box address is the same', () => {
-      const data = extractor.hasData(tx1.outputs[0]);
+      const data = extractor.hasBoxData(tx1.outputs[0]);
       expect(data).toEqual(true);
     });
 
     /**
-     * @target hasData should return false when the box address is different
+     * @target hasBoxData should return false when the box address is different
      * @dependencies
      * @scenario
      * - mock extractor with required address
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return false
      */
     it('should return false when box address is different', () => {
-      const data = extractor.hasData(tx1.outputs[1]);
+      const data = extractor.hasBoxData(tx1.outputs[1]);
       expect(data).toEqual(false);
     });
 
     /**
-     * @target hasData should return true when the box has required token and address
+     * @target hasBoxData should return true when the box has required token and address
      * @dependencies
      * @scenario
      * - mock extractor with required address and token
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return true
      */
@@ -86,16 +86,16 @@ describe('AddressExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
-      const data = extractor.hasData(tx1.outputs[0]);
+      const data = extractor.hasBoxData(tx1.outputs[0]);
       expect(data).toEqual(true);
     });
 
     /**
-     * @target hasData should return true when the box has required token
+     * @target hasBoxData should return true when the box has required token
      * @dependencies
      * @scenario
      * - mock extractor with required token
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return true
      */
@@ -109,16 +109,16 @@ describe('AddressExtractor', () => {
         '',
         ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
-      const data = extractor.hasData(tx1.outputs[3]);
+      const data = extractor.hasBoxData(tx1.outputs[3]);
       expect(data).toEqual(true);
     });
 
     /**
-     * @target hasData should return false when box doesn't have required token
+     * @target hasBoxData should return false when box doesn't have required token
      * @dependencies
      * @scenario
      * - mock extractor with required token
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return false
      */
@@ -132,16 +132,16 @@ describe('AddressExtractor', () => {
         '',
         ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
-      const data = extractor.hasData(tx1.outputs[1]);
+      const data = extractor.hasBoxData(tx1.outputs[1]);
       expect(data).toEqual(false);
     });
 
     /**
-     * @target hasData should return true when the box has required token but the address is different
+     * @target hasBoxData should return true when the box has required token but the address is different
      * @dependencies
      * @scenario
      * - mock extractor with required address and token
-     * - run test (call `hasData`)
+     * - run test (call `hasBoxData`)
      * @expected
      * - to return false
      */
@@ -155,7 +155,7 @@ describe('AddressExtractor', () => {
         '9hdcMw4sc8a8kUv7RLKomSsBCP5xc6fJ9HwR8tJf8kJLaJh4fY2',
         ['ba698c3c943e06ad224d42c736826f8dc38981fb92814f577a89c0ad9361c367'],
       );
-      const data = extractor.hasData(tx1.outputs[3]);
+      const data = extractor.hasBoxData(tx1.outputs[3]);
       expect(data).toEqual(false);
     });
   });

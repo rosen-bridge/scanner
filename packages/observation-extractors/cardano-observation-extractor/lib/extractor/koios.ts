@@ -14,11 +14,17 @@ export class CardanoKoiosObservationExtractor extends AbstractObservationExtract
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new CardanoKoiosRosenExtractor(lockAddress, tokens, logger),
+      new CardanoKoiosRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('CardanoKoiosRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

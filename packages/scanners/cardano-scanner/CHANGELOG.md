@@ -1,5 +1,43 @@
 # @rosen-bridge/cardano-scanner
 
+## 2.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - @rosen-bridge/abstract-scanner@1.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-scanner@1.0.0
+
+## 1.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.3
+
+## 1.0.0
+
+### Major Changes
+
+- Change type of metadata for Blockfrost
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes

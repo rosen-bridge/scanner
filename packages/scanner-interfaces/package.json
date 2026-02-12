@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Defines all scanner interfaces",
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "type-check": "tsc --noEmit"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.18.0",
+    "npm": "11.6.2"
   }
 }

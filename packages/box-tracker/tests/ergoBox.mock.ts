@@ -1,10 +1,11 @@
-import { ErgoBox } from '../lib/interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 
-export const mockBoxes: ErgoBox[] = [
+export const mockBoxes: OutputBox[] = [
   {
     boxId: 'box1',
     value: 1000n,
-    ergoTree: 'address1',
+    ergoTree:
+      '0008cd03c3e3af7c79f6d09c6ecdfe35be9575d8407c9576e31348ad1805f44693276399',
     creationHeight: 100,
     assets: [
       { tokenId: 'tokenA', amount: 50n },
@@ -17,7 +18,8 @@ export const mockBoxes: ErgoBox[] = [
   {
     boxId: 'box2',
     value: 2000n,
-    ergoTree: 'address2',
+    ergoTree:
+      '0008cd03c3e3af7c79f6d09c6ecdfe35be9575d8407c9576e31348ad1805f44693276399',
     creationHeight: 200,
     assets: [{ tokenId: 'tokenA', amount: 10n }],
     additionalRegisters: {},

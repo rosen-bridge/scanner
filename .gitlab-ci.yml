@@ -1,101 +1,17 @@
-image: node:22.18
+image: $GITLAB_CI_IMAGE
 
-stages:
-  - installation
-  - depcheck
-  - build
-  - type_check
-  - lint
-  - test
-  - changeset
+default:
+  interruptible: true
 
-installation:
-  stage: installation
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: push
-    paths:
-      - node_modules
-      - '**/node_modules'
-  script:
-    - npm ci
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE =~ /push|web/'
+      when: always
+    - when: never
 
-depcheck:
-  stage: depcheck
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-  script:
-    - git fetch origin $CI_DEFAULT_BRANCH
-    - npx lint-staged --diff origin/$CI_DEFAULT_BRANCH...HEAD
+include:
+  - component: $CI_SERVER_FQDN/${ROOT_COMPONENT}
 
-build:
-  stage: build
-  cache:
-    - key: $CI_COMMIT_REF_NAME
-      policy: pull-push
-      paths:
-        - node_modules
-        - '**/node_modules'
-        - '**/dist'
-  script:
-    - npm run build
-
-type_check:
-  stage: type_check
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run type-check
-
-lint:
-  stage: lint
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run lint:check
-
-test:
-  stage: test
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  script:
-    - npm run coverage
-  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: '**/coverage/cobertura-coverage.xml'
-
-changeset:
-  stage: changeset
-  cache:
-    key: $CI_COMMIT_REF_NAME
-    policy: pull
-    paths:
-      - node_modules
-      - '**/node_modules'
-      - '**/dist'
-  before_script:
-    - git fetch origin dev
-  script:
-    - npx changeset status --since=origin/dev
+    inputs:
+      enable_ci_child: true
+      enable_snapshot_publish_child: true

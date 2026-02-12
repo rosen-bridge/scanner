@@ -13,11 +13,17 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
       tokens,
-      new DogeRpcRosenExtractor(lockAddress, tokens, logger),
+      new DogeRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('DogeRpcRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

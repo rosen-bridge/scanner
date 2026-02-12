@@ -1,5 +1,40 @@
 # @rosen-bridge/ergo-scanner
 
+## 1.0.1
+
+### Patch Changes
+
+- Add `spendingProof` to input box interface
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - @rosen-bridge/abstract-scanner@1.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-scanner@1.0.0
+
+## 0.1.4
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.3
+
+## 0.1.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@0.2.2
+
 ## 0.1.2
 
 ### Patch Changes

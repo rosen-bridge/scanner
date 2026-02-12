@@ -4,24 +4,29 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BitcoinRunesRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 
+import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
 import { BitcoinRunesAbstractObservationExtractor } from './bitcoinRunesAbstractObservationExtractor';
 
 export class BitcoinRunesRpcObservationExtractor extends BitcoinRunesAbstractObservationExtractor<BitcoinRpcTransaction> {
   constructor(
     lockAddress: string,
-    unisatUrl: string,
-    unisatApiKey: string,
+    runesProtocolNetwork: AbstractRunesProtocolNetwork,
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       lockAddress,
-      unisatUrl,
-      unisatApiKey,
+      runesProtocolNetwork,
       dataSource,
       tokens,
-      new BitcoinRunesRpcRosenExtractor(lockAddress, tokens, logger),
+      new BitcoinRunesRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('BitcoinRunesRpcRosenExtractor'),
+        storeRawData,
+      ),
       logger,
     );
   }

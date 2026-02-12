@@ -3,6 +3,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { ObservationEntity } from '../../lib';
 import { ObservationEntityAction } from '../../lib/actions/db';
+import { observationEntity1, observationEntity2 } from '../extractor/testData';
 import { firstObservations, secondObservations } from '../observations.mock';
 import { createDatabase, generateBlockEntity } from '../utils.mock';
 
@@ -229,6 +230,54 @@ describe('ObservationEntityAction', () => {
         }),
       );
     });
+
+    /**
+     * @target should not raise duplicate data error when storing an observation that already exists with a different extractor value
+     * @dependencies
+     * - dataSource
+     * @scenario
+     * - insert two observations with identical fields except extractor
+     * - call storeObservations with an observation matching the existing one for 'first-extractor' but with new rawData
+     * @expected
+     * - storeObservations should return true
+     * - repository should still contain exactly two records
+     * - the record with extractor 'first-extractor' should be updated with the new rawData
+     */
+    it('should not raise duplicate data error when storing an observation that already exists with a different extractor value', async () => {
+      const repository = dataSource.getRepository(ObservationEntity);
+      await repository.insert([
+        {
+          ...firstObservations[0],
+          extractor: 'first-extractor',
+          block: '1',
+          height: 1,
+        },
+        {
+          ...firstObservations[0],
+          extractor: 'second-extractor',
+          block: '1',
+          height: 1,
+        },
+      ]);
+      const res = await action.storeObservations(
+        [{ ...firstObservations[0], rawData: 'override-mocked-raw-data' }],
+        generateBlockEntity(dataSource, '1'),
+        'first-extractor',
+      );
+      expect(res).toEqual(true);
+      const [newRows, count] = await repository.findAndCount();
+      expect(count).toEqual(2);
+      expect(newRows[0]).toEqual(
+        expect.objectContaining({
+          ...firstObservations[0],
+          block: '1',
+          extractor: 'first-extractor',
+          height: 1,
+          rawData: 'override-mocked-raw-data',
+        }),
+      );
+      expect(newRows[1]).toEqual(expect.objectContaining(firstObservations[0]));
+    });
   });
 
   /**
@@ -283,6 +332,39 @@ describe('ObservationEntityAction', () => {
       expect(
         (await dataSource.getRepository(ObservationEntity).find()).length,
       ).toEqual(3);
+    });
+  });
+
+  describe('createUsedBlocksQuery', () => {
+    /**
+     * @target createUsedBlocksQuery should return only the used blocks associated with the input `extractorId`
+     * @dependencies
+     * - Database
+     * @scenario
+     * - Insert 2 observationEntities with two different `extractorId‍‍` into the table
+     * - call `createUsedBlocksQuery` with the specific extractorId
+     * @expected
+     * - the returned blocks match those associated with the input `extractorId`
+     */
+    it('should return only the used blocks associated with the input `extractorId`', async () => {
+      const sampleObservationEntities = [
+        observationEntity1,
+        observationEntity2,
+      ];
+      const repository = dataSource.getRepository(ObservationEntity);
+      await repository.insert(sampleObservationEntities);
+
+      const extractorId = observationEntity1.extractor;
+
+      const executeUsedBlocksQuery = await action
+        .createUsedBlocksQuery(extractorId)
+        .getRawMany();
+
+      const usedBlocks = executeUsedBlocksQuery.map((row) => row.block);
+
+      const sampleBlocks = [observationEntity1.block];
+
+      expect(sampleBlocks).toEqual(usedBlocks);
     });
   });
 });

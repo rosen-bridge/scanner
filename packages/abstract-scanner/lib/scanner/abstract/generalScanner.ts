@@ -34,7 +34,11 @@ abstract class GeneralScanner<
      */
     this.initialHeight = initialHeight + 1;
     this.suffix = suffix;
-    this.action = new BlockDbAction(this.dataSource, this.name(), this.logger);
+    this.action = new BlockDbAction(
+      this.dataSource,
+      this.name(),
+      this.logger.child('BlockDbAction'),
+    );
   }
 
   /**
@@ -209,6 +213,9 @@ abstract class GeneralScanner<
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
+      if (e instanceof Error && e.stack) {
+        this.logger.error(`error stack: ${e.stack}`);
+      }
     }
   };
 }

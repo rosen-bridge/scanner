@@ -1,6 +1,10 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import {
+  DataSource,
+  Repository,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { AddressTxsEntity } from '../entities/addressTxsEntity';
 import { ExtractedTx } from '../interfaces/types';
@@ -42,7 +46,7 @@ export class TxAction {
    */
   storeTxs = async (
     txs: Array<ExtractedTx>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ) => {
     await this.deleteBlockTxs(block.hash, extractor);
@@ -66,5 +70,21 @@ export class TxAction {
         })),
       )
       .execute();
+  };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<AddressTxsEntity> => {
+    return this.repository
+      .createQueryBuilder('evmAddressTxEntity')
+      .select('evmAddressTxEntity.blockId', 'block')
+      .where('evmAddressTxEntity.extractor = :extractorId', { extractorId });
   };
 }

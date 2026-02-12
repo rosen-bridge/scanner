@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib",
+    "types": ["node"]
+  },
+  "exclude": ["tests", "vitest.config.ts"],
+  "references": [
+    {
+      "path": "../abstract-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../scanner-interfaces/tsconfig.build.json"
+    },
+    {
+      "path": "../observation-extractors/ergo-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../observation-extractors/cardano-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../observation-extractors/bitcoin-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../observation-extractors/bitcoin-runes-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../observation-extractors/evm-observation-extractor/tsconfig.build.json"
+    },
+    {
+      "path": "../abstract-scanner/tsconfig.build.json"
+    }
+  ]
+}

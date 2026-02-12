@@ -1,4 +1,5 @@
-import { ErgoBox } from '../lib';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+
 import * as boxHandler from '../lib/boxHandler';
 import { MempoolTracker } from '../lib/mempoolTracker';
 import { AbstractErgoNetwork } from '../lib/network/abstract/abstractErgoNetwork';
@@ -67,7 +68,7 @@ describe('MempoolTracker', () => {
         ]);
 
       vi.spyOn(boxHandler, 'generateTracker').mockReturnValue(
-        (box: ErgoBox) => box.boxId === 'b1',
+        (box: OutputBox) => box.boxId === 'b1',
       );
 
       const result = await mempoolTracker.track('testAddr', []);

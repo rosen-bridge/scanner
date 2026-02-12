@@ -1,0 +1,34 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["tests", "lib"],
+  "references": [
+    {
+      "path": "../abstract-observation-extractor"
+    },
+    {
+      "path": "../scanner-interfaces"
+    },
+    {
+      "path": "../observation-extractors/ergo-observation-extractor"
+    },
+    {
+      "path": "../observation-extractors/cardano-observation-extractor"
+    },
+    {
+      "path": "../observation-extractors/bitcoin-observation-extractor"
+    },
+    {
+      "path": "../observation-extractors/bitcoin-runes-observation-extractor"
+    },
+    {
+      "path": "../observation-extractors/evm-observation-extractor"
+    },
+    {
+      "path": "../abstract-scanner"
+    }
+  ]
+}

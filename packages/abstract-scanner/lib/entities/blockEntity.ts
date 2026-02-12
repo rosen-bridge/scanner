@@ -34,7 +34,7 @@ export class BlockEntity {
   @Column({ type: 'varchar' })
   scanner: string;
 
-  @Column({ type: 'bigint' })
+  @Column({ type: 'int' })
   timestamp: number;
 
   @Column({ type: 'int', nullable: true })

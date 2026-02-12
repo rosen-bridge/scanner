@@ -1,4 +1,4 @@
-import { Block, InputExtension } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, InputExtension } from '@rosen-bridge/scanner-interfaces';
 
 import { TestEntity } from './testUtils';
 
@@ -96,45 +96,60 @@ export const extractedData = {
   serialized: 'serialized1',
 };
 
-export const block: Block = {
+export const block: BlockInfo = {
   hash: 'hash',
   height: 100,
-  parentHash: 'parentHash',
-} as Block;
+};
 
-export const block2: Block = {
+export const block2: BlockInfo = {
   hash: 'hash2',
   height: 101,
-  parentHash: 'parentHash2',
-} as Block;
+};
 
 export const sampleEntities: Omit<TestEntity, 'id'>[] = [
   {
     extractor: 'extractor',
-    boxId: '1',
+    identifier: 'id1',
     serialized: 'serialized1',
     block: 'blockId1',
     height: 100,
   },
   {
     extractor: 'extractor',
-    boxId: '2',
+    identifier: 'id2',
     serialized: 'serialized2',
     block: 'blockId2',
     height: 200,
   },
   {
     extractor: 'extractor',
-    boxId: '3',
+    identifier: 'id3',
     serialized: 'serialized3',
     block: 'blockId3',
     height: 300,
   },
   {
     extractor: 'extractor',
-    boxId: '4',
+    identifier: '4',
     serialized: 'serialized4',
     block: 'blockId4',
     height: 400,
+  },
+];
+
+export const sampleEntities2: Omit<TestEntity, 'id'>[] = [
+  {
+    extractor: 'extractor2',
+    identifier: '5',
+    serialized: 'serialized5',
+    block: 'blockId5',
+    height: 500,
+  },
+  {
+    extractor: 'extractor2',
+    identifier: '6',
+    serialized: 'serialized6',
+    block: 'blockId6',
+    height: 600,
   },
 ];

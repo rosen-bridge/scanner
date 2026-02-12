@@ -1,6 +1,11 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, In, Repository } from '@rosen-bridge/extended-typeorm';
-import { Block } from '@rosen-bridge/scanner-interfaces';
+import {
+  DataSource,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { ObservationEntity } from '../entities/observationEntity';
 import { ExtractedObservation } from '../interfaces/extractedObservation';
@@ -24,7 +29,7 @@ export class ObservationEntityAction {
    */
   storeObservations = async (
     observations: Array<ExtractedObservation>,
-    block: Block,
+    block: BlockInfo,
     extractor: string,
   ) => {
     if (observations.length === 0) return true;
@@ -74,6 +79,7 @@ export class ObservationEntityAction {
           await repository.update(
             {
               requestId: observation.requestId,
+              extractor: extractor,
             },
             entity,
           );
@@ -101,5 +107,21 @@ export class ObservationEntityAction {
       block: block,
       extractor: extractor,
     });
+  };
+
+  /**
+   * Builds a query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A query builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<ObservationEntity> => {
+    return this.observationRepository
+      .createQueryBuilder('observationEntity')
+      .select('observationEntity.block', 'block')
+      .where('observationEntity.extractor = :extractorId', { extractorId });
   };
 }

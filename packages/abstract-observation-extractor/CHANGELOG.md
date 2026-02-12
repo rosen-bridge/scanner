@@ -1,5 +1,56 @@
 # @rosen-bridge/abstract-observation-extractor
 
+## 1.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.0.1
+  - @rosen-bridge/rosen-extractor@11.2.1
+  - @rosen-bridge/scanner-interfaces@0.2.2
+  - @rosen-bridge/tokens@5.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Minor Changes
+
+- Update AbstractExtractor interface; add `createUsedBlocksQuery` method that returns the query for used blocks
+
+### Patch Changes
+
+- Update ObservationEntityAction to considering extractor in storeObservations method
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.0.0
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/rosen-extractor@11.2.0
+  - @rosen-bridge/tokens@5.0.0
+
+## 0.2.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@11.1.1
+
+## 0.2.2
+
+### Patch Changes
+
+- Update Dependencies
+  - @rosen-bridge/rosen-extractor@11.1.0
+
+## 0.2.1
+
+### Patch Changes
+
+- Fixed type definitions in entities based migrations
+- Update Dependencies
+  - @rosen-bridge/rosen-extractor@11.0.0
+
 ## 0.2.0
 
 ### Minor Changes

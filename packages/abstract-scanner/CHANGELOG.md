@@ -1,5 +1,39 @@
 # @rosen-bridge/abstract-scanner
 
+## 1.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.0.1
+  - @rosen-bridge/scanner-interfaces@0.2.2
+
+## 1.0.0
+
+### Major Changes
+
+- Update AbstractExtractor interface; use `BlockInfo` in `processTransactions` and rename `initializeBoxes` to `initializeData`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-logger@4.0.0
+  - @rosen-bridge/abstract-extractor@3.0.0
+
+## 0.2.3
+
+### Patch Changes
+
+- Fix Web-socket scanner mutex release after max retrials
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@11.1.1
+
+## 0.2.2
+
+### Patch Changes
+
+- Fixed type definitions in entities based migrations
+
 ## 0.2.1
 
 ### Patch Changes

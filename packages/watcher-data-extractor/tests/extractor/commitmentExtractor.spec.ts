@@ -6,8 +6,8 @@ import { TokenMap } from '@rosen-bridge/tokens';
 import CommitmentEntity from '../../lib/entities/commitmentEntity';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import { JsonBI } from '../../lib/utils';
-import { commitmentTxGenerator, createDatabase } from './utilsFunctions.mock';
-import { block, commitmentAddress, RWTId } from './utilsVariable.mock';
+import { block, commitmentAddress, RWTId } from './testData';
+import { commitmentTxGenerator, createDatabase } from './testUtils';
 
 let dataSource: DataSource;
 

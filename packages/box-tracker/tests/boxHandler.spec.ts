@@ -18,7 +18,10 @@ describe('generateTracker', () => {
       { tokenId: 'tokenB', amount: 10n },
     ];
 
-    const tracker = generateTracker('address1', tokens);
+    const tracker = generateTracker(
+      '9hx5RVkqwazdGr2YPimSqzxnUPQZsqnJQ4PDEUV5W2S7rNkgash',
+      tokens,
+    );
     expect(tracker(mockBoxes[0])).toBe(true);
   });
 
@@ -32,7 +35,10 @@ describe('generateTracker', () => {
    */
   it('should return false when the address does not match', () => {
     const tokens: Token[] = [{ tokenId: 'tokenA', amount: 10n }];
-    const tracker = generateTracker('wrongAddress', tokens);
+    const tracker = generateTracker(
+      '2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe',
+      tokens,
+    );
 
     expect(tracker(mockBoxes[0])).toBe(false);
   });
@@ -51,7 +57,10 @@ describe('generateTracker', () => {
       { tokenId: 'tokenC', amount: 5n },
     ];
 
-    const tracker = generateTracker('address1', tokens);
+    const tracker = generateTracker(
+      '9hx5RVkqwazdGr2YPimSqzxnUPQZsqnJQ4PDEUV5W2S7rNkgash',
+      tokens,
+    );
     expect(tracker(mockBoxes[0])).toBe(false);
   });
 
@@ -65,7 +74,10 @@ describe('generateTracker', () => {
    */
   it('should return false when token amount is insufficient', () => {
     const tokens: Token[] = [{ tokenId: 'tokenA', amount: 100n }];
-    const tracker = generateTracker('address1', tokens);
+    const tracker = generateTracker(
+      '9hx5RVkqwazdGr2YPimSqzxnUPQZsqnJQ4PDEUV5W2S7rNkgash',
+      tokens,
+    );
 
     expect(tracker(mockBoxes[0])).toBe(false);
   });
