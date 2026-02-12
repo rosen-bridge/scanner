@@ -135,14 +135,13 @@ describe('HandshakeRpcNetwork', () => {
 
       const result = await network.getBlockTxs(testData.blockHash);
 
-      // Verify no transaction has any vout with covenant type !== 0 and !== undefined
-      result.forEach((tx) => {
-        tx.vout.forEach((vout) => {
-          if (vout.covenant !== undefined) {
-            expect(vout.covenant.type).toBe(0);
-          }
-        });
-      });
+      // Verify no transaction has any vout with covenant type !== 0
+      const invalidVouts = result.flatMap((tx) =>
+        tx.vout.filter(
+          (vout) => vout.covenant !== undefined && vout.covenant.type !== 0,
+        ),
+      );
+      expect(invalidVouts).toHaveLength(0);
 
       // Verify the filtered transactions
       expect(result).toContainEqual(testData.txWithCovenantType0);

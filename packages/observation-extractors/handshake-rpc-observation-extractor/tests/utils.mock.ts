@@ -33,7 +33,9 @@ export const generateBlockEntity = (
   const repository = dataSource.getRepository(BlockEntity);
   return repository.create({
     height: height ? height : 100000,
-    parentHash: parent ? parent : '0000000000000000000000000000000000000000000000000000000000000000',
+    parentHash: parent
+      ? parent
+      : '0000000000000000000000000000000000000000000000000000000000000000',
     hash: hash,
   });
 };

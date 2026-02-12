@@ -185,7 +185,6 @@ export const txWithoutCovenant = {
     {
       value: 2.0,
       n: 0,
-      script: '76c014af92ad98c7f77559f96430dfef2a6805b87b24f888ac',
     },
   ],
   hex: '01000000...',
@@ -210,7 +209,6 @@ export const txWithCovenantType1 = {
     {
       value: 0.5,
       n: 0,
-      script: '76c014af92ad98c7f77559f96430dfef2a6805b87b24f888ac',
       covenant: {
         type: 1, // Name auction covenant - should be filtered
         items: ['name', 'hash', 'value'],
@@ -239,7 +237,6 @@ export const txWithMixedCovenants = {
     {
       value: 1.0,
       n: 0,
-      script: '76c014af92ad98c7f77559f96430dfef2a6805b87b24f888ac',
       covenant: {
         type: 0,
         items: [],
@@ -248,7 +245,6 @@ export const txWithMixedCovenants = {
     {
       value: 0.5,
       n: 1,
-      script: '76c014af92ad98c7f77559f96430dfef2a6805b87b24f888ac',
       covenant: {
         type: 2, // Non-zero covenant type - should filter entire tx
         items: ['data'],

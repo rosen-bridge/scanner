@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
@@ -46,7 +45,7 @@ describe('HandshakeRpcObservationExtractor', () => {
      * should return true and insert observation into database on valid lock tx
      * @dependencies
      * @scenario
-     * - mock a valid Handshake lock transaction with OP_RETURN data
+     * - mock a valid Handshake lock transaction with chunked Rosen data outputs
      * - run test
      * - check returned value
      * - check database
@@ -103,10 +102,10 @@ describe('HandshakeRpcObservationExtractor', () => {
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
-     * should return true with no observation on invalid lock tx (missing OP_RETURN)
+     * should return true with no observation on invalid lock tx (missing lock output)
      * @dependencies
      * @scenario
-     * - mock a transaction without valid OP_RETURN data
+     * - mock a transaction without lock output to the lock address
      * - run test
      * - check returned value
      * - check database
@@ -114,7 +113,7 @@ describe('HandshakeRpcObservationExtractor', () => {
      * - it should return true
      * - no observation should be inserted into database
      */
-    it('should return true with no observation on invalid lock tx (missing OP_RETURN)', async () => {
+    it('should return true with no observation on invalid lock tx (missing lock output)', async () => {
       // run test
       const result = await extractor.processTransactions(
         [mockInvalidTx],
