@@ -17,7 +17,11 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
     super(
       dataSource,
       tokens,
-      new HandshakeRpcRosenExtractor(lockAddress, tokens, logger),
+      new HandshakeRpcRosenExtractor(
+        lockAddress,
+        tokens,
+        logger?.child('HandshakeRpcRosenExtractor')
+      ),
       logger,
     );
   }

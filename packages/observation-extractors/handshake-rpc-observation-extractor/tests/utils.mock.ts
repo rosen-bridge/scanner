@@ -10,7 +10,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 export const createDatabase = async (): Promise<DataSource> => {
   return new DataSource({
-    type: 'better-sqlite3',
+    type: 'sqlite',
     database: `:memory:`,
     entities: [BlockEntity, ObservationEntity],
     migrations: [...migrations.sqlite, ...scannerMigrations.sqlite],

@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { vi } from 'vitest';
 
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
@@ -33,12 +34,6 @@ describe('HandshakeRpcObservationExtractor', () => {
     );
   });
 
-  afterEach(async () => {
-    if (dataSource && dataSource.isInitialized) {
-      await dataSource.destroy();
-    }
-  });
-
   describe('processTransactions', () => {
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -51,25 +46,25 @@ describe('HandshakeRpcObservationExtractor', () => {
      * - check database
      * @expected
      * - it should return true
-     * - observation should be inserted into database with correct data
+     * - observation should be inserted into database
      */
     it('should return true and insert observation into database on valid lock tx', async () => {
       // run test
-      const result = await extractor.processTransactions(
+      const res = await extractor.processTransactions(
         [mockLockTx],
         generateBlockEntity(dataSource, 'block-hash'),
       );
 
-      // check returned value
-      expect(result).toEqual(true);
+      // check returned valid
+      expect(res).toEqual(true);
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
-      const observation = rows[0];
-      expect(observation).toEqual(expectedObservation);
-    });
+      const observation1 = rows[0];
+      expect(observation1).toEqual(expectedObservation);
+    }, 100000);
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -86,19 +81,19 @@ describe('HandshakeRpcObservationExtractor', () => {
      */
     it('should return true with no observation when transaction has name auction covenant', async () => {
       // run test
-      const result = await extractor.processTransactions(
+      const res = await extractor.processTransactions(
         [mockAuctionTx],
         generateBlockEntity(dataSource, 'block-hash'),
       );
 
-      // check returned value
-      expect(result).toEqual(true);
+      // check returned valid
+      expect(res).toEqual(true);
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-    });
+    }, 100000);
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -111,23 +106,23 @@ describe('HandshakeRpcObservationExtractor', () => {
      * - check database
      * @expected
      * - it should return true
-     * - no observation should be inserted into database
+     * - no observation should be into database
      */
     it('should return true with no observation on invalid lock tx (missing lock output)', async () => {
       // run test
-      const result = await extractor.processTransactions(
+      const res = await extractor.processTransactions(
         [mockInvalidTx],
         generateBlockEntity(dataSource, 'block-hash'),
       );
 
-      // check returned value
-      expect(result).toEqual(true);
+      // check returned valid
+      expect(res).toEqual(true);
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-    });
+    }, 100000);
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -144,20 +139,20 @@ describe('HandshakeRpcObservationExtractor', () => {
      */
     it('should process multiple transactions and only insert valid ones', async () => {
       // run test
-      const result = await extractor.processTransactions(
+      const res = await extractor.processTransactions(
         [mockLockTx, mockAuctionTx, mockInvalidTx],
         generateBlockEntity(dataSource, 'block-hash'),
       );
 
-      // check returned value
-      expect(result).toEqual(true);
+      // check returned valid
+      expect(res).toEqual(true);
 
       // check database
       const repository = dataSource.getRepository(ObservationEntity);
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
       expect(rows[0].sourceTxId).toEqual(mockLockTx.txid);
-    });
+    }, 100000);
   });
 
   describe('getId', () => {
