@@ -171,29 +171,6 @@ describe('FiroRpcNetwork', () => {
     });
   });
 
-  describe('getBlockTxIds', () => {
-    /**
-     * @target `FiroRpcNetwork.getBlockTxIds` should return transaction ID array from block
-     * @dependencies Mock axios response for getblock RPC call via getBlockInfo
-     * @scenario
-     * - Mock axios to return block data containing transaction IDs
-     * - Call getBlockTxIds with test block hash
-     * - Verify returned array contains expected transaction IDs
-     * - Verify correct RPC method call through getBlockInfo
-     * @expected
-     * - Array should match tx field from getblock response
-     * - axios.post should be called once for getblock method
-     */
-    it('should return transaction IDs array from block', async () => {
-      mockAxiosPost(testData.getBlockResponse);
-
-      const result = await network.getBlockTxIds(testData.blockHash);
-
-      expect(result).toEqual(testData.getBlockResponse.result.tx);
-      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('getTransaction', () => {
     /**
      * @target `FiroRpcNetwork.getTransaction` should return complete transaction details

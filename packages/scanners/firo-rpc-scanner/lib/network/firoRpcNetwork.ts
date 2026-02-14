@@ -128,22 +128,6 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
   };
 
   /**
-   * Return transactions ids in a block with specified hash
-   * @param blockHash
-   * @returns
-   */
-  getBlockTxIds = async (blockHash: string): Promise<Array<string>> => {
-    try {
-      const blockInfo = await this.getBlockInfo(blockHash);
-      return blockInfo.tx;
-    } catch (error) {
-      throw new Error(
-        `Failed to get block transaction IDs for ${blockHash}: ${error}`,
-      );
-    }
-  };
-
-  /**
    * Return transaction info with specified transaction ID
    * @param txId
    * @returns
