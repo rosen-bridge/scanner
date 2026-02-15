@@ -109,12 +109,9 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
     ).tx;
 
     // Filter out name auction transactions (covenant type != 0)
-    // Bridge only accepts transactions with no covenant (type 0) or no covenant field
+    // Bridge only accepts transactions where all outputs have covenant type 0 (NONE)
     const filteredTxs = blockTxs.filter((tx) => {
-      return !tx.vout.some((output) => {
-        const covenantType = output.covenant?.type;
-        return covenantType !== undefined && covenantType !== 0;
-      });
+      return !tx.vout.some((output) => output.covenant.type !== 0);
     });
 
     return filteredTxs;

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { vi } from 'vitest';
 
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';

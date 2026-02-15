@@ -13,20 +13,23 @@ export interface HandshakeRpcTransaction {
     txinwitness?: string[];
     sequence: number;
   }>;
-  vout: Array<{
-    value: number;
-    n: number;
-    address: {
-      version: number;
-      hash: string;
-      string: string;
-    };
-    covenant?: {
-      type: number;
-      items: string[];
-    };
-  }>;
+  vout: Array<HandshakeRpcTxOutput>;
   hash: string;
+}
+
+export interface HandshakeRpcTxOutput {
+  value: number;
+  n: number;
+  address: {
+    version: number;
+    hash: string;
+    string: string;
+  };
+  covenant: {
+    type: number;
+    action: string;
+    items: string[];
+  };
 }
 
 export interface BlockHeader {

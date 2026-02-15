@@ -28,13 +28,16 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "bitcoinjs-lib": "^6.1.6",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^1.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.2",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/rosen-extractor": "^11.2.1",
-    "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-bridge/tokens": "^5.0.1"
+    "@rosen-bridge/handshake-rpc-scanner": "^0.1.0",
+    "@rosen-bridge/rosen-extractor": "^11.3.0",
+    "@rosen-bridge/tokens": "^6.0.0",
+    "blakejs": "^1.2.1"
+  },
+  "devDependencies": {
+    "@rosen-bridge/abstract-scanner": "^1.0.1"
   },
   "engines": {
     "node": ">=22.18.0",

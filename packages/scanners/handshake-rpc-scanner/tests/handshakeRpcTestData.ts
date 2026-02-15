@@ -166,7 +166,7 @@ export const txWithCovenantType0 = {
   hex: '0000000001098dbd3b719ffea382e89926c70b582b117ee106d7b1609c4cd983cd4317ef4102000000ffffffff0300000000000000001f134f505f52455455524e20746573742064617461000040420f000000000000141da864f4cdb5777cece3fc874b3c8cb74d3d304c0000d8682008000000000014a0b08267b3b16475cbef11f33353f8bd4573c9b7000000000000024199d8e7647e929267bd632c04fcc028fbdefc5abe2954395c5a5ede0c768ebd49433a47ecbdeefe16e8e95b60b03d90e54afa0b920ce75b313303086289ab53ae0121023960e2391f0f729c31c5ba12cee26e8ec46d4ad414390ff5dc21a1e10abba175',
 };
 
-// Transaction without covenant field (should be included)
+// Transaction with covenant type 0 on all outputs (should be included)
 export const txWithoutCovenant = {
   txid: 'tx2222222222222222222222222222222222222222222222222222222222222222',
   hash: 'hash222222222222222222222222222222222222222222222222222222222222',
@@ -185,6 +185,16 @@ export const txWithoutCovenant = {
     {
       value: 2.0,
       n: 0,
+      address: {
+        version: 0,
+        hash: 'abcdef1234567890abcdef1234567890abcdef12',
+        string: 'hs1q4hxmhzs4t5mwf4g9sne5x5s35sddfmkz9g7s7',
+      },
+      covenant: {
+        type: 0,
+        action: 'NONE',
+        items: [],
+      },
     },
   ],
   hex: '01000000...',
@@ -211,6 +221,7 @@ export const txWithCovenantType1 = {
       n: 0,
       covenant: {
         type: 1, // Name auction covenant - should be filtered
+        action: 'CLAIM',
         items: ['name', 'hash', 'value'],
       },
     },
@@ -239,6 +250,7 @@ export const txWithMixedCovenants = {
       n: 0,
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
@@ -247,6 +259,7 @@ export const txWithMixedCovenants = {
       n: 1,
       covenant: {
         type: 2, // Non-zero covenant type - should filter entire tx
+        action: 'BID',
         items: ['data'],
       },
     },

@@ -90,14 +90,14 @@ describe('HandshakeRpcNetwork', () => {
      * @scenario
      * - mock axios to return block with transactions including:
      *   - transaction with covenant type 0 (should be included)
-     *   - transaction without covenant field (should be included)
+     *   - transaction with covenant type 0 on all outputs (should be included)
      *   - transaction with covenant type 1 (should be filtered out)
      *   - transaction with mixed covenants (should be filtered out)
      * - run test
      * - check returned value
      * - check if function got called
      * @expected
-     * - it should return only transactions with covenant type 0 or no covenant
+     * - it should return only transactions where all outputs have covenant type 0
      * - transactions with non-zero covenant types should be filtered out
      * - axios.post should got called once to get block with mocked block hash and verbosity 2
      */
@@ -128,7 +128,7 @@ describe('HandshakeRpcNetwork', () => {
      * @expected
      * - transactions with covenant type 1 (name auction) should be excluded
      * - transactions with covenant type 2 or higher should be excluded
-     * - only covenant type 0 or undefined covenant should be included
+     * - only transactions where all outputs have covenant type 0 should be included
      */
     it('should filter out name auction transactions', async () => {
       mockAxiosPost(testData.getBlockResponse);
@@ -137,9 +137,7 @@ describe('HandshakeRpcNetwork', () => {
 
       // Verify no transaction has any vout with covenant type !== 0
       const invalidVouts = result.flatMap((tx) =>
-        tx.vout.filter(
-          (vout) => vout.covenant !== undefined && vout.covenant.type !== 0,
-        ),
+        tx.vout.filter((vout) => vout.covenant.type !== 0),
       );
       expect(invalidVouts).toHaveLength(0);
 

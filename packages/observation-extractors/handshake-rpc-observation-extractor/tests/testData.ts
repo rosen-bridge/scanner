@@ -34,8 +34,8 @@ export const mockLockTx: HandshakeRpcTransaction = {
   ],
   vout: [
     {
-      // Data output 0: chunk 0
-      value: 1000,
+      // Data output 0: chunk 0 (value 0.001 HNS = 1000 dollarydoos)
+      value: 0.001,
       n: 0,
       address: {
         version: 0,
@@ -45,12 +45,13 @@ export const mockLockTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
     {
-      // Data output 1: chunk 1
-      value: 1001,
+      // Data output 1: chunk 1 (value 0.001001 HNS = 1001 dollarydoos)
+      value: 0.001001,
       n: 1,
       address: {
         version: 0,
@@ -60,12 +61,13 @@ export const mockLockTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
     {
-      // Data output 2: chunk 2
-      value: 1002,
+      // Data output 2: chunk 2 (value 0.001002 HNS = 1002 dollarydoos)
+      value: 0.001002,
       n: 2,
       address: {
         version: 0,
@@ -75,12 +77,13 @@ export const mockLockTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
     {
-      // Lock output to bridge address
-      value: 100000,
+      // Lock output to bridge address (value 0.1 HNS = 100000 dollarydoos)
+      value: 0.1,
       n: 3,
       address: {
         version: 0,
@@ -89,12 +92,13 @@ export const mockLockTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
     {
-      // Change output
-      value: 50000,
+      // Change output (value 0.05 HNS = 50000 dollarydoos)
+      value: 0.05,
       n: 4,
       address: {
         version: 0,
@@ -103,6 +107,7 @@ export const mockLockTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
@@ -136,6 +141,7 @@ export const mockAuctionTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 3, // BID covenant type
+        action: 'BID',
         items: ['name', 'hash', 'value'],
       },
     },
@@ -169,6 +175,7 @@ export const mockInvalidTx: HandshakeRpcTransaction = {
       },
       covenant: {
         type: 0,
+        action: 'NONE',
         items: [],
       },
     },
@@ -188,7 +195,7 @@ export const expectedRosenData = {
   targetChainTokenId:
     'dcbda15f1361f5eeba416dd63e059fce34f0c57499e9afe733ea0fd59cf63f48',
   sourceTxId: mockLockTx.txid,
-  rawData: `${dataChunk0}:1000,${dataChunk1}:1001,${dataChunk2}:1002,${mockLockAddressHash}:100000,${changeAddressHash}:50000`,
+  rawData: `${dataChunk0}:0.001,${dataChunk1}:0.001001,${dataChunk2}:0.001002,${mockLockAddressHash}:0.1,${changeAddressHash}:0.05`,
 };
 
 // Expected observation to be stored
