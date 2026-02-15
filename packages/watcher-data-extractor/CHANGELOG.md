@@ -1,5 +1,18 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 13.0.3
+
+### Patch Changes
+
+- Fix sqlite migration on `eventTriggerEntity` table
+
+## 13.0.2
+
+### Patch Changes
+
+- Update dependencies:
+  - @rosen-bridge/tokens@6.0.0
+
 ## 13.0.1
 
 ### Patch Changes
