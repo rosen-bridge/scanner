@@ -104,14 +104,14 @@ export class RewardExtractor extends AbstractErgoTxExtractor<
 
     const rewardBoxes = this.findOutputs(tx, [this.rewardErgoTree]);
     if (rewardBoxes.length !== 1) {
-      this.logger.debug(
+      this.logger.trace(
         `[hasTxData] invalid reward box count (expected=1, actual=${rewardBoxes.length}, txId=${txId})`,
       );
       return false;
     }
 
     if (rewardBoxes[0].assets.length > 1) {
-      this.logger.debug(
+      this.logger.trace(
         `[hasTxData] invalid reward box asset count (expected<=1, actual=${rewardBoxes[0].assets.length}, txId=${txId})`,
       );
       return false;
@@ -119,14 +119,14 @@ export class RewardExtractor extends AbstractErgoTxExtractor<
 
     const networkFeeBoxes = this.findOutputs(tx, this.networkFeeErgoTrees);
     if (networkFeeBoxes.length !== 1) {
-      this.logger.debug(
+      this.logger.trace(
         `[hasTxData] invalid network-fee box count (expected=1, actual=${networkFeeBoxes.length}, txId=${txId})`,
       );
       return false;
     }
 
     if (networkFeeBoxes[0].assets.length > 1) {
-      this.logger.debug(
+      this.logger.trace(
         `[hasTxData] invalid network-fee box asset count (expected<=1, actual=${networkFeeBoxes[0].assets.length}, txId=${txId})`,
       );
       return false;
@@ -137,7 +137,7 @@ export class RewardExtractor extends AbstractErgoTxExtractor<
       this.guardEmissionErgoTrees,
     );
     if (guardEmissionBoxes.length !== 1) {
-      this.logger.debug(
+      this.logger.trace(
         `[hasTxData] invalid guard-emission box count (expected=1, actual=${guardEmissionBoxes.length}, txId=${txId})`,
       );
       return false;

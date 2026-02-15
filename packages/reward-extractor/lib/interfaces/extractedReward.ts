@@ -10,7 +10,7 @@ export interface ExtractedRewardData extends AbstractEntityData {
   emissionTokenId: string;
   guardsEmission: bigint;
   watchersEmission: bigint;
-  rewardedWIDsCount: number | null;
+  rewardedWIDsCount: number;
   rewardedWIDs: string;
   extractor: string;
 }

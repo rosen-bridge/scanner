@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import {
-  BlockInfo,
-  ErgoNetworkType,
-  Transaction,
-} from '@rosen-bridge/scanner-interfaces';
+import { ErgoNetworkType, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { RewardAction } from '../../lib/actions/rewardAction';
 import { RewardExtractor } from '../../lib/extractors/rewardExtractor';
@@ -19,6 +15,7 @@ import {
   SAMPLE_INVALID_TX_WITHOUT_ANY_PERMIT_BOX,
   SAMPLE_INVALID_TX_BY_EMISSION_BOX_WITH_MULTIPLE_TOKENS,
   SAMPLE_INVALID_TX_WITHOUT_ANY_REWARD_RELATED_BOXES,
+  EXPECTED_EXTRACTED_REWARD_DATA,
 } from './testData';
 
 interface TestContext {
@@ -170,10 +167,10 @@ describe('RewardExtractor', () => {
     }) => {
       const data = extractor.extractTxData(
         SAMPLE_VALID_REWARD_TX as unknown as Transaction,
-        SAMPLE_BLOCK as BlockInfo,
+        SAMPLE_BLOCK,
       );
       expect(data).toBeDefined();
-      expect(data!.watchersEmission).toBeDefined();
+      expect(data).toEqual(EXPECTED_EXTRACTED_REWARD_DATA);
     });
   });
 });

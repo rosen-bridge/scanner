@@ -88,3 +88,20 @@ export const SAMPLE_INVALID_TX_WITHOUT_ANY_REWARD_RELATED_BOXES = {
   outputs: [],
   inputs: [],
 };
+
+export const EXPECTED_EXTRACTED_REWARD_DATA = {
+  block: 'x',
+  bridgeFee: 10n,
+  emissionTokenId: 'RSN_TOKEN',
+  extractor: 'test-reward-extractor',
+  guardsEmission: 5n,
+  height: 1,
+  identifier: 'tx123',
+  networkFee: 2n,
+  rewardedWIDs:
+    '307831393562643435373038356534386230653134363764613939663031316663363738323734383063386139393162396131626135336136643262623133356434',
+  rewardedWIDsCount: 1,
+  serialized: 'AQID',
+  tokenId: 'RSN_TOKEN',
+  watchersEmission: 5n,
+};

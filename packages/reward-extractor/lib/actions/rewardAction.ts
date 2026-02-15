@@ -36,7 +36,7 @@ export class RewardAction extends AbstractErgoAction<
       emissionTokenId: item.emissionTokenId,
       guardsEmission: item.guardsEmission,
       watchersEmission: item.watchersEmission,
-      rewardedWIDsCount: item.rewardedWIDsCount ?? 0,
+      rewardedWIDsCount: item.rewardedWIDsCount,
       rewardedWIDs: item.rewardedWIDs,
       extractor: extractor,
     }));
