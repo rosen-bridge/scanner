@@ -667,20 +667,8 @@ describe('action', () => {
 
   describe('removeUnusedBlocksInBatches', () => {
     let blockRepository: Repository<BlockEntity>;
-    beforeEach(() => {
+    beforeEach(async () => {
       blockRepository = dataSource.getRepository(BlockEntity);
-
-      vi.spyOn(action.blockRepository, 'find').mockResolvedValue([
-        {
-          id: 2,
-          height: 16,
-          hash: 'blockhashOld5',
-          parentHash: 'parentHashOld5',
-          scanner: 'scanner1',
-          status: PROCEED,
-          timestamp: 1,
-        },
-      ]);
 
       vi.spyOn(action, 'generateQueriesWithUniqueParams').mockImplementation(
         () => {
@@ -708,19 +696,28 @@ describe('action', () => {
      */
     it('should filter all unused blocks using the combined queries that fetch used blocks', async () => {
       await blockRepository.insert(sampleBlocks1);
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
+      const blockAgeThreshold = 1;
+
+      const thresholdTimestamp = lastBlock
+        ? lastBlock.timestamp - blockAgeThreshold
+        : 0;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
-        10,
+        blockAgeThreshold,
+        lastBlock,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
         .sort((block1, block2) => block1.height - block2.height)
         .filter(
           (sampleBlock) =>
-            !(sampleBlock.height > 16 || sampleBlock.height < 12),
+            !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
+            sampleBlock.timestamp < thresholdTimestamp,
         )
         .map((block) => block.hash);
 
@@ -744,11 +741,20 @@ describe('action', () => {
       const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
       await blockRepository.insert(sampleBlocks);
 
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
+      const blockAgeThreshold = 1;
+
+      const thresholdTimestamp = lastBlock
+        ? lastBlock.timestamp - blockAgeThreshold
+        : 0;
+
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
-        10,
+        blockAgeThreshold,
+        lastBlock,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
@@ -756,7 +762,8 @@ describe('action', () => {
         .filter(
           (sampleBlock) =>
             !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
-            sampleBlock.scanner == sampleBlocks1[0].scanner,
+            sampleBlock.scanner == sampleBlocks1[0].scanner &&
+            sampleBlock.timestamp < thresholdTimestamp,
         )
         .map((block) => block.hash);
 
@@ -779,11 +786,12 @@ describe('action', () => {
     it('should filters all unused blocks based on the block lifetime threshold provided as input', async () => {
       await blockRepository.insert(sampleBlocks1);
 
-      const lastBlock = await blockRepository.find();
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
       const blockAgeThreshold = 1;
 
-      const thresholdHeight = lastBlock.length
-        ? lastBlock[0].height - blockAgeThreshold
+      const thresholdTimestamp = lastBlock
+        ? lastBlock.timestamp - blockAgeThreshold
         : 0;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
@@ -791,6 +799,7 @@ describe('action', () => {
         10,
         sampleBlocks1[0].scanner,
         blockAgeThreshold,
+        lastBlock,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
@@ -798,7 +807,7 @@ describe('action', () => {
         .filter(
           (sampleBlock) =>
             !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
-            sampleBlock.height > thresholdHeight,
+            sampleBlock.timestamp < thresholdTimestamp,
         )
         .map((block) => block.hash);
 
@@ -824,11 +833,12 @@ describe('action', () => {
 
       await blockRepository.insert(sampleBlocks);
 
-      const lastBlock = await blockRepository.find();
-      const blockAgeThreshold = 2;
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
+      const blockAgeThreshold = 0;
 
-      const thresholdHeight = lastBlock.length
-        ? lastBlock[0].height - blockAgeThreshold
+      const thresholdTimestamp = lastBlock
+        ? lastBlock.timestamp - blockAgeThreshold
         : 0;
 
       const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
@@ -836,6 +846,7 @@ describe('action', () => {
         1,
         sampleBlocks1[0].scanner,
         blockAgeThreshold,
+        lastBlock,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
@@ -844,7 +855,7 @@ describe('action', () => {
           (sampleBlock) =>
             !(sampleBlock.height > 16 || sampleBlock.height < 12) &&
             sampleBlock.scanner == sampleBlocks1[0].scanner &&
-            sampleBlock.height > thresholdHeight,
+            sampleBlock.timestamp < thresholdTimestamp,
         )
         .map((block) => block.hash);
 

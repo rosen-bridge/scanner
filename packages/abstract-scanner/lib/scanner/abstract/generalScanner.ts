@@ -197,7 +197,8 @@ abstract class GeneralScanner<
    */
   update = async () => {
     try {
-      await this.removeOldUnusedBlocks();
+      let lastSavedBlock = await this.action.getLastSavedBlock();
+      await this.removeOldUnusedBlocks(lastSavedBlock);
       const latestHeight = await this.network.getCurrentHeight();
       if (
         !this.blockChainLastHeight ||
@@ -205,7 +206,6 @@ abstract class GeneralScanner<
       )
         this.blockChainLastHeight = latestHeight;
 
-      let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       } else await this.verifyExtractorsInitialization(lastSavedBlock);

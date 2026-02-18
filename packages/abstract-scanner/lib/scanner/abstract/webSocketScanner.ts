@@ -58,13 +58,13 @@ abstract class WebSocketScanner<
     transactions: Array<TransactionType>,
   ) => {
     const release = await this.mutex.acquire();
-    await this.removeOldUnusedBlocks();
+    const lastSavedBlock = await this.action.getLastSavedBlock();
+    await this.removeOldUnusedBlocks(lastSavedBlock);
     await this.tryRunningFunction(
       async () => {
         try {
           await this.forkBlock(block.height);
 
-          const lastSavedBlock = await this.action.getLastSavedBlock();
           if (lastSavedBlock && block.parentHash !== lastSavedBlock.hash) {
             this.logger.error('It seems saved block is not valid in scanner.');
             return false;

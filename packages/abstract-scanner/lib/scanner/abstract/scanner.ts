@@ -10,6 +10,7 @@ import {
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { One_Hour_InSeconds, Seven_Days_InSeconds } from '../../constants';
+import { BlockEntity } from '../../entities/blockEntity';
 import { BlockDbAction } from '../action';
 import { BlockTimeConfig } from '../interfaces';
 
@@ -225,10 +226,11 @@ export abstract class AbstractScanner<TransactionType> {
 
   /**
    * Removes unused blocks from the database
-   *
-   * @returns Returns the hashes of deleted blocks
+   * @param lastSavedBlock
    */
-  removeOldUnusedBlocks = async (): Promise<void> => {
+  removeOldUnusedBlocks = async (
+    lastSavedBlock: BlockEntity | undefined,
+  ): Promise<void> => {
     try {
       this.logger.debug('Starting the process to remove old unused blocks');
 
@@ -241,20 +243,18 @@ export abstract class AbstractScanner<TransactionType> {
           this.blockTimeConfig.blockTime,
       );
 
-      const blockAgeThreshold = Math.floor(
-        this.blockTimeConfig.blockAgeThreshold! /
-          this.blockTimeConfig.blockTime,
-      );
-
       const unusedBlockHashes = await this.action.removeUnusedBlocksInBatches(
         extractorUsedBlocksQueries,
         deletedBlockCount,
         this.name(),
-        blockAgeThreshold,
+        this.blockTimeConfig.blockAgeThreshold!,
+        lastSavedBlock,
       );
-      this.logger.debug(
-        `Successfully removed old unused block hashes: ${unusedBlockHashes.join(', ')}`,
-      );
+      if (unusedBlockHashes.length)
+        this.logger.debug(
+          `Successfully removed old unused block hashes: ${unusedBlockHashes.join(', ')}`,
+        );
+      else this.logger.debug('No unused block hashes found to remove.');
     } catch (error) {
       this.logger.error(
         `An error occurred while removing old unused blocks: ${error}`,

@@ -2,12 +2,20 @@ import { BlockEntity, PROCEED } from '../../lib';
 
 export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
   {
+    height: 12,
+    hash: 'blockhashOld1',
+    parentHash: 'parentHashOld1',
+    scanner: 'scanner1',
+    status: PROCEED,
+    timestamp: 1,
+  },
+  {
     height: 13,
     hash: 'blockhashOld2',
     parentHash: 'parentHashOld2',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 2,
   },
   {
     height: 14,
@@ -15,7 +23,7 @@ export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld3',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 3,
   },
   {
     height: 15,
@@ -23,7 +31,7 @@ export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld4',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 4,
   },
   {
     height: 16,
@@ -31,15 +39,7 @@ export const sampleBlocks1: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld5',
     scanner: 'scanner1',
     status: PROCEED,
-    timestamp: 1,
-  },
-  {
-    height: 12,
-    hash: 'blockhashOld1',
-    parentHash: 'parentHashOld1',
-    scanner: 'scanner1',
-    status: PROCEED,
-    timestamp: 1,
+    timestamp: 5,
   },
 ];
 
@@ -50,7 +50,7 @@ export const sampleBlocks2: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld5',
     scanner: 'scanner2',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 6,
   },
   {
     height: 17,
@@ -58,7 +58,7 @@ export const sampleBlocks2: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld6',
     scanner: 'scanner2',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 7,
   },
   {
     height: 18,
@@ -66,6 +66,6 @@ export const sampleBlocks2: Omit<BlockEntity, 'id'>[] = [
     parentHash: 'parentHashOld7',
     scanner: 'scanner2',
     status: PROCEED,
-    timestamp: 1,
+    timestamp: 8,
   },
 ];
