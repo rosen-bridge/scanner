@@ -6,11 +6,11 @@ export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction
   constructor(config: ScannerConfig<BitcoinEsploraTransaction>) {
     super(
       'doge',
-      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
+      config.blockTimeConfig,
       config.logger,
       config.suffix,
     );

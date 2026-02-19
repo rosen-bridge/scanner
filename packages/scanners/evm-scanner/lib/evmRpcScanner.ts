@@ -8,11 +8,11 @@ export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
   constructor(chain: string, config: ScannerConfig<TransactionResponse>) {
     super(
       `${chain}`,
-      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
+      config.blockTimeConfig,
       config.logger,
       config.suffix,
     );

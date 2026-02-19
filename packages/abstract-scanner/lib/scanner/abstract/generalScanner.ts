@@ -21,11 +21,11 @@ abstract class GeneralScanner<
 
   constructor(
     private scannerName: string,
-    blockTimeConfig: BlockTimeConfig,
     private dataSource: DataSource,
     initialHeight: number,
     private network: AbstractNetworkConnector<TransactionType>,
     private blockRetrieveGap = 0,
+    blockTimeConfig: BlockTimeConfig,
     logger?: AbstractLogger,
     private suffix?: string,
   ) {
@@ -198,7 +198,6 @@ abstract class GeneralScanner<
   update = async () => {
     try {
       let lastSavedBlock = await this.action.getLastSavedBlock();
-      await this.removeOldUnusedBlocks(lastSavedBlock);
       const latestHeight = await this.network.getCurrentHeight();
       if (
         !this.blockChainLastHeight ||
@@ -209,6 +208,7 @@ abstract class GeneralScanner<
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       } else await this.verifyExtractorsInitialization(lastSavedBlock);
+      await this.removeOldUnusedBlocks(lastSavedBlock);
       if (!(await this.isForkHappen())) {
         await this.stepForward(lastSavedBlock);
       } else {

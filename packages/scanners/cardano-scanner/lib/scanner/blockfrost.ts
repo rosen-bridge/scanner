@@ -6,11 +6,11 @@ class CardanoBlockFrostScanner extends GeneralScanner<BlockFrostTransaction> {
   constructor(config: ScannerConfig<BlockFrostTransaction>) {
     super(
       'cardano',
-      config.blockTimeConfig,
       config.dataSource,
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
+      config.blockTimeConfig,
       config.logger,
       config.suffix,
     );

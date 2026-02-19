@@ -3,10 +3,7 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import {
-  ObjectLiteral,
-  SelectQueryBuilder,
-} from '@rosen-bridge/extended-typeorm';
+import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { One_Hour_InSeconds, Seven_Days_InSeconds } from '../../constants';
@@ -236,7 +233,7 @@ export abstract class AbstractScanner<TransactionType> {
 
       const extractorUsedBlocksQueries = this.extractors
         .map((extracor) => extracor.createUsedBlocksQuery())
-        .filter((value) => value instanceof SelectQueryBuilder);
+        .filter((value) => value != undefined);
 
       const deletedBlockCount = Math.floor(
         this.blockTimeConfig.blockTrimCountInRound! /

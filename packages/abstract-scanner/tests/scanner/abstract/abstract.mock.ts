@@ -102,11 +102,11 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
   ) {
     super(
       name,
-      blockTimeConfig,
       dataSource,
       0,
       networkConnector,
       100,
+      blockTimeConfig,
       undefined,
     );
   }
