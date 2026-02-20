@@ -778,7 +778,7 @@ describe('action', () => {
      * @scenario
      * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
      * - Insert 4 BlockEntities related to this scanner
-     * - Defines a thresholdHeight for run the test
+     * - Defines a thresholdTimestamp for run the test
      * - Run test (call `removeUnusedBlocksInBatches`)
      * @expected
      * - Ensures that the blocks being removed are correctly filtered
@@ -823,7 +823,7 @@ describe('action', () => {
      * - Mocks generateQueriesWithUniqueParams to return specific `queryParts` and `parameters`
      * - Insert 4 BlockEntities related to this scanner
      * - Insert 3 BlockEntities related to the same scanner, but with a different scannerName
-     * - Defines a thresholdHeight for executing the test
+     * - Defines a thresholdTimestamp for executing the test
      * - call `removeUnusedBlocksInBatches` with deletedBlockCount = 1
      * @expected
      * - Ensures that the blocks being removed are correctly filtered

@@ -361,7 +361,8 @@ export class BlockDbAction {
    * @param extractorUsedBlocksQueries
    * @param deletedBlockCount
    * @param scannerName
-   * @param threshold
+   * @param blockAgeThreshold
+   * @param lastSavedBlock
    * @returns The hashes of the removed unused blocks
    */
   removeUnusedBlocksInBatches = async (
