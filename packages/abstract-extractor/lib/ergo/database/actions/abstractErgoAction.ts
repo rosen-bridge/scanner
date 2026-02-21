@@ -191,7 +191,7 @@ export abstract class AbstractErgoAction<
     extractor: string,
   ): Promise<boolean> => {
     this.logger.debug(
-      `Storing entities in block ${block} and extractor ${extractor}`,
+      `Storing entities in block ${block.hash} and ${extractor} extractor`,
     );
     let entitiesToInsert: ExtractedData[] = [],
       entitiesToUpdate: ExtractedData[] = [];
