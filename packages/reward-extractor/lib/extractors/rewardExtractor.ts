@@ -16,7 +16,6 @@ import { RewardEntity } from '../entities/rewardEntity';
 import {
   ExtractedRewardData,
   RewardAddresses,
-  RewardInitializeOptions,
 } from '../interfaces/extractedReward';
 
 export class RewardExtractor extends AbstractErgoTxExtractor<
@@ -39,7 +38,7 @@ export class RewardExtractor extends AbstractErgoTxExtractor<
   constructor(
     private readonly id: string,
     dataSource: DataSource,
-    initializeOptions: RewardInitializeOptions,
+    initializeOptions: InitializeOptions,
     rewardAddresses: RewardAddresses,
     logger: AbstractLogger = new DummyLogger(),
   ) {
@@ -47,7 +46,7 @@ export class RewardExtractor extends AbstractErgoTxExtractor<
       {
         ...initializeOptions,
         active: initializeOptions.active ?? true,
-      } as InitializeOptions,
+      },
       logger,
     );
 
