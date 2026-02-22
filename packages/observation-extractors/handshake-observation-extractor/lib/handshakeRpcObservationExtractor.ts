@@ -1,8 +1,9 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { HandshakeRpcTransaction } from '@rosen-bridge/handshake-rpc-scanner';
 import { HandshakeRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 export class HandshakeRpcObservationExtractor extends AbstractObservationExtractor<HandshakeRpcTransaction> {
@@ -20,7 +21,7 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
       new HandshakeRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('HandshakeRpcRosenExtractor')
+        logger?.child('HandshakeRpcRosenExtractor'),
       ),
       logger,
     );
@@ -35,4 +36,15 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
    * gets transaction id from TransactionType
    */
   getTxId = (tx: HandshakeRpcTransaction) => tx.txid;
+
+  /**
+   * filter by output covenant type
+   */
+  preprocessTransactions = (
+    txs: Array<HandshakeRpcTransaction>,
+    block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ) =>
+    txs.filter((tx) => {
+      return !tx.vout.some((output) => output.covenant.type !== 0);
+    });
 }

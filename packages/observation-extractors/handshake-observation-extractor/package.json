@@ -1,6 +1,6 @@
 {
-  "name": "@rosen-bridge/handshake-rpc-observation-extractor",
-  "version": "0.1.0",
+  "name": "@rosen-bridge/handshake-observation-extractor",
+  "version": "0.0.0",
   "description": "Event observation data extractor for Handshake chain",
   "repository": {
     "type": "git",
@@ -31,9 +31,10 @@
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/abstract-observation-extractor": "^1.0.2",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
-    "@rosen-bridge/handshake-rpc-scanner": "^0.1.0",
+    "@rosen-bridge/handshake-rpc-scanner": "^0.0.0",
     "@rosen-bridge/rosen-extractor": "^11.3.0",
     "@rosen-bridge/tokens": "^6.0.0",
+    "@rosen-bridge/scanner-interfaces": "^0.2.2",
     "blakejs": "^1.2.1"
   },
   "devDependencies": {

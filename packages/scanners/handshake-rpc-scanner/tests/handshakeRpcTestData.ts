@@ -200,7 +200,7 @@ export const txWithoutCovenant = {
   hex: '01000000...',
 };
 
-// Transaction with covenant type 1 (name auction - should be FILTERED OUT)
+// Transaction with covenant type 1 (name auction)
 export const txWithCovenantType1 = {
   txid: 'tx3333333333333333333333333333333333333333333333333333333333333333',
   hash: 'hash333333333333333333333333333333333333333333333333333333333333',
@@ -220,7 +220,7 @@ export const txWithCovenantType1 = {
       value: 0.5,
       n: 0,
       covenant: {
-        type: 1, // Name auction covenant - should be filtered
+        type: 1,
         action: 'CLAIM',
         items: ['name', 'hash', 'value'],
       },
@@ -229,7 +229,7 @@ export const txWithCovenantType1 = {
   hex: '01000000...',
 };
 
-// Transaction with mixed outputs (some with non-zero covenant, should be FILTERED OUT)
+// Transaction with mixed outputs (some with non-zero covenant)
 export const txWithMixedCovenants = {
   txid: 'tx4444444444444444444444444444444444444444444444444444444444444444',
   hash: 'hash444444444444444444444444444444444444444444444444444444444444',
@@ -258,7 +258,7 @@ export const txWithMixedCovenants = {
       value: 0.5,
       n: 1,
       covenant: {
-        type: 2, // Non-zero covenant type - should filter entire tx
+        type: 2,
         action: 'BID',
         items: ['data'],
       },
@@ -291,13 +291,18 @@ export const getBlockResponse = {
     tx: [
       txWithCovenantType0,
       txWithoutCovenant,
-      txWithCovenantType1, // This will be filtered
-      txWithMixedCovenants, // This will be filtered
+      txWithCovenantType1,
+      txWithMixedCovenants,
     ],
   },
   error: null,
   id: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2',
 };
 
-// Expected transactions after filtering (only transactions with covenant type 0 or no covenant)
-export const filteredBlockTxs = [txWithCovenantType0, txWithoutCovenant];
+// Expected transactions
+export const allBlockTxs = [
+  txWithCovenantType0,
+  txWithoutCovenant,
+  txWithCovenantType1,
+  txWithMixedCovenants,
+];

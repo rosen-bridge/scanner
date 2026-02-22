@@ -1,6 +1,3 @@
- 
-import { vi } from 'vitest';
-
 import { ObservationEntity } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
@@ -51,7 +48,7 @@ describe('HandshakeRpcObservationExtractor', () => {
     it('should return true and insert observation into database on valid lock tx', async () => {
       // run test
       const res = await extractor.processTransactions(
-        [mockLockTx],
+        [mockLockTx, mockAuctionTx],
         generateBlockEntity(dataSource, 'block-hash'),
       );
 

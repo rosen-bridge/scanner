@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { vi } from 'vitest';
 
 import axios from '@rosen-clients/rate-limited-axios';
@@ -23,5 +22,7 @@ export const mockAxiosPost = (result: unknown) => {
  */
 export const resetAxiosMock = () => {
   axiosInstance.post.mockReset();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vi.spyOn(axios, 'create').mockReturnValue(axiosInstance as any);
 };

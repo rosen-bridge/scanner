@@ -89,7 +89,6 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
 
   /**
    * Return transactions in a block with specified hash
-   * Filters out name auction transactions (covenant type != 0)
    * @param blockHash
    * @returns
    */
@@ -108,12 +107,6 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
       blockHashResponse.data.result as { tx: Array<HandshakeRpcTransaction> }
     ).tx;
 
-    // Filter out name auction transactions (covenant type != 0)
-    // Bridge only accepts transactions where all outputs have covenant type 0 (NONE)
-    const filteredTxs = blockTxs.filter((tx) => {
-      return !tx.vout.some((output) => output.covenant.type !== 0);
-    });
-
-    return filteredTxs;
+    return blockTxs;
   };
 }

@@ -1,4 +1,4 @@
-# @rosen-bridge/handshake-rpc-observation-extractor
+# @rosen-bridge/handshake-observation-extractor
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ Event observation data extractor for Handshake chain
 npm:
 
 ```sh
-npm i @rosen-bridge/handshake-rpc-observation-extractor
+npm i @rosen-bridge/handshake-observation-extractor
 ```
 
 yarn:
 
 ```sh
-yarn add @rosen-bridge/handshake-rpc-observation-extractor
+yarn add @rosen-bridge/handshake-observation-extractor
 ```
