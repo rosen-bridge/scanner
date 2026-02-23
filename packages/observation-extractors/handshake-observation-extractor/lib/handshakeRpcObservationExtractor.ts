@@ -1,11 +1,13 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { HandshakeRpcTransaction } from '@rosen-bridge/handshake-scanner';
+import {
+  HandshakeRpcTransaction,
+  HandshakeRpcTxOutput,
+} from '@rosen-bridge/handshake-scanner';
 import { HandshakeRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
-import { HandshakeTxOutput } from './types';
 
 export class HandshakeRpcObservationExtractor extends AbstractObservationExtractor<HandshakeRpcTransaction> {
   readonly FROM_CHAIN = 'handshake';
@@ -46,6 +48,8 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
     block: BlockInfo, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) =>
     txs.filter((tx) => {
-      return !tx.vout.some((output: HandshakeTxOutput) => output.covenant.type !== 0);
+      return !tx.vout.some(
+        (output: HandshakeRpcTxOutput) => output.covenant.type !== 0,
+      );
     });
 }
