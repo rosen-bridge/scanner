@@ -8,6 +8,6 @@
   "references": [
     { "path": "../../abstract-observation-extractor" },
     { "path": "../../abstract-scanner" },
-    { "path": "../../scanners/handshake-rpc-scanner" }
+    { "path": "../../scanners/handshake-scanner" }
   ]
 }

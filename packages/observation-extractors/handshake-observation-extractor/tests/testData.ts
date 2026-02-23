@@ -1,6 +1,6 @@
 import { blake2b } from 'blakejs';
 
-import { HandshakeRpcTransaction } from '@rosen-bridge/handshake-rpc-scanner';
+import { HandshakeRpcTransaction } from '@rosen-bridge/handshake-scanner';
 
 // Mock lock address (same as used in rosen-extractor tests)
 export const mockLockAddress = 'hs1qqzs0e6rrkr0r85e4h6m8xq7457ca07sh6ezhpv';

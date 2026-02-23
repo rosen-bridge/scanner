@@ -6,6 +6,6 @@
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
     { "path": "../../abstract-observation-extractor/tsconfig.build.json" },
-    { "path": "../../scanners/handshake-rpc-scanner/tsconfig.build.json" }
+    { "path": "../../scanners/handshake-scanner/tsconfig.build.json" }
   ]
 }

@@ -1,4 +1,4 @@
-# @rosen-bridge/handshake-rpc-scanner
+# @rosen-bridge/handshake-scanner
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ A Handshake blockchain scanner based on RPC API
 npm:
 
 ```sh
-npm i @rosen-bridge/handshake-rpc-scanner
+npm i @rosen-bridge/handshake-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add @rosen-bridge/handshake-rpc-scanner
+yarn add @rosen-bridge/handshake-scanner
 ```

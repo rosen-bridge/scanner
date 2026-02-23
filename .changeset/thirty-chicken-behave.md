@@ -1,5 +1,5 @@
 ---
-"@rosen-bridge/handshake-rpc-scanner": minor
+"@rosen-bridge/handshake-scanner": minor
 ---
 
 Add Handshake chain RPC scanner

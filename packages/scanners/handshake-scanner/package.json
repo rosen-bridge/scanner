@@ -1,5 +1,5 @@
 {
-  "name": "@rosen-bridge/handshake-rpc-scanner",
+  "name": "@rosen-bridge/handshake-scanner",
   "version": "0.0.0",
   "description": "A Handshake blockchain scanner based on RPC API",
   "repository": {
@@ -30,7 +30,7 @@
   "dependencies": {
     "@rosen-bridge/abstract-scanner": "^1.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-clients/rate-limited-axios": "^1.1.0"
+    "@rosen-clients/rate-limited-axios": "^1.1.1"
   },
   "engines": {
     "node": ">=22.18.0",
