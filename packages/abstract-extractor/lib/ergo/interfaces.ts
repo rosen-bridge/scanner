@@ -68,7 +68,7 @@ export interface RangeQuery {
 export type RangeList = RangeQuery[];
 
 export interface InitializeOptions {
-  active: boolean;
+  active?: boolean;
   type: ErgoNetworkType;
   url: string;
   address: string;

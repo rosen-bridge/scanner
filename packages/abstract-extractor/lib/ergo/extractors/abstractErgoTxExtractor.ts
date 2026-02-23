@@ -41,7 +41,10 @@ export abstract class AbstractErgoTxExtractor<
    * @returns extracted data in proper format or undefined if no data should be extracted
    * @throws Error if not overridden by subclass
    */
-  abstract extractTxData: (tx: Transaction) => ExtractedData | undefined;
+  abstract extractTxData: (
+    tx: Transaction,
+    block: BlockInfo,
+  ) => ExtractedData | undefined;
 
   /**
    * Check if the transaction has the required data format.
@@ -71,7 +74,7 @@ export abstract class AbstractErgoTxExtractor<
           continue;
         }
         this.logger.debug(`Trying to extract data from tx [${tx.id}]`);
-        const extractedData = this.extractTxData(tx);
+        const extractedData = this.extractTxData(tx, block);
         if (extractedData) {
           this.logger.debug(
             `Extracted data ${JsonBigInt.stringify(extractedData)} from tx ${
@@ -125,6 +128,6 @@ export abstract class AbstractErgoTxExtractor<
       );
       await initializer.initializeData(initialBlock);
     } else
-      this.logger.info(`Initializiation for [${this.getId()}] is turned off`);
+      this.logger.info(`Initialization for [${this.getId()}] is turned off`);
   };
 }
