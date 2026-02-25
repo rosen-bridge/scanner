@@ -61,7 +61,7 @@ describe('HandshakeRpcObservationExtractor', () => {
       expect(rowsCount).toEqual(1);
       const observation1 = rows[0];
       expect(observation1).toEqual(expectedObservation);
-    }, 100000);
+    });
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -90,7 +90,7 @@ describe('HandshakeRpcObservationExtractor', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-    }, 100000);
+    });
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -119,7 +119,7 @@ describe('HandshakeRpcObservationExtractor', () => {
       const repository = dataSource.getRepository(ObservationEntity);
       const [, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(0);
-    }, 100000);
+    });
 
     /**
      * @target HandshakeRpcObservationExtractor.processTransactions
@@ -149,7 +149,7 @@ describe('HandshakeRpcObservationExtractor', () => {
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(1);
       expect(rows[0].sourceTxId).toEqual(mockLockTx.txid);
-    }, 100000);
+    });
   });
 
   describe('getId', () => {
