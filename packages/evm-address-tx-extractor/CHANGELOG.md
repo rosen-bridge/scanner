@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 2.0.2
+
+### Patch Changes
+
+- Fix typo in logs descriptions
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.1.0
+
 ## 2.0.1
 
 ### Patch Changes
