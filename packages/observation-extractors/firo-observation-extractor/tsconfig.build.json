@@ -6,6 +6,6 @@
   "exclude": ["tests", "vitest.config.ts"],
   "references": [
     { "path": "../../abstract-observation-extractor/tsconfig.build.json" },
-    { "path": "../../scanners/firo-rpc-scanner/tsconfig.build.json" }
+    { "path": "../../scanners/firo-scanner/tsconfig.build.json" }
   ]
 }

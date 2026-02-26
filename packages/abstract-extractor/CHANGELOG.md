@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.1.0
+
+### Minor Changes
+
+- Add block parameter to the AbstractErgoTxExtractor.extractTxData method
+
 ## 3.0.1
 
 ### Patch Changes

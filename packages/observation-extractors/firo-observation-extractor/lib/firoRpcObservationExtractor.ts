@@ -1,7 +1,7 @@
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { FiroRpcTransaction } from '@rosen-bridge/firo-rpc-scanner';
+import { FiroRpcTransaction } from '@rosen-bridge/firo-scanner';
 import { FiroRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 

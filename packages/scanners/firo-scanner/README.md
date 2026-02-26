@@ -1,4 +1,4 @@
-# @rosen-bridge/firo-rpc-scanner
+# @rosen-bridge/firo-scanner
 
 ## Table of contents
 
@@ -14,11 +14,11 @@ A Firo blockchain scanner based on network RPC
 npm:
 
 ```sh
-npm i @rosen-bridge/firo-rpc-scanner
+npm i @rosen-bridge/firo-scanner
 ```
 
 yarn:
 
 ```sh
-yarn add @rosen-bridge/firo-rpc-scanner
+yarn add @rosen-bridge/firo-scanner
 ```
