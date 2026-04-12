@@ -36,7 +36,7 @@
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-clients/rate-limited-axios": "^1.1.1",
+    "@rosen-clients/rate-limited-axios": "^2.0.0",
     "cockatiel": "^3.2.1"
   },
   "engines": {
