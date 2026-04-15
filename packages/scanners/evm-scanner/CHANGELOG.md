@@ -1,5 +1,12 @@
 # @rosen-bridge/evm-scanner
 
+## 1.0.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@1.0.3
+
 ## 1.0.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-observation-extractor",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Event observation data extractor for different chains",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^3.1.0",
+    "@rosen-bridge/abstract-extractor": "^3.1.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/rosen-extractor": "^11.3.0",
@@ -37,7 +37,7 @@
     "blakejs": "^1.2.1"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^1.0.2"
+    "@rosen-bridge/abstract-scanner": "^1.0.3"
   },
   "engines": {
     "node": ">=22.18.0",

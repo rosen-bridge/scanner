@@ -1,5 +1,13 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.1.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-clients/ergo-explorer@2.1.2
+  - @rosen-clients/ergo-node@3.1.2
+
 ## 3.1.0
 
 ### Minor Changes
