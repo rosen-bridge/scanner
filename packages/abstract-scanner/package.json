@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-scanner",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Abstract scanner toolkit for blockchain scanning with logging.",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^3.1.0",
+    "@rosen-bridge/abstract-extractor": "^3.1.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/json-bigint": "^1.1.0",

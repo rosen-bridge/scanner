@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/tx-id-extractor",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Extract and store all transaction ids in ogmios blocks.",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/schema": "^6.6.1",
-    "@rosen-bridge/abstract-extractor": "^3.1.0",
+    "@rosen-bridge/abstract-extractor": "^3.1.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.2"

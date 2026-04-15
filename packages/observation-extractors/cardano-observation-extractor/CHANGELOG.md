@@ -1,5 +1,12 @@
 # @rosen-bridge/cardano-observation-extractor
 
+## 2.0.4
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.4
+
 ## 2.0.3
 
 ### Patch Changes

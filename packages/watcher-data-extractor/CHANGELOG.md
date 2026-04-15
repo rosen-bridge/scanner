@@ -1,5 +1,13 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 13.0.5
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.1.1
+  - @rosen-clients/ergo-explorer@2.1.2
+
 ## 13.0.4
 
 ### Patch Changes

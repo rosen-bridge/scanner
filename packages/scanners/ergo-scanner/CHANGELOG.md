@@ -1,5 +1,14 @@
 # @rosen-bridge/ergo-scanner
 
+## 1.0.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@1.0.3
+  - @rosen-clients/ergo-explorer@2.1.2
+  - @rosen-clients/ergo-node@3.1.2
+
 ## 1.0.2
 
 ### Patch Changes
