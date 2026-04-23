@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/bitcoin-runes-observation-extractor",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "Event observation data extractor for Bitcoin Runes chain",
   "repository": {
     "type": "git",
@@ -29,19 +29,19 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^1.0.4",
-    "@rosen-bridge/bitcoin-scanner": "^1.0.3",
-    "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.5",
+    "@rosen-bridge/bitcoin-scanner": "^1.0.4",
+    "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",
-    "@rosen-bridge/rosen-extractor": "^11.3.0",
+    "@rosen-bridge/rosen-extractor": "^12.0.1",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-bridge/tokens": "^6.0.0",
+    "@rosen-bridge/tokens": "^6.0.1",
     "@rosen-clients/rate-limited-axios": "^2.0.0",
     "blakejs": "^1.2.1",
     "ordiscan": "^1.3.0"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^1.0.3"
+    "@rosen-bridge/abstract-scanner": "^1.0.4"
   },
   "engines": {
     "node": ">=22.18.0",

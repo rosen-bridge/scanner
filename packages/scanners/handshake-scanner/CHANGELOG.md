@@ -1,5 +1,12 @@
 # @rosen-bridge/handshake-scanner
 
+## 0.1.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@1.0.4
+
 ## 0.1.1
 
 ### Patch Changes

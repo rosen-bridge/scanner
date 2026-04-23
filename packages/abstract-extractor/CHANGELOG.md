@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.1.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/extended-typeorm@1.1.0
+
 ## 3.1.1
 
 ### Patch Changes
