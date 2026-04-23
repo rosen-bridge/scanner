@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/firo-observation-extractor",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Event observation data extractor for Firo chain",
   "repository": {
     "type": "git",
@@ -27,9 +27,9 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^1.0.4",
+    "@rosen-bridge/abstract-observation-extractor": "^1.0.5",
     "@rosen-bridge/extended-typeorm": "^1.1.0",
-    "@rosen-bridge/firo-scanner": "^0.1.1",
+    "@rosen-bridge/firo-scanner": "^0.1.2",
     "@rosen-bridge/rosen-extractor": "^12.0.1",
     "@rosen-bridge/tokens": "^6.0.1"
   },

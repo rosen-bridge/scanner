@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-scanner",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A Cardano chain scanner.",
   "repository": {
     "type": "git",
@@ -32,7 +32,7 @@
     "@cardano-ogmios/schema": "^6.6.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^13.2.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-scanner": "^1.0.3",
+    "@rosen-bridge/abstract-scanner": "^1.0.4",
     "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",

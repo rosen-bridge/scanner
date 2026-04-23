@@ -1,5 +1,12 @@
 # @rosen-bridge/bitcoin-scanner
 
+## 1.0.4
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes
