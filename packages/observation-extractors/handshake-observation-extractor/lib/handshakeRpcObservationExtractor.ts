@@ -17,6 +17,7 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
     dataSource: DataSource,
     tokens: TokenMap,
     logger?: AbstractLogger,
+    storeRawData = true,
   ) {
     super(
       dataSource,
@@ -25,6 +26,7 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
         lockAddress,
         tokens,
         logger?.child('HandshakeRpcRosenExtractor'),
+        storeRawData,
       ),
       logger,
     );
