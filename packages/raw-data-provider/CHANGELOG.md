@@ -1,5 +1,17 @@
 # @rosen-bridge/raw-data-provider
 
+## 0.1.4
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.6
+  - @rosen-bridge/bitcoin-runes-observation-extractor@3.0.1
+  - @rosen-bridge/bitcoin-observation-extractor@8.0.1
+  - @rosen-bridge/cardano-observation-extractor@3.0.1
+  - @rosen-bridge/ergo-observation-extractor@2.0.1
+  - @rosen-bridge/evm-observation-extractor@7.0.1
+
 ## 0.1.3
 
 ### Patch Changes

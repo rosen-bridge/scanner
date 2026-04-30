@@ -1,5 +1,13 @@
 # @rosen-bridge/ergo-observation-extractor
 
+## 2.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.6
+  - @rosen-bridge/rosen-extractor@12.0.2
+
 ## 2.0.0
 
 ### Major Changes
