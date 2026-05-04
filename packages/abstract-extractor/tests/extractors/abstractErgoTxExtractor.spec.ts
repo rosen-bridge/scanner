@@ -47,7 +47,7 @@ describe('AbstractErgoTxExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx);
+      expect(extractSpy).toBeCalledWith(tx, block);
       expect(storeSpy).toBeCalledWith(
         [extractedData],
         block,
@@ -130,7 +130,7 @@ describe('AbstractErgoTxExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx);
+      expect(extractSpy).toBeCalledWith(tx, block);
       expect(storeSpy).not.toBeCalled();
       expect(result).toEqual(true);
       expect(triggerCallbacks).not.toBeCalled();
@@ -172,7 +172,7 @@ describe('AbstractErgoTxExtractor', () => {
       const result = await extractor.processTransactions([tx], block);
 
       expect(extractSpy).toBeCalledTimes(1);
-      expect(extractSpy).toBeCalledWith(tx);
+      expect(extractSpy).toBeCalledWith(tx, block);
       expect(storeSpy).toBeCalledWith(
         [extractedData],
         block,
@@ -244,8 +244,8 @@ describe('AbstractErgoTxExtractor', () => {
       const result = await extractor.processTransactions([tx, tx2, tx3], block);
 
       expect(extractSpy).toBeCalledTimes(2);
-      expect(extractSpy).toBeCalledWith(tx);
-      expect(extractSpy).toBeCalledWith(tx2);
+      expect(extractSpy).toBeCalledWith(tx, block);
+      expect(extractSpy).toBeCalledWith(tx2, block);
       expect(storeSpy).toBeCalledWith(
         [extractedData, extractedData2],
         block,

@@ -71,7 +71,7 @@ export class Migration1762768664031 implements MigrationInterface {
                 )
             SELECT "id",
                 "eventId",
-                "identifier",
+                "boxId",
                 "block",
                 "height",
                 "extractor",
@@ -176,7 +176,7 @@ export class Migration1762768664031 implements MigrationInterface {
                 )
             SELECT "id",
                 "eventId",
-                "boxId",
+                "identifier",
                 "block",
                 "height",
                 "extractor",

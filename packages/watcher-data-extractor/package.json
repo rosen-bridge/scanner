@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "13.0.1",
+  "version": "13.0.6",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "repository": {
     "type": "git",
@@ -28,20 +28,20 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^3.0.1",
+    "@rosen-bridge/abstract-extractor": "^3.1.2",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/extended-typeorm": "^1.0.1",
+    "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^0.2.2",
-    "@rosen-bridge/tokens": "^5.0.1",
-    "@rosen-clients/ergo-explorer": "^2.1.1",
+    "@rosen-bridge/tokens": "^6.0.1",
+    "@rosen-clients/ergo-explorer": "^2.1.2",
     "@types/lodash-es": "^4.17.6",
     "blakejs": "^1.2.1",
     "ergo-lib-wasm-nodejs": "^0.24.1",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@rosen-bridge/abstract-scanner": "^1.0.1"
+    "@rosen-bridge/abstract-scanner": "^1.0.4"
   },
   "engines": {
     "node": ">=22.18.0",

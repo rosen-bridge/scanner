@@ -1,5 +1,26 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.1.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/extended-typeorm@1.1.0
+
+## 3.1.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-clients/ergo-explorer@2.1.2
+  - @rosen-clients/ergo-node@3.1.2
+
+## 3.1.0
+
+### Minor Changes
+
+- Add block parameter to the AbstractErgoTxExtractor.extractTxData method
+
 ## 3.0.1
 
 ### Patch Changes

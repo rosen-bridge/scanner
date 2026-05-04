@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib"
+  },
+  "exclude": ["tests", "vitest.config.ts"],
+  "references": [
+    { "path": "../../abstract-observation-extractor/tsconfig.build.json" },
+    { "path": "../../scanners/firo-scanner/tsconfig.build.json" }
+  ]
+}
