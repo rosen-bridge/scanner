@@ -3,10 +3,16 @@ import JsonBigInt from '@rosen-bridge/json-bigint';
 import RateLimitedAxios, { Axios } from '@rosen-clients/rate-limited-axios';
 
 import { AbstractRunesProtocolNetwork } from './abstractRunesProtocolNetwork';
-import { TxOutputRune, UnisatResponse, UnisatTxRunes } from './types';
+import {
+  TxOutputRune,
+  UnisatBoxDetail,
+  UnisatResponse,
+  UnisatTxRunes,
+} from './types';
 
 export class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
   protected unisatClient: Axios;
+  protected readonly PAGE_SIZE = 500;
 
   constructor(
     protected readonly unisatUrl: string,
@@ -41,27 +47,36 @@ export class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
     const runes: TxOutputRune[] = [];
 
     // get the runes transfers of the transaction from Unisat
-    let txRunes: UnisatTxRunes;
+    let txRunes: UnisatBoxDetail[] = [];
     try {
-      const response = await this.unisatClient.get<
-        UnisatResponse<UnisatTxRunes>
-      >(`/v1/indexer/runes/event?txid=${txId}`);
+      let offset = 0;
+      let response = await this.unisatClient.get<UnisatResponse<UnisatTxRunes>>(
+        `/v1/indexer/runes/event?txid=${txId}&start=${offset}&limit=${this.PAGE_SIZE}`,
+      );
       this.logger.debug(
-        `requested 'indexer/runes/event' filtering txId [${txId}]. Response: ${JsonBigInt.stringify(
+        `requested 'indexer/runes/event' filtering txId [${txId}] on offset|limit [${offset}|${this.PAGE_SIZE}]. Response: ${JsonBigInt.stringify(
           response.data,
         )}`,
       );
-
-      txRunes = response.data.data;
-      if (txRunes.detail.length !== txRunes.total) {
-        throw new Error(
-          `Unexpected pagination: expected [${txRunes.total}] runes but got [${txRunes.detail.length}]`,
+      const total = response.data.data.total;
+      while (true) {
+        const runes = response.data.data;
+        if (height > runes.height) {
+          throw new Error(
+            `UnisatRunesProtocolNetwork is not synced. processing block height is [${height}] and synced height of network is [${runes.height}]`,
+          );
+        }
+        if (runes.detail.length === 0) break;
+        txRunes.push(...response.data.data.detail);
+        offset += this.PAGE_SIZE;
+        if (offset > total) break;
+        response = await this.unisatClient.get<UnisatResponse<UnisatTxRunes>>(
+          `/v1/indexer/runes/event?txid=${txId}&start=${offset}&limit=${this.PAGE_SIZE}`,
         );
-      }
-
-      if (height > txRunes.height) {
-        throw new Error(
-          `UnisatRunesProtocolNetwork is not synced. processing block height is [${height}] and synced height of network is [${txRunes.height}]`,
+        this.logger.debug(
+          `requested 'indexer/runes/event' filtering txId [${txId}] on offset|limit [${offset}|${this.PAGE_SIZE}]. Response: ${JsonBigInt.stringify(
+            response.data,
+          )}`,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,7 +88,7 @@ export class UnisatRunesProtocolNetwork extends AbstractRunesProtocolNetwork {
       throw new Error(baseError + e.message);
     }
 
-    for (const transfer of txRunes.detail) {
+    for (const transfer of txRunes) {
       if (transfer.txid !== txId) {
         throw new Error(
           `ImpossibleBehavior: Fetched runes event for tx [${txId}] but got a transfer with txId [${transfer.txid}]`,

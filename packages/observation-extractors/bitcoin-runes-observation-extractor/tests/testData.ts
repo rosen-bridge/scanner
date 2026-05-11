@@ -295,30 +295,124 @@ export const mockUnisatResponse1: UnisatTxRunes = {
   ],
 };
 
-export const mockUnisatResponse2: UnisatTxRunes = {
-  total: 2,
-  start: 0,
-  height: 100,
+export const userTxId =
+  '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da';
+export const mockUnisatResponse2Page1: UnisatTxRunes = {
   detail: [
     {
-      txid: mockTxId,
       type: 'receive',
-      address: 'addr1',
-      runeId: 'r1',
-      amount: '1',
-      vout: 0,
-      //
-      height: 0,
-      txidx: 0,
-      timestamp: 0,
-      rune: '',
-      spacedRune: '',
-      divisibility: 0,
+      address: 'bc1q3mu53mhnfx2l828yrnx3pxsn204x57amadnl4r',
+      amount: '2000',
+      height: 937936,
+      txidx: 1982,
+      txid: '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da',
+      timestamp: 1771834104,
+      runeId: '880887:3052',
+      rune: 'ROSENPOCRUNE',
+      spacedRune: 'ROSEN•POC•RUNE',
+      divisibility: 3,
+      vout: 2,
       spentTxid: '',
       spentVout: 0,
-    }, // only 1 entry but total = 2, should trigger pagination error
+    },
+    {
+      type: 'receive',
+      address: 'bc1qwu6zk52mz9wyy62ktdahuxqzmqd8xzxa92gk73',
+      amount: '146032',
+      height: 937936,
+      txidx: 1982,
+      txid: '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da',
+      timestamp: 1771834104,
+      runeId: '880887:3052',
+      rune: 'ROSENPOCRUNE',
+      spacedRune: 'ROSEN•POC•RUNE',
+      divisibility: 3,
+      vout: 0,
+      spentTxid: '',
+      spentVout: 0,
+    },
+    {
+      type: 'send',
+      address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
+      amount: '148032',
+      height: 937936,
+      txidx: 1982,
+      txid: '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da',
+      timestamp: 1771834104,
+      runeId: '880887:3052',
+      rune: 'ROSENPOCRUNE',
+      spacedRune: 'ROSEN•POC•RUNE',
+      divisibility: 3,
+      vout: 0,
+      spentTxid:
+        'bcc3e443c0cdf7f54996506db9b303656e5608c5662983cee4973685ade90234',
+      spentVout: 0,
+    },
   ],
+  height: 200,
+  start: 0,
+  total: 5,
 };
+export const mockUnisatResponse2Page2 = {
+  detail: [
+    {
+      type: 'receive',
+      address: 'bc1qwu6zk52mz9wyy62ktdahuxqzmqd8xzxa92gk73',
+      amount: '4492999000',
+      height: 937936,
+      txidx: 1982,
+      txid: '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da',
+      timestamp: 1771834104,
+      runeId: '880352:855',
+      rune: 'TESTINGCATAETCH',
+      spacedRune: 'TESTING•CATA•ETCH',
+      divisibility: 2,
+      vout: 0,
+      spentTxid: '',
+      spentVout: 0,
+    },
+    {
+      type: 'send',
+      address: 'bc1px0ad45qrfwc20yfd9wljeytrvfa6tmrcxv6pgxze2svvx00tp7mstj5rpk',
+      amount: '4492999000',
+      height: 937936,
+      txidx: 1982,
+      txid: '17551425648a5dd1c989f234e2477d6a5bd1eab0974a586c892f1c276f52c4da',
+      timestamp: 1771834104,
+      runeId: '880352:855',
+      rune: 'TESTINGCATAETCH',
+      spacedRune: 'TESTING•CATA•ETCH',
+      divisibility: 2,
+      vout: 0,
+      spentTxid:
+        'bcc3e443c0cdf7f54996506db9b303656e5608c5662983cee4973685ade90234',
+      spentVout: 0,
+    },
+  ],
+  height: 200,
+  start: 3,
+  total: 5,
+};
+export const unisatResult = [
+  {
+    address: 'bc1q3mu53mhnfx2l828yrnx3pxsn204x57amadnl4r',
+    runeId: '880887:3052',
+    runeAmount: '2000',
+    vout: 2,
+  },
+  {
+    address: 'bc1qwu6zk52mz9wyy62ktdahuxqzmqd8xzxa92gk73',
+    runeId: '880887:3052',
+    runeAmount: '146032',
+    vout: 0,
+  },
+  {
+    address: 'bc1qwu6zk52mz9wyy62ktdahuxqzmqd8xzxa92gk73',
+    runeId: '880352:855',
+    runeAmount: '4492999000',
+    vout: 0,
+  },
+];
 
 export const mockUnisatResponse3: UnisatTxRunes = {
   total: 1,
