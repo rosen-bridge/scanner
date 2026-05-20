@@ -38,12 +38,28 @@ export function createMockSocket(
     for (const line of lines) {
       try {
         const req = JSON.parse(line);
-        const responseData = responses.get(req.method);
-        if (responseData !== undefined) {
+        const handler = responses.get(req.method);
+        if (handler !== undefined) {
+          let result: unknown;
+          let error: { code: number; message: string } | undefined;
+
+          try {
+            // Support both static values and functions (called with params)
+            result =
+              typeof handler === 'function'
+                ? (handler as (params: unknown[]) => unknown)(req.params)
+                : handler;
+          } catch (e) {
+            error = {
+              code: -1,
+              message: e instanceof Error ? e.message : String(e),
+            };
+          }
+
           const response = JSON.stringify({
             jsonrpc: '2.0',
             id: req.id,
-            result: responseData,
+            ...(error ? { error } : { result }),
           });
           // Use setTimeout so the response arrives after write returns
           setTimeout(() => {

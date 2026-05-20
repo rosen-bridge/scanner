@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { FiroElectrumXNetwork } from '../../lib/network/firoElectrumxNetwork';
+import { FiroElectrumXNetwork } from '../../lib/network/firoElectrumXNetwork';
 import { blockHeader, testTx, testTxV3 } from '../firoElectrumxTestData';
 import { createMockSocket } from '../mocked/electrumxSocket.mock';
 
@@ -176,20 +176,23 @@ describe('FiroElectrumXNetwork', () => {
 
       await network.getBlockAtHeight(42);
 
-      // Two txids: one good, one that will fail
       const badTxid =
         'badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb';
       mockResponses.set('blockchain.block.txids', [badTxid, testTx.txid]);
 
-      // Mock responses: first tx fails, second succeeds
-      // We can't easily make one fail and one succeed with a simple map,
-      // so we use a function-based approach in the mock...
-      // Actually, let's just test with both succeeding for now.
-      // The real test of this would need a more sophisticated mock.
-      mockResponses.set('blockchain.transaction.get', testTx.hex);
+      // Function-based handler: first call throws, second returns hex
+      let callCount = 0;
+      mockResponses.set('blockchain.transaction.get', () => {
+        callCount++;
+        if (callCount === 1) {
+          throw new Error('Transaction not found');
+        }
+        return testTx.hex;
+      });
 
       const txs = await network.getBlockTxs(blockHeader.hash);
-      expect(txs.length).toBeGreaterThanOrEqual(1);
+      expect(txs).toHaveLength(1);
+      expect(txs[0].txid).toBe(testTx.txid);
     });
   });
 

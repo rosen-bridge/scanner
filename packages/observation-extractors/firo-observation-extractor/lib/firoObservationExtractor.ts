@@ -5,7 +5,7 @@ import { FiroRpcTransaction } from '@rosen-bridge/firo-scanner';
 import { FiroRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-export class FiroRpcObservationExtractor extends AbstractObservationExtractor<FiroRpcTransaction> {
+export class FiroObservationExtractor extends AbstractObservationExtractor<FiroRpcTransaction> {
   readonly FROM_CHAIN = 'firo';
 
   constructor(
@@ -21,7 +21,7 @@ export class FiroRpcObservationExtractor extends AbstractObservationExtractor<Fi
       new FiroRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('FiroRpcRosenExtractor'),
+        logger?.child('FiroRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -38,3 +38,6 @@ export class FiroRpcObservationExtractor extends AbstractObservationExtractor<Fi
    */
   getTxId = (tx: FiroRpcTransaction) => tx.txid;
 }
+
+/** @deprecated Use FiroObservationExtractor instead */
+export const FiroRpcObservationExtractor = FiroObservationExtractor;
