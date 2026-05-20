@@ -1,5 +1,12 @@
 # @rosen-bridge/raw-data-provider
 
+## 0.1.5
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/bitcoin-runes-observation-extractor@3.0.2
+
 ## 0.1.4
 
 ### Patch Changes
