@@ -1,5 +1,5 @@
-import * as net from 'net';
 import { createHash } from 'crypto';
+import * as net from 'net';
 
 import {
   AbstractNetworkConnector,
@@ -51,12 +51,14 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
   // ---------------- AbstractNetworkConnector implementation ----------------
 
   getCurrentHeight = async (): Promise<number> => {
+    await this.ensureConnected();
     const result = await this.sendRequest('blockchain.headers.subscribe', []);
     const typed = result as { height: number };
     return typed.height;
   };
 
   getBlockAtHeight = async (height: number): Promise<Block> => {
+    await this.ensureConnected();
     const rawHeader = await this.sendRequest('blockchain.block.header', [
       height,
     ]);
@@ -79,6 +81,8 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
           `getBlockAtHeight must be called before getBlockTxs for the same block.`,
       );
     }
+
+    await this.ensureConnected();
 
     // 1. Get all txids in the block
     const txids = (await this.sendRequest('blockchain.block.txids', [
@@ -154,11 +158,31 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
         this.socket!.on('error', this.onSocketError);
         this.socket!.on('close', this.onSocketClose);
 
-        // Send server.version first
+        // Send server.version directly (no sendRequest — we're mid-connect)
+        const vId = this.nextId++;
+        const vRequest = JSON.stringify({
+          jsonrpc: '2.0',
+          id: vId,
+          method: 'server.version',
+          params: ['rosen-scanner', '1.4'],
+        });
+
         try {
-          await this.sendRequest('server.version', ['rosen-scanner', '1.4']);
+          await new Promise<unknown>((res, rej) => {
+            const timer = setTimeout(() => {
+              this.pending.delete(vId);
+              rej(
+                new Error(
+                  `ElectrumX request timeout [server.version] after ${this.timeout}ms`,
+                ),
+              );
+            }, this.timeout);
+            this.pending.set(vId, { resolve: res, reject: rej, timer });
+            this.socket!.write(vRequest + '\n');
+          });
+          // server.version response is ["software", "protocol"] — just check we got a result
           this.versionSent = true;
-          this.reconnectBackoff = 1000; // reset backoff on successful connect
+          this.reconnectBackoff = 1000;
           resolve();
         } catch (e) {
           reject(e);
@@ -183,10 +207,7 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
       this.connectPromise = this.doConnect();
       this.connectPromise.catch(() => {
         // Backoff — try again later
-        this.reconnectBackoff = Math.min(
-          this.reconnectBackoff * 2,
-          30000,
-        );
+        this.reconnectBackoff = Math.min(this.reconnectBackoff * 2, 30000);
         this.scheduleReconnect();
       });
     }, this.reconnectBackoff);
@@ -202,41 +223,37 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
 
   // ---------------- JSON-RPC request/response ----------------
 
-  private sendRequest = (method: string, params: unknown[]): Promise<unknown> => {
+  private sendRequest = (
+    method: string,
+    params: unknown[],
+  ): Promise<unknown> => {
+    const id = this.nextId++;
+    const request = JSON.stringify({
+      jsonrpc: '2.0',
+      id,
+      method,
+      params,
+    });
+
     return new Promise<unknown>((resolve, reject) => {
-      const doSend = () => {
-        const id = this.nextId++;
-        const request = JSON.stringify({
-          jsonrpc: '2.0',
-          id,
-          method,
-          params,
-        });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(
+          new Error(
+            `ElectrumX request timeout [${method}] after ${this.timeout}ms`,
+          ),
+        );
+      }, this.timeout);
 
-        const timer = setTimeout(() => {
-          this.pending.delete(id);
-          reject(
-            new Error(
-              `ElectrumX request timeout [${method}] after ${this.timeout}ms`,
-            ),
-          );
-        }, this.timeout);
+      this.pending.set(id, { resolve, reject, timer });
 
-        this.pending.set(id, { resolve, reject, timer });
-
-        try {
-          this.socket!.write(request + '\n');
-        } catch (err) {
-          clearTimeout(timer);
-          this.pending.delete(id);
-          reject(err);
-        }
-      };
-
-      // Ensure we're connected, then send
-      this.ensureConnected()
-        .then(doSend)
-        .catch(reject);
+      try {
+        this.socket!.write(request + '\n');
+      } catch (err) {
+        clearTimeout(timer);
+        this.pending.delete(id);
+        reject(err);
+      }
     });
   };
 
@@ -290,7 +307,12 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
     // bytes 72-75: bits
     // bytes 76-79: nonce
 
-    const parentHash = raw.subarray(4, 36).toString('hex').match(/.{2}/g)!.reverse().join('');
+    const parentHash = raw
+      .subarray(4, 36)
+      .toString('hex')
+      .match(/.{2}/g)!
+      .reverse()
+      .join('');
     const timestamp = raw.readUInt32LE(68);
 
     // Block hash = double-SHA256 of 80 header bytes, reversed for display
@@ -385,7 +407,9 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
     // ScriptSig (varstr)
     const { value: scriptLen, offset: newOff } = this.readVarInt(raw, offset);
     offset = newOff;
-    const scriptSigHex = raw.subarray(offset, offset + scriptLen).toString('hex');
+    const scriptSigHex = raw
+      .subarray(offset, offset + scriptLen)
+      .toString('hex');
     offset += scriptLen;
 
     // Sequence (4 bytes LE)

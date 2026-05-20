@@ -1,49 +1,4 @@
-// Core RPC Response Types
-export interface JsonRpcResult<T> {
-  id: string | number;
-  result: T;
-}
-
-export type JsonRpcError = {
-  id: string;
-  error: {
-    code: number;
-    message?: string;
-    data?: unknown;
-  };
-};
-
-// Coinbase transaction (in Firo getblock RPC response)
-export interface FiroRpcCoinbaseTransaction {
-  version: number;
-  height: number;
-  merkleRootMNList: string;
-}
-
-// Firo getblock RPC response
-export interface FiroRpcBlock {
-  hash: string;
-  confirmations: number;
-  size: number;
-  strippedsize?: number;
-  weight?: number;
-  height: number;
-  version: number;
-  versionHex: string;
-  merkleroot: string;
-  tx: Array<string>;
-  cbTx?: FiroRpcCoinbaseTransaction;
-  time: number;
-  mediantime: number;
-  nonce: number;
-  bits: string;
-  difficulty: number;
-  chainwork: string;
-  previousblockhash?: string;
-  nextblockhash?: string;
-}
-
-// Transaction input types (in Firo getrawtransaction RPC response)
+// Transaction input types
 export interface FiroRpcTxInput {
   txid: string;
   vout: number;
@@ -55,7 +10,7 @@ export interface FiroRpcTxInput {
   txinwitness?: string[];
 }
 
-// Transaction output types (in Firo getrawtransaction RPC response)
+// Transaction output types
 export interface FiroRpcTxOutput {
   value: number;
   n: number;
@@ -68,7 +23,7 @@ export interface FiroRpcTxOutput {
   };
 }
 
-// Firo getrawtransaction RPC response
+// Firo transaction
 export interface FiroRpcTransaction {
   hex: string;
   txid: string;
