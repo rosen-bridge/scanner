@@ -26,6 +26,7 @@ abstract class GeneralScanner<
     private blockRetrieveGap = 0,
     logger?: AbstractLogger,
     private suffix?: string,
+    private heightGap = 100,
   ) {
     super(logger);
     /**
@@ -190,8 +191,31 @@ abstract class GeneralScanner<
     this.blockChainLastHeight;
 
   /**
-   * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
-   * scenario in the blockchain and invalidate the database till the database synced again.
+   * Checks if any registered extractor detects an event within the given block height range.
+   *
+   * @param {number} fromHeight - The starting block height to check.
+   * @param {number} toHeight - The ending block height to check.
+   * @returns {Promise<boolean>} True if at least one event is found, false otherwise.
+   */
+  protected checkExtractorsForEvents = async (
+    fromHeight: number,
+    toHeight: number,
+  ): Promise<boolean> => {
+    if (this.extractors.length == 0) return true;
+    for (const extractor of this.extractors) {
+      const hasEvent = await extractor.hasEventInHeightRange(
+        fromHeight,
+        toHeight,
+      );
+      if (hasEvent) return true;
+    }
+    return false;
+  };
+
+  /**
+   * worker function that synchronizes the database with the blockchain.
+   * It handles scanner initialization, fork resolution, step-by-step block processing,
+   * and fast-forwarding when no events are detected.
    */
   update = async () => {
     try {
@@ -199,17 +223,44 @@ abstract class GeneralScanner<
       if (
         !this.blockChainLastHeight ||
         this.blockChainLastHeight < latestHeight
-      )
+      ) {
         this.blockChainLastHeight = latestHeight;
+      }
 
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       } else await this.verifyExtractorsInitialization(lastSavedBlock);
-      if (!(await this.isForkHappen())) {
-        await this.stepForward(lastSavedBlock);
-      } else {
+      if (await this.isForkHappen()) {
         await this.stepBackward();
+      } else {
+        let currentHeight = Math.min(
+          lastSavedBlock.height + this.heightGap,
+          latestHeight,
+        );
+        const hasAnyEvent = await this.checkExtractorsForEvents(
+          lastSavedBlock.height,
+          currentHeight,
+        );
+        if (hasAnyEvent) {
+          this.logger.info(
+            `Events detected between ${lastSavedBlock.height} and ${currentHeight}. Processing blocks`,
+          );
+          await this.stepForward(lastSavedBlock);
+        } else {
+          this.logger.info(
+            `No events between ${lastSavedBlock.height} and ${currentHeight}. Fast forwarding`,
+          );
+          const currentBlock =
+            await this.network.getBlockAtHeight(currentHeight);
+
+          const savedBlock = await this.action.saveBlock(currentBlock);
+          if (typeof savedBlock === 'boolean') {
+            throw new Error(
+              `Can not store block ${currentBlock.height} in fast-forward update`,
+            );
+          }
+        }
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);

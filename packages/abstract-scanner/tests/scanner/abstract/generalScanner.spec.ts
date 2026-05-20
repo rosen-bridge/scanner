@@ -16,6 +16,7 @@ let dataSource: DataSource;
 describe('generalScanner', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
+    vi.restoreAllMocks();
   });
 
   describe('isForkHappen', () => {
@@ -572,6 +573,87 @@ describe('generalScanner', () => {
       await scanner.update();
 
       expect(scanner.getBlockChainLastHeight()).toEqual(200);
+    });
+
+    /**
+     * @target update should call stepForward when events are detected by extractors
+     * @dependencies
+     * - checkExtractorsForEvents
+     * @scenario
+     * - Mock checkExtractorsForEvents to return true (events exist)
+     * - Call update
+     * @expected
+     * - should call stepForward to process blocks sequentially
+     * - should NOT call processBlock directly (fast-forward mode)
+     */
+    it('should call stepForward when events are detected by extractors', async () => {
+      const network = new NetworkConnectorTest();
+      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(3);
+      const scanner = new TestGeneralScanner('first', dataSource, network);
+
+      await insertBlocks(scanner, 2);
+
+      vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
+      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
+        true,
+      );
+
+      const mockedStepForward = vi
+        .spyOn(scanner as any, 'stepForward')
+        .mockResolvedValue(undefined);
+
+      await scanner.update();
+
+      expect(mockedStepForward).toHaveBeenCalled();
+    });
+
+    /**
+     * @target update should fast-forward and call processBlock when no events are detected by extractors
+     * @dependencies
+     * - checkExtractorsForEvents
+     * @scenario
+     * - Mock checkExtractorsForEvents to return false (no events)
+     * - Call update
+     * @expected
+     * - should NOT call stepForward
+     * - should call getBlockAtHeight for the latest height
+     * - should call processBlock directly with the latest block (fast-forward)
+     */
+    it('should fast-forward and call processBlock when no events are detected by extractors', async () => {
+      const network = new NetworkConnectorTest();
+      const currentHeight = 3;
+      const currentBlock = {
+        height: 3,
+        parentHash: '2',
+        hash: '3',
+        timestamp: 30,
+      };
+
+      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(currentHeight);
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        async (height) => {
+          if (height === 3) return currentBlock as any;
+          return null;
+        },
+      );
+
+      const scanner = new TestGeneralScanner('first', dataSource, network);
+
+      await insertBlocks(scanner, 2);
+
+      vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
+      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
+        false,
+      );
+
+      const mockedStepForward = vi
+        .spyOn(scanner as any, 'stepForward')
+        .mockResolvedValue(undefined);
+
+      await scanner.update();
+
+      expect(mockedStepForward).not.toHaveBeenCalled();
+      expect(network.getBlockAtHeight).toHaveBeenCalledWith(currentHeight);
     });
   });
 });

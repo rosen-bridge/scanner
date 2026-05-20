@@ -1,5 +1,11 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 3.0.2
+
+### Patch Changes
+
+- Fix bug where pagination was ignored while fetching address or transaction runes
+
 ## 3.0.1
 
 ### Patch Changes
