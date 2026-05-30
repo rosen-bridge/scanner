@@ -92,15 +92,11 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
     // 2. Fetch each transaction hex and parse it
     const transactions: Array<FiroRpcTransaction> = [];
     for (const txid of txids) {
-      try {
-        const hex = (await this.sendRequest('blockchain.transaction.get', [
-          txid,
-          false,
-        ])) as string;
-        transactions.push(this.parseTransactionHex(hex, txid));
-      } catch (error) {
-        console.warn(`Failed to fetch transaction ${txid}: ${error}`);
-      }
+      const hex = (await this.sendRequest('blockchain.transaction.get', [
+        txid,
+        false,
+      ])) as string;
+      transactions.push(this.parseTransactionHex(hex, txid));
     }
 
     return transactions;
@@ -339,14 +335,9 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
     const raw = Buffer.from(hex, 'hex');
     let offset = 0;
 
-    // Version (4 bytes LE)
-    const version = raw.readInt32LE(offset);
+    // Firo packs tx type into the upper 16 bits of the same 4-byte field.
+    const version = raw.readUInt32LE(offset) & 0xffff;
     offset += 4;
-
-    // Firo tx version >= 3 has a 2-byte type field
-    if (version >= 3) {
-      offset += 2; // skip type field
-    }
 
     // Parse vin
     const { value: vinCount, offset: newOff } = this.readVarInt(raw, offset);

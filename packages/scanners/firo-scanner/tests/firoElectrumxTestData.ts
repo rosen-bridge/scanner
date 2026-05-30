@@ -134,22 +134,17 @@ function buildTestTx(): {
 
 export const testTx = buildTestTx();
 
-// A Firo tx version 3 (with type field) for testing
+// A Firo tx version 3 with packed transaction type for testing
 function buildTestTxV3(): {
   hex: string;
   txid: string;
 } {
   const parts: Buffer[] = [];
 
-  // Version (4 bytes LE) — version 3
-  const version = Buffer.alloc(4);
-  version.writeUInt32LE(3, 0);
-  parts.push(version);
-
-  // Type field (2 bytes LE) — Firo-specific
-  const typeField = Buffer.alloc(2);
-  typeField.writeUInt16LE(0, 0);
-  parts.push(typeField);
+  // Version 3 plus tx type 8 packed into the upper 16 bits.
+  const versionAndType = Buffer.alloc(4);
+  versionAndType.writeUInt32LE(3 | (8 << 16), 0);
+  parts.push(versionAndType);
 
   // Vin count = 1
   parts.push(Buffer.from([0x01]));
@@ -193,6 +188,7 @@ function buildTestTxV3(): {
   // Locktime
   const locktime = Buffer.alloc(4);
   parts.push(locktime);
+  parts.push(Buffer.from([0x00])); // empty extra payload for typed tx
 
   const raw = Buffer.concat(parts);
   const hex = raw.toString('hex');

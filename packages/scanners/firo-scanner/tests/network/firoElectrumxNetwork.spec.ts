@@ -163,14 +163,14 @@ describe('FiroElectrumXNetwork', () => {
     });
 
     /**
-     * @target FiroElectrumXNetwork.getBlockTxs should skip individual tx
-     * failures and return successful ones
+     * @target FiroElectrumXNetwork.getBlockTxs should fail when a tx fetch
+     * fails
      * @dependencies
      * -   One tx get fails with ElectrumX error
      * @expected
-     * - Should return only the successful transactions
+     * - Should reject instead of returning a partial block
      */
-    it('should skip failed transaction fetches', async () => {
+    it('should fail when a transaction fetch fails', async () => {
       mockResponses.set('server.version', ['rosen-scanner', '1.4']);
       mockResponses.set('blockchain.block.header', blockHeader.hex);
 
@@ -190,23 +190,23 @@ describe('FiroElectrumXNetwork', () => {
         return testTx.hex;
       });
 
-      const txs = await network.getBlockTxs(blockHeader.hash);
-      expect(txs).toHaveLength(1);
-      expect(txs[0].txid).toBe(testTx.txid);
+      await expect(network.getBlockTxs(blockHeader.hash)).rejects.toThrow(
+        'Transaction not found',
+      );
     });
   });
 
   describe('transaction hex parsing', () => {
     /**
      * @target FiroElectrumXNetwork should correctly parse a Firo version 3
-     * transaction with type field
+     * transaction with packed type
      * @dependencies
      * -   getBlockAtHeight called first
      * -   blockchain.transaction.get returns v3 tx hex
      * @expected
-     * - Should parse both vouts correctly despite the 2-byte type field
+     * - Should parse both vouts correctly despite the packed type bits
      */
-    it('should parse a version 3 Firo transaction with type field', async () => {
+    it('should parse a version 3 Firo transaction with packed type', async () => {
       mockResponses.set('server.version', ['rosen-scanner', '1.4']);
       mockResponses.set('blockchain.block.header', blockHeader.hex);
 
