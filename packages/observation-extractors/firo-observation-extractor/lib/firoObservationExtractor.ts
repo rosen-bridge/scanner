@@ -31,7 +31,7 @@ export class FiroObservationExtractor extends AbstractObservationExtractor<FiroR
   /**
    * gets Id for current extractor
    */
-  getId = () => 'firo-rpc-extractor';
+  getId = () => 'firo-observation-extractor';
 
   /**
    * gets transaction id from TransactionType
