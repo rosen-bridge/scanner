@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { vi } from 'vitest';
 
 /**
- * Creates a mock net.Socket that auto-responds to ElectrumX JSON-RPC requests.
+ * Creates a mock TLS socket that auto-responds to ElectrumX JSON-RPC requests.
  *
  * The socket's write() parses each JSON-RPC line, looks up a response in the
  * provided `responses` map (keyed by method name), and emits the response

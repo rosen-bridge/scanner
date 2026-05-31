@@ -7,12 +7,12 @@ import { createMockSocket } from '../mocked/electrumxSocket.mock';
 // We store the mock socket factory so each test can set up its own responses
 let mockResponses: Map<string, unknown>;
 
-vi.mock('net', () => ({
-  createConnection: vi.fn(() => {
+vi.mock('tls', () => ({
+  connect: vi.fn(() => {
     const socket = createMockSocket(mockResponses);
-    // Emit 'connect' asynchronously so ensureConnected -> doConnect can wire
-    // up the 'connect' listener before it fires
-    setTimeout(() => socket.emit('connect'));
+    // Emit 'secureConnect' asynchronously so ensureConnected -> doConnect can
+    // wire up the TLS listener before it fires.
+    setTimeout(() => socket.emit('secureConnect'));
     return socket;
   }),
 }));
@@ -235,14 +235,14 @@ describe('FiroElectrumXNetwork', () => {
      * - Should throw with the error message
      */
     it('should throw on ElectrumX error response', async () => {
-      const { createConnection } = await import('net');
+      const { connect } = await import('tls');
 
       // Reset to use a custom socket that sends an error response
-      vi.mocked(createConnection).mockImplementationOnce(() => {
+      vi.mocked(connect).mockImplementationOnce(() => {
         const socket = createMockSocket(
           new Map(),
-        ) as unknown as import('net').Socket & { written: string[] };
-        setTimeout(() => socket.emit('connect'));
+        ) as unknown as import('tls').TLSSocket & { written: string[] };
+        setTimeout(() => socket.emit('secureConnect'));
         // Override write to send error for blockchain.block.header
         socket.write = (data: string) => {
           socket.written.push(data);

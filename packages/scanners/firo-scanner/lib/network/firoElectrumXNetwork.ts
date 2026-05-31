@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import * as net from 'net';
+import * as tls from 'tls';
 
 import {
   AbstractNetworkConnector,
@@ -23,7 +23,7 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
   private readonly port: number;
   private readonly timeout: number;
 
-  private socket: net.Socket | null = null;
+  private socket: tls.TLSSocket | null = null;
   private nextId = 1;
   private pending = new Map<
     number,
@@ -102,7 +102,7 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
     return transactions;
   };
 
-  // ---------------- TCP Connection Management ----------------
+  // ---------------- TLS Connection Management ----------------
 
   private ensureConnected = async (): Promise<void> => {
     // Already connected and version handshake done
@@ -126,7 +126,11 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
   private doConnect = (): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
       this.versionSent = false;
-      this.socket = net.createConnection(this.port, this.host);
+      this.socket = tls.connect({
+        host: this.host,
+        port: this.port,
+        servername: this.host,
+      });
 
       const onError = (err: Error) => {
         cleanup();
@@ -148,7 +152,7 @@ class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransaction> 
       this.socket.once('error', onError);
       this.socket.on('data', onData);
 
-      this.socket.once('connect', async () => {
+      this.socket.once('secureConnect', async () => {
         // Remove the connect-time error handler; replace with reconnect handler
         this.socket!.removeListener('error', onError);
         this.socket!.on('error', this.onSocketError);
