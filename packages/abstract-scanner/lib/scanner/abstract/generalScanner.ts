@@ -243,12 +243,12 @@ abstract class GeneralScanner<
           currentHeight,
         );
         if (hasAnyEvent) {
-          this.logger.info(
+          this.logger.debug(
             `Events detected between ${lastSavedBlock.height} and ${currentHeight}. Processing blocks`,
           );
           await this.stepForward(lastSavedBlock);
         } else {
-          this.logger.info(
+          this.logger.debug(
             `No events between ${lastSavedBlock.height} and ${currentHeight}. Fast forwarding`,
           );
           const currentBlock =
