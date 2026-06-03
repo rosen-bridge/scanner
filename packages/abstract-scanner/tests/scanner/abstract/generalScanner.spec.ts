@@ -198,13 +198,20 @@ describe('generalScanner', () => {
 
   describe('stepForward', () => {
     /**
-     * Test when no fork happens it must step forward
-     * Dependency: database should be filled with data of another scanner
-     * Scenario: Create scanner insert two blocks
-     *           Then call stepForward with last inserted block
-     * Expected: block at height 3 & 4 must exist for this scanner
+     * @target stepForward should insert block on stepForward when checkExtractorsForEvents return true
+     * @dependencies
+     * - checkExtractorsForEvents
+     * - getCurrentHeight
+     * - getBlockAtHeight
+     * - database should be filled with data of another scanner
+     * @scenario
+     * - Create scanner insert two blocks
+     * - Then call stepForward with last inserted block
+     * - Mock checkExtractorsForEvents to return true
+     * @expected
+     * - block at height 3 & 4 must exist for this scanner
      */
-    it('should insert block on stepForward', async () => {
+    it('should insert block on stepForward when checkExtractorsForEvents return true', async () => {
       const network = new NetworkConnectorTest();
       vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
         new Promise((resolve) => resolve(4)),
@@ -256,11 +263,91 @@ describe('generalScanner', () => {
       const scanner = new TestGeneralScanner('first', dataSource, network);
       await insertBlocks(scanner, 2);
       const lastBlock = await scanner.action.getLastSavedBlock();
+      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
+        true,
+      );
       expect(lastBlock).toBeDefined();
       if (lastBlock) {
         await scanner['stepForward'](lastBlock);
       }
       expect(await scanner.action.getBlockAtHeight(3)).toBeDefined();
+      expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
+    });
+
+    /**
+     * @target stepForward should insert last block on stepForward when no event detected by extractors and fast-forward to the last block
+     * @dependencies
+     * - checkExtractorsForEvents
+     * - getCurrentHeight
+     * - getBlockAtHeight
+     * - database should be filled with data of another scanner
+     * @scenario
+     * - Create scanner insert two blocks
+     * - Then call stepForward with last inserted block
+     * - Mock checkExtractorsForEvents to return false
+     * @expected
+     * - block at height 4 must exist for this scanner and block at height 3 must NOT exist for this scanner
+     */
+    it('should insert last block on stepForward when no event detected by extractors and fast-forward to the last block', async () => {
+      const network = new NetworkConnectorTest();
+      vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
+        new Promise((resolve) => resolve(4)),
+      );
+      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
+        (height: number) => {
+          return new Promise((resolve) => {
+            switch (height) {
+              case 1: {
+                resolve({
+                  height: 1,
+                  parentHash: ' ',
+                  hash: '1',
+                  timestamp: 10,
+                });
+                break;
+              }
+              case 2: {
+                resolve({
+                  height: 2,
+                  parentHash: '1',
+                  hash: '2',
+                  timestamp: 20,
+                });
+                break;
+              }
+              case 3: {
+                resolve({
+                  height: 3,
+                  parentHash: '2',
+                  hash: '3',
+                  timestamp: 30,
+                });
+                break;
+              }
+              case 4: {
+                resolve({
+                  height: 4,
+                  parentHash: '3',
+                  hash: '4',
+                  timestamp: 40,
+                });
+                break;
+              }
+            }
+          });
+        },
+      );
+      const scanner = new TestGeneralScanner('first', dataSource, network);
+      await insertBlocks(scanner, 2);
+      const lastBlock = await scanner.action.getLastSavedBlock();
+      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
+        false,
+      );
+      expect(lastBlock).toBeDefined();
+      if (lastBlock) {
+        await scanner['stepForward'](lastBlock);
+      }
+      expect(await scanner.action.getBlockAtHeight(3)).not.toBeDefined();
       expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
     });
   });
@@ -573,87 +660,6 @@ describe('generalScanner', () => {
       await scanner.update();
 
       expect(scanner.getBlockChainLastHeight()).toEqual(200);
-    });
-
-    /**
-     * @target update should call stepForward when events are detected by extractors
-     * @dependencies
-     * - checkExtractorsForEvents
-     * @scenario
-     * - Mock checkExtractorsForEvents to return true (events exist)
-     * - Call update
-     * @expected
-     * - should call stepForward to process blocks sequentially
-     * - should NOT call processBlock directly (fast-forward mode)
-     */
-    it('should call stepForward when events are detected by extractors', async () => {
-      const network = new NetworkConnectorTest();
-      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(3);
-      const scanner = new TestGeneralScanner('first', dataSource, network);
-
-      await insertBlocks(scanner, 2);
-
-      vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
-      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
-        true,
-      );
-
-      const mockedStepForward = vi
-        .spyOn(scanner as any, 'stepForward')
-        .mockResolvedValue(undefined);
-
-      await scanner.update();
-
-      expect(mockedStepForward).toHaveBeenCalled();
-    });
-
-    /**
-     * @target update should fast-forward and call processBlock when no events are detected by extractors
-     * @dependencies
-     * - checkExtractorsForEvents
-     * @scenario
-     * - Mock checkExtractorsForEvents to return false (no events)
-     * - Call update
-     * @expected
-     * - should NOT call stepForward
-     * - should call getBlockAtHeight for the latest height
-     * - should call processBlock directly with the latest block (fast-forward)
-     */
-    it('should fast-forward and call processBlock when no events are detected by extractors', async () => {
-      const network = new NetworkConnectorTest();
-      const currentHeight = 3;
-      const currentBlock = {
-        height: 3,
-        parentHash: '2',
-        hash: '3',
-        timestamp: 30,
-      };
-
-      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(currentHeight);
-      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
-        async (height) => {
-          if (height === 3) return currentBlock as any;
-          return null;
-        },
-      );
-
-      const scanner = new TestGeneralScanner('first', dataSource, network);
-
-      await insertBlocks(scanner, 2);
-
-      vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
-      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
-        false,
-      );
-
-      const mockedStepForward = vi
-        .spyOn(scanner as any, 'stepForward')
-        .mockResolvedValue(undefined);
-
-      await scanner.update();
-
-      expect(mockedStepForward).not.toHaveBeenCalled();
-      expect(network.getBlockAtHeight).toHaveBeenCalledWith(currentHeight);
     });
   });
 });

@@ -67,7 +67,8 @@ abstract class GeneralScanner<
   };
 
   /**
-   * This method introduces delay between consecutive block processing operations
+   * This method introduces delay between consecutive block processing
+   * operations
    */
   protected delayBetweenBlocksProcessing = async (startTime: number) => {
     const spentTime = new Date().getTime() - startTime;
@@ -89,7 +90,8 @@ abstract class GeneralScanner<
     if (block.txCount) {
       if (txs.length != block.txCount) {
         this.logger.debug(
-          `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`,
+          `Aborting block process with hash [${block.hash}] expected to have 
+          ${block.txCount} transactions but had ${txs.length}`,
         );
         return false;
       }
@@ -108,37 +110,50 @@ abstract class GeneralScanner<
   };
 
   /**
-   * process forward in scanner. get blocks and store information from transactions.
+   * process forward in scanner. get blocks and store information from
+   * transactions.
    * @param lastSavedBlock: last saved block entity in database
    */
   protected stepForward = async (lastSavedBlock: BlockEntity) => {
-    const currentHeight = await this.network.getCurrentHeight();
+    let currentHeight = await this.network.getCurrentHeight();
     const firstBlock = await this.action.getFirstSavedBlock();
+
     if (!firstBlock || firstBlock.height >= currentHeight) {
       return;
     }
+    let stopHeight = lastSavedBlock.height;
+    let step = this.heightGap;
     for (
-      let height = lastSavedBlock.height + 1;
-      height <= currentHeight;
-      height++
+      let height = lastSavedBlock.height;
+      height < currentHeight;
+      height += step
     ) {
-      const block = await this.network.getBlockAtHeight(height);
-      if (lastSavedBlock !== undefined) {
-        if (block.parentHash === lastSavedBlock.hash) {
-          const savedBlock = await this.processBlock(block);
-          if (typeof savedBlock === 'boolean') {
-            break;
-          } else {
-            lastSavedBlock = savedBlock;
-          }
-        } else {
-          this.logger.debug(
-            `Invalid block at height ${height}. Block info is [${JsonBI.stringify(
+      if (
+        step > 1 &&
+        (await this.checkExtractorsForEvents(height, height + this.heightGap))
+      ) {
+        step = 1;
+        stopHeight = height + this.heightGap;
+      }
+      const block = await this.network.getBlockAtHeight(height + step);
+      if (block.parentHash != lastSavedBlock.hash && step === 1) {
+        this.logger.debug(
+          `Invalid block at height ${lastSavedBlock.height + 1}. Block info 
+            is [${JsonBI.stringify(
               block,
             )} and the expected parent hash is [${lastSavedBlock.hash}]`,
-          );
+        );
+        break;
+      } else {
+        const savedBlock = await this.processBlock(block);
+        if (typeof savedBlock === 'boolean') {
           break;
+        } else {
+          lastSavedBlock = savedBlock;
         }
+      }
+      if (height + step == stopHeight) {
+        step = this.heightGap;
       }
     }
   };
@@ -191,17 +206,18 @@ abstract class GeneralScanner<
     this.blockChainLastHeight;
 
   /**
-   * Checks if any registered extractor detects an event within the given block height range.
+   * Checks if any registered extractor detects an event
+   * within the given block height range.
    *
    * @param {number} fromHeight - The starting block height to check.
    * @param {number} toHeight - The ending block height to check.
-   * @returns {Promise<boolean>} True if at least one event is found, false otherwise.
+   * @returns {Promise<boolean>} True if at least one event is found,
+   * false otherwise.
    */
   protected checkExtractorsForEvents = async (
     fromHeight: number,
     toHeight: number,
   ): Promise<boolean> => {
-    if (this.extractors.length == 0) return true;
     for (const extractor of this.extractors) {
       const hasEvent = await extractor.hasEventInHeightRange(
         fromHeight,
@@ -214,7 +230,8 @@ abstract class GeneralScanner<
 
   /**
    * worker function that synchronizes the database with the blockchain.
-   * It handles scanner initialization, fork resolution, step-by-step block processing,
+   * It handles scanner initialization, fork resolution,
+   * step-by-step block processing,
    * and fast-forwarding when no events are detected.
    */
   update = async () => {
@@ -223,44 +240,17 @@ abstract class GeneralScanner<
       if (
         !this.blockChainLastHeight ||
         this.blockChainLastHeight < latestHeight
-      ) {
+      )
         this.blockChainLastHeight = latestHeight;
-      }
 
       let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       } else await this.verifyExtractorsInitialization(lastSavedBlock);
-      if (await this.isForkHappen()) {
-        await this.stepBackward();
+      if (!(await this.isForkHappen())) {
+        await this.stepForward(lastSavedBlock);
       } else {
-        let currentHeight = Math.min(
-          lastSavedBlock.height + this.heightGap,
-          latestHeight,
-        );
-        const hasAnyEvent = await this.checkExtractorsForEvents(
-          lastSavedBlock.height,
-          currentHeight,
-        );
-        if (hasAnyEvent) {
-          this.logger.debug(
-            `Events detected between ${lastSavedBlock.height} and ${currentHeight}. Processing blocks`,
-          );
-          await this.stepForward(lastSavedBlock);
-        } else {
-          this.logger.debug(
-            `No events between ${lastSavedBlock.height} and ${currentHeight}. Fast forwarding`,
-          );
-          const currentBlock =
-            await this.network.getBlockAtHeight(currentHeight);
-
-          const savedBlock = await this.action.saveBlock(currentBlock);
-          if (typeof savedBlock === 'boolean') {
-            throw new Error(
-              `Can not store block ${currentBlock.height} in fast-forward update`,
-            );
-          }
-        }
+        await this.stepBackward();
       }
     } catch (e) {
       this.logger.error(`An error occurred during update process. ${e}`);
