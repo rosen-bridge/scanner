@@ -115,7 +115,7 @@ abstract class GeneralScanner<
    * @param lastSavedBlock: last saved block entity in database
    */
   protected stepForward = async (lastSavedBlock: BlockEntity) => {
-    let currentHeight = await this.network.getCurrentHeight();
+    const currentHeight = await this.network.getCurrentHeight();
     const firstBlock = await this.action.getFirstSavedBlock();
 
     if (!firstBlock || firstBlock.height >= currentHeight) {
@@ -144,13 +144,12 @@ abstract class GeneralScanner<
             )} and the expected parent hash is [${lastSavedBlock.hash}]`,
         );
         break;
+      }
+      const savedBlock = await this.processBlock(block);
+      if (typeof savedBlock === 'boolean') {
+        break;
       } else {
-        const savedBlock = await this.processBlock(block);
-        if (typeof savedBlock === 'boolean') {
-          break;
-        } else {
-          lastSavedBlock = savedBlock;
-        }
+        lastSavedBlock = savedBlock;
       }
       if (height + step == stopHeight) {
         step = this.heightGap;

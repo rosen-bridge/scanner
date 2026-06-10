@@ -266,10 +266,7 @@ describe('generalScanner', () => {
       vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
         true,
       );
-      expect(lastBlock).toBeDefined();
-      if (lastBlock) {
-        await scanner['stepForward'](lastBlock);
-      }
+      await scanner['stepForward'](lastBlock!);
       expect(await scanner.action.getBlockAtHeight(3)).toBeDefined();
       expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
     });
@@ -296,44 +293,12 @@ describe('generalScanner', () => {
       vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
         (height: number) => {
           return new Promise((resolve) => {
-            switch (height) {
-              case 1: {
-                resolve({
-                  height: 1,
-                  parentHash: ' ',
-                  hash: '1',
-                  timestamp: 10,
-                });
-                break;
-              }
-              case 2: {
-                resolve({
-                  height: 2,
-                  parentHash: '1',
-                  hash: '2',
-                  timestamp: 20,
-                });
-                break;
-              }
-              case 3: {
-                resolve({
-                  height: 3,
-                  parentHash: '2',
-                  hash: '3',
-                  timestamp: 30,
-                });
-                break;
-              }
-              case 4: {
-                resolve({
-                  height: 4,
-                  parentHash: '3',
-                  hash: '4',
-                  timestamp: 40,
-                });
-                break;
-              }
-            }
+            resolve({
+              height,
+              parentHash: height === 1 ? ' ' : (height - 1).toString(),
+              hash: height.toString(),
+              timestamp: 10 * height,
+            });
           });
         },
       );
@@ -343,11 +308,8 @@ describe('generalScanner', () => {
       vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
         false,
       );
-      expect(lastBlock).toBeDefined();
-      if (lastBlock) {
-        await scanner['stepForward'](lastBlock);
-      }
-      expect(await scanner.action.getBlockAtHeight(3)).not.toBeDefined();
+      await scanner['stepForward'](lastBlock!);
+      expect(await scanner.action.getBlockAtHeight(3)).toBeUndefined();
       expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
     });
   });
