@@ -1,7 +1,7 @@
 {
   "name": "@rosen-bridge/firo-scanner",
   "version": "0.1.2",
-  "description": "A Firo blockchain scanner based on network RPC",
+  "description": "A Firo blockchain scanner based on RPC and ElectrumX",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rosen-bridge/scanner.git"

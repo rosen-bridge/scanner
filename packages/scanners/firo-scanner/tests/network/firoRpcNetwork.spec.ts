@@ -139,6 +139,27 @@ describe('FiroRpcNetwork', () => {
         });
       });
     });
+
+    /**
+     * @target `FiroRpcNetwork.getBlockTxs` should fail when a transaction fetch fails
+     * @dependencies Mock axios response for getblock and failing getrawtransaction RPC call
+     * @scenario
+     * - Mock axios to return block data containing transaction IDs array
+     * - Mock axios to reject the getrawtransaction call
+     * - Call getBlockTxs with test block hash
+     * @expected
+     * - Should reject instead of returning a partial transaction list
+     * - axios.post should be called once for getblock and once for getrawtransaction
+     */
+    it('should fail when a block transaction fetch fails', async () => {
+      mockAxiosPost(testData.getBlockResponse);
+      axiosInstance.post.mockRejectedValueOnce(new Error('tx fetch failed'));
+
+      await expect(network.getBlockTxs(testData.blockHash)).rejects.toThrow(
+        `Failed to get block transactions for ${testData.blockHash}:`,
+      );
+      expect(axiosInstance.post).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('getBlockInfo', () => {

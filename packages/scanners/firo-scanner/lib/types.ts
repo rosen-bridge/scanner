@@ -43,7 +43,7 @@ export interface FiroRpcBlock {
   nextblockhash?: string;
 }
 
-// Transaction input types (in Firo getrawtransaction RPC response)
+// Transaction input types
 export interface FiroRpcTxInput {
   txid: string;
   vout: number;
@@ -55,7 +55,7 @@ export interface FiroRpcTxInput {
   txinwitness?: string[];
 }
 
-// Transaction output types (in Firo getrawtransaction RPC response)
+// Transaction output types
 export interface FiroRpcTxOutput {
   value: number;
   n: number;
@@ -68,7 +68,7 @@ export interface FiroRpcTxOutput {
   };
 }
 
-// Firo getrawtransaction RPC response
+// Firo transaction
 export interface FiroRpcTransaction {
   hex: string;
   txid: string;
