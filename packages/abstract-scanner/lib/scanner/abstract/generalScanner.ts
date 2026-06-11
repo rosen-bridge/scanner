@@ -26,6 +26,7 @@ abstract class GeneralScanner<
     private blockRetrieveGap = 0,
     logger?: AbstractLogger,
     private suffix?: string,
+    private heightGap = 100,
   ) {
     super(logger);
     /**
@@ -66,7 +67,8 @@ abstract class GeneralScanner<
   };
 
   /**
-   * This method introduces delay between consecutive block processing operations
+   * This method introduces delay between consecutive block processing
+   * operations
    */
   protected delayBetweenBlocksProcessing = async (startTime: number) => {
     const spentTime = new Date().getTime() - startTime;
@@ -88,7 +90,8 @@ abstract class GeneralScanner<
     if (block.txCount) {
       if (txs.length != block.txCount) {
         this.logger.debug(
-          `Aborting block process with hash [${block.hash}] expected to have ${block.txCount} transactions but had ${txs.length}`,
+          `Aborting block process with hash [${block.hash}] expected to have 
+          ${block.txCount} transactions but had ${txs.length}`,
         );
         return false;
       }
@@ -107,37 +110,49 @@ abstract class GeneralScanner<
   };
 
   /**
-   * process forward in scanner. get blocks and store information from transactions.
+   * process forward in scanner. get blocks and store information from
+   * transactions.
    * @param lastSavedBlock: last saved block entity in database
    */
   protected stepForward = async (lastSavedBlock: BlockEntity) => {
     const currentHeight = await this.network.getCurrentHeight();
     const firstBlock = await this.action.getFirstSavedBlock();
+
     if (!firstBlock || firstBlock.height >= currentHeight) {
       return;
     }
+    let stopHeight = lastSavedBlock.height;
+    let step = this.heightGap;
     for (
-      let height = lastSavedBlock.height + 1;
-      height <= currentHeight;
-      height++
+      let height = lastSavedBlock.height;
+      height < currentHeight;
+      height += step
     ) {
-      const block = await this.network.getBlockAtHeight(height);
-      if (lastSavedBlock !== undefined) {
-        if (block.parentHash === lastSavedBlock.hash) {
-          const savedBlock = await this.processBlock(block);
-          if (typeof savedBlock === 'boolean') {
-            break;
-          } else {
-            lastSavedBlock = savedBlock;
-          }
-        } else {
-          this.logger.debug(
-            `Invalid block at height ${height}. Block info is [${JsonBI.stringify(
+      if (
+        step > 1 &&
+        (await this.checkExtractorsForEvents(height, height + this.heightGap))
+      ) {
+        step = 1;
+        stopHeight = height + this.heightGap;
+      }
+      const block = await this.network.getBlockAtHeight(height + step);
+      if (block.parentHash != lastSavedBlock.hash && step === 1) {
+        this.logger.debug(
+          `Invalid block at height ${lastSavedBlock.height + 1}. Block info 
+            is [${JsonBI.stringify(
               block,
             )} and the expected parent hash is [${lastSavedBlock.hash}]`,
-          );
-          break;
-        }
+        );
+        break;
+      }
+      const savedBlock = await this.processBlock(block);
+      if (typeof savedBlock === 'boolean') {
+        break;
+      } else {
+        lastSavedBlock = savedBlock;
+      }
+      if (height + step == stopHeight) {
+        step = this.heightGap;
       }
     }
   };
@@ -190,8 +205,33 @@ abstract class GeneralScanner<
     this.blockChainLastHeight;
 
   /**
-   * worker function that runs for syncing the database with the Cardano blockchain and checks if we have any fork
-   * scenario in the blockchain and invalidate the database till the database synced again.
+   * Checks if any registered extractor detects an event
+   * within the given block height range.
+   *
+   * @param {number} fromHeight - The starting block height to check.
+   * @param {number} toHeight - The ending block height to check.
+   * @returns {Promise<boolean>} True if at least one event is found,
+   * false otherwise.
+   */
+  protected checkExtractorsForEvents = async (
+    fromHeight: number,
+    toHeight: number,
+  ): Promise<boolean> => {
+    for (const extractor of this.extractors) {
+      const hasEvent = await extractor.hasEventInHeightRange(
+        fromHeight,
+        toHeight,
+      );
+      if (hasEvent) return true;
+    }
+    return false;
+  };
+
+  /**
+   * worker function that synchronizes the database with the blockchain.
+   * It handles scanner initialization, fork resolution,
+   * step-by-step block processing,
+   * and fast-forwarding when no events are detected.
    */
   update = async () => {
     try {

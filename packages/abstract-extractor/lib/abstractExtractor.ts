@@ -49,6 +49,27 @@ export abstract class AbstractExtractor<
   abstract initializeData: (initialBlock: BlockInfo) => Promise<void>;
 
   /**
+   * hasEventInHeightRange used by the scanner's fast-forward mechanism.
+   * During a large sync, instead of fetching and processing thousands of blocks one by one,
+   * the scanner checks this method. If an external API or node can confirm that *no relevant events*
+   * exist in the `[fromHeight, toHeight]` range, return `false`. The scanner will then skip fetching
+   * these blocks entirely, vastly improving sync speed.
+   * Returns `true`, forcing the scanner to safely process every single block sequentially.
+   *
+   * @param fromHeight - The starting block height of the chunk being evaluated.
+   * @param toHeight - The ending block height of the chunk.
+   * @returns {Promise<boolean>} `true` if events exist (or if unknown). `false` ONLY if it's guaranteed the range is empty.
+   */
+  public hasEventInHeightRange = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fromHeight?: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    toHeight?: number,
+  ): Promise<boolean> => {
+    return true;
+  };
+
+  /**
    * Create a query for used blocks associated with the given `extractorId`
    * This method only builds the query and does not execute it
    *
