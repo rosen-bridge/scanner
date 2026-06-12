@@ -1,1 +1,1 @@
-export * from './firoRpcObservationExtractor';
+export * from './firoObservationExtractor';

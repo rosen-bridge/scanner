@@ -108,6 +108,8 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
       100,
       blockTimeConfig,
       undefined,
+      undefined,
+      2,
     );
   }
 

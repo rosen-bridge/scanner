@@ -91,12 +91,8 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
 
       // Get detailed transaction data for each transaction ID
       for (const txId of txids) {
-        try {
-          const txResponse = await this.getTransaction(txId);
-          transactions.push(txResponse);
-        } catch (error) {
-          console.warn(`Failed to fetch transaction ${txId}: ${error}`);
-        }
+        const txResponse = await this.getTransaction(txId);
+        transactions.push(txResponse);
       }
 
       return transactions;
