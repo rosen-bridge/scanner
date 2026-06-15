@@ -2,4 +2,5 @@
 '@rosen-bridge/firo-scanner': minor
 ---
 
-Add FiroElectrumXNetwork TCP connector and FiroElectrumXScanner, replace firod JSON-RPC dependency with ElectrumX protocol
+Add `FiroElectrumXScanner` which uses ElectrumX-firo server to scan the blockchain
+Add `ElectrumXSocket`, a client for ElectrumX-firo server

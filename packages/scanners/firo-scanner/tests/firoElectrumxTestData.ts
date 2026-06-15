@@ -1,3 +1,5 @@
+export const blockHeight = 1309789;
+
 export const blockHeader = {
   hex: '020000000a1b2c3d4e5f6789abcdef01234567890abcdef0123456789abcdef0123456781a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b80924a663c2b0f1a00000000',
   hash: '7534b042d90bb78b3ea39f6b8e1da9bcda46ce24def6fcfef8adebf73b66f85e',
@@ -18,6 +20,7 @@ export const testTx = {
     {
       value: 1.0,
       scriptHex: '76a914abcdefabcdefabcdefabcdefabcdefabcdef88ac',
+      n: 0,
     },
   ],
 };
@@ -25,4 +28,22 @@ export const testTx = {
 export const testTxV3 = {
   hex: '030008000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0280f0fa020000000017a9141234567890abcdef1234567890abcdef123456788700a3e111000000001976a914deadbeefdeadbeefdeadbeefdeadbeefdeadbeef88ac0000000000',
   txid: '35e3e5391cca0b2938654a1bf1036a12e93f5c57c641640259a6c59b81771afc',
+  expectedVin: [
+    {
+      txid: '0000000000000000000000000000000000000000000000000000000000000000',
+      vout: 0,
+    },
+  ],
+  expectedVout: [
+    {
+      value: 0.5,
+      scriptHex: 'a9141234567890abcdef1234567890abcdef1234567887',
+      n: 0,
+    },
+    {
+      value: 3,
+      scriptHex: '76a914deadbeefdeadbeefdeadbeefdeadbeefdeadbeef88ac',
+      n: 1,
+    },
+  ],
 };
