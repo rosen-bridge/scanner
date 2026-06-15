@@ -86,7 +86,7 @@ abstract class GeneralScanner<
     this.logger.debug(
       `Processing block at height [${block.height}] in scanner ${this.name()}`,
     );
-    const txs = await this.network.getBlockTxs(block.hash);
+    const txs = await this.network.getBlockTxs(block.hash, block.height);
     if (block.txCount) {
       if (txs.length != block.txCount) {
         this.logger.debug(
