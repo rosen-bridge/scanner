@@ -127,7 +127,7 @@ export class ElectrumXSocket {
    * Disables auto-reconnect and gracefully closes the underlying TLS socket.
    * @throws if the socket has not been initialized via `setupSocket`
    */
-  disconnect = () => {
+  disconnect = (): void => {
     if (!this.socket)
       throw new Error(
         `Socket is not initialized. Make sure "setupSocket" is called.`,
@@ -151,7 +151,7 @@ export class ElectrumXSocket {
    *   `server.version` handshake)
    * @returns the JSON-RPC `result` field
    */
-  protected sendRequest = async <Result>(
+  sendRequest = async <Result>(
     method: string,
     params: unknown[],
     ignoreConnection = false,
@@ -196,7 +196,7 @@ export class ElectrumXSocket {
    * dropped.
    * @param data raw JSON-RPC response string (without trailing newline)
    */
-  private processResponse = (data: string) => {
+  private processResponse = (data: string): void => {
     this.logger.debug(`Trying to parse response: ${data}`);
     let response: ElectrumXResponse<unknown>;
     try {
