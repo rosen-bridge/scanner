@@ -12,6 +12,7 @@ export class FiroRpcScanner extends GeneralScanner<FiroRpcTransaction> {
       config.blockRetrieveGap,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }
