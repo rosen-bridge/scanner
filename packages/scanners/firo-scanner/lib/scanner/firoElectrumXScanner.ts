@@ -13,6 +13,7 @@ export class FiroElectrumXScanner extends GeneralScanner<FiroRpcTransaction> {
       config.blockTimeConfig,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

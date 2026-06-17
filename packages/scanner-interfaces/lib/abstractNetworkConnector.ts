@@ -15,8 +15,12 @@ abstract class AbstractNetworkConnector<TransactionType> {
   /**
    * fetch list if transaction of specific block
    * @param blockHash
+   * @param height
    */
-  abstract getBlockTxs: (blockHash: string) => Promise<Array<TransactionType>>;
+  abstract getBlockTxs: (
+    blockHash: string,
+    height: number,
+  ) => Promise<Array<TransactionType>>;
 }
 
 export { AbstractNetworkConnector };

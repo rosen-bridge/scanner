@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/scanner-interfaces",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Defines all scanner interfaces",
   "repository": {
     "type": "git",

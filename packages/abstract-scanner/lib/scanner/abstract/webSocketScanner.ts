@@ -17,7 +17,7 @@ abstract class WebSocketScanner<
 
   protected constructor(
     protected scannerName: string,
-    blockTimeConfig: BlockTimeConfig,
+    blockTimeConfig?: BlockTimeConfig,
     logger?: AbstractLogger,
     maxTryBlock: number = DEFAULT_MAX_TRY_BLOCK,
     protected suffix?: string,

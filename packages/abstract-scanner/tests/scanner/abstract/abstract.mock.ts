@@ -58,7 +58,7 @@ export class ExtractorTest extends AbstractExtractor<
     return Promise.resolve();
   };
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }
 
 export class NetworkConnectorTest extends AbstractNetworkConnector<TestTransaction> {
@@ -159,6 +159,8 @@ export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
 
   start = async () => Promise.resolve();
 
+  removeOldUnusedBlocks = () => Promise.resolve();
+
   stop = async () => Promise.resolve();
 }
 
@@ -174,5 +176,5 @@ export class FailExtractor extends AbstractExtractor<
 
   processTransactions = () => Promise.resolve(false);
 
-  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral> | undefined;
+  createUsedBlocksQuery: () => SelectQueryBuilder<ObjectLiteral>;
 }

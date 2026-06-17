@@ -1,4 +1,8 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import {
+  DataSource,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
@@ -16,10 +20,8 @@ describe('AbstractScanner', () => {
   let blockTimeConfig: BlockTimeConfig;
   beforeEach(async () => {
     dataSource = await createDatabase();
-    blockTimeConfig = {
-      blockTime: 12,
-    };
   });
+  blockTimeConfig = { blockAgeThreshold: 1000, blockTrimCountInRound: 5 };
 
   describe('registerExtractor', () => {
     /**
@@ -446,6 +448,95 @@ describe('AbstractScanner', () => {
         hash: 'hash',
       });
       expect(mockedInit).not.toHaveBeenCalled();
+    });
+  });
+  describe('removeOldUnusedBlocks', () => {
+    /**
+     * @target removeOldUnusedBlocks should call database action with correct parameters
+     * @scenario
+     * - Create a scanner instance with specific blockTimeConfig
+     * - Mock extractors to return custom queries via `createUsedBlocksQuery`
+     * - Spy on action's `removeUnusedBlocksInBatches` method
+     * - Call `removeOldUnusedBlocks` with a mock lastSavedBlock
+     * - Verify parameters passed to database action
+     * @expected
+     * - call removeUnusedBlocksInBatches with expected queries and parameters
+     */
+    it('should call database action with correct parameters', async () => {
+      const customBlockTimeConfig = {
+        blockAgeThreshold: 3600,
+        blockTrimCountInRound: 50,
+      };
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        customBlockTimeConfig,
+      );
+
+      const extractor1 = new ExtractorTest('ext-1');
+      const extractor2 = new ExtractorTest('ext-2');
+
+      const query1 = {
+        text: 'query for extractor 1',
+      } as unknown as SelectQueryBuilder<ObjectLiteral>;
+      const query2 = {
+        text: 'query for extractor 2',
+      } as unknown as SelectQueryBuilder<ObjectLiteral>;
+      vi.spyOn(extractor1, 'createUsedBlocksQuery').mockReturnValue(query1);
+      vi.spyOn(extractor2, 'createUsedBlocksQuery').mockReturnValue(query2);
+
+      scanner.extractors = [extractor1, extractor2];
+
+      const mockLastSavedBlock = {
+        id: 1,
+        height: 100,
+        hash: 'hash',
+      } as BlockEntity;
+      const removeUnusedBlocksSpy = vi
+        .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
+        .mockResolvedValue(['hash1', 'hash2']);
+
+      await scanner['removeOldUnusedBlocks'](mockLastSavedBlock);
+
+      expect(removeUnusedBlocksSpy).toHaveBeenCalledWith(
+        [query1, query2],
+        50,
+        scanner.name(),
+        mockLastSavedBlock.timestamp - 3600,
+      );
+    });
+
+    /**
+     * @target removeOldUnusedBlocks should pass empty queries to database action from extractors
+     * @scenario
+     * - Setup an extractor that returns undefined for its used blocks query
+     * - Call removeOldUnusedBlocks
+     * @expected
+     * - call removeUnusedBlocksInBatches with empty list of extractor's queries
+     */
+    it('should pass empty queries to database action from extractors', async () => {
+      const scanner = new TestAbstractScanner(
+        'first',
+        dataSource,
+        blockTimeConfig,
+      );
+      const extractor = new ExtractorTest('ext-1');
+      vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue(
+        dataSource.createQueryBuilder(),
+      );
+      scanner.extractors = [extractor];
+
+      const removeUnusedBlocksSpy = vi
+        .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
+        .mockResolvedValue([]);
+
+      await scanner['removeOldUnusedBlocks'](undefined);
+      expect(removeUnusedBlocksSpy).toBeCalledWith(
+        [dataSource.createQueryBuilder()],
+        5,
+        'first',
+        0,
+      );
     });
   });
 });

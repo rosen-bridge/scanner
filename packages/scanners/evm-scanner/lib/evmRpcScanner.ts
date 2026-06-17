@@ -15,6 +15,7 @@ export class EvmRpcScanner extends GeneralScanner<TransactionResponse> {
       config.blockTimeConfig,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

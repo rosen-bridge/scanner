@@ -9,11 +9,11 @@ export interface ScannerConfig<TransactionType> {
   blockRetrieveGap?: number;
   blockTimeConfig: BlockTimeConfig;
   suffix?: string;
+  heightGap?: number;
   logger?: AbstractLogger;
 }
 
 export interface BlockTimeConfig {
-  blockTime: number;
-  blockAgeThreshold?: number;
-  blockTrimCountInRound?: number;
+  blockAgeThreshold: number;
+  blockTrimCountInRound: number;
 }

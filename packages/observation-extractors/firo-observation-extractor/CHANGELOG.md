@@ -1,5 +1,17 @@
 # @rosen-bridge/firo-observation-extractor
 
+## 1.1.0
+
+### Minor Changes
+
+- Rename FiroRpcObservationExtractor to FiroObservationExtractor, deprecate RPC-specific alias
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.7
+  - @rosen-bridge/firo-scanner@0.2.0
+
 ## 1.0.1
 
 ### Patch Changes

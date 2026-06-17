@@ -13,6 +13,7 @@ export class DogeRpcScanner extends GeneralScanner<DogeRpcTransaction> {
       config.blockTimeConfig,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

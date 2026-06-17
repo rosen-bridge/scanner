@@ -15,7 +15,8 @@ let repository: Repository<BlockEntity>;
 describe('webSocketScanner', () => {
   beforeEach(async () => {
     const blockTimeConfig: BlockTimeConfig = {
-      blockTime: 12,
+      blockAgeThreshold: 1000,
+      blockTrimCountInRound: 5,
     };
     dataSource = await createDatabase();
     scanner = new TestWebSocketScanner(dataSource, blockTimeConfig);
@@ -77,7 +78,6 @@ describe('webSocketScanner', () => {
      * - no block inserted to database
      */
     it('should not insert block in database if current block hash not equals last inserted one', async () => {
-      vi.spyOn(scanner, 'removeOldUnusedBlocks').mockResolvedValue();
       await scanner['stepForward'](
         {
           hash: 'block 2',
@@ -104,7 +104,6 @@ describe('webSocketScanner', () => {
      */
     it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
-      vi.spyOn(scanner, 'removeOldUnusedBlocks').mockResolvedValue();
       await scanner['stepForward'](
         {
           hash: 'block 2',

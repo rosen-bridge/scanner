@@ -708,8 +708,7 @@ describe('action', () => {
         [],
         10,
         sampleBlocks1[0].scanner,
-        blockAgeThreshold,
-        lastBlock,
+        lastBlock.timestamp - blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
@@ -753,8 +752,7 @@ describe('action', () => {
         [],
         10,
         sampleBlocks1[0].scanner,
-        blockAgeThreshold,
-        lastBlock,
+        lastBlock.timestamp - blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks
@@ -798,8 +796,7 @@ describe('action', () => {
         [],
         10,
         sampleBlocks1[0].scanner,
-        blockAgeThreshold,
-        lastBlock,
+        lastBlock.timestamp - blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks1
@@ -845,8 +842,7 @@ describe('action', () => {
         [],
         1,
         sampleBlocks1[0].scanner,
-        blockAgeThreshold,
-        lastBlock,
+        lastBlock.timestamp - blockAgeThreshold,
       );
 
       const expectBlockHashesToDelete = sampleBlocks

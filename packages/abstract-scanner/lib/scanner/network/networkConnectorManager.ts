@@ -141,11 +141,15 @@ export class NetworkConnectorManager<TransactionType>
   /**
    * Get all transactions in a block
    * @param blockHash The hash of the block to get transactions from
+   * @param height The height of the block to get transactions from
    * @returns Array of transactions in the block
    */
-  getBlockTxs = async (blockHash: string): Promise<Array<TransactionType>> => {
+  getBlockTxs = async (
+    blockHash: string,
+    height: number,
+  ): Promise<Array<TransactionType>> => {
     return this.executeWithStrategy((connector) =>
-      connector.getBlockTxs(blockHash),
+      connector.getBlockTxs(blockHash, height),
     );
   };
 

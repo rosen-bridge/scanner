@@ -28,7 +28,7 @@ abstract class GeneralScanner<
     blockTimeConfig: BlockTimeConfig,
     logger?: AbstractLogger,
     private suffix?: string,
-    private heightGap = 100,
+    private heightGap = 1,
   ) {
     super(blockTimeConfig, logger);
     /**
@@ -88,7 +88,7 @@ abstract class GeneralScanner<
     this.logger.debug(
       `Processing block at height [${block.height}] in scanner ${this.name()}`,
     );
-    const txs = await this.network.getBlockTxs(block.hash);
+    const txs = await this.network.getBlockTxs(block.hash, block.height);
     if (block.txCount) {
       if (txs.length != block.txCount) {
         this.logger.debug(
@@ -237,7 +237,6 @@ abstract class GeneralScanner<
    */
   update = async () => {
     try {
-      let lastSavedBlock = await this.action.getLastSavedBlock();
       const latestHeight = await this.network.getCurrentHeight();
       if (
         !this.blockChainLastHeight ||
@@ -245,6 +244,7 @@ abstract class GeneralScanner<
       )
         this.blockChainLastHeight = latestHeight;
 
+      let lastSavedBlock = await this.action.getLastSavedBlock();
       if (!lastSavedBlock) {
         lastSavedBlock = await this.initialize();
       } else await this.verifyExtractorsInitialization(lastSavedBlock);

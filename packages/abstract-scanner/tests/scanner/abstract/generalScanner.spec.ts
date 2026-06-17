@@ -19,7 +19,8 @@ describe('generalScanner', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
     blockTimeConfig = {
-      blockTime: 12,
+      blockAgeThreshold: 2000,
+      blockTrimCountInRound: 10,
     };
     vi.restoreAllMocks();
   });
@@ -625,7 +626,9 @@ describe('generalScanner', () => {
         network,
         blockTimeConfig,
       );
-      vi.spyOn(scanner, 'removeOldUnusedBlocks').mockResolvedValue();
+      vi.spyOn(scanner as any, 'removeOldUnusedBlocks').mockResolvedValue(() =>
+        Promise.resolve(),
+      );
 
       vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
         (height: number) => {

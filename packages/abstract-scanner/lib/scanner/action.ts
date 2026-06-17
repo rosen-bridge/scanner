@@ -369,17 +369,13 @@ export class BlockDbAction {
     extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[],
     deletedBlockCount: number,
     scannerName: string,
-    blockAgeThreshold: number,
-    lastSavedBlock: BlockEntity | undefined,
+    thresholdTimestamp: number,
   ): Promise<string[]> => {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
     );
 
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
-    const thresholdTimestamp = lastSavedBlock
-      ? lastSavedBlock.timestamp - blockAgeThreshold
-      : 0;
 
     const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')

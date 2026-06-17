@@ -1,5 +1,21 @@
 # @rosen-bridge/abstract-scanner
 
+## 2.0.0
+
+### Major Changes
+
+- Update `GeneralScanner` and `NetworkConnectorManager` to reflect major update of `@rosen-bridge/scanner-interfaces` (Add a `height` argument to `AbstractNetworkConnector.getBlockTxs`)
+
+### Minor Changes
+
+- Add fast-forward feature to `GeneralScanner` and `heightGap` parameter into scanners config
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.0
+  - @rosen-bridge/scanner-interfaces@1.0.0
+
 ## 1.0.4
 
 ### Patch Changes
