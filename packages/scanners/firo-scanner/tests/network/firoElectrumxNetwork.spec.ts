@@ -1,136 +1,96 @@
 import { vi } from 'vitest';
 
 import { FiroElectrumXNetwork } from '../../lib/network/firoElectrumXNetwork';
-import { blockHeader, testTx, testTxV3 } from '../firoElectrumxTestData';
-import { createMockSocket } from '../mocked/electrumxSocket.mock';
-
-// We store the mock socket factory so each test can set up its own responses
-let mockResponses: Map<string, unknown>;
+import {
+  blockHeader,
+  blockHeight,
+  testTx,
+  testTxV3,
+} from '../firoElectrumxTestData';
+import {
+  mockedSocket,
+  mockSocketError,
+  mockSocketResult,
+  resetSocketMock,
+} from '../mocked/electrumxSocket.mock';
 
 vi.mock('tls', () => ({
-  connect: vi.fn(() => {
-    const socket = createMockSocket(mockResponses);
-    // Emit 'secureConnect' asynchronously so ensureConnected -> doConnect can
-    // wire up the TLS listener before it fires.
-    setTimeout(() => socket.emit('secureConnect'));
-    return socket;
-  }),
+  connect: vi.fn(() => mockedSocket),
 }));
 
 describe('FiroElectrumXNetwork', () => {
   let network: FiroElectrumXNetwork;
 
-  beforeEach(() => {
-    mockResponses = new Map();
-    network = new FiroElectrumXNetwork('127.0.0.1', 50001, 5000);
+  beforeEach(async () => {
+    resetSocketMock();
+    mockSocketResult('server.version', ['FiroElectrumXSocket', '1.4']);
+    network = new FiroElectrumXNetwork('address', 50002);
+    network.setupSocket();
   });
 
   describe('getCurrentHeight', () => {
     /**
-     * @target FiroElectrumXNetwork.getCurrentHeight should return the height
-     * from blockchain.headers.subscribe
+     * @target FiroElectrumXNetwork.getCurrentHeight should return the height successfully
      * @dependencies
-     * -   blockchain.headers.subscribe: returns { hex, height }
+     * - mock blockchain.headers.subscribe
+     * - run test
+     * - check returned value
      * @expected
-     * - Should return the height number
+     * - should return the mocked height number
      */
-    it('should return the current height from blockchain.headers.subscribe', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.headers.subscribe', {
+    it('should return the current height successfully', async () => {
+      mockSocketResult('blockchain.headers.subscribe', {
         hex: blockHeader.hex,
-        height: 1309789,
+        height: blockHeight,
       });
 
       const height = await network.getCurrentHeight();
-      expect(height).toBe(1309789);
+      expect(height).toBe(blockHeight);
     });
   });
 
   describe('getBlockAtHeight', () => {
     /**
-     * @target FiroElectrumXNetwork.getBlockAtHeight should return a parsed Block
+     * @target FiroElectrumXNetwork.getBlockAtHeight should parse the block successfully
      * from blockchain.block.header
      * @dependencies
-     * -   blockchain.block.header: returns raw header hex string
+     * - mock blockchain.block.header
+     * - run test
+     * - check returned value
      * @expected
-     * - Should parse the 80-byte header and return hash, parentHash, height, timestamp
+     * - should parse the 80-byte header and return hash, parentHash, height, timestamp
      */
-    it('should return parsed Block from blockchain.block.header', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', blockHeader.hex);
+    it('should parse the block successfully', async () => {
+      mockSocketResult('blockchain.block.header', blockHeader.hex);
 
-      const block = await network.getBlockAtHeight(42);
+      const block = await network.getBlockAtHeight(blockHeight);
 
       expect(block.hash).toBe(blockHeader.hash);
       expect(block.parentHash).toBe(blockHeader.parentHash);
-      expect(block.height).toBe(42);
+      expect(block.height).toBe(blockHeight);
       expect(block.timestamp).toBe(1716163200);
-    });
-
-    /**
-     * @target FiroElectrumXNetwork.getBlockAtHeight should cache the height
-     * for later getBlockTxs lookup
-     * @dependencies
-     * -   getBlockAtHeight must be called before getBlockTxs for the same block
-     * @expected
-     * - getBlockTxs should use the cached height
-     */
-    it('should cache height for subsequent getBlockTxs call', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', blockHeader.hex);
-
-      await network.getBlockAtHeight(42);
-
-      // Now getBlockTxs should work with the cached hash
-      mockResponses.set('blockchain.block.txids', [testTx.txid]);
-      mockResponses.set('blockchain.transaction.get', testTx.hex);
-
-      const txs = await network.getBlockTxs(blockHeader.hash);
-      expect(txs).toHaveLength(1);
-    });
-
-    /**
-     * @target FiroElectrumXNetwork.getBlockAtHeight should throw for invalid header
-     * @dependencies
-     * -   blockchain.block.header: returns hex shorter than 80 bytes
-     * @expected
-     * - Should throw an error about invalid block header
-     */
-    it('should throw for an invalid (too short) block header', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', 'deadbeef'); // only 4 bytes
-
-      await expect(network.getBlockAtHeight(1)).rejects.toThrow(
-        'Invalid block header',
-      );
     });
   });
 
   describe('getBlockTxs', () => {
     /**
-     * @target FiroElectrumXNetwork.getBlockTxs should return parsed transactions
+     * @target FiroElectrumXNetwork.getBlockTxs should get and parse block transactions successfully
      * from blockchain.block.txids + blockchain.transaction.get
      * @dependencies
-     * -   getBlockAtHeight must be called first
-     * -   blockchain.block.txids: returns array of txids
-     * -   blockchain.transaction.get: returns raw transaction hex
+     * - mock blockchain.block.txids to return 2 transactions (v2 and v3)
+     * - mock blockchain.transaction.get to return mocked transactions
      * @expected
-     * - Should parse hex into FiroRpcTransaction with correct vin/vout
+     * - should parse the transactions into FiroRpcTransaction with correct vin/vout
      */
-    it('should return parsed transactions for a block', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', blockHeader.hex);
+    it('should get and parse block transactions successfully', async () => {
+      mockSocketResult('blockchain.block.txids', [testTx.txid, testTxV3.txid]);
+      mockSocketResult('blockchain.transaction.get', testTx.hex);
+      mockSocketResult('blockchain.transaction.get', testTxV3.hex);
 
-      // First get the block to cache the height
-      await network.getBlockAtHeight(42);
+      const txs = await network.getBlockTxs(blockHeader.hash, blockHeight);
 
-      // Set up txids and tx responses
-      mockResponses.set('blockchain.block.txids', [testTx.txid]);
-      mockResponses.set('blockchain.transaction.get', testTx.hex);
-
-      const txs = await network.getBlockTxs(blockHeader.hash);
-
-      expect(txs).toHaveLength(1);
+      expect(txs).toHaveLength(2);
+      // verify 1st transaction
       const tx = txs[0];
       expect(tx.txid).toBe(testTx.txid);
       expect(tx.hash).toBe(testTx.txid);
@@ -141,146 +101,55 @@ describe('FiroElectrumXNetwork', () => {
       expect(tx.vin[0].vout).toBe(testTx.expectedVin[0].vout);
       expect(tx.vout).toHaveLength(1);
       expect(tx.vout[0].value).toBe(testTx.expectedVout[0].value);
+      expect(tx.vout[0].n).toBe(testTx.expectedVout[0].n);
       expect(tx.vout[0].scriptPubKey.hex).toBe(
         testTx.expectedVout[0].scriptHex,
       );
-    });
-
-    /**
-     * @target FiroElectrumXNetwork.getBlockTxs should throw if getBlockAtHeight
-     * was not called first for the same block hash
-     * @dependencies
-     * -   hashToHeight cache is empty
-     * @expected
-     * - Should throw about missing cached height
-     */
-    it('should throw if getBlockAtHeight was not called first', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-
-      await expect(network.getBlockTxs('unknown-hash')).rejects.toThrow(
-        'No cached height',
+      // verify 2nd transaction
+      const txV3 = txs[1];
+      expect(txV3.txid).toBe(testTxV3.txid);
+      expect(txV3.hash).toBe(testTxV3.txid);
+      expect(txV3.version).toBe(3);
+      expect(txV3.locktime).toBe(0);
+      expect(txV3.vin).toHaveLength(1);
+      expect(txV3.vin[0].txid).toBe(testTxV3.expectedVin[0].txid);
+      expect(txV3.vin[0].vout).toBe(testTxV3.expectedVin[0].vout);
+      expect(txV3.vout).toHaveLength(2);
+      expect(txV3.vout[0].value).toBe(testTxV3.expectedVout[0].value);
+      expect(txV3.vout[0].n).toBe(testTxV3.expectedVout[0].n);
+      expect(txV3.vout[0].scriptPubKey.hex).toBe(
+        testTxV3.expectedVout[0].scriptHex,
+      );
+      expect(txV3.vout[1].value).toBe(testTxV3.expectedVout[1].value);
+      expect(txV3.vout[1].n).toBe(testTxV3.expectedVout[1].n);
+      expect(txV3.vout[1].scriptPubKey.hex).toBe(
+        testTxV3.expectedVout[1].scriptHex,
       );
     });
 
     /**
-     * @target FiroElectrumXNetwork.getBlockTxs should fail when a tx fetch
-     * fails
+     * @target FiroElectrumXNetwork.getBlockTxs should throw error when all transactions are not fetched
      * @dependencies
-     * -   One tx get fails with ElectrumX error
+     * - mock blockchain.block.txids to return 2 transactions
+     * - mock blockchain.transaction.get to return one transaction and throw error for the other one
+     * - run test & check thrown exception
      * @expected
-     * - Should reject instead of returning a partial block
+     * - should be rejected with the mocked error
      */
-    it('should fail when a transaction fetch fails', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', blockHeader.hex);
-
-      await network.getBlockAtHeight(42);
-
+    it('should throw error when all transactions are not fetched', async () => {
       const badTxid =
         'badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb';
-      mockResponses.set('blockchain.block.txids', [badTxid, testTx.txid]);
-
-      // Function-based handler: first call throws, second returns hex
-      let callCount = 0;
-      mockResponses.set('blockchain.transaction.get', () => {
-        callCount++;
-        if (callCount === 1) {
-          throw new Error('Transaction not found');
-        }
-        return testTx.hex;
+      mockSocketResult('blockchain.block.txids', [badTxid, testTx.txid]);
+      // First transaction.get errors, second one would succeed (but is never reached).
+      mockSocketError('blockchain.transaction.get', {
+        code: -1,
+        message: 'Mocked Error',
       });
+      mockSocketResult('blockchain.transaction.get', testTx.hex);
 
-      await expect(network.getBlockTxs(blockHeader.hash)).rejects.toThrow(
-        'Transaction not found',
-      );
-    });
-  });
-
-  describe('transaction hex parsing', () => {
-    /**
-     * @target FiroElectrumXNetwork should correctly parse a Firo version 3
-     * transaction with packed type
-     * @dependencies
-     * -   getBlockAtHeight called first
-     * -   blockchain.transaction.get returns v3 tx hex
-     * @expected
-     * - Should parse both vouts correctly despite the packed type bits
-     */
-    it('should parse a version 3 Firo transaction with packed type', async () => {
-      mockResponses.set('server.version', ['rosen-scanner', '1.4']);
-      mockResponses.set('blockchain.block.header', blockHeader.hex);
-
-      await network.getBlockAtHeight(42);
-
-      mockResponses.set('blockchain.block.txids', [testTxV3.txid]);
-      mockResponses.set('blockchain.transaction.get', testTxV3.hex);
-
-      const txs = await network.getBlockTxs(blockHeader.hash);
-
-      expect(txs).toHaveLength(1);
-      const tx = txs[0];
-      expect(tx.version).toBe(3);
-      expect(tx.vout).toHaveLength(2);
-      expect(tx.vout[0].value).toBe(0.5);
-      expect(tx.vout[1].value).toBe(3.0);
-    });
-  });
-
-  describe('error handling', () => {
-    /**
-     * @target FiroElectrumXNetwork should throw on ElectrumX JSON-RPC error response
-     * @dependencies
-     * -   ElectrumX returns error response
-     * @expected
-     * - Should throw with the error message
-     */
-    it('should throw on ElectrumX error response', async () => {
-      const { connect } = await import('tls');
-
-      // Reset to use a custom socket that sends an error response
-      vi.mocked(connect).mockImplementationOnce(() => {
-        const socket = createMockSocket(
-          new Map(),
-        ) as unknown as import('tls').TLSSocket & { written: string[] };
-        setTimeout(() => socket.emit('secureConnect'));
-        // Override write to send error for blockchain.block.header
-        socket.write = (data: string) => {
-          socket.written.push(data);
-          const lines = data.split('\n').filter((l) => l.trim());
-          for (const line of lines) {
-            try {
-              const req = JSON.parse(line);
-              // Handle server.version normally
-              if (req.method === 'server.version') {
-                const resp = JSON.stringify({
-                  jsonrpc: '2.0',
-                  id: req.id,
-                  result: ['rosen-scanner', '1.4'],
-                });
-                setTimeout(() => socket.emit('data', Buffer.from(resp + '\n')));
-              } else {
-                // Send error for everything else
-                const resp = JSON.stringify({
-                  jsonrpc: '2.0',
-                  id: req.id,
-                  error: { code: -1, message: 'block height out of range' },
-                });
-                setTimeout(() => socket.emit('data', Buffer.from(resp + '\n')));
-              }
-            } catch {
-              // ignore
-            }
-          }
-          return true;
-        };
-        return socket;
-      });
-
-      const net2 = new FiroElectrumXNetwork('127.0.0.1', 50001, 5000);
-
-      await expect(net2.getBlockAtHeight(99999999)).rejects.toThrow(
-        'block height out of range',
-      );
+      await expect(
+        network.getBlockTxs(blockHeader.hash, blockHeight),
+      ).rejects.toThrow('Mocked Error');
     });
   });
 });

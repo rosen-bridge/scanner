@@ -21,7 +21,7 @@ export class FiroObservationExtractor extends AbstractObservationExtractor<FiroR
       new FiroRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('FiroRosenExtractor'),
+        logger?.child('firoRpcRosenExtractor'),
         storeRawData,
       ),
       logger,

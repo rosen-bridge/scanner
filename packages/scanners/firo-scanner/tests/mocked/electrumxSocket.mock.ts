@@ -1,89 +1,78 @@
-import { EventEmitter } from 'events';
-import { vi } from 'vitest';
+interface ResponseEntry {
+  result?: unknown;
+  error?: { code: number; message: string };
+}
 
 /**
- * Creates a mock TLS socket that auto-responds to ElectrumX JSON-RPC requests.
- *
- * The socket's write() parses each JSON-RPC line, looks up a response in the
- * provided `responses` map (keyed by method name), and emits the response
- * as a 'data' event.
+ * Minimal TLS-socket stand-in used by ElectrumXSocket tests. Holds registered
+ * event handlers and a FIFO queue of JSON-RPC responses per method name.
  */
-export function createMockSocket(
-  responses: Map<string, unknown>,
-): EventEmitter & { written: string[]; destroyed: boolean } {
-  const socket = new EventEmitter() as EventEmitter & {
-    written: string[];
-    destroyed: boolean;
-    write: (data: string) => boolean;
-    destroy: () => void;
-    setEncoding: () => void;
-    setNoDelay: () => void;
-    setKeepAlive: () => void;
-    setTimeout: () => void;
-    end: () => void;
-    ref: () => void;
-    unref: () => void;
-    connecting: boolean;
+export class ElectrumXSocketMock {
+  private handlers = new Map<string, (...args: unknown[]) => void>();
+  responses = new Map<string, ResponseEntry[]>();
+
+  /**
+   * Registers a handler for the given socket event (e.g. `'data'`).
+   */
+  on = (event: string, fn: (...args: unknown[]) => void): void => {
+    this.handlers.set(event, fn);
   };
 
-  socket.written = [];
-  socket.destroyed = false;
-  socket.connecting = false;
-
-  socket.write = (data: string) => {
-    socket.written.push(data);
-
-    // Parse JSON-RPC request and auto-respond
-    const lines = data.split('\n').filter((l) => l.trim());
+  /**
+   * Parses each newline-delimited JSON-RPC request, pops the next queued
+   * response for that method and delivers it to the `'data'` handler.
+   * Throws if no response is queued for the method or no `'data'` handler
+   * has been registered.
+   */
+  write = (data: string): boolean => {
+    const lines = data.split('\n').filter((l) => l.trim().length > 0);
     for (const line of lines) {
-      try {
-        const req = JSON.parse(line);
-        const handler = responses.get(req.method);
-        if (handler !== undefined) {
-          let result: unknown;
-          let error: { code: number; message: string } | undefined;
-
-          try {
-            // Support both static values and functions (called with params)
-            result =
-              typeof handler === 'function'
-                ? (handler as (params: unknown[]) => unknown)(req.params)
-                : handler;
-          } catch (e) {
-            error = {
-              code: -1,
-              message: e instanceof Error ? e.message : String(e),
-            };
-          }
-
-          const response = JSON.stringify({
-            jsonrpc: '2.0',
-            id: req.id,
-            ...(error ? { error } : { result }),
-          });
-          // Use setTimeout so the response arrives after write returns
-          setTimeout(() => {
-            socket.emit('data', Buffer.from(response + '\n'));
-          });
-        }
-      } catch {
-        // ignore parse errors
+      const req = JSON.parse(line);
+      const queue = this.responses.get(req.method);
+      if (!queue || queue.length === 0) {
+        throw new Error(`Method [${req.method}] is not mocked`);
       }
+      const entry = queue.shift()!;
+      const response = JSON.stringify({
+        jsonrpc: '2.0',
+        id: req.id,
+        ...entry,
+      });
+      const dataHandler = this.handlers.get('data');
+      if (dataHandler)
+        setTimeout(() => dataHandler(Buffer.from(response + '\n'))); // used setTimeout to simulate async behavior
+      else throw new Error(`The "data" event is not registered!`);
     }
     return true;
   };
-
-  socket.destroy = () => {
-    socket.destroyed = true;
-  };
-
-  socket.setEncoding = vi.fn();
-  socket.setNoDelay = vi.fn();
-  socket.setKeepAlive = vi.fn();
-  socket.setTimeout = vi.fn();
-  socket.end = vi.fn();
-  socket.ref = vi.fn();
-  socket.unref = vi.fn();
-
-  return socket;
 }
+
+export let mockedSocket = new ElectrumXSocketMock();
+
+/**
+ * Queues a successful JSON-RPC `result` to be returned for the next call to
+ * `method`.
+ */
+export const mockSocketResult = (method: string, result: unknown): void => {
+  const queue = mockedSocket.responses.get(method) ?? [];
+  queue.push({ result });
+  mockedSocket.responses.set(method, queue);
+};
+
+/**
+ * Queues a JSON-RPC `error` to be returned for the next call to `method`.
+ */
+export const mockSocketError = (
+  method: string,
+  error: { code: number; message: string },
+): void => {
+  const queue = mockedSocket.responses.get(method) ?? [];
+  queue.push({ error });
+  mockedSocket.responses.set(method, queue);
+};
+
+/**
+ * Replaces the shared `mockedSocket` with a fresh instance, clearing all
+ * registered handlers and queued responses.
+ */
+export const resetSocketMock = () => (mockedSocket = new ElectrumXSocketMock());
