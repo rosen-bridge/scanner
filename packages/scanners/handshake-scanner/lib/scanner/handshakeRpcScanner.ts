@@ -12,6 +12,7 @@ export class HandshakeRpcScanner extends GeneralScanner<HandshakeRpcTransaction>
       config.blockRetrieveGap,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

@@ -26,7 +26,7 @@ abstract class GeneralScanner<
     private blockRetrieveGap = 0,
     logger?: AbstractLogger,
     private suffix?: string,
-    private heightGap = 100,
+    private heightGap = 1,
   ) {
     super(logger);
     /**

@@ -12,6 +12,7 @@ export class BitcoinRpcScanner extends GeneralScanner<BitcoinRpcTransaction> {
       config.blockRetrieveGap,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

@@ -12,6 +12,7 @@ export class DogeEsploraScanner extends GeneralScanner<BitcoinEsploraTransaction
       config.blockRetrieveGap,
       config.logger,
       config.suffix,
+      config.heightGap,
     );
   }
 }

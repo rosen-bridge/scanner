@@ -8,5 +8,6 @@ export interface ScannerConfig<TransactionType> {
   network: AbstractNetworkConnector<TransactionType>;
   blockRetrieveGap?: number;
   suffix?: string;
+  heightGap?: number;
   logger?: AbstractLogger;
 }
