@@ -1,5 +1,13 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.1.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/scanner-interfaces@1.0.0
+  - uuid@11.1.1
+
 ## 3.1.2
 
 ### Patch Changes

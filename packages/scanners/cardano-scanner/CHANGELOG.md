@@ -1,5 +1,17 @@
 # @rosen-bridge/cardano-scanner
 
+## 2.1.0
+
+### Minor Changes
+
+- Add heightGap config into scanners config
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@2.0.0
+  - @rosen-bridge/scanner-interfaces@1.0.0
+
 ## 2.0.4
 
 ### Patch Changes
