@@ -1,5 +1,11 @@
 # @rosen-bridge/scanner-interfaces
 
+## 1.0.0
+
+### Major Changes
+
+- Add a `height` argument to `AbstractNetworkConnector.getBlockTxs`
+
 ## 0.2.2
 
 ### Patch Changes
