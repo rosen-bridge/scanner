@@ -8,13 +8,12 @@
 
 ### Minor Changes
 
-- Add heightGap config into scanners config
+- Add fast-forward feature to `GeneralScanner` and `heightGap` parameter into scanners config
 
 ### Patch Changes
 
-- Add fast-forward feature when no events are detected.
 - Update dependencies
-  - @rosen-bridge/abstract-extractor@3.1.3
+  - @rosen-bridge/abstract-extractor@3.2.0
   - @rosen-bridge/scanner-interfaces@1.0.0
 
 ## 1.0.4

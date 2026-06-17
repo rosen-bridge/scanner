@@ -1,6 +1,10 @@
 # @rosen-bridge/abstract-extractor
 
-## 3.1.3
+## 3.2.0
+
+### Minor Changes
+
+- Add `hasEventInHeightRange` function to `AbstractExtractor` which is utilized by the fast-forward feature in scanners
 
 ### Patch Changes
 

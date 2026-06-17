@@ -5,7 +5,7 @@
 ### Patch Changes
 
 - Update dependencies
-  - @rosen-bridge/abstract-extractor@3.1.3
+  - @rosen-bridge/abstract-extractor@3.2.0
   - @rosen-bridge/scanner-interfaces@1.0.0
 
 ## 0.0.1
