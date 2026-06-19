@@ -5,9 +5,16 @@ import {
   TransactionResponseParams,
 } from 'ethers';
 
-import { EvmTxStatus } from '../../lib';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+
+import { AddressTxsEntity, EvmTxStatus } from '../../lib';
+import { generateRandomId } from '../testUtils';
 
 export const address = '0x103931ca7ea5a385918e77e64fdd96430f6d2eca';
+export const testAddress1 = '0xedee4752e5a2f595151c94762fb38e5730357785';
+export const testAddress2 = '0x103931ca7ea5a385918e77e64fdd96430f6d2eca';
+
 export const txs: Array<TransactionResponse> = [
   Transaction.from({
     type: 2,
@@ -103,3 +110,55 @@ export const expectedExtractedTxs = [
     },
   },
 ];
+
+export const createMockTx = (
+  nonce: number,
+  address: string,
+  blockId: string,
+  extractor: string,
+  status: EvmTxStatus = EvmTxStatus.succeed,
+) => ({
+  unsignedHash: '0x' + generateRandomId(),
+  signedHash: '0x' + generateRandomId(),
+  nonce,
+  address,
+  blockId,
+  extractor,
+  status,
+});
+
+export const insertMockBlock = async (
+  dataSource: DataSource,
+  height: number,
+  hash: string,
+  parentHash: string = '0x' + generateRandomId(),
+  scanner: string = 'evm',
+) => {
+  const repository = dataSource.getRepository(BlockEntity);
+  await repository.insert({
+    height,
+    hash,
+    parentHash,
+    status: 'PROCEED',
+    scanner,
+    timestamp: Math.floor(Date.now() / 1000),
+  });
+};
+export const insertMockTransactions = async (
+  repository: Repository<AddressTxsEntity>,
+  address: string,
+  extractor: string,
+  transactions: Array<{ nonce: number; blockId: string }>,
+) => {
+  for (const tx of transactions) {
+    await repository.insert({
+      unsignedHash: '0x' + generateRandomId(),
+      signedHash: '0x' + generateRandomId(),
+      nonce: tx.nonce,
+      address,
+      blockId: tx.blockId,
+      extractor,
+      status: EvmTxStatus.succeed,
+    });
+  }
+};

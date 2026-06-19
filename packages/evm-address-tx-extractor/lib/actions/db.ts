@@ -1,4 +1,5 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import {
   DataSource,
   Repository,
@@ -11,10 +12,12 @@ import { ExtractedTx } from '../interfaces/types';
 
 export class TxAction {
   private readonly repository: Repository<AddressTxsEntity>;
+  private readonly dataSource: DataSource;
   readonly logger: AbstractLogger;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.repository = dataSource.getRepository(AddressTxsEntity);
+    this.dataSource = dataSource;
+    this.repository = this.dataSource.getRepository(AddressTxsEntity);
     this.logger = logger ? logger : new DummyLogger();
   }
 
@@ -86,5 +89,38 @@ export class TxAction {
       .createQueryBuilder('evmAddressTxEntity')
       .select('evmAddressTxEntity.blockId', 'block')
       .where('evmAddressTxEntity.extractor = :extractorId', { extractorId });
+  };
+
+  /**
+   * Returns the latest known nonce recorded for the specified extractor and address
+   * before the given block height.
+   *
+   * The method joins transaction records with stored block metadata and
+   * finds the transaction with the highest block height lower than the
+   * requested height. If multiple transactions exist in the same block,
+   * it returns the highest nonce from that block.
+   *
+   * @param extractor - Extractor identifier.
+   * @param address - The address to filter transactions by.
+   * @param height - Upper bound block height (Inclusive).
+   * @returns The last nonce before the given height, or -1 if no transaction found.
+   */
+  getLastNonceBeforeHeight = async (
+    extractor: string,
+    address: string,
+    height: number,
+  ): Promise<number> => {
+    const result = await this.repository
+      .createQueryBuilder('tx')
+      .innerJoin(BlockEntity, 'block', 'block.hash = tx.blockId')
+      .select('MAX(tx.nonce)', 'nonce')
+      .where('tx.extractor = :extractor', { extractor })
+      .andWhere('tx.address = :address', { address })
+      .andWhere('block.height <= :height', { height })
+      .getRawOne();
+
+    return result?.nonce !== null && result?.nonce !== undefined
+      ? Number(result.nonce)
+      : -1;
   };
 }
