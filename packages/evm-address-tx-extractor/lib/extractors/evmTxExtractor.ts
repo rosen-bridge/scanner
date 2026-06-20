@@ -130,13 +130,9 @@ export class EvmTxExtractor extends AbstractExtractor<
    * `false` if it is guaranteed to be empty.
    */
   override hasEventInHeightRange = async (
-    fromHeight?: number,
-    toHeight?: number,
+    fromHeight: number,
+    toHeight: number,
   ): Promise<boolean> => {
-    if (fromHeight === undefined || toHeight === undefined) {
-      return true;
-    }
-
     const lastDbNonce = await this.action.getLastNonceBeforeHeight(
       this.getId(),
       this.address,

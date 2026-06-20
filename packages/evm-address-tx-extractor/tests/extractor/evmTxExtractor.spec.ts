@@ -100,27 +100,6 @@ describe('EvmTxExtractor', () => {
     });
 
     /**
-     * @target hasEventInHeightRange should return true when fromHeight or toHeight is undefined
-     * @dependencies
-     * @scenario
-     * - Call hasEventInHeightRange with undefined parameters
-     * @expected
-     * - Should return true (safe default)
-     */
-    it('should return true when fromHeight or toHeight is undefined', async () => {
-      const result1 = await extractor.hasEventInHeightRange(undefined, 100);
-      const result2 = await extractor.hasEventInHeightRange(100, undefined);
-      const result3 = await extractor.hasEventInHeightRange(
-        undefined,
-        undefined,
-      );
-
-      expect(result1).toBe(true);
-      expect(result2).toBe(true);
-      expect(result3).toBe(true);
-    });
-
-    /**
      * @target hasEventInHeightRange should return false when nonce hasn't changed
      * @dependencies
      * @scenario

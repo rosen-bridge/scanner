@@ -122,7 +122,7 @@ abstract class GeneralScanner<
       return;
     }
     let stopHeight = lastSavedBlock.height;
-    let step = this.heightGap;
+    let step = Math.min(this.heightGap, currentHeight - lastSavedBlock.height);
     for (
       let height = lastSavedBlock.height;
       height < currentHeight;
@@ -130,11 +130,12 @@ abstract class GeneralScanner<
     ) {
       if (
         step > 1 &&
-        (await this.checkExtractorsForEvents(height, height + this.heightGap))
+        (await this.checkExtractorsForEvents(height, height + step))
       ) {
+        stopHeight = height + step;
         step = 1;
-        stopHeight = height + this.heightGap;
       }
+      if (height + step > currentHeight) break;
       const block = await this.network.getBlockAtHeight(height + step);
       if (block.parentHash != lastSavedBlock.hash && step === 1) {
         this.logger.debug(
@@ -152,7 +153,7 @@ abstract class GeneralScanner<
         lastSavedBlock = savedBlock;
       }
       if (height + step == stopHeight) {
-        step = this.heightGap;
+        step = Math.min(this.heightGap, currentHeight - height);
       }
     }
   };
