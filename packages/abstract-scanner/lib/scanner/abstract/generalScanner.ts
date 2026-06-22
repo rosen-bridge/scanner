@@ -112,7 +112,7 @@ abstract class GeneralScanner<
   /**
    * process forward in scanner. get blocks and store information from
    * transactions.
-   * @param lastSavedBlock: last saved block entity in database
+   * @param lastSavedBlock last saved block entity in the database
    */
   protected stepForward = async (lastSavedBlock: BlockEntity) => {
     const currentHeight = await this.network.getCurrentHeight();
@@ -123,11 +123,7 @@ abstract class GeneralScanner<
     }
     let stopHeight = lastSavedBlock.height;
     let step = Math.min(this.heightGap, currentHeight - lastSavedBlock.height);
-    for (
-      let height = lastSavedBlock.height;
-      height < currentHeight;
-      height += step
-    ) {
+    for (let height = lastSavedBlock.height; height < currentHeight; ) {
       if (
         step > 1 &&
         (await this.checkExtractorsForEvents(height, height + step))
@@ -135,8 +131,8 @@ abstract class GeneralScanner<
         stopHeight = height + step;
         step = 1;
       }
-      if (height + step > currentHeight) break;
-      const block = await this.network.getBlockAtHeight(height + step);
+      height += step;
+      const block = await this.network.getBlockAtHeight(height);
       if (block.parentHash != lastSavedBlock.hash && step === 1) {
         this.logger.debug(
           `Invalid block at height ${lastSavedBlock.height + 1}. Block info 
@@ -152,7 +148,7 @@ abstract class GeneralScanner<
       } else {
         lastSavedBlock = savedBlock;
       }
-      if (height + step == stopHeight) {
+      if (height == stopHeight) {
         step = Math.min(this.heightGap, currentHeight - height);
       }
     }
