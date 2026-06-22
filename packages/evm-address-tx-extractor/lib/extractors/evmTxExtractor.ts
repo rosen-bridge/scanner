@@ -133,7 +133,7 @@ export class EvmTxExtractor extends AbstractExtractor<
     fromHeight: number,
     toHeight: number,
   ): Promise<boolean> => {
-    const lastDbNonce = await this.action.getLastNonceBeforeHeight(
+    const lastDbNonce = await this.action.getNonceUpToHeight(
       this.getId(),
       this.address,
       fromHeight,
@@ -159,16 +159,26 @@ export class EvmTxExtractor extends AbstractExtractor<
     }
 
     this.logger.debug(
-      `Checking range [${fromHeight}, ${toHeight}], dbNonce=${lastDbNonce}, networkNonce=${networkNonce}`,
+      `Checking range [${fromHeight}, ${toHeight}] with db nonce [${lastDbNonce}] and using network nonce [${networkNonce}]`,
     );
 
     const nextExpectedNonce = lastDbNonce + 1;
-    const hasEvents = networkNonce > nextExpectedNonce;
 
+    if (networkNonce < nextExpectedNonce) {
+      throw new Error(
+        `ImpossibleBehavior: Next network nonce [${networkNonce}] is less than the expected nonce [${nextExpectedNonce}]`,
+      );
+    }
+    if (networkNonce === nextExpectedNonce) {
+      this.logger.debug(
+        `No related transaction is expected to be found in block range [${fromHeight}, ${toHeight}]`,
+      );
+      return false;
+    }
+    const possibleTxCount = networkNonce - nextExpectedNonce;
     this.logger.debug(
-      `nextExpectedNonce=${nextExpectedNonce}, hasEvents=${hasEvents}`,
+      `It's possible to have [${possibleTxCount}] related transaction(s) in block range [${fromHeight}, ${toHeight}]`,
     );
-
-    return hasEvents;
+    return true;
   };
 }

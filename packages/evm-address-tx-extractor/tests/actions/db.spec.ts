@@ -5,10 +5,9 @@ import { TxAction } from '../../lib/actions/db';
 import {
   insertMockBlock,
   insertMockTransactions,
-  testAddress1,
-  testAddress2,
-} from '../extractor/testData';
-import { createDatabase, generateRandomId } from '../testUtils';
+  createDatabase,
+  generateRandomId,
+} from '../testUtils';
 
 let dataSource: DataSource;
 let action: TxAction;
@@ -20,6 +19,9 @@ describe('TxAction', () => {
     action = new TxAction(dataSource);
     repository = dataSource.getRepository(AddressTxsEntity);
   });
+
+  const testAddress1 = '0xedee4752e5a2f595151c94762fb38e5730357785';
+  const testAddress2 = '0x103931ca7ea5a385918e77e64fdd96430f6d2eca';
 
   describe('deleteBlockTxs', () => {
     /**
@@ -183,49 +185,55 @@ describe('TxAction', () => {
     });
   });
 
-  describe('getLastNonceBeforeHeight', () => {
+  describe('getNonceUpToHeight', () => {
     /**
-     * @target getLastNonceBeforeHeight should return the correct nonce
-     * when transactions exist before the given height for the specified address
+     * @target getNonceUpToHeight should return the greatest nonce before or on the given height
      * @dependencies
      * @scenario
-     * - Insert mock blocks with unique parent hashes
-     * - Insert transactions with nonces at different blocks
-     * - Call getLastNonceBeforeHeight with address and height
+     * - Insert mock blocks at heights 1, 2, 3, and 4
+     * - Insert transactions with nonces at different blocks:
+     *   - nonce 10 at block 1
+     *   - nonce 11 at block 2
+     *   - nonce 12 at block 3
+     *   - nonce 13 at block 4 (higher than the requested height)
+     * - Call getNonceUpToHeight with height 3
      * @expected
-     * - Should return the highest nonce from blocks before the given height for that address
+     * - Should return the highest nonce from blocks up to the given height (nonce 12 from block 3)
+     * - Should not include nonce 13 from block 4 (above the requested height)
      */
-    it('should return correct nonce when transactions exist before height for the address', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
-      await insertMockBlock(dataSource, 2, 'block2', '0x' + '2'.repeat(64));
-      await insertMockBlock(dataSource, 3, 'block3', '0x' + '3'.repeat(64));
+    it('should return the greatest nonce before or on the given height', async () => {
+      await insertMockBlock(dataSource, 1, 'block1', 'block0');
+      await insertMockBlock(dataSource, 2, 'block2', 'block1');
+      await insertMockBlock(dataSource, 3, 'block3', 'block2');
+      await insertMockBlock(dataSource, 4, 'block4', 'block3');
 
       await insertMockTransactions(repository, testAddress1, 'extractor1', [
         { nonce: 10, blockId: 'block1' },
-        { nonce: 20, blockId: 'block2' },
-        { nonce: 30, blockId: 'block3' },
+        { nonce: 11, blockId: 'block2' },
+        { nonce: 12, blockId: 'block3' },
+        { nonce: 13, blockId: 'block4' },
       ]);
 
-      const nonce = await action.getLastNonceBeforeHeight(
+      const nonce = await action.getNonceUpToHeight(
         'extractor1',
         testAddress1,
         3,
       );
 
-      expect(nonce).toBe(30);
+      expect(nonce).toBe(12);
     });
 
     /**
-     * @target getLastNonceBeforeHeight should return -1 when no transactions exist for the address
+     * @target getNonceUpToHeight should return -1 when no transaction exists
      * @dependencies
      * @scenario
      * - No transactions in database for the address
-     * - Call getLastNonceBeforeHeight with the address
+     * - Call getNonceUpToHeight with the address
      * @expected
      * - Should return -1
      */
-    it('should return -1 when no transactions exist for the address', async () => {
-      const nonce = await action.getLastNonceBeforeHeight(
+    it('should return -1 when no transaction exists', async () => {
+      const nonce = await action.getNonceUpToHeight(
         'extractor1',
         testAddress1,
         100,
@@ -234,17 +242,17 @@ describe('TxAction', () => {
     });
 
     /**
-     * @target getLastNonceBeforeHeight should only consider transactions from the specified address
+     * @target getNonceUpToHeight should only consider transactions from the specified address
      * @dependencies
      * @scenario
      * - Insert mock block
      * - Insert transactions for two different addresses
-     * - Call getLastNonceBeforeHeight for one address
+     * - Call getNonceUpToHeight for one address
      * @expected
      * - Should only return nonce from the specified address
      */
     it('should only consider transactions from the specified address', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
+      await insertMockBlock(dataSource, 1, 'block1', 'block0');
 
       await insertMockTransactions(repository, testAddress1, 'extractor1', [
         { nonce: 5, blockId: 'block1' },
@@ -254,34 +262,27 @@ describe('TxAction', () => {
         { nonce: 100, blockId: 'block1' },
       ]);
 
-      const nonce1 = await action.getLastNonceBeforeHeight(
+      const nonce1 = await action.getNonceUpToHeight(
         'extractor1',
         testAddress1,
         10,
       );
-      const nonce2 = await action.getLastNonceBeforeHeight(
-        'extractor1',
-        testAddress2,
-        10,
-      );
 
       expect(nonce1).toBe(5);
-      expect(nonce2).toBe(100);
-      expect(nonce1).not.toEqual(nonce2);
     });
 
     /**
-     * @target getLastNonceBeforeHeight should only consider transactions from the specified extractor
+     * @target getNonceUpToHeight should only consider transactions from the specified extractor
      * @dependencies
      * @scenario
      * - Insert mock block
      * - Insert transactions for two different extractors with same address
-     * - Call getLastNonceBeforeHeight for one extractor
+     * - Call getNonceUpToHeight for one extractor
      * @expected
      * - Should only return nonce from the specified extractor
      */
     it('should only consider transactions from the specified extractor', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
+      await insertMockBlock(dataSource, 1, 'block1', 'block0');
 
       await insertMockTransactions(repository, testAddress1, 'extractor1', [
         { nonce: 5, blockId: 'block1' },
@@ -291,116 +292,41 @@ describe('TxAction', () => {
         { nonce: 10, blockId: 'block1' },
       ]);
 
-      const nonce1 = await action.getLastNonceBeforeHeight(
+      const nonce1 = await action.getNonceUpToHeight(
         'extractor1',
-        testAddress1,
-        10,
-      );
-      const nonce2 = await action.getLastNonceBeforeHeight(
-        'extractor2',
         testAddress1,
         10,
       );
 
       expect(nonce1).toBe(5);
-      expect(nonce2).toBe(10);
-      expect(nonce1).not.toEqual(nonce2);
     });
 
     /**
-     * @target getLastNonceBeforeHeight should only consider transactions before the given height
-     * @dependencies
-     * @scenario
-     * - Insert mock blocks at different heights with unique parent hashes
-     * - Insert transactions at different blocks for the address
-     * - Call getLastNonceBeforeHeight with a height
-     * @expected
-     * - Should not include transactions at or after the given height
-     */
-    it('should only consider transactions before the given height', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
-      await insertMockBlock(dataSource, 2, 'block2', '0x' + '2'.repeat(64));
-      await insertMockBlock(dataSource, 3, 'block3', '0x' + '3'.repeat(64));
-      await insertMockBlock(dataSource, 4, 'block4', '0x' + '4'.repeat(64));
-
-      await insertMockTransactions(repository, testAddress1, 'extractor1', [
-        { nonce: 100, blockId: 'block1' },
-        { nonce: 200, blockId: 'block4' },
-      ]);
-
-      const nonce = await action.getLastNonceBeforeHeight(
-        'extractor1',
-        testAddress1,
-        3,
-      );
-
-      expect(nonce).toBe(100);
-    });
-
-    /**
-     * @target getLastNonceBeforeHeight should handle multiple transactions in the same block
+     * @target getNonceUpToHeight should return the greatest nonce when multiple transactions exist for the address in a block
      * @dependencies
      * @scenario
      * - Insert mock block
      * - Insert multiple transactions with different nonces in the same block for the address
-     * - Call getLastNonceBeforeHeight
+     * - Call getNonceUpToHeight
      * @expected
      * - Should return the highest nonce from that block
      */
-    it('should handle multiple transactions in the same block', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
+    it('should return the greatest nonce when multiple transactions exist for the address in a block', async () => {
+      await insertMockBlock(dataSource, 1, 'block1', 'block0');
 
       await insertMockTransactions(repository, testAddress1, 'extractor1', [
         { nonce: 5, blockId: 'block1' },
-        { nonce: 10, blockId: 'block1' },
-        { nonce: 15, blockId: 'block1' },
+        { nonce: 6, blockId: 'block1' },
+        { nonce: 7, blockId: 'block1' },
       ]);
 
-      const nonce = await action.getLastNonceBeforeHeight(
+      const nonce = await action.getNonceUpToHeight(
         'extractor1',
         testAddress1,
-        2,
+        1,
       );
 
-      expect(nonce).toBe(15);
-    });
-
-    /**
-     * @target getLastNonceBeforeHeight should handle transactions from different addresses in the same block
-     * @dependencies
-     * @scenario
-     * - Insert mock block
-     * - Insert transactions for two different addresses in the same block
-     * - Call getLastNonceBeforeHeight for one address
-     * @expected
-     * - Should only return nonce for the specified address, not the other
-     */
-    it('should handle transactions from different addresses in the same block', async () => {
-      await insertMockBlock(dataSource, 1, 'block1', '0x' + '1'.repeat(64));
-
-      await insertMockTransactions(repository, testAddress1, 'extractor1', [
-        { nonce: 5, blockId: 'block1' },
-      ]);
-
-      await insertMockTransactions(repository, testAddress2, 'extractor1', [
-        { nonce: 100, blockId: 'block1' },
-      ]);
-
-      const nonce1 = await action.getLastNonceBeforeHeight(
-        'extractor1',
-        testAddress1,
-        10,
-      );
-
-      const nonce2 = await action.getLastNonceBeforeHeight(
-        'extractor1',
-        testAddress2,
-        10,
-      );
-
-      expect(nonce1).toBe(5);
-      expect(nonce2).toBe(100);
-      expect(nonce1).not.toEqual(nonce2);
+      expect(nonce).toBe(7);
     });
   });
 });

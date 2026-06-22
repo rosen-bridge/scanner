@@ -12,12 +12,10 @@ import { ExtractedTx } from '../interfaces/types';
 
 export class TxAction {
   private readonly repository: Repository<AddressTxsEntity>;
-  private readonly dataSource: DataSource;
   readonly logger: AbstractLogger;
 
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.dataSource = dataSource;
-    this.repository = this.dataSource.getRepository(AddressTxsEntity);
+    this.repository = dataSource.getRepository(AddressTxsEntity);
     this.logger = logger ? logger : new DummyLogger();
   }
 
@@ -92,20 +90,15 @@ export class TxAction {
   };
 
   /**
-   * Returns the latest known nonce recorded for the specified extractor and address
-   * before the given block height.
-   *
-   * The method joins transaction records with stored block metadata and
-   * finds the transaction with the highest block height lower than the
-   * requested height. If multiple transactions exist in the same block,
-   * it returns the highest nonce from that block.
+   * Returns the highest nonce recorded for the specified extractor and address
+   * up to and including the given block height.
    *
    * @param extractor - Extractor identifier.
    * @param address - The address to filter transactions by.
    * @param height - Upper bound block height (Inclusive).
-   * @returns The last nonce before the given height, or -1 if no transaction found.
+   * @returns The highest nonce up to the given height, or -1 if no transaction found.
    */
-  getLastNonceBeforeHeight = async (
+  getNonceUpToHeight = async (
     extractor: string,
     address: string,
     height: number,

@@ -121,8 +121,8 @@ abstract class GeneralScanner<
     if (!firstBlock || firstBlock.height >= currentHeight) {
       return;
     }
-    let stopHeight = lastSavedBlock.height;
     let step = Math.min(this.heightGap, currentHeight - lastSavedBlock.height);
+    let stopHeight = lastSavedBlock.height + step;
     for (let height = lastSavedBlock.height; height < currentHeight; ) {
       if (
         step > 1 &&
@@ -150,6 +150,7 @@ abstract class GeneralScanner<
       }
       if (height == stopHeight) {
         step = Math.min(this.heightGap, currentHeight - height);
+        stopHeight = height + step;
       }
     }
   };
