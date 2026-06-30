@@ -97,32 +97,34 @@ describe('EvmTxExtractor', () => {
     });
 
     /**
-     * @target hasEventInHeightRange should return false when nonce hasn't changed
+     * @target hasEventInHeightRange should return false when nonce has not changed
      * @dependencies
+     * - getTransactionCount
+     * - getNonceUpToHeight
      * @scenario
      * - Insert mock blocks at heights 100 and 101
-     * - Insert transactions with nonces up to 4 for the address up to height 100
-     * - Network nonce is 5 (no new transactions)
-     * - lastDbNonce = 5, networkNonce = 6 (no new transactions)
-     * - nextExpectedNonce = 6, 6 > 6 → false
+     * - Insert transactions with nonces up to 5 for the address at height 101
+     * - Mock getTransactionCount to return 6 (no new transactions)
+     * - Call hasEventInHeightRange with fromHeight=101 and toHeight=200
+     * - Check return value
      * @expected
-     * - Should return false
+     * - Should return false because network nonce (6) equals nextExpectedNonce (6)
      */
     it('should return false when nonce has not changed', async () => {
       await insertMockBlock(dataSource, 100, 'block100', 'block99');
       await insertMockBlock(dataSource, 101, 'block101', 'block100');
 
       await insertMockTransactions(repository, address, 'extractor1', [
-        { nonce: 1, blockId: 'block100' },
-        { nonce: 2, blockId: 'block100' },
-        { nonce: 3, blockId: 'block100' },
-        { nonce: 4, blockId: 'block100' },
-        { nonce: 5, blockId: 'block100' },
+        { nonce: 1, blockId: 'block101' },
+        { nonce: 2, blockId: 'block101' },
+        { nonce: 3, blockId: 'block101' },
+        { nonce: 4, blockId: 'block101' },
+        { nonce: 5, blockId: 'block101' },
       ]);
 
       rpcInstance.getTransactionCount.mockResolvedValue(6);
 
-      const result = await extractor.hasEventInHeightRange(100, 200);
+      const result = await extractor.hasEventInHeightRange(101, 200);
 
       expect(result).toBe(false);
     });
@@ -130,48 +132,56 @@ describe('EvmTxExtractor', () => {
     /**
      * @target hasEventInHeightRange should return true when nonce has changed
      * @dependencies
+     * - getTransactionCount
+     * - getNonceUpToHeight
      * @scenario
      * - Insert mock blocks at heights 100 and 101
-     * - Insert transactions with nonces up to 6 for the address up to height 100
-     * - Network nonce is 10 (new transactions exist)
-     * - lastDbNonce = 6, networkNonce = 10 (new transactions exist)
-     * - nextExpectedNonce = 7, 10 > 7 → true
+     * - Insert transactions with nonces up to 6 for the address at height 101
+     * - Mock getTransactionCount to return 10 (new transactions exist)
+     * - Call hasEventInHeightRange with fromHeight=101 and toHeight=200
+     * - Check return value
      * @expected
-     * - Should return true
+     * - Should return true because network nonce (10) is greater than nextExpectedNonce (7)
      */
     it('should return true when nonce has changed', async () => {
       await insertMockBlock(dataSource, 100, 'block100', 'block99');
       await insertMockBlock(dataSource, 101, 'block101', 'block100');
 
       await insertMockTransactions(repository, address, 'extractor1', [
-        { nonce: 1, blockId: 'block100' },
-        { nonce: 2, blockId: 'block100' },
-        { nonce: 3, blockId: 'block100' },
-        { nonce: 4, blockId: 'block100' },
-        { nonce: 5, blockId: 'block100' },
-        { nonce: 6, blockId: 'block100' },
+        { nonce: 1, blockId: 'block101' },
+        { nonce: 2, blockId: 'block101' },
+        { nonce: 3, blockId: 'block101' },
+        { nonce: 4, blockId: 'block101' },
+        { nonce: 5, blockId: 'block101' },
+        { nonce: 6, blockId: 'block101' },
       ]);
 
       rpcInstance.getTransactionCount.mockResolvedValue(10);
 
-      const result = await extractor.hasEventInHeightRange(100, 200);
+      const result = await extractor.hasEventInHeightRange(101, 200);
 
       expect(result).toBe(true);
     });
 
     /**
-     * @target should get the nonce at to height instead of latest nonce when "checkNonceAtToHeight" is enabled
+     * @target hasEventInHeightRange should get the nonce at to height instead of latest nonce when "checkNonceAtToHeight" is enabled
      * @dependencies
+     * - getTransactionCount
+     * - getNonceUpToHeight
      * @scenario
      * - Create extractor with checkNonceAtToHeight = true
-     * - Insert mock blocks at heights 100, 101, and 200
+     * - Insert mock blocks at heights 100 and 101
      * - Insert transactions up to block 100 with nonce 5
-     * - Mock current nonce at latest (block 200) to be 10 (different from toHeight)
-     * - Should check nonce at toHeight first
+     * - Mock getTransactionCount to return different values based on whether height parameter is provided
+     *   - When called with toHeight (200): return 6 (no new transactions)
+     *   - When called without height (latest): return 10 (new transactions exist)
+     * - Call hasEventInHeightRange with fromHeight=101 and toHeight=200
+     * - Check if function got called
+     * - Check return value
      * @expected
-     * - getTransactionCount called with toHeight parameter (200)
-     * - getTransactionCount should NOT be called with latest (no fallback needed)
-     * - Should use the nonce at toHeight (6) instead of latest nonce (10)
+     * - getTransactionCount should be called once with toHeight parameter (200)
+     * - getTransactionCount should NOT be called without parameters
+     * - Should return false because nonce at toHeight (6) equals lastDbNonce (6)
      */
     it('should get the nonce at to height instead of latest nonce when "checkNonceAtToHeight" is enabled', async () => {
       const extractorWithCheck = new EvmTxExtractor(
@@ -185,17 +195,21 @@ describe('EvmTxExtractor', () => {
 
       await insertMockBlock(dataSource, 100, 'block100', 'block99');
       await insertMockBlock(dataSource, 101, 'block101', 'block100');
-      await insertMockBlock(dataSource, 200, 'block200', 'block199');
 
       await insertMockTransactions(repository, address, 'extractor1', [
         { nonce: 5, blockId: 'block100' },
       ]);
 
-      rpcInstance.getTransactionCount
-        .mockResolvedValueOnce(6)
-        .mockResolvedValueOnce(10);
+      rpcInstance.getTransactionCount.mockImplementation(
+        (_: string, height?: number) => {
+          if (height === 200) {
+            return Promise.resolve(6);
+          }
+          return Promise.resolve(10);
+        },
+      );
 
-      const result = await extractorWithCheck.hasEventInHeightRange(100, 200);
+      const result = await extractorWithCheck.hasEventInHeightRange(101, 200);
 
       expect(result).toBe(false);
       expect(rpcInstance.getTransactionCount).toHaveBeenCalledTimes(1);
@@ -209,15 +223,22 @@ describe('EvmTxExtractor', () => {
     /**
      * @target hasEventInHeightRange should fallback to latest nonce when toHeight check fails
      * @dependencies
+     * - getTransactionCount
+     * - getNonceUpToHeight
      * @scenario
-     * - checkNonceAtToHeight = true
+     * - Create extractor with checkNonceAtToHeight = true
      * - Insert mock blocks at heights 100 and 101
      * - Insert transactions up to block 100 with nonce 5
-     * - getTransactionCount at toHeight throws error
-     * - Falls back to latest nonce
+     * - Mock getTransactionCount at toHeight to throw an error
+     * - Mock getTransactionCount at latest to return 10
+     * - Call hasEventInHeightRange with fromHeight=101 and toHeight=200
+     * - Check if function got called
+     * - Check return value
      * @expected
-     * - Should return true based on latest nonce
-     * - Called twice: once for toHeight (failed), once for latest
+     * - getTransactionCount should be called twice
+     * - First call should be with toHeight parameter (200) and fail
+     * - Second call should be without parameters (latest) and succeed
+     * - Should return true based on latest nonce (10)
      */
     it('should fallback to latest nonce when toHeight check fails', async () => {
       const extractorWithCheck = new EvmTxExtractor(
@@ -239,7 +260,7 @@ describe('EvmTxExtractor', () => {
         .mockRejectedValueOnce(new Error('missing trie node'))
         .mockResolvedValueOnce(10);
 
-      const result = await extractorWithCheck.hasEventInHeightRange(100, 200);
+      const result = await extractorWithCheck.hasEventInHeightRange(101, 200);
 
       expect(result).toBe(true);
       expect(rpcInstance.getTransactionCount).toHaveBeenCalledTimes(2);

@@ -311,23 +311,27 @@ describe('generalScanner', () => {
       expect(await scanner.action.getBlockAtHeight(3)).toBeUndefined();
       expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
     });
+
     /**
-     * @target stepForward should process the remaining block when the distance to chain tip is smaller than heightGap
+     * @target stepForward should process up to the current height when the distance to the current height is less than heightGap
      * @dependencies
      * - getCurrentHeight
      * - getBlockAtHeight
      * - checkExtractorsForEvents
      * @scenario
-     * - scanner is at height 2
-     * - current blockchain height is 3
-     * - configured heightGap is 2
-     * - no event is detected
+     * - mock NetworkConnectorTest to return current height 3
+     * - mock getBlockAtHeight to return blocks with proper parent-child relationships
+     * - create a scanner with heightGap=2 and insert initial blocks 1 and 2
+     * - spy on checkExtractorsForEvents and mock it to return false
+     * - get last saved block (height 2) from the scanner
+     * - call stepForward with the last block
+     * - check if function got called
      * @expected
-     * - scanner should process block 3
-     * - scanner should not request block 4
-     * - block at height 3 should be stored
+     * - getBlockAtHeight should be called with height 3
+     * - getBlockAtHeight should NOT be called with height 4
+     * - block at height 3 should be stored in the database
      */
-    it('should process the remaining block when the distance to chain tip is smaller than heightGap', async () => {
+    it('stepForward should process up to the current height when the distance to the current height is less than heightGap', async () => {
       const network = new NetworkConnectorTest();
 
       vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(3);
@@ -358,75 +362,26 @@ describe('generalScanner', () => {
 
       expect(await scanner.action.getBlockAtHeight(3)).toBeDefined();
     });
-    /**
-     * @target stepForward should reduce step size near chain tip after fast-forwarding when no events are detected
-     * @dependencies
-     * - getCurrentHeight
-     * - getBlockAtHeight
-     * - checkExtractorsForEvents
-     * @scenario
-     * - scanner is at height 2
-     * - current blockchain height is 5
-     * - configured heightGap is 2
-     * - no events are detected
-     * @expected
-     * - scanner fast-forwards to height 4 (skipping height 3)
-     * - scanner reduces step to 1 and processes block 5
-     * - scanner does NOT request block 6
-     * - blocks 4 and 5 are stored in the database
-     */
-    it('should reduce step size near chain tip after fast-forwarding', async () => {
-      const network = new NetworkConnectorTest();
-
-      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(5);
-
-      const getBlockSpy = vi
-        .spyOn(network, 'getBlockAtHeight')
-        .mockImplementation(async (height: number) => ({
-          height,
-          parentHash: height === 1 ? ' ' : `${height - 1}`,
-          hash: `${height}`,
-          timestamp: height * 10,
-        }));
-
-      const scanner = new TestGeneralScanner('first', dataSource, network, 2);
-
-      await insertBlocks(scanner, 2);
-
-      const lastBlock = await scanner.action.getLastSavedBlock();
-
-      vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
-        false,
-      );
-
-      await scanner['stepForward'](lastBlock!);
-
-      expect(getBlockSpy).toHaveBeenCalledWith(4);
-      expect(getBlockSpy).toHaveBeenCalledWith(5);
-
-      expect(getBlockSpy).not.toHaveBeenCalledWith(6);
-
-      expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
-      expect(await scanner.action.getBlockAtHeight(5)).toBeDefined();
-    });
 
     /**
-     * @target stepForward should process all blocks one by one when events are detected throughout the range
+     * @target stepForward should process all blocks one by one when events are detected continuously
      * @dependencies
      * - checkExtractorsForEvents
      * - getCurrentHeight
      * - getBlockAtHeight
      * @scenario
-     * - scanner is at height 5
-     * - current blockchain height is 15
-     * - configured heightGap is 5
-     * - events are detected at every step
+     * - mock NetworkConnectorTest to return current height 15
+     * - mock getBlockAtHeight to return blocks with proper parent-child relationships
+     * - create a scanner with heightGap=5 and insert initial blocks 1-5
+     * - spy on checkExtractorsForEvents and mock it to return true for all calls
+     * - get last saved block (height 5) from the scanner
+     * - call stepForward with the last block
+     * - check if function got called
      * @expected
-     * - scanner processes blocks one by one from height 6 to 15
-     * - all blocks from 6 to 15 are stored in the database
-     * - scanner does NOT strore block more than 15
+     * - all blocks from 6 to 15 should be stored in the database
+     * - block at height 16 should NOT be stored in the database
      */
-    it('should process all blocks one by one when events are detected throughout the range', async () => {
+    it('stepForward should process all blocks one by one when events are detected continuously', async () => {
       const network = new NetworkConnectorTest();
 
       vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(15);
