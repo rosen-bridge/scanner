@@ -6,7 +6,12 @@ import {
 } from '@rosen-bridge/scanner-interfaces';
 import axios, { Axios } from '@rosen-clients/rate-limited-axios';
 
-import { FiroRpcBlock, FiroRpcTransaction, JsonRpcResult } from '../types';
+import {
+  FiroRpcBlock,
+  FiroRpcBlockWithTransactions,
+  FiroRpcTransaction,
+  JsonRpcResult,
+} from '../types';
 
 class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
   private readonly url: string;
@@ -84,18 +89,13 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
     blockHash: string,
   ): Promise<Array<FiroRpcTransaction>> => {
     try {
-      const blockResponse = await this.getBlockInfo(blockHash);
+      const blockResponse =
+        await this.makeRpcCall<FiroRpcBlockWithTransactions>('getblock', [
+          blockHash,
+          2,
+        ]);
 
-      const txids: Array<string> = blockResponse.tx;
-      const transactions: Array<FiroRpcTransaction> = [];
-
-      // Get detailed transaction data for each transaction ID
-      for (const txId of txids) {
-        const txResponse = await this.getTransaction(txId);
-        transactions.push(txResponse);
-      }
-
-      return transactions;
+      return blockResponse.tx;
     } catch (error) {
       throw new Error(
         `Failed to get block transactions for ${blockHash}: ${error}`,
@@ -120,23 +120,6 @@ class FiroRpcNetwork extends AbstractNetworkConnector<FiroRpcTransaction> {
       return block;
     } catch (error) {
       throw new Error(`Failed to get block info for ${blockHash}: ${error}`);
-    }
-  };
-
-  /**
-   * Return transaction info with specified transaction ID
-   * @param txId
-   * @returns
-   */
-  getTransaction = async (txId: string): Promise<FiroRpcTransaction> => {
-    try {
-      const transaction = await this.makeRpcCall<FiroRpcTransaction>(
-        'getrawtransaction',
-        [txId, true],
-      );
-      return transaction;
-    } catch (error) {
-      throw new Error(`Failed to get transaction ${txId}: ${error}`);
     }
   };
 

@@ -89,8 +89,7 @@ describe('FiroRpcNetwork', () => {
      * @target `FiroRpcNetwork.getBlockTxs` should return block transactions successfully
      * @dependencies Mock axios responses for getblock and getrawtransaction RPC calls
      * @scenario
-     * - Mock axios to return block data containing transaction IDs array
-     * - Mock axios to return detailed transaction data for each transaction ID via getrawtransaction
+     * - Mock axios to return block data containing transactions array
      * - Call getBlockTxs with test block hash
      * - Verify returned transaction array length and content
      * - Verify correct RPC method calls and parameters
@@ -98,67 +97,24 @@ describe('FiroRpcNetwork', () => {
      * - Should return array of full transaction objects (not just IDs)
      * - Array length should match number of transactions in block
      * - Each transaction should have complete Firo transaction structure (txid, hash, vin, vout, cbTx, etc.)
-     * - axios.post should be called (1 + tx_count) times: once for getblock, once per transaction for getrawtransaction
-     * - getblock call should use correct block hash and verbose=true parameter
-     * - getrawtransaction calls should use correct transaction IDs and verbose=true parameter
+     * - getblock call should use correct block hash and verbose=2 parameter
      * - All RPC calls should include proper JSON-RPC structure with method, params, and id fields
      */
     it('should return block transactions successfully', async () => {
       // Mock the getblock call first
-      mockAxiosPost(testData.getBlockResponse);
-
-      // Define responses for each transaction
-      const transactionResponses = [testData.getRawTransactionResponse];
-
-      // Mock the getrawtransaction calls for each transaction
-      transactionResponses.forEach((response) => {
-        mockAxiosPost(response);
-      });
-
+      mockAxiosPost(testData.getBlockResponseWithTransactions);
       const result = await network.getBlockTxs(testData.blockHash);
 
       expect(result).toHaveLength(testData.getBlockResponse.result.tx.length);
       expect(result[0]).toEqual(testData.sampleTransaction);
-      expect(axiosInstance.post).toHaveBeenCalledTimes(
-        1 + testData.getBlockResponse.result.tx.length,
-      );
+      expect(axiosInstance.post).toHaveBeenCalledOnce();
 
       // Check the getblock call
       expect(axiosInstance.post).toHaveBeenNthCalledWith(1, '', {
         method: 'getblock',
-        params: [testData.blockHash, true],
+        params: [testData.blockHash, 2],
         id: expect.any(String),
       });
-
-      // Check the getrawtransaction calls
-      testData.getBlockResponse.result.tx.forEach((txId, index) => {
-        expect(axiosInstance.post).toHaveBeenNthCalledWith(index + 2, '', {
-          method: 'getrawtransaction',
-          params: [txId, true],
-          id: expect.any(String),
-        });
-      });
-    });
-
-    /**
-     * @target `FiroRpcNetwork.getBlockTxs` should fail when a transaction fetch fails
-     * @dependencies Mock axios response for getblock and failing getrawtransaction RPC call
-     * @scenario
-     * - Mock axios to return block data containing transaction IDs array
-     * - Mock axios to reject the getrawtransaction call
-     * - Call getBlockTxs with test block hash
-     * @expected
-     * - Should reject instead of returning a partial transaction list
-     * - axios.post should be called once for getblock and once for getrawtransaction
-     */
-    it('should fail when a block transaction fetch fails', async () => {
-      mockAxiosPost(testData.getBlockResponse);
-      axiosInstance.post.mockRejectedValueOnce(new Error('tx fetch failed'));
-
-      await expect(network.getBlockTxs(testData.blockHash)).rejects.toThrow(
-        `Failed to get block transactions for ${testData.blockHash}:`,
-      );
-      expect(axiosInstance.post).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -187,36 +143,6 @@ describe('FiroRpcNetwork', () => {
       expect(axiosInstance.post).toHaveBeenCalledWith('', {
         method: 'getblock',
         params: [testData.blockHash, true],
-        id: expect.any(String),
-      });
-    });
-  });
-
-  describe('getTransaction', () => {
-    /**
-     * @target `FiroRpcNetwork.getTransaction` should return complete transaction details
-     * @dependencies Mock axios response for getrawtransaction RPC call
-     * @scenario
-     * - Mock axios to return complete transaction data
-     * - Call getTransaction with test transaction ID
-     * - Verify returned transaction matches expected structure
-     * - Verify correct RPC method call and parameters
-     * @expected
-     * - Should return complete FiroRpcTransaction object
-     * - axios.post should be called once with getrawtransaction method
-     * - RPC call should include transaction ID and verbose=true parameter
-     */
-    it('should return complete transaction details', async () => {
-      const testTxId = testData.sampleTransaction.txid;
-      mockAxiosPost(testData.getRawTransactionResponse);
-
-      const result = await network.getTransaction(testTxId);
-
-      expect(result).toEqual(testData.sampleTransaction);
-      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(axiosInstance.post).toHaveBeenCalledWith('', {
-        method: 'getrawtransaction',
-        params: [testTxId, true],
         id: expect.any(String),
       });
     });
