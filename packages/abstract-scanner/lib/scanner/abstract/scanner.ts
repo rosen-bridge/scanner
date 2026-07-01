@@ -234,7 +234,7 @@ export abstract class AbstractScanner<TransactionType> {
         extracor.createUsedBlocksQuery(),
       );
       const thresholdTimestamp = lastSavedBlock
-        ? lastSavedBlock.timestamp - this.blockTimeConfig.blockAgeThreshold!
+        ? lastSavedBlock.timestamp - this.blockTimeConfig.blockAgeThreshold
         : 0;
       const unusedBlockHashes = await this.action.removeUnusedBlocksInBatches(
         extractorUsedBlocksQueries.filter((query) => query !== undefined),
