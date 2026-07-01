@@ -129,7 +129,7 @@ export class EvmTxExtractor extends AbstractExtractor<
    * @returns `true` if the range may contain relevant transactions,
    * `false` if it is guaranteed to be empty.
    */
-  override hasEventInHeightRange = async (
+  hasEventInHeightRange = async (
     fromHeight: number,
     toHeight: number,
   ): Promise<boolean> => {

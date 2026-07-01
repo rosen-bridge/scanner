@@ -319,22 +319,22 @@ describe('generalScanner', () => {
      * - getBlockAtHeight
      * - checkExtractorsForEvents
      * @scenario
-     * - mock NetworkConnectorTest to return current height 3
+     * - mock NetworkConnectorTest to return current height 4
      * - mock getBlockAtHeight to return blocks with proper parent-child relationships
-     * - create a scanner with heightGap=2 and insert initial blocks 1 and 2
+     * - create a scanner with heightGap=3 and insert initial blocks 1 and 2
      * - spy on checkExtractorsForEvents and mock it to return false
      * - get last saved block (height 2) from the scanner
      * - call stepForward with the last block
      * - check if function got called
      * @expected
-     * - getBlockAtHeight should be called with height 3
-     * - getBlockAtHeight should NOT be called with height 4
-     * - block at height 3 should be stored in the database
+     * - getBlockAtHeight should NOT be called with height 3
+     * - getBlockAtHeight should be called with height 4
+     * - block at height 4 should be stored in the database
      */
     it('stepForward should process up to the current height when the distance to the current height is less than heightGap', async () => {
       const network = new NetworkConnectorTest();
 
-      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(3);
+      vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(4);
 
       const getBlockSpy = vi
         .spyOn(network, 'getBlockAtHeight')
@@ -345,7 +345,7 @@ describe('generalScanner', () => {
           timestamp: height * 10,
         }));
 
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner('first', dataSource, network, 3);
 
       await insertBlocks(scanner, 2);
 
@@ -357,10 +357,10 @@ describe('generalScanner', () => {
 
       await scanner['stepForward'](lastBlock!);
 
-      expect(getBlockSpy).toHaveBeenCalledWith(3);
-      expect(getBlockSpy).not.toHaveBeenCalledWith(4);
+      expect(getBlockSpy).not.toHaveBeenCalledWith(3);
+      expect(getBlockSpy).toHaveBeenCalledWith(4);
 
-      expect(await scanner.action.getBlockAtHeight(3)).toBeDefined();
+      expect(await scanner.action.getBlockAtHeight(4)).toBeDefined();
     });
 
     /**
@@ -379,21 +379,21 @@ describe('generalScanner', () => {
      * - check if function got called
      * @expected
      * - all blocks from 6 to 15 should be stored in the database
-     * - block at height 16 should NOT be stored in the database
+     * - getBlockAtHeight should NOT be called with any height greater than 15
      */
     it('stepForward should process all blocks one by one when events are detected continuously', async () => {
       const network = new NetworkConnectorTest();
 
       vi.spyOn(network, 'getCurrentHeight').mockResolvedValue(15);
 
-      vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
-        async (height: number) => ({
+      const getBlockSpy = vi
+        .spyOn(network, 'getBlockAtHeight')
+        .mockImplementation(async (height: number) => ({
           height,
           parentHash: height === 1 ? ' ' : `${height - 1}`,
           hash: `${height}`,
           timestamp: height * 10,
-        }),
-      );
+        }));
 
       const scanner = new TestGeneralScanner('first', dataSource, network, 5);
 
@@ -410,7 +410,8 @@ describe('generalScanner', () => {
       for (let i = 6; i < 16; i++)
         expect(await scanner.action.getBlockAtHeight(i)).toBeDefined();
 
-      expect(await scanner.action.getBlockAtHeight(16)).not.toBeDefined();
+      const requestedHeights = getBlockSpy.mock.calls.map((call) => call[0]);
+      expect(Math.max(...requestedHeights)).toBe(15);
     });
   });
 
