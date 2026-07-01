@@ -62,9 +62,9 @@ export abstract class AbstractExtractor<
    */
   public hasEventInHeightRange = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fromHeight?: number,
+    fromHeight: number,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    toHeight?: number,
+    toHeight: number,
   ): Promise<boolean> => {
     return true;
   };

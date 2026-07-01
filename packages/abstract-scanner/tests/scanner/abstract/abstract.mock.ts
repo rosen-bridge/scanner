@@ -99,6 +99,7 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
     dataSource: DataSource,
     networkConnector: NetworkConnectorTest,
     blockTimeConfig: BlockTimeConfig,
+    heightGap: number = 1,
   ) {
     super(
       name,
@@ -109,7 +110,7 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
       blockTimeConfig,
       undefined,
       undefined,
-      2,
+      heightGap,
     );
   }
 

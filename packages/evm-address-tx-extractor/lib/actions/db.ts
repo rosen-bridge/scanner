@@ -1,4 +1,5 @@
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
+import { BlockEntity } from '@rosen-bridge/abstract-scanner';
 import {
   DataSource,
   Repository,
@@ -86,5 +87,33 @@ export class TxAction {
       .createQueryBuilder('evmAddressTxEntity')
       .select('evmAddressTxEntity.blockId', 'block')
       .where('evmAddressTxEntity.extractor = :extractorId', { extractorId });
+  };
+
+  /**
+   * Returns the highest nonce recorded for the specified extractor and address
+   * up to and including the given block height.
+   *
+   * @param extractor - Extractor identifier.
+   * @param address - The address to filter transactions by.
+   * @param height - Upper bound block height (Inclusive).
+   * @returns The highest nonce up to the given height, or -1 if no transaction found.
+   */
+  getNonceUpToHeight = async (
+    extractor: string,
+    address: string,
+    height: number,
+  ): Promise<number> => {
+    const result = await this.repository
+      .createQueryBuilder('tx')
+      .innerJoin(BlockEntity, 'block', 'block.hash = tx.blockId')
+      .select('MAX(tx.nonce)', 'nonce')
+      .where('tx.extractor = :extractor', { extractor })
+      .andWhere('tx.address = :address', { address })
+      .andWhere('block.height <= :height', { height })
+      .getRawOne();
+
+    return result?.nonce !== null && result?.nonce !== undefined
+      ? Number(result.nonce)
+      : -1;
   };
 }

@@ -139,6 +139,14 @@ export const getBlockResponse = {
   id: '19774cdc6bc663926590dc2fe7bfe77ba57a5343aaa16db5ffc377e95663fd4e',
 };
 
+export const getBlockResponseWithTransactions = {
+  ...getBlockResponse,
+  result: {
+    ...getBlockResponse.result,
+    tx: [sampleTransaction],
+  },
+};
+
 export const getBlockCountResponse = {
   result: currentBlockHeight,
   error: null,
