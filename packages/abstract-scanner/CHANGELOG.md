@@ -1,5 +1,13 @@
 # @rosen-bridge/abstract-scanner
 
+## 2.0.1
+
+### Patch Changes
+
+- Fix `stepForward` to cap step value at remaining blocks when approaching current height, preventing `BlockNotFound` errors.
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.1
+
 ## 2.0.0
 
 ### Major Changes

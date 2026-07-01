@@ -1,5 +1,12 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 13.0.8
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.1
+
 ## 13.0.7
 
 ### Patch Changes

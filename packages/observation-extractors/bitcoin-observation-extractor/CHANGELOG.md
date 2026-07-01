@@ -1,5 +1,12 @@
 # @rosen-bridge/bitcoin-observation-extractor
 
+## 8.0.3
+
+### Patch Changes
+
+- @rosen-bridge/abstract-observation-extractor@1.0.8
+- @rosen-bridge/bitcoin-scanner@1.1.1
+
 ## 8.0.2
 
 ### Patch Changes

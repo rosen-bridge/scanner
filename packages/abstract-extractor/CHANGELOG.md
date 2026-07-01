@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.2.1
+
+### Patch Changes
+
+- Make `fromHeight` and `toHeight` required in `hasEventInHeightRange`.
+
 ## 3.2.0
 
 ### Minor Changes
