@@ -43,6 +43,11 @@ export interface FiroRpcBlock {
   nextblockhash?: string;
 }
 
+// Firo getblock RPC response
+export interface FiroRpcBlockWithTransactions extends Omit<FiroRpcBlock, 'tx'> {
+  tx: Array<FiroRpcTransaction>;
+}
+
 // Transaction input types
 export interface FiroRpcTxInput {
   txid: string;
