@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/evm-address-tx-extractor",
-  "version": "2.0.5",
+  "version": "3.0.0",
   "description": "Extract and store EVM chain notable data of transactions for an address",
   "repository": {
     "type": "git",
@@ -28,9 +28,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^3.2.0",
+    "@rosen-bridge/abstract-extractor": "^3.2.1",
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-scanner": "^2.0.0",
+    "@rosen-bridge/abstract-scanner": "^2.0.1",
     "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
     "ethers": "6.16.0"
