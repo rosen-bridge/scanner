@@ -1,12 +1,10 @@
-interface ExtractedPermit {
-  boxId: string;
-  boxSerialized: string;
+import { AbstractEntityData } from '@rosen-bridge/abstract-extractor';
+
+interface ExtractedPermit extends AbstractEntityData {
   WID: string;
   txId: string;
-  block?: string;
-  height?: number;
-  spendBlock?: string;
-  spendHeight?: number;
+  spendBlock?: string | null;
+  spendHeight?: number | null;
 }
 
 export { ExtractedPermit };

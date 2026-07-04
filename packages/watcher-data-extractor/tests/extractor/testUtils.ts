@@ -343,9 +343,9 @@ export const insertPermitEntity = (
   return repository.insert({
     height: height || 1,
     block: 'blockId',
-    boxId: boxId || 'boxId',
+    identifier: boxId || 'boxId',
     txId: 'txID',
-    boxSerialized: 'serialized',
+    serialized: 'serialized',
     extractor: 'extractor',
     WID: 'wid',
   });
