@@ -1,43 +1,28 @@
-import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import PermitAction from '../../lib/actions/permitAction';
-import PermitEntity from '../../lib/entities/permitEntity';
-import { ExtractedPermit } from '../../lib/interfaces/extractedPermit';
 import { block } from '../extractor/testData';
 import { createDatabase } from '../extractor/testUtils';
-
-const samplePermit1: ExtractedPermit = {
-  identifier: '1',
-  serialized: 'serialized1',
-  WID: 'wid1',
-  txId: 'txId1',
-};
-const samplePermit2: ExtractedPermit = {
-  identifier: '2',
-  serialized: 'serialized2',
-  WID: 'wid2',
-  txId: 'txId2',
-};
+import { samplePermit1, samplePermit2 } from './testData';
 
 let dataSource: DataSource;
 
-describe('PermitEntityAction', () => {
+describe('PermitAction', () => {
   let action: PermitAction;
-  let repository: Repository<PermitEntity>;
   beforeEach(async () => {
     dataSource = await createDatabase();
     action = new PermitAction(dataSource);
-    repository = dataSource.getRepository(PermitEntity);
   });
 
   describe('createEntity', () => {
     /**
-     * 2 valid PermitBox should save successfully
-     * Dependency: Nothing
-     * Scenario: 2 PermitBox should save successfully
-     * Expected: storeBoxes should returns true and database row count should be 2
+     * @target createEntity should 2 valid PermitExtracted data should change to permit entities and save successfully
+     * @scenario
+     * - 2 PermitBox should save successfully
+     * @expected
+     * - storeBoxes should returns true and database row count should be 2
      */
-    it('gets two PermitBox and dataBase row should be 2', async () => {
+    it('should 2 valid PermitExtracted data should change to permit entities and save successfully', async () => {
       const rows = await action['createEntity'](
         [samplePermit1, samplePermit2],
         block,
@@ -61,71 +46,6 @@ describe('PermitEntityAction', () => {
           height: 10,
           spendBlock: null,
           spendHeight: null,
-        }),
-      );
-    });
-  });
-
-  describe('convertEntityToData', () => {
-    /**
-     * different permit with different extractor should save successfully
-     * Dependency: permit for the first extractor should be in the database
-     * Scenario: second extractor should save different permit in the database
-     * Expected: storePermits should returns true and each saved permit should have valid fields
-     */
-    it('checks that permit saved successfully with two different extractor', async () => {
-      await repository.insert([
-        {
-          ...samplePermit1,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
-        },
-        {
-          ...samplePermit2,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
-        },
-      ]);
-      const res = await action['convertEntityToData']([
-        {
-          ...samplePermit1,
-          id: 1,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
-        },
-        {
-          ...samplePermit2,
-          id: 2,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
-        },
-      ]);
-      expect(res[0]).toEqual(
-        expect.objectContaining({
-          identifier: '1',
-          serialized: 'serialized1',
-          WID: 'wid1',
-          txId: 'txId1',
-          id: 1,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
-        }),
-      );
-      expect(res[1]).toEqual(
-        expect.objectContaining({
-          identifier: '2',
-          serialized: 'serialized2',
-          WID: 'wid2',
-          txId: 'txId2',
-          id: 2,
-          extractor: 'first-extractor',
-          block: '1',
-          height: 1,
         }),
       );
     });

@@ -6,7 +6,6 @@ import { extractedPermit, permitBox } from './permitExtractorTestData';
 import { permitAddress, RWTId } from './testData';
 import { createDatabase } from './testUtils';
 
-vi.mock('@rosen-clients/ergo-explorer');
 let dataSource: DataSource;
 let extractor: PermitExtractor;
 
@@ -33,7 +32,7 @@ describe('permitExtractor', () => {
      * @target getId should return the id of the extractor
      * @dependencies
      * @scenario
-     * - calling getId of CommitmentExtractor
+     * - calling getId of permitExtractor
      * @expected
      * - getId should return 'extractorId'
      */
@@ -63,7 +62,7 @@ describe('permitExtractor', () => {
      * @target hasBoxData should return true when the box has required ergoTree and token
      * @dependencies
      * @scenario
-     * - mock extractor with required address and token
+     * - create an extractor with required address and token
      * - run test (call `hasBoxData`)
      * @expected
      * - to return true
@@ -77,7 +76,7 @@ describe('permitExtractor', () => {
      * @target hasBoxData should return false when the box ergoTree is different
      * @dependencies
      * @scenario
-     * - mock extractor with required address and token
+     * - create an extractor with required address and token
      * - run test with different ergoTree (call `hasBoxData`)
      * @expected
      * - to return false
@@ -96,7 +95,7 @@ describe('permitExtractor', () => {
      * @target hasBoxData should return false when box doesn't have required token
      * @dependencies
      * @scenario
-     * - mock extractor with required address and token
+     * - create an extractor with required address and token
      * - run test with box without token (call `hasBoxData`)
      * @expected
      * - to return false
@@ -114,7 +113,7 @@ describe('permitExtractor', () => {
      * @target hasBoxData should return false when box has different token
      * @dependencies
      * @scenario
-     * - mock extractor with required address and token
+     * - create an extractor with required address and token
      * - run test with box with different token (call `hasBoxData`)
      * @expected
      * - to return false
@@ -138,7 +137,7 @@ describe('permitExtractor', () => {
      * @target hasBoxData should return false when R4 register is missing
      * @dependencies
      * @scenario
-     * - mock extractor with required address and token
+     * - create an extractor with required address and token
      * - run test with box without R4 register (call `hasBoxData`)
      * @expected
      * - to return false
