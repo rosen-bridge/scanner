@@ -4,10 +4,10 @@ import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import CommitmentEntity from '../entities/commitmentEntity';
-import { extractedCommitment } from '../interfaces/extractedCommitment';
+import { ExtractedCommitment } from '../interfaces/extractedCommitment';
 
 class CommitmentAction extends AbstractErgoBoxAction<
-  extractedCommitment,
+  ExtractedCommitment,
   CommitmentEntity
 > {
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
@@ -22,7 +22,7 @@ class CommitmentAction extends AbstractErgoBoxAction<
    * @returns the commitment entities (without the id)
    */
   protected createEntity = (
-    commitments: extractedCommitment[],
+    commitments: ExtractedCommitment[],
     block: BlockInfo,
     extractor: string,
   ): Array<Omit<CommitmentEntity, 'id'>> => {
@@ -45,7 +45,7 @@ class CommitmentAction extends AbstractErgoBoxAction<
    */
   protected convertEntityToData = (
     entities: CommitmentEntity[],
-  ): extractedCommitment[] => {
+  ): ExtractedCommitment[] => {
     return entities;
   };
 

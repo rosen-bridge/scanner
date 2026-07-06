@@ -11,11 +11,11 @@ import { TokenMap } from '@rosen-bridge/tokens';
 
 import CommitmentAction from '../actions/commitmentAction';
 import CommitmentEntity from '../entities/commitmentEntity';
-import { extractedCommitment } from '../interfaces/extractedCommitment';
+import { ExtractedCommitment } from '../interfaces/extractedCommitment';
 import { JsonBI } from '../utils';
 
 class CommitmentExtractor extends AbstractErgoBoxExtractor<
-  extractedCommitment,
+  ExtractedCommitment,
   CommitmentEntity
 > {
   private readonly id: string;
@@ -61,6 +61,9 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
       box.assets &&
       box.additionalRegisters &&
       box.assets.length > 0 &&
+      box.additionalRegisters.R4 &&
+      box.additionalRegisters.R5 &&
+      box.additionalRegisters.R6 &&
       box.assets[0].tokenId === this.RWTId &&
       this.commitmentsErgoTrees.indexOf(box.ergoTree) !== -1
     );
@@ -72,7 +75,7 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
    * @param boxes
    * @returns extracted commitment
    */
-  extractBoxData = (box: OutputBox): extractedCommitment | undefined => {
+  extractBoxData = (box: OutputBox): ExtractedCommitment | undefined => {
     try {
       const decodedBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
       const R4 = decodedBox.register_value(wasm.NonMandatoryRegisterId.R4);

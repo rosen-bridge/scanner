@@ -14,12 +14,12 @@ export class Migration1782948062354 implements MigrationInterface {
             ALTER TABLE "permit_entity" RENAME COLUMN "boxSerialized"  TO "serialized"
         `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity" DROP COLUMN "spendBlock"
-        `);
+        ALTER TABLE "permit_entity" 
+        ALTER COLUMN "spendBlock" TYPE character varying
+    `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity"
-            ADD "spendBlock" character varying
-        `);
+        ALTER TABLE "permit_entity" DROP CONSTRAINT IF EXISTS "UQ_d3226602b909b64bcaeadc39c3c"
+    `);
     await queryRunner.query(`
             ALTER TABLE "permit_entity"
             ADD CONSTRAINT "UQ_205c6c8499dff192ec078910956" UNIQUE ("identifier", "extractor")
@@ -28,29 +28,21 @@ export class Migration1782948062354 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            ALTER TABLE "permit_entity" DROP COLUMN "spendBlock"
-        `);
+        ALTER TABLE "permit_entity" 
+        ALTER COLUMN "spendBlock" TYPE text
+    `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity"
-            ADD "spendBlock" text
-        `);
+        ALTER TABLE "permit_entity" RENAME COLUMN "serialized" TO "boxSerialized"
+    `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity" DROP COLUMN "serialized"
-        `);
+        ALTER TABLE "permit_entity" RENAME COLUMN "identifier" TO "boxId"
+    `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity" DROP COLUMN "identifier"
-        `);
+        ALTER TABLE "permit_entity" DROP CONSTRAINT IF EXISTS "UQ_205c6c8499dff192ec078910956"
+    `);
     await queryRunner.query(`
-            ALTER TABLE "permit_entity"
-            ADD "boxSerialized" character varying NOT NULL
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "permit_entity"
-            ADD "boxId" character varying NOT NULL
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "permit_entity"
-            ADD CONSTRAINT "UQ_d3226602b909b64bcaeadc39c3c" UNIQUE ("extractor", "boxId")
-        `);
+        ALTER TABLE "permit_entity"
+        ADD CONSTRAINT "UQ_d3226602b909b64bcaeadc39c3c" UNIQUE ("extractor", "boxId")
+    `);
   }
 }

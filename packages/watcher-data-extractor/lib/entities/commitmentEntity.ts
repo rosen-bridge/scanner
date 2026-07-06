@@ -1,8 +1,7 @@
 import { AbstractErgoBoxEntity } from '@rosen-bridge/abstract-extractor';
-import { Column, Entity, Unique } from '@rosen-bridge/extended-typeorm';
+import { Column, Entity } from '@rosen-bridge/extended-typeorm';
 
 @Entity('commitment_entity')
-@Unique(['boxId', 'extractor'])
 class CommitmentEntity extends AbstractErgoBoxEntity {
   @Column({ type: 'varchar' })
   txId: string;

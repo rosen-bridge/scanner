@@ -1,22 +1,28 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
+import { TokenMap } from '@rosen-bridge/tokens';
 
-import PermitExtractor from '../../lib/extractor/permitExtractor';
-import { extractedPermit, permitBox } from './permitExtractorTestData';
-import { permitAddress, RWTId } from './testData';
+import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
+import {
+  commitmentAddress,
+  commitmentBox,
+  extractedCommitment,
+  RWTId,
+} from './testData';
 import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;
-let extractor: PermitExtractor;
+let extractor: CommitmentExtractor;
 
-describe('permitExtractor', () => {
+describe('commitmentExtractor', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
-    extractor = new PermitExtractor(
+    extractor = new CommitmentExtractor(
       'extractorId',
-      dataSource,
-      permitAddress,
+      [commitmentAddress],
       RWTId,
+      dataSource,
+      new TokenMap(),
       {
         active: true,
         type: ErgoNetworkType.Explorer,
@@ -52,8 +58,8 @@ describe('permitExtractor', () => {
      * - extract the box information
      */
     it('should extract data in correct format', () => {
-      const data = extractor.extractBoxData(permitBox);
-      expect(data).toEqual(extractedPermit);
+      const data = extractor.extractBoxData(commitmentBox);
+      expect(data).toEqual(extractedCommitment);
     });
   });
 
@@ -68,7 +74,7 @@ describe('permitExtractor', () => {
      * - to return true
      */
     it('should return true when the box has required ergoTree and token', () => {
-      const data = extractor.hasBoxData(permitBox);
+      const data = extractor.hasBoxData(commitmentBox);
       expect(data).toEqual(true);
     });
 
@@ -83,7 +89,7 @@ describe('permitExtractor', () => {
      */
     it('should return false when box ergoTree is different', () => {
       const boxWithDifferentErgoTree = {
-        ...permitBox,
+        ...commitmentBox,
         ergoTree:
           '1005040004000e36100204a00b08cd0279be667ef9dcbbac55a062988a69108cd60e0a9fbb2e0fcc898ce68a7051b66',
       };
@@ -102,7 +108,7 @@ describe('permitExtractor', () => {
      */
     it("should return false when box doesn't have required token", () => {
       const boxWithoutToken = {
-        ...permitBox,
+        ...commitmentBox,
         assets: [],
       };
       const data = extractor.hasBoxData(boxWithoutToken);
@@ -120,7 +126,7 @@ describe('permitExtractor', () => {
      */
     it('should return false when box has different token', () => {
       const boxWithDifferentToken = {
-        ...permitBox,
+        ...commitmentBox,
         assets: [
           {
             tokenId:
@@ -144,9 +150,9 @@ describe('permitExtractor', () => {
      */
     it('should return false when R4 register is missing', () => {
       const boxWithoutR4 = {
-        ...permitBox,
+        ...commitmentBox,
         additionalRegisters: {
-          R5: permitBox.additionalRegisters.R5,
+          R5: commitmentBox.additionalRegisters.R5,
         },
       };
       const data = extractor.hasBoxData(boxWithoutR4);

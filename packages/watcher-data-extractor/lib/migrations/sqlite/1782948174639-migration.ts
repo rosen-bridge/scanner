@@ -45,7 +45,7 @@ export class Migration1782948174639 implements MigrationInterface {
                 "spendBlock",
                 "spendHeight",
                 "extractor"
-            FROM "collateral_entity"
+            FROM "permit_entity"
         `);
     await queryRunner.query(`
             DROP TABLE "permit_entity"

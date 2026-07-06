@@ -40,7 +40,7 @@ class PermitExtractor extends AbstractErgoBoxExtractor<
     this.logger = logger ? logger : new DummyLogger();
     this.actions = new PermitAction(
       dataSource,
-      this.logger.child('PermitAction'),
+      this.logger.child('permitAction'),
     );
   }
 
@@ -50,30 +50,25 @@ class PermitExtractor extends AbstractErgoBoxExtractor<
   getId = () => `${this.id}`;
 
   /**
-   * Checks proper data format in the box
+   * Checks the proper data format in the box
    * @param box
    * @return true if the box has the required data and false otherwise
    */
   hasBoxData = (box: OutputBox): boolean => {
-    if (
+    return !!(
       box.additionalRegisters &&
       box.additionalRegisters.R4 &&
       box.assets &&
-      box.assets.length == 1 &&
+      box.assets.length > 0 &&
       box.assets[0].tokenId === this.RWT &&
       box.ergoTree === this.permitErgoTree
-    ) {
-      return true;
-    }
-    return false;
+    );
   };
 
   /**
-   * Extracts permit data from json boxes
+   * Extracts permit data from json box
    * and filter to fit in a specified height range
    * @param boxes
-   * @param toHeight
-   * @param heightDifference
    * @returns extracted permit
    */
   extractBoxData = (box: OutputBox): ExtractedPermit | undefined => {
