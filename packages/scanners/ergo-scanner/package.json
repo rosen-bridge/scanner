@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/ergo-scanner",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An Ergo chain scanner.",
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-scanner": "^2.0.0",
+    "@rosen-bridge/abstract-scanner": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
     "@rosen-clients/ergo-explorer": "^2.1.2",
     "@rosen-clients/ergo-node": "^3.1.2"

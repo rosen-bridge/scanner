@@ -96,8 +96,18 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
     name: string,
     dataSource: DataSource,
     networkConnector: NetworkConnectorTest,
+    heightGap: number = 1,
   ) {
-    super(name, dataSource, 0, networkConnector, 100, undefined, undefined, 2);
+    super(
+      name,
+      dataSource,
+      0,
+      networkConnector,
+      100,
+      undefined,
+      undefined,
+      heightGap,
+    );
   }
 
   getFirstBlock = async (): Promise<Block> => {

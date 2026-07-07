@@ -1,4 +1,9 @@
-import { isCallException, Transaction, TransactionResponse } from 'ethers';
+import {
+  isCallException,
+  JsonRpcProvider,
+  Transaction,
+  TransactionResponse,
+} from 'ethers';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -17,6 +22,8 @@ export class EvmTxExtractor extends AbstractExtractor<
   readonly action: TxAction;
   private readonly id: string;
   private readonly address: string;
+  private readonly provider: JsonRpcProvider;
+  private readonly checkNonceAtToHeight: boolean;
 
   /**
    * address should be lower case (without checksum)
@@ -25,6 +32,9 @@ export class EvmTxExtractor extends AbstractExtractor<
     dataSource: DataSource,
     id: string,
     address: string,
+    rpcUrl: string,
+    authToken?: string,
+    checkNonceAtToHeight = false,
     logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
@@ -32,6 +42,10 @@ export class EvmTxExtractor extends AbstractExtractor<
     this.address = address;
     this.logger = logger;
     this.action = new TxAction(dataSource, this.logger.child('TxAction'));
+    this.provider = authToken
+      ? new JsonRpcProvider(`${rpcUrl}/${authToken}`)
+      : new JsonRpcProvider(rpcUrl);
+    this.checkNonceAtToHeight = checkNonceAtToHeight;
   }
 
   /**
@@ -106,4 +120,65 @@ export class EvmTxExtractor extends AbstractExtractor<
    */
   createUsedBlocksQuery = (): SelectQueryBuilder<AddressTxsEntity> =>
     this.action.createUsedBlocksQuery(this.getId());
+
+  /**
+   * checks if nonce changes within the specified height range
+   *
+   * @param fromHeight - Start height of the range being evaluated.
+   * @param toHeight - End height of the range being evaluated.
+   * @returns `true` if the range may contain relevant transactions,
+   * `false` if it is guaranteed to be empty.
+   */
+  hasEventInHeightRange = async (
+    fromHeight: number,
+    toHeight: number,
+  ): Promise<boolean> => {
+    const lastDbNonce = await this.action.getNonceUpToHeight(
+      this.getId(),
+      this.address,
+      fromHeight,
+    );
+
+    let networkNonce: number;
+    if (this.checkNonceAtToHeight) {
+      try {
+        networkNonce = await this.provider.getTransactionCount(
+          this.address,
+          toHeight,
+        );
+
+        this.logger.debug(`Nonce at height [${toHeight}] is [${networkNonce}]`);
+      } catch (error) {
+        this.logger.debug(
+          `Failed to fetch nonce at height [${toHeight}], falling back to latest nonce: ${error}`,
+        );
+        networkNonce = await this.provider.getTransactionCount(this.address);
+      }
+    } else {
+      networkNonce = await this.provider.getTransactionCount(this.address);
+    }
+
+    this.logger.debug(
+      `Checking range [${fromHeight}, ${toHeight}] with db nonce [${lastDbNonce}] and using network nonce [${networkNonce}]`,
+    );
+
+    const nextExpectedNonce = lastDbNonce + 1;
+
+    if (networkNonce < nextExpectedNonce) {
+      throw new Error(
+        `ImpossibleBehavior: Next network nonce [${networkNonce}] is less than the expected nonce [${nextExpectedNonce}]`,
+      );
+    }
+    if (networkNonce === nextExpectedNonce) {
+      this.logger.debug(
+        `No related transaction is expected to be found in block range [${fromHeight}, ${toHeight}]`,
+      );
+      return false;
+    }
+    const possibleTxCount = networkNonce - nextExpectedNonce;
+    this.logger.debug(
+      `It's possible to have [${possibleTxCount}] related transaction(s) in block range [${fromHeight}, ${toHeight}]`,
+    );
+    return true;
+  };
 }
