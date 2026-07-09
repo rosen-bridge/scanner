@@ -30,7 +30,7 @@
   "dependencies": {
     "@rosen-bridge/abstract-scanner": "^2.0.1",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
-    "@rosen-clients/rate-limited-axios": "^2.0.0"
+    "@rosen-clients/rate-limited-axios": "^2.0.1"
   },
   "engines": {
     "node": ">=22.18.0",
