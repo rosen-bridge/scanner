@@ -1,5 +1,14 @@
 # @rosen-bridge/box-tracker
 
+## 0.1.7
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.2
+  - @rosen-clients/ergo-explorer@2.1.3
+  - @rosen-clients/ergo-node@3.1.3
+
 ## 0.1.6
 
 ### Patch Changes

@@ -3,3 +3,6 @@ export { FiroRpcNetwork } from './network/firoRpcNetwork';
 export { FiroElectrumXScanner } from './scanner/firoElectrumXScanner';
 export { FiroElectrumXNetwork } from './network/firoElectrumXNetwork';
 export * from './types';
+export { ElectrumXSocket } from './network/electrumXSocket';
+export * from './network/parsers';
+export * from './network/types';
