@@ -1,7 +1,6 @@
-import { Mutex } from 'await-semaphore';
-
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { Block } from '@rosen-bridge/scanner-interfaces';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import { AbstractScanner } from './scanner';
 

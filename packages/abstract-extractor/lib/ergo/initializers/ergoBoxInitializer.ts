@@ -1,4 +1,3 @@
-import { Mutex } from 'await-semaphore';
 import { groupBy, sortBy } from 'lodash-es';
 
 import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
@@ -8,6 +7,7 @@ import {
   OutputBox,
   Transaction,
 } from '@rosen-bridge/scanner-interfaces';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import { AbstractErgoBoxAction, AbstractErgoEntity } from '../database';
 import {

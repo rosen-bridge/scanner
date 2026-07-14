@@ -94,10 +94,6 @@ export class ElectrumXSocket {
       }
       setTimeout(() => {
         this.logger.debug(`Reconnecting socket`);
-        this.socket = tls.connect({
-          host: this.host,
-          port: this.port,
-        });
         this.setupSocket();
       }, this.reconnectDelay * 1000);
       this.logger.info(`Scheduled reconnect for ${this.reconnectDelay}s`);

@@ -1,10 +1,10 @@
-import { Mutex } from 'await-semaphore';
 import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import { BlockDbAction } from '../action';
 
