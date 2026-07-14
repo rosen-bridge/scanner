@@ -1,5 +1,14 @@
 # @rosen-bridge/firo-scanner
 
+## 0.2.3
+
+### Patch Changes
+
+- Remove redundant and invalid connection attempt while reconnecting after `close` signal in the `ElectrumXSocket`
+- Add `logger` argument to the `FiroElectrumXNetwork` which is used to derive the `ElectrumXSocket` logger
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@2.0.3
+
 ## 0.2.2
 
 ### Patch Changes

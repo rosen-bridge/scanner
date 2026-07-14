@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.2.3
+
+### Patch Changes
+
+- Replace `await-semaphore` with `@rosen-bridge/semaphore` package
+
 ## 3.2.2
 
 ### Patch Changes

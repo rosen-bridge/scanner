@@ -1,5 +1,12 @@
 # @rosen-bridge/cardano-scanner
 
+## 2.1.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@2.0.3
+
 ## 2.1.2
 
 ### Patch Changes

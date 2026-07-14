@@ -1,5 +1,12 @@
 # @rosen-bridge/box-tracker
 
+## 0.1.8
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.3
+
 ## 0.1.7
 
 ### Patch Changes
