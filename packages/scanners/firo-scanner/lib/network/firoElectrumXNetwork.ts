@@ -1,3 +1,4 @@
+import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import {
   AbstractNetworkConnector,
   Block,
@@ -16,9 +17,16 @@ export class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransa
     port: number,
     reconnectDelay?: number,
     timeout?: number,
+    logger: AbstractLogger = new DummyLogger(),
   ) {
     super();
-    this.client = new ElectrumXSocket(host, port, reconnectDelay, timeout);
+    this.client = new ElectrumXSocket(
+      host,
+      port,
+      reconnectDelay,
+      timeout,
+      logger.child('electrumXSocket'),
+    );
   }
 
   /**
