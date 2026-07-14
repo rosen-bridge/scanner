@@ -33,7 +33,7 @@
     "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
-    "await-semaphore": "^0.1.3",
+    "@rosen-bridge/semaphore": "^0.1.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

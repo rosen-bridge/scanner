@@ -1,6 +1,5 @@
-import { Mutex } from 'await-semaphore';
-
 import { DummyLogger, AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import { RangeList, RangeQuery } from '../../interfaces';
 
