@@ -2,8 +2,12 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 
 import PermitExtractor from '../../lib/extractor/permitExtractor';
-import { extractedPermit, permitBox } from './permitExtractorTestData';
-import { permitAddress, RWTId } from './testData';
+import {
+  extractedPermit,
+  permitBox,
+  permitAddress,
+} from './permitExtractorTestData';
+import { RWTId } from './testData';
 import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;

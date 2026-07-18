@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/firo-scanner",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "A Firo blockchain scanner based on RPC and ElectrumX",
   "repository": {
     "type": "git",
@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-scanner": "^2.0.1",
+    "@rosen-bridge/abstract-scanner": "^2.0.3",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
-    "@rosen-clients/rate-limited-axios": "^2.0.0"
+    "@rosen-clients/rate-limited-axios": "^2.0.1"
   },
   "engines": {
     "node": ">=22.18.0",

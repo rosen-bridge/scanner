@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/reward-extractor",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "private": true,
   "description": "Extract reward transactions data",
   "repository": {
@@ -29,7 +29,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^3.2.1",
+    "@rosen-bridge/abstract-extractor": "^3.2.3",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",

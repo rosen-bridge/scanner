@@ -1,9 +1,9 @@
-import { Mutex } from 'await-semaphore';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
 import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import { AbstractExtractor } from '../../abstractExtractor';
 import { AbstractErgoEntity, AbstractErgoAction } from '../database';

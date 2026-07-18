@@ -14,7 +14,6 @@ import {
   commitmentAddress,
   eventTriggerAddress,
   last10BlockHeader,
-  permitAddress,
   RWTId,
 } from './testData';
 
@@ -40,101 +39,6 @@ export const createDatabase = async (): Promise<DataSource> => {
   await dataSource.initialize();
   await dataSource.runMigrations();
   return dataSource;
-};
-
-/**
- * cleaning all table of the passed datasource
- * @param dataSource
- */
-export async function clearDB(dataSource: DataSource) {
-  const entities = dataSource.entityMetadatas;
-  for (const entity of entities) {
-    const repository = await dataSource.getRepository(entity.name);
-    await repository.query(`DELETE FROM ${entity.tableName};`);
-    await repository.query(
-      `DELETE FROM SQLITE_SEQUENCE WHERE name='${entity.tableName}';`,
-    );
-  }
-}
-
-/**
- * generates transaction with output address sets to permitAddress
- *  hasToken sets that rwt set in the output or not
- * @param hasToken
- * @param WID
- */
-export const permitTxGenerator = (hasToken = true, WID: string) => {
-  const sk = wasm.SecretKey.random_dlog();
-  const permitAddressContract = wasm.Contract.pay_to_address(
-    wasm.Address.from_base58(permitAddress),
-  );
-  const address = wasm.Contract.pay_to_address(sk.get_address());
-  const outBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str('100000000'));
-  const outBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
-    outBoxValue,
-    permitAddressContract,
-    0,
-  );
-
-  if (hasToken) {
-    outBoxBuilder.add_token(
-      wasm.TokenId.from_str(RWTId),
-      wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
-    );
-  }
-
-  outBoxBuilder.set_register_value(
-    4,
-    wasm.Constant.from_byte_array(new Uint8Array(Buffer.from(WID, 'hex'))),
-  );
-
-  const outBox = outBoxBuilder.build();
-  const tokens = new wasm.Tokens();
-  if (hasToken) {
-    tokens.add(
-      new wasm.Token(
-        wasm.TokenId.from_str(RWTId),
-        wasm.TokenAmount.from_i64(wasm.I64.from_str('10')),
-      ),
-    );
-  }
-
-  const inputBox = new wasm.ErgoBox(
-    wasm.BoxValue.from_i64(wasm.I64.from_str('1100000000')),
-    0,
-    address,
-    wasm.TxId.zero(),
-    0,
-    tokens,
-  );
-  const unspentBoxes = new wasm.ErgoBoxes(inputBox);
-  const txOutputs = new wasm.ErgoBoxCandidates(outBox);
-  const fee = wasm.TxBuilder.SUGGESTED_TX_FEE();
-  const boxSelector = new wasm.SimpleBoxSelector();
-  const targetBalance = wasm.BoxValue.from_i64(
-    outBoxValue.as_i64().checked_add(fee.as_i64()),
-  );
-  const boxSelection = boxSelector.select(unspentBoxes, targetBalance, tokens);
-  const tx = wasm.TxBuilder.new(
-    boxSelection,
-    txOutputs,
-    0,
-    fee,
-    sk.get_address(),
-  ).build();
-  const blockHeaders = wasm.BlockHeaders.from_json(last10BlockHeader);
-  const preHeader = wasm.PreHeader.from_block_header(blockHeaders.get(0));
-  const ctx = new wasm.ErgoStateContext(preHeader, blockHeaders);
-  const sks = new wasm.SecretKeys();
-  sks.add(sk);
-  const wallet = wasm.Wallet.from_secrets(sks);
-  const signed = wallet.sign_transaction(
-    ctx,
-    tx,
-    unspentBoxes,
-    wasm.ErgoBoxes.from_boxes_json([]),
-  );
-  return JsonBI.parse(signed.to_json()) as Transaction;
 };
 
 /**

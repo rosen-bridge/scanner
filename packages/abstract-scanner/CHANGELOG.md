@@ -1,5 +1,20 @@
 # @rosen-bridge/abstract-scanner
 
+## 2.0.3
+
+### Patch Changes
+
+- Replace `await-semaphore` with `@rosen-bridge/semaphore` package
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.3
+
+## 2.0.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@3.2.2
+
 ## 2.0.1
 
 ### Patch Changes

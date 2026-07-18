@@ -66,10 +66,10 @@ class PermitExtractor extends AbstractErgoBoxExtractor<
   };
 
   /**
-   * Extracts permit data from json box
-   * and filter to fit in a specified height range
-   * @param boxes
-   * @returns extracted permit
+   * Extracts permit data from an Ergo box
+   *
+   * @param box
+   * @returns The extracted permit, or `undefined` if register R4 does not exist
    */
   extractBoxData = (box: OutputBox): ExtractedPermit | undefined => {
     const ergoBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));

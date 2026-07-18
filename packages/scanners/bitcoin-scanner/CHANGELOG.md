@@ -1,5 +1,20 @@
 # @rosen-bridge/bitcoin-scanner
 
+## 1.1.3
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@2.0.3
+
+## 1.1.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@2.0.2
+  - @rosen-clients/rate-limited-axios@2.0.1
+
 ## 1.1.1
 
 ### Patch Changes

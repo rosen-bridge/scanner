@@ -1,5 +1,19 @@
 # @rosen-bridge/abstract-extractor
 
+## 3.2.3
+
+### Patch Changes
+
+- Replace `await-semaphore` with `@rosen-bridge/semaphore` package
+
+## 3.2.2
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-clients/ergo-explorer@2.1.3
+  - @rosen-clients/ergo-node@3.1.3
+
 ## 3.2.1
 
 ### Patch Changes

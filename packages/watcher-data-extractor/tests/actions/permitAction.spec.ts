@@ -3,7 +3,7 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import PermitAction from '../../lib/actions/permitAction';
 import { block } from '../extractor/testData';
 import { createDatabase } from '../extractor/testUtils';
-import { samplePermit1, samplePermit2 } from './testData';
+import { samplePermit1, samplePermit2 } from './permitActionTestData';
 
 let dataSource: DataSource;
 
