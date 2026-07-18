@@ -373,9 +373,7 @@ export class BlockDbAction {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
     );
-
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
-
     const blocksToDelete = await this.blockRepository
       .createQueryBuilder('blockEntity')
       .addSelect('blockEntity.hash', 'hash')
@@ -389,13 +387,10 @@ export class BlockDbAction {
       .orderBy('blockEntity.height', 'ASC')
       .take(deletedBlockCount)
       .getRawMany();
-
     const unusedBlockHashes = blocksToDelete.map((row) => row.hash);
-
     await this.blockRepository.delete({
       hash: In(unusedBlockHashes),
     });
-
     return unusedBlockHashes;
   };
 }

@@ -54,7 +54,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
     super(
       'cardano',
-      config.blockTimeConfig,
+      config.blockCleanupConfig,
       logger,
       config.maxTryBlock,
       config.suffix,

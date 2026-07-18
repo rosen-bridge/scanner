@@ -8,4 +8,4 @@
 '@rosen-bridge/abstract-scanner': major
 ---
 
-Add removeOldUnusedBlocks method to AbstractScanner for cleaning up old unused blocks
+Add automatic cleanup of old unused blocks during scanner execution

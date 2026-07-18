@@ -17,7 +17,7 @@ import { migrations } from '../../../lib/migrations';
 import { GeneralScanner } from '../../../lib/scanner/abstract/generalScanner';
 import { AbstractScanner } from '../../../lib/scanner/abstract/scanner';
 import { BlockDbAction } from '../../../lib/scanner/action';
-import { BlockTimeConfig } from '../../../lib/scanner/interfaces';
+import { BlockCleanupConfig } from './../../../lib/scanner/interfaces';
 
 export interface TestTransaction {
   height: number;
@@ -84,9 +84,9 @@ export class TestAbstractScanner extends AbstractScanner<TestTransaction> {
   constructor(
     private scannerName: string,
     dataSource: DataSource,
-    blockTimeConfig: BlockTimeConfig,
+    blockCleanupConfig: BlockCleanupConfig,
   ) {
-    super(blockTimeConfig);
+    super(blockCleanupConfig);
     this.action = new BlockDbAction(dataSource, scannerName);
   }
 
@@ -98,7 +98,7 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
     name: string,
     dataSource: DataSource,
     networkConnector: NetworkConnectorTest,
-    blockTimeConfig: BlockTimeConfig,
+    blockCleanupConfig: BlockCleanupConfig,
     heightGap: number = 1,
   ) {
     super(
@@ -107,7 +107,7 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
       0,
       networkConnector,
       100,
-      blockTimeConfig,
+      blockCleanupConfig,
       undefined,
       undefined,
       heightGap,
@@ -117,6 +117,8 @@ export class TestGeneralScanner extends GeneralScanner<TestTransaction> {
   getFirstBlock = async (): Promise<Block> => {
     return { height: 2, hash: '2', parentHash: '1', timestamp: 20 };
   };
+
+  removeOldUnusedBlocks = () => Promise.resolve();
 }
 
 export const createDatabase = async () => {
@@ -150,8 +152,8 @@ export const insertBlocks = async (
 };
 
 export class TestWebSocketScanner extends WebSocketScanner<{ id: string }> {
-  constructor(dataSource: DataSource, blockTimeConfig: BlockTimeConfig) {
-    super('test scanner', blockTimeConfig);
+  constructor(dataSource: DataSource, blockCleanupConfig: BlockCleanupConfig) {
+    super('test scanner', blockCleanupConfig);
     this.action = new BlockDbAction(dataSource, this.name());
   }
 

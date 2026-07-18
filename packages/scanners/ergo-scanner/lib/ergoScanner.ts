@@ -9,7 +9,7 @@ class ErgoScanner extends GeneralScanner<Transaction> {
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
-      config.blockTimeConfig,
+      config.blockCleanupConfig,
       config.logger,
       config.suffix,
       config.heightGap,

@@ -6,7 +6,7 @@ import {
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
-import { BlockTimeConfig } from '../../../lib/scanner/interfaces';
+import { BlockCleanupConfig } from '../../../lib/scanner/interfaces';
 import {
   ExtractorTest,
   TestAbstractScanner,
@@ -17,11 +17,14 @@ import {
 let dataSource: DataSource;
 
 describe('AbstractScanner', () => {
-  let blockTimeConfig: BlockTimeConfig;
+  let blockCleanupConfig: BlockCleanupConfig;
   beforeEach(async () => {
     dataSource = await createDatabase();
   });
-  blockTimeConfig = { blockAgeThreshold: 1000, blockTrimCountInRound: 5 };
+  blockCleanupConfig = {
+    blockCleanupThresholdDuration: 1000,
+    blockTrimCountInRound: 5,
+  };
 
   describe('registerExtractor', () => {
     /**
@@ -34,7 +37,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
@@ -58,7 +61,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor1 = new ExtractorTest('1');
       const extractor2 = new ExtractorTest('2');
@@ -80,7 +83,7 @@ describe('AbstractScanner', () => {
       const scanner1 = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       await insertBlocks(scanner1, 10);
       await scanner1['forkBlock'](3);
@@ -97,12 +100,12 @@ describe('AbstractScanner', () => {
       const scanner1 = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const scanner2 = new TestAbstractScanner(
         'second',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       await insertBlocks(scanner1, 10);
       await insertBlocks(scanner2, 10);
@@ -134,7 +137,7 @@ describe('AbstractScanner', () => {
       const scanner1 = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('extractor');
       scanner1.extractors.push(extractor);
@@ -156,7 +159,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
@@ -183,7 +186,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       scanner.extractors.push(extractor);
@@ -204,7 +207,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       vi.spyOn(extractor, 'processTransactions').mockImplementation(() =>
@@ -238,7 +241,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
@@ -267,7 +270,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
@@ -300,7 +303,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
@@ -333,7 +336,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
@@ -366,7 +369,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await dataSource.getRepository(ExtractorStatusEntity).insert({
@@ -402,7 +405,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
@@ -436,7 +439,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
       await scanner.registerExtractor(extractor);
@@ -450,11 +453,12 @@ describe('AbstractScanner', () => {
       expect(mockedInit).not.toHaveBeenCalled();
     });
   });
+
   describe('removeOldUnusedBlocks', () => {
     /**
      * @target removeOldUnusedBlocks should call database action with correct parameters
      * @scenario
-     * - Create a scanner instance with specific blockTimeConfig
+     * - Create a scanner instance with specific blockCleanupConfig
      * - Mock extractors to return custom queries via `createUsedBlocksQuery`
      * - Spy on action's `removeUnusedBlocksInBatches` method
      * - Call `removeOldUnusedBlocks` with a mock lastSavedBlock
@@ -463,14 +467,14 @@ describe('AbstractScanner', () => {
      * - call removeUnusedBlocksInBatches with expected queries and parameters
      */
     it('should call database action with correct parameters', async () => {
-      const customBlockTimeConfig = {
-        blockAgeThreshold: 3600,
+      const customBlockCleanupConfig: BlockCleanupConfig = {
+        blockCleanupThresholdDuration: 3600,
         blockTrimCountInRound: 50,
       };
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        customBlockTimeConfig,
+        customBlockCleanupConfig,
       );
 
       const extractor1 = new ExtractorTest('ext-1');
@@ -518,7 +522,7 @@ describe('AbstractScanner', () => {
       const scanner = new TestAbstractScanner(
         'first',
         dataSource,
-        blockTimeConfig,
+        blockCleanupConfig,
       );
       const extractor = new ExtractorTest('ext-1');
       vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue(

@@ -8,7 +8,7 @@ import {
 
 import { BlockEntity } from '../../entities/blockEntity';
 import { BlockDbAction } from '../action';
-import { BlockTimeConfig } from '../interfaces';
+import { BlockCleanupConfig } from '../interfaces';
 import { AbstractScanner } from './scanner';
 
 abstract class GeneralScanner<
@@ -25,12 +25,12 @@ abstract class GeneralScanner<
     initialHeight: number,
     private network: AbstractNetworkConnector<TransactionType>,
     private blockRetrieveGap = 0,
-    blockTimeConfig: BlockTimeConfig,
+    blockCleanupConfig: BlockCleanupConfig,
     logger?: AbstractLogger,
     private suffix?: string,
     private heightGap = 1,
   ) {
-    super(blockTimeConfig, logger);
+    super(blockCleanupConfig, logger);
     /**
      * In order to keep the scanners functionalities consistent, we add config
      * `initialHeight` by one so that it matches how other scanners work.

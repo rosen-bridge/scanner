@@ -7,13 +7,13 @@ export interface ScannerConfig<TransactionType> {
   initialHeight: number;
   network: AbstractNetworkConnector<TransactionType>;
   blockRetrieveGap?: number;
-  blockTimeConfig: BlockTimeConfig;
+  blockCleanupConfig: BlockCleanupConfig;
   suffix?: string;
   heightGap?: number;
   logger?: AbstractLogger;
 }
 
-export interface BlockTimeConfig {
-  blockAgeThreshold: number;
+export interface BlockCleanupConfig {
+  blockCleanupThresholdDuration: number;
   blockTrimCountInRound: number;
 }

@@ -6,10 +6,13 @@ import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
 import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { BLOCK_CLEANUP_THRESHOLD_DURATION, BLOCK_TRIM } from '../../constants';
+import {
+  BLOCK_CLEANUP_THRESHOLD_DURATION,
+  BLOCK_TRIM_COUNT_IN_ROUND,
+} from '../../constants';
 import { BlockEntity } from '../../entities/blockEntity';
 import { BlockDbAction } from '../action';
-import { BlockTimeConfig } from '../interfaces';
+import { BlockCleanupConfig } from '../interfaces';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -17,19 +20,23 @@ export abstract class AbstractScanner<TransactionType> {
   newExtractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
-  blockTimeConfig: BlockTimeConfig;
+  blockCleanupConfig: BlockCleanupConfig;
 
-  constructor(blockTimeConfig?: BlockTimeConfig, logger?: AbstractLogger) {
+  constructor(
+    blockCleanupConfig?: BlockCleanupConfig,
+    logger?: AbstractLogger,
+  ) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
     this.initializeMutex = new Mutex();
 
-    this.blockTimeConfig = {
-      blockAgeThreshold:
-        blockTimeConfig?.blockAgeThreshold ?? BLOCK_CLEANUP_THRESHOLD_DURATION,
+    this.blockCleanupConfig = {
+      blockCleanupThresholdDuration:
+        blockCleanupConfig?.blockCleanupThresholdDuration ??
+        BLOCK_CLEANUP_THRESHOLD_DURATION,
       blockTrimCountInRound:
-        blockTimeConfig?.blockTrimCountInRound ?? BLOCK_TRIM,
+        blockCleanupConfig?.blockTrimCountInRound ?? BLOCK_TRIM_COUNT_IN_ROUND,
     };
   }
 
@@ -234,11 +241,12 @@ export abstract class AbstractScanner<TransactionType> {
         extracor.createUsedBlocksQuery(),
       );
       const thresholdTimestamp = lastSavedBlock
-        ? lastSavedBlock.timestamp - this.blockTimeConfig.blockAgeThreshold
+        ? lastSavedBlock.timestamp -
+          this.blockCleanupConfig.blockCleanupThresholdDuration
         : 0;
       const unusedBlockHashes = await this.action.removeUnusedBlocksInBatches(
         extractorUsedBlocksQueries.filter((query) => query !== undefined),
-        this.blockTimeConfig.blockTrimCountInRound!,
+        this.blockCleanupConfig.blockTrimCountInRound,
         this.name(),
         thresholdTimestamp,
       );
@@ -246,13 +254,13 @@ export abstract class AbstractScanner<TransactionType> {
         this.logger.debug(
           `Successfully removed old unused block hashes: ${unusedBlockHashes.join(', ')}`,
         );
-      else this.logger.debug('No unused block hashes found to remove.');
+      else this.logger.debug('No unused block hashes found to remove');
     } catch (error) {
       this.logger.error(
         `An error occurred while removing old unused blocks: ${error}`,
       );
       if (error instanceof Error && error.stack) {
-        this.logger.debug(`error stack: ${error.stack}`);
+        this.logger.error(error.stack);
       }
     }
   };

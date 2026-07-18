@@ -10,7 +10,7 @@ export class BitcoinEsploraScanner extends GeneralScanner<BitcoinEsploraTransact
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
-      config.blockTimeConfig,
+      config.blockCleanupConfig,
       config.logger,
       config.suffix,
       config.heightGap,
