@@ -38,4 +38,10 @@ export class CardanoKoiosObservationExtractor extends AbstractObservationExtract
    * gets transaction id from TransactionType
    */
   getTxId = (tx: KoiosTransaction) => tx.tx_hash;
+
+  /**
+   * Filter transactions which spends collateral instead of inputs
+   */
+  preprocessTransactions = (txs: Array<KoiosTransaction>) =>
+    txs.filter((item) => item.valid_contract);
 }

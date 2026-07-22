@@ -22,6 +22,7 @@ interface KoiosCborTx {
   absolute_slot: number;
   tx_timestamp: number;
   cbor: string;
+  valid_contract: boolean;
 }
 
 type KoiosTransaction = KoiosCborTx & TransactionJSON;
