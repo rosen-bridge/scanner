@@ -38,4 +38,10 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
    * gets transaction id from TransactionType
    */
   getTxId = (tx: Transaction) => tx.id;
+
+  /**
+   * Filter transactions which spends collateral instead of inputs
+   */
+  preprocessTransactions = (txs: Array<Transaction>) =>
+    txs.filter((item) => item.spends === 'inputs');
 }
