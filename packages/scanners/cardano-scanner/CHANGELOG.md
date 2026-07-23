@@ -1,5 +1,11 @@
 # @rosen-bridge/cardano-scanner
 
+## 2.2.0
+
+### Minor Changes
+
+- Add valid_contract field to transactions
+
 ## 2.1.3
 
 ### Patch Changes

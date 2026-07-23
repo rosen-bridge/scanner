@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/cardano-observation-extractor",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Event observation data extractor for Cardano chain",
   "repository": {
     "type": "git",
