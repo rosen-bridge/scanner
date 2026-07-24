@@ -1,5 +1,11 @@
 # @rosen-bridge/cardano-observation-extractor
 
+## 3.0.6
+
+### Patch Changes
+
+- Ignore failed transactions
+
 ## 3.0.5
 
 ### Patch Changes

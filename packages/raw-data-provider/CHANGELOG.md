@@ -1,5 +1,16 @@
 # @rosen-bridge/raw-data-provider
 
+## 0.2.0
+
+### Minor Changes
+
+- Add valid_contract field to transactions
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/cardano-observation-extractor@3.0.6
+
 ## 0.1.9
 
 ### Patch Changes
