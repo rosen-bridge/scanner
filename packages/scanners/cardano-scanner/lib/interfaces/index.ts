@@ -1,3 +1,4 @@
+import { BlockCleanupConfig } from '@rosen-bridge/abstract-scanner/dist/scanner/interfaces';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 interface OgmiosReconnectionConfig {
@@ -13,6 +14,7 @@ interface CardanoOgmiosConfig {
   initialHash: string;
   maxTryBlock?: number;
   dataSource: DataSource;
+  blockCleanupConfig: BlockCleanupConfig;
   useTls?: boolean;
   reconnectionConfig?: OgmiosReconnectionConfig;
   suffix?: string;

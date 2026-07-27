@@ -10,6 +10,7 @@ export class HandshakeRpcScanner extends GeneralScanner<HandshakeRpcTransaction>
       config.initialHeight,
       config.network,
       config.blockRetrieveGap,
+      config.blockCleanupConfig,
       config.logger,
       config.suffix,
       config.heightGap,

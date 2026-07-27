@@ -1,6 +1,7 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { BlockEntity, PROCEED } from '../../../lib';
+import { BlockCleanupConfig } from './../../../lib/scanner/interfaces';
 import {
   createDatabase,
   FailExtractor,
@@ -13,8 +14,12 @@ let repository: Repository<BlockEntity>;
 
 describe('webSocketScanner', () => {
   beforeEach(async () => {
+    const blockCleanupConfig: BlockCleanupConfig = {
+      blockCleanupThresholdDuration: 1000,
+      blockTrimCountInRound: 5,
+    };
     dataSource = await createDatabase();
-    scanner = new TestWebSocketScanner(dataSource);
+    scanner = new TestWebSocketScanner(dataSource, blockCleanupConfig);
     repository = dataSource.getRepository(BlockEntity);
     await repository.insert({
       hash: 'block 1',
@@ -29,7 +34,7 @@ describe('webSocketScanner', () => {
   describe('tryRunningFunction', () => {
     /**
      * @target webSocketScanner.tryRunningFunction should call fn once and return true
-     * @dependency
+     * @dependencies
      * @scenario
      * - call tryRunningFunction with call back function which not throw exception
      * @expected
@@ -45,7 +50,7 @@ describe('webSocketScanner', () => {
     });
     /**
      * @target webSocketScanner.tryRunningFunction should called fn 10 time if returns false and return false
-     * @dependency
+     * @dependencies
      * @scenario
      * - call tryRunningFunction with call back function which not throw exception
      * @expected
@@ -65,14 +70,19 @@ describe('webSocketScanner', () => {
     /**
      * @target webSocketScanner.stepForward should not insert block in database
      * if current block hash not equals last inserted one
-     * @dependency
+     * @dependencies
      * @scenario
      * - insert a block into database
      * - call stepForward with a block with different parent hash of inserted block
      * @expected
      * - no block inserted to database
+     * - removeOldUnusedBlocks must be called
      */
     it('should not insert block in database if current block hash not equals last inserted one', async () => {
+      const removeOldUnusedBlocksSpy = vi.spyOn(
+        scanner,
+        'removeOldUnusedBlocks',
+      );
       await scanner['stepForward'](
         {
           hash: 'block 2',
@@ -83,22 +93,29 @@ describe('webSocketScanner', () => {
         },
         [],
       );
+      expect(removeOldUnusedBlocksSpy).toBeCalled();
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
 
     /**
      * @target webSocketScanner.stepForward should not insert block into database
      * if block parent hash is not equals to current block hash
-     * @dependency
+     * @dependencies
      * @scenario
      * - insert a block into database
      * - register fail extractor
      * - call stepForward with a block with a block and no transaction
      * @expected
      * - no block inserted to database
+     * - removeOldUnusedBlocks must be called
      */
     it('should not insert block into database if block parent hash is not equals to current block hash', async () => {
       scanner.registerExtractor(new FailExtractor());
+      const removeOldUnusedBlocksSpy = vi.spyOn(
+        scanner,
+        'removeOldUnusedBlocks',
+      );
+
       await scanner['stepForward'](
         {
           hash: 'block 2',
@@ -109,18 +126,25 @@ describe('webSocketScanner', () => {
         },
         [],
       );
+      expect(removeOldUnusedBlocksSpy).toBeCalled();
       expect((await repository.findBy({ height: 101 })).length).toEqual(0);
     });
     /**
      * @target webSocketScanner.stepForward should store block into database
-     * @dependency
+     * @dependencies
      * @scenario
      * - insert a block into database
      * - call stepForward with a block
      * @expected
      * - must store a block entity to database with correct values
+     * - removeOldUnusedBlocks must be called
      */
     it('should store block into database', async () => {
+      const removeOldUnusedBlocksSpy = vi.spyOn(
+        scanner,
+        'removeOldUnusedBlocks',
+      );
+
       await scanner['stepForward'](
         {
           hash: 'block 2',
@@ -132,6 +156,7 @@ describe('webSocketScanner', () => {
         [],
       );
       const inserted = await repository.findBy({ height: 101 });
+      expect(removeOldUnusedBlocksSpy).toBeCalled();
       expect(inserted.length).toBe(1);
       const block = inserted[0];
       expect(block.hash).toEqual('block 2');
@@ -143,7 +168,7 @@ describe('webSocketScanner', () => {
   describe('stepBackward', () => {
     /**
      * @target webSocketScanner.stepBackward should delete block from database
-     * @dependency
+     * @dependencies
      * @scenario
      * - insert two block into database
      * - call stepBackward

@@ -1,4 +1,4 @@
-import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import {
   BlockEntity,
@@ -8,6 +8,7 @@ import {
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 import { BlockDbAction } from '../../lib/scanner/action';
 import { createDatabase } from './abstract/abstract.mock';
+import { sampleBlocks1, sampleBlocks2 } from './scannerActionData';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
@@ -620,6 +621,256 @@ describe('action', () => {
       expect(extractorStatus.length).toBe(1);
       expect(extractorStatus[0].extractorId).toBe('extractorId');
       expect(extractorStatus[0].updateHeight).toBe(12);
+    });
+  });
+
+  describe('generateQueriesWithUniqueParams', () => {
+    /**
+     * @target generateQueriesWithUniqueParams should generates unique parameters for the input queries
+     *  and returns both the queries and the generated parameters
+     * @dependencies
+     * - Database
+     * @scenario
+     * - Creates two queries with the same parameters
+     * - Run test (call `generateQueriesWithUniqueParams`)
+     * @expected
+     * - Ensures that the parameters inside the queries are unique
+     */
+    it('should generates unique parameters for the input queries and returns both the queries and the generated parameters', async () => {
+      const repository = dataSource.getRepository(BlockEntity);
+
+      const query1 = repository
+        .createQueryBuilder('block')
+        .select('block.height', 'height')
+        .where('height = :height', { height: 200 });
+
+      const query2 = repository
+        .createQueryBuilder('block')
+        .select('block.height', 'height')
+        .where('height = :height', { height: 250 });
+
+      const { queryParts, parameters } = action.generateQueriesWithUniqueParams(
+        [query1, query2],
+      );
+
+      const expectQueryParts = [
+        'SELECT "block"."height" AS "height" FROM "block_entity" "block" WHERE height = :query1height',
+        'SELECT "block"."height" AS "height" FROM "block_entity" "block" WHERE height = :query2height',
+      ];
+
+      const expectParameters = { query1height: 200, query2height: 250 };
+
+      expect(expectQueryParts).toEqual(queryParts);
+      expect(expectParameters).toEqual(parameters);
+    });
+  });
+
+  describe('removeUnusedBlocksInBatches', () => {
+    let blockRepository: Repository<BlockEntity>;
+    beforeEach(async () => {
+      blockRepository = dataSource.getRepository(BlockEntity);
+    });
+
+    /**
+     * @target
+     * removeUnusedBlocksInBatches should remove every unused block that belongs to the specified scanner
+     *
+     * @dependencies
+     * - Database
+     * - BlockEntity Repository
+     *
+     * @scenario
+     * - Insert two groups of BlockEntity records into the database.
+     * - The first group belongs to `scanner1`.
+     * - The second group belongs to another scanner.
+     * - No blocks are marked as used.
+     * - Execute `removeUnusedBlocksInBatches` for `scanner1`.
+     *
+     * @expected
+     * - Only blocks associated with `scanner1` are selected for deletion.
+     * - Scanner 1 blocks are completely removed from the database.
+     * - Scanner 2 blocks remain in the database.
+     */
+    it('should remove every unused block that belongs to the specified scanner', async () => {
+      const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
+      await blockRepository.insert(sampleBlocks);
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
+      const blockAgeThreshold = 1;
+
+      const thresholdTimestamp = lastBlock
+        ? lastBlock.timestamp - blockAgeThreshold
+        : 0;
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        10,
+        sampleBlocks1[0].scanner,
+        thresholdTimestamp,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter(
+          (sampleBlock) => sampleBlock.scanner === sampleBlocks1[0].scanner,
+        )
+        .map((block) => block.hash);
+
+      const remainingBlocksInDb = await blockRepository.find();
+      const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
+
+      const expectedRemainingHashes = sampleBlocks
+        .filter((b) => b.scanner !== sampleBlocks1[0].scanner)
+        .map((b) => b.hash);
+      expectBlockHashesToDelete.forEach((deletedHash) => {
+        expect(remainingHashesInDb).not.toContain(deletedHash);
+      });
+      expect(remainingHashesInDb.sort()).toEqual(
+        expectedRemainingHashes.sort(),
+      );
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+
+    /**
+     * @target
+     * removeUnusedBlocksInBatches should delete only blocks older than the provided lifetime threshold
+     *
+     * @dependencies
+     * - Database
+     * - BlockEntity Repository
+     *
+     * @scenario
+     * - Insert several BlockEntity records with different timestamps.
+     * - Set a specific threshold timestamp.
+     * - Execute `removeUnusedBlocksInBatches`.
+     *
+     * @expected
+     * - Remaining block hashes exactly match the hashes of blocks that have a timestamp >= 3.
+     * - Deleted block hashes exactly match the hashes of blocks that have a timestamp < 3.
+     */
+    it('should delete only blocks older than the provided lifetime threshold', async () => {
+      await blockRepository.insert(sampleBlocks1);
+      const thresholdTimestamp = 3;
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        10,
+        sampleBlocks1[0].scanner,
+        thresholdTimestamp,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter((sampleBlock) => sampleBlock.timestamp < thresholdTimestamp)
+        .map((block) => block.hash);
+
+      const remainingBlocksInDb = await blockRepository.find();
+      const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
+      const expectBlockHashesInDb = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter((sampleBlock) => sampleBlock.timestamp >= thresholdTimestamp)
+        .map((block) => block.hash);
+      expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+
+    /**
+     * @target
+     * removeUnusedBlocksInBatches should exclude blocks referenced by extractor-used block queries
+     *
+     * @dependencies
+     * - Database
+     * - BlockEntity Repository
+     * - QueryBuilder
+     *
+     * @scenario
+     * - Insert BlockEntity records into the database.
+     * - Create a query representing a block currently referenced by an extractor.
+     * - Pass this query as `extractorUsedBlocksQueries`.
+     * - Execute `removeUnusedBlocksInBatches`.
+     *
+     * @expected
+     * - `blockHashesToDelete.length` equals 4, all removable blocks minus the 1 used block.
+     * - `remainingHashesInDb` contains only the used block hash.
+     * - `blockHashesToDelete` matches all sample block hashes except the used block hash.
+     */
+    it('should exclude blocks referenced by extractor-used block queries', async () => {
+      await blockRepository.insert(sampleBlocks1);
+      const usedBlocksQuery = blockRepository
+        .createQueryBuilder()
+        .select('BlockEntity.hash')
+        .where('BlockEntity.hash = :blockHash', {
+          blockHash: sampleBlocks1[0]?.hash,
+        });
+      const blocks = await blockRepository.find();
+      const lastBlock = blocks[blocks.length - 1];
+      const thresholdTimestamp = lastBlock.timestamp + 1;
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [usedBlocksQuery],
+        20,
+        sampleBlocks1[0].scanner,
+        thresholdTimestamp,
+      );
+
+      const expectBlockHashesToDelete = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter((sampleBlock) => sampleBlock.hash != sampleBlocks1[0]?.hash)
+        .map((block) => block.hash);
+      const remainingBlocksInDb = await blockRepository.find();
+      const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
+      const expectBlockHashesInDb = sampleBlocks1
+        .sort((block1, block2) => block1.height - block2.height)
+        .filter((sampleBlock) => sampleBlock.hash == sampleBlocks1[0]?.hash)
+        .map((block) => block.hash);
+      expect(blockHashesToDelete.length).toEqual(4);
+      expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
+      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+    });
+
+    /**
+     * @target
+     * removeUnusedBlocksInBatches should respect the maximum deletion batch size
+     *
+     * @dependencies
+     * - Database
+     * - BlockEntity Repository
+     *
+     * @scenario
+     * - Insert 5 blocks with multiple timestamp in  BlockEntity.
+     * - Set a thresholdTimestamp 4 that qualifies 3 blocks for deletion.
+     * - Execute `removeUnusedBlocksInBatches` with `deletedBlockCount` set to 1.
+     *
+     * @expected
+     * @expected
+     * - Returned deleted block hash matches the hash of the oldest block.
+     * - Length of returned deleted block hashes equals 1.
+     * - Deleted block is no longer present in the database.
+     * - Total count of remaining blocks in the database decreases by 1.
+     */
+    it('should respect the maximum deletion batch size', async () => {
+      await blockRepository.insert(sampleBlocks1);
+      const thresholdTimestamp = 4;
+
+      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+        [],
+        1,
+        sampleBlocks1[0].scanner,
+        thresholdTimestamp,
+      );
+      const sortedSampleBlocks = [...sampleBlocks1].sort(
+        (a, b) => a.height - b.height,
+      );
+      const remainingBlocksInDb = await blockRepository.find();
+
+      const expectedDeletedHash = sortedSampleBlocks[0].hash;
+
+      const isDeletedBlockInDb = remainingBlocksInDb.some(
+        (b) => b.hash === expectedDeletedHash,
+      );
+      expect(blockHashesToDelete[0]).toEqual(expectedDeletedHash);
+      expect(blockHashesToDelete.length).toEqual(1);
+      expect(isDeletedBlockInDb).toBe(false);
+      expect(remainingBlocksInDb.length).toEqual(sampleBlocks1.length - 1);
     });
   });
 });
