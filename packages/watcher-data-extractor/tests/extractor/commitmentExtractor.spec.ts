@@ -1,138 +1,162 @@
-import * as ergoLib from 'ergo-lib-wasm-nodejs';
-
 import { DataSource } from '@rosen-bridge/extended-typeorm';
+import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import CommitmentEntity from '../../lib/entities/commitmentEntity';
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
-import { JsonBI } from '../../lib/utils';
-import { block, commitmentAddress, RWTId } from './testData';
-import { commitmentTxGenerator, createDatabase } from './testUtils';
+import {
+  commitmentAddress,
+  commitmentBox,
+  extractedCommitment,
+  RWTId,
+} from './testData';
+import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;
+let extractor: CommitmentExtractor;
 
-describe('CommitmentExtractor', () => {
+describe('commitmentExtractor', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
+    extractor = new CommitmentExtractor(
+      'extractorId',
+      [commitmentAddress],
+      RWTId,
+      dataSource,
+      new TokenMap(),
+      {
+        active: true,
+        type: ErgoNetworkType.Explorer,
+        url: 'https://explorer.ergoplatform.com/',
+        address:
+          '2Eit2LFRqu2Mo33z3pYTJRHNCMq8F5shBvB1xmwtrGiZohpcoacfYASrP6jyWdbE1iBqAxgTmjFCF5UBPXzwbkuoDKq3PSTEDeCkCxP3GmrPARY4RUX9LvKUShwpSnMoPmxqQEQ54XKy63V1qxp4m5vYA2z7zwvFMcq9Thzr61aXKcRtV24pm2xnuuXUz7cJdghdPipxcvrJSMAhGiMtfZhhHUtCR2Ho4W7tUByNyJanXYPxM9uijstv6D3ryvWT1p1MxGyy1Epx7dSMYQgxq8x1HecAuG65VsykmtdzaDuJFBxiC5QBrfh9CiqT1k6UW798wb7Pa4oGopYXTLEuviFifnUSo6DzrTfaDQkdxPENqXDTF63noiPmRsPYB5wxbDXf2DBSB9359MdXbZLFymcPd8ofdZz7k6xQ9w53EfCg8HMkLf8mgR7e6XnhnB4jQ5q4DYbSw4yfg7fmDwDne5RwcUz8urhLFSba9qt4XJvT4oBuMfk1LRaRVyk4K9xecqSGXEMW6p3mQw2YDpZbGo5hLtpTvTPmrxqYkVpbNfgb6kkV1eKyHWo89jCQnG5zzjrENgmDhTYXUnD6P6stzuaJKXhQBWKGnu6pHZhsZ9WgRAQJP7AcRxJ6Qj77iiE4EqnAiVFaUXKJsd5cr1e8euXvBaaDRXcGezbw9psZ3NthzpWjtJTgyS8PLxKHFdTZyKLkKc',
+      },
+    );
   });
 
-  /**
-   * getting id of the extractor tests
-   * Dependency: Nothing
-   * Scenario: calling getId of CommitmentExtractor
-   * Expected: getId should return 'extractorId'
-   */
   describe('getId', () => {
+    /**
+     * @target getId should return the id of the extractor
+     * @dependencies
+     * @scenario
+     * - calling getId of permitExtractor
+     * @expected
+     * - getId should return 'extractorId'
+     */
     it('should return id of the extractor', async () => {
-      const tokenMap = new TokenMap();
-      await tokenMap.updateConfigByJson([]);
-      const extractor = new CommitmentExtractor(
-        'extractorId',
-        [commitmentAddress],
-        RWTId,
-        dataSource,
-        tokenMap,
-      );
       const data = extractor.getId();
       expect(data).toBe('extractorId');
     });
   });
 
-  describe('processTransaction', () => {
+  describe('extractBoxData', () => {
     /**
-     * 2 valid commitment should save successfully
-     * Dependency: Nothing
-     * Scenario: block with 3 transaction passed to the function and 2 of the transactions are valid commitment
-     * Expected: processTransactions should returns true and database row count should be 2
+     * @target extractBoxData should extract data in correct format
+     * @dependencies
+     * @scenario
+     * - run test for a box (call `extractBoxData`)
+     * @expected
+     * - extract the box information
      */
-    it('should save 2 commitments', async () => {
-      const tokenMap = new TokenMap();
-      await tokenMap.updateConfigByJson([]);
-      const extractor = new CommitmentExtractor(
-        'extractorId',
-        [commitmentAddress],
-        RWTId,
-        dataSource,
-        tokenMap,
-      );
-      const tx1 = commitmentTxGenerator(true, 'f1', '11', 'd1');
-      const tx2 = commitmentTxGenerator(true, 'f2', '22', 'd2');
-      const tx3 = commitmentTxGenerator(false, 'f3', '33', 'd3');
-      const res = await extractor.processTransactions([tx1, tx3, tx2], block);
-      expect(res).toBeTruthy();
-      const repository = dataSource.getRepository(CommitmentEntity);
-      const [rows, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toBe(2);
-      const commitment1 = rows[0];
-      const commitment2 = rows[1];
-      const box1 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx1.outputs[0]));
-      const box2 = ergoLib.ErgoBox.from_json(JsonBI.stringify(tx2.outputs[0]));
-      expect(commitment1).toEqual({
-        id: 1,
-        txId: tx1.id,
-        WID: 'f1',
-        commitment: 'd1',
-        eventId: '11',
-        boxId: box1.box_id().to_str(),
-        boxSerialized: Buffer.from(box1.sigma_serialize_bytes()).toString(
-          'base64',
-        ),
-        extractor: 'extractorId',
-        block: 'hash',
-        height: 10,
-        spendBlock: null,
-        spendHeight: null,
-        spendTxId: null,
-        spendIndex: null,
-        rwtCount: '10',
-      });
-      expect(commitment2).toEqual({
-        id: 2,
-        txId: tx2.id,
-        WID: 'f2',
-        commitment: 'd2',
-        eventId: '22',
-        boxId: box2.box_id().to_str(),
-        boxSerialized: Buffer.from(box2.sigma_serialize_bytes()).toString(
-          'base64',
-        ),
-        extractor: 'extractorId',
-        block: 'hash',
-        height: 10,
-        spendBlock: null,
-        spendHeight: null,
-        spendTxId: null,
-        spendIndex: null,
-        rwtCount: '10',
-      });
+    it('should extract data in correct format', () => {
+      const data = extractor.extractBoxData(commitmentBox);
+      expect(data).toEqual(extractedCommitment);
     });
   });
 
-  describe('forkBlock', () => {
+  describe('hasBoxData', () => {
     /**
-     * forkBlock should delete block from database
-     * Dependency: Nothing
-     * Scenario: 2 valid commitment saved in the dataBase, and then we call forkBlock
-     * Expected: afterCalling forkBlock database row count should be 0
+     * @target hasBoxData should return true when the box has required ergoTree and token
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test (call `hasBoxData`)
+     * @expected
+     * - to return true
      */
-    it('should remove only block with specific block id and extractor id', async () => {
-      const tokenMap = new TokenMap();
-      await tokenMap.updateConfigByJson([]);
-      const extractor = new CommitmentExtractor(
-        'extractorId',
-        [commitmentAddress],
-        RWTId,
-        dataSource,
-        tokenMap,
-      );
-      const tx1 = commitmentTxGenerator(true, 'wid1', '1', 'digest1');
-      const tx2 = commitmentTxGenerator(true, 'wid2', '2', 'digest2');
-      const tx3 = commitmentTxGenerator(false, 'wid2', '2', 'digest2');
-      await extractor.processTransactions([tx1, tx2, tx3], block);
-      await extractor.forkBlock('hash');
-      const repository = dataSource.getRepository(CommitmentEntity);
-      const [, rowsCount] = await repository.findAndCount();
-      expect(rowsCount).toBe(0);
+    it('should return true when the box has required ergoTree and token', () => {
+      const data = extractor.hasBoxData(commitmentBox);
+      expect(data).toEqual(true);
+    });
+
+    /**
+     * @target hasBoxData should return false when the box ergoTree is different
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with different ergoTree (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it('should return false when box ergoTree is different', () => {
+      const boxWithDifferentErgoTree = {
+        ...commitmentBox,
+        ergoTree:
+          '1005040004000e36100204a00b08cd0279be667ef9dcbbac55a062988a69108cd60e0a9fbb2e0fcc898ce68a7051b66',
+      };
+      const data = extractor.hasBoxData(boxWithDifferentErgoTree);
+      expect(data).toEqual(false);
+    });
+
+    /**
+     * @target hasBoxData should return false when box doesn't have required token
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with box without token (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it("should return false when box doesn't have required token", () => {
+      const boxWithoutToken = {
+        ...commitmentBox,
+        assets: [],
+      };
+      const data = extractor.hasBoxData(boxWithoutToken);
+      expect(data).toEqual(false);
+    });
+
+    /**
+     * @target hasBoxData should return false when box has different token
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with box with different token (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it('should return false when box has different token', () => {
+      const boxWithDifferentToken = {
+        ...commitmentBox,
+        assets: [
+          {
+            tokenId:
+              'dd1d06937ec75aae076f91cacb2fb721d2495030ff2c8096a61bd2b608bdc311',
+            amount: BigInt(100),
+          },
+        ],
+      };
+      const data = extractor.hasBoxData(boxWithDifferentToken);
+      expect(data).toEqual(false);
+    });
+
+    /**
+     * @target hasBoxData should return false when R4 register is missing
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with box without R4 register (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it('should return false when R4 register is missing', () => {
+      const boxWithoutR4 = {
+        ...commitmentBox,
+        additionalRegisters: {
+          R5: commitmentBox.additionalRegisters.R5,
+        },
+      };
+      const data = extractor.hasBoxData(boxWithoutR4);
+      expect(data).toEqual(false);
     });
   });
 });

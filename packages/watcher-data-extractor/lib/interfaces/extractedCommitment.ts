@@ -1,11 +1,13 @@
-interface extractedCommitment {
+import { AbstractEntityData } from '@rosen-bridge/abstract-extractor';
+
+interface ExtractedCommitment extends AbstractEntityData {
   txId: string;
   WID: string;
   commitment: string;
   eventId: string;
-  boxId: string;
-  boxSerialized: string;
   rwtCount: string;
+  spendTxId?: string | null;
+  spendIndex?: number | null;
 }
 
-export { extractedCommitment };
+export { ExtractedCommitment };

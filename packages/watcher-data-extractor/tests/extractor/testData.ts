@@ -1,7 +1,49 @@
+import { ErgoBox } from 'ergo-lib-wasm-nodejs';
+
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
-import { Transaction } from '@rosen-bridge/scanner-interfaces';
+import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { EventTriggerEntity } from '../../lib';
+import { ExtractedCommitment } from '../../lib/interfaces/extractedCommitment';
+import { JsonBI } from '../../lib/utils';
+
+export const commitmentBox: OutputBox = {
+  boxId: '94935010e7f86a493ad7584a9d5d6cebe9194dd602fdea66a7c55bb697bcf341',
+  transactionId:
+    'f58ed8166dd90117355216b4a801fa2d205f9047f746c02d933a505edbf1a7f7',
+  value: 2000000n,
+  creationHeight: 1773828,
+  index: 1,
+  ergoTree:
+    '101c04000e209ccf1988673407c6b4484ff906e3d25792b2004ff1baebd79ee032dc0bfe275f04000200020004020400010004000400040004000400040604040402050205c8010500040204000400020004000400040204000400d80bd601b2a4730000d6027301d60393cbc272017202d604e4c6a7041ad6059572037201b2a5730200d606e4c67205041ad607c67205051ad608e67207d609957208b0e472078301027303d901093c0e0eb38c7209018c7209028301027304d60ab472097305b17209d60bb2a5730600957203d801d60cb2b5a5d9010c63d801d60ec6720c041a95e6720e93e4720e72047307730800d19683040193cbc2720ce4c6a7070e938cb2db6308720c730900018cb2db6308a7730a0001efae7206d9010d0e93720483010e720d93cbb3720ab27204730b00e4c6a7060ed801d60ccbc2720b9593720c7202d806d60db5a4d9010d6393c2a7c2720dd60eb1720dd60fb2db6501fe730c00d610e4c6720f0611d611b27210730d00d6129ab27210730e009d9cb27210730f00997eb1e4c6720f041a0573107311d19683080192c1720bb0ad720dd9011363c172137312d90113599a8c7213018c72130293b1b5720dd901136393e4c67213041a72047313ae7206d901130e9383010e7213720493e4c67205060ee4c6a7070e93b17206720e93cbb3720ab27204731400e4c6a7060e93e4c6a7051a83010e957208cbb2e472077315008301027316917e720e05958f7211721272117212d19683050193c5a7c57201938cb2db6308720b731700018cb2db6308a77318000193e4c6720b041a7204938cb2db6308b2a4731900731a0001b27204731b0093720ce4c6a7070e',
+  assets: [
+    {
+      tokenId:
+        '3c6cb596273a737c3e111c31d3ec868b84676b7bad82f9888ad574b44edef267',
+      amount: 1000n,
+    },
+  ],
+  additionalRegisters: {
+    R4: '0e205ac40753ae38e6188c77fa78c983f7bb846f8c1d565e53f3aa1e32d74887a84b',
+    R5: '0e208226f7bf13b879625052d9b37199bd864914ad5a897703839b5f07172d8487e0',
+    R6: '0e205b7a0ea44088523470a54583e19eb298dc1267cabfcfb1a9c3560dd7d4a4baad',
+    R7: '0e20ab27e8b16c5ead1747b27e6631bced1250922009f56731caa7a739b1f7ba0b75',
+  },
+};
+
+const parsedBox = ErgoBox.from_json(JsonBI.stringify(commitmentBox));
+
+export const extractedCommitment: ExtractedCommitment = {
+  identifier:
+    '94935010e7f86a493ad7584a9d5d6cebe9194dd602fdea66a7c55bb697bcf341',
+  serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString('base64'),
+  txId: 'f58ed8166dd90117355216b4a801fa2d205f9047f746c02d933a505edbf1a7f7',
+  WID: '5ac40753ae38e6188c77fa78c983f7bb846f8c1d565e53f3aa1e32d74887a84b',
+  commitment:
+    '5b7a0ea44088523470a54583e19eb298dc1267cabfcfb1a9c3560dd7d4a4baad',
+  eventId: '8226f7bf13b879625052d9b37199bd864914ad5a897703839b5f07172d8487e0',
+  rwtCount: '1000',
+};
 
 export const permitAddress =
   'EE7687i4URb4YuSGSQXPCbAjMfN4dUt5Qx8BqKZJiZhDY8fdnSUwcAGqAsqfn1tW1byXB8nDrgkFzkAFgaaempKxfcPtDzAbnu9QfknzmtfnLYHdxPPg7Qtjy7jK5yUpPQ2M4Ps3h5kH57xWDJxcKviEMY11rQnxATjTKTQgGtfzsAPpqsUyT2ZpVYsFzUGJ4nSj4WaDZSU1Hovv6dPkSTArLQSjp38wE72ae6hbNJwXGkqgfBtdVXcZVtnqevw9xUNcE6i942CQ9hVMfbdRobnsaLgsDLQomsh8jLMXqkMde5qH2vGBUqnLKgjxCZaa7vStpPXT5EuzLn9napGwUcbJjgRk69FsRSfCrcydZbYxw4Gnh6ZB9at2USpwL1HdVkHVh8M6Kbw6ppRfeG4JeFsUw33H4sSRk6UPqfuFcRUf7Cec2vmPezXTPT7CXQqEeCjxmWXqfyEQUfnCwpiH5fQ9A8CQ3jTyFhxBTpoGDdtiVCmhqhKxjh9M7gcjpr1dUjGMCWxjir94ejfq24XQrSscrZuUT5NVHTWAkzQ';
