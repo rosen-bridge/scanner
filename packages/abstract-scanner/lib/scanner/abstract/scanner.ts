@@ -16,7 +16,9 @@ import { BlockCleanupConfig } from '../interfaces';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
-  extractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
+  protected extractors: Array<
+    AbstractExtractor<TransactionType, ObjectLiteral>
+  >;
   newExtractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;

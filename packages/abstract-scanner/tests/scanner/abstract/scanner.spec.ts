@@ -45,7 +45,7 @@ describe('AbstractScanner', () => {
       await scanner.registerExtractor(extractor);
       await scanner.registerExtractor(extractor2);
       expect(scanner.newExtractors.length).toEqual(2);
-      expect(scanner.extractors.length).toEqual(0);
+      expect(scanner['extractors'].length).toEqual(0);
     });
   });
 
@@ -140,7 +140,7 @@ describe('AbstractScanner', () => {
         blockCleanupConfig,
       );
       const extractor = new ExtractorTest('extractor');
-      scanner1.extractors.push(extractor);
+      scanner1['extractors'].push(extractor);
       await insertBlocks(scanner1, 10);
       await scanner1['forkBlock'](10);
       expect(extractor.forked.length).toEqual(1);
@@ -189,7 +189,7 @@ describe('AbstractScanner', () => {
         blockCleanupConfig,
       );
       const extractor = new ExtractorTest('test');
-      scanner.extractors.push(extractor);
+      scanner['extractors'].push(extractor);
       await scanner['processBlockTransactions'](
         { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
         [{ height: 1, blockHash: '1' }],
@@ -213,7 +213,7 @@ describe('AbstractScanner', () => {
       vi.spyOn(extractor, 'processTransactions').mockImplementation(() =>
         Promise.reject('this is my error on save'),
       );
-      scanner.extractors.push(extractor);
+      scanner['extractors'].push(extractor);
       await expect(() => {
         return scanner['processBlockTransactions'](
           { height: 1, parentHash: ' ', hash: '1', timestamp: 10 },
@@ -250,7 +250,7 @@ describe('AbstractScanner', () => {
       const initInfo = { height: 100, hash: 'hash2' } as BlockInfo;
       await scanner['verifyExtractorsInitialization'](initInfo);
       expect(mockedInitFn).toHaveBeenCalledWith(['test'], initInfo);
-      expect(scanner.extractors[0]).toBe(extractor);
+      expect(scanner['extractors'][0]).toBe(extractor);
       expect(scanner.newExtractors.length).toBe(0);
     });
 
@@ -489,7 +489,7 @@ describe('AbstractScanner', () => {
       vi.spyOn(extractor1, 'createUsedBlocksQuery').mockReturnValue(query1);
       vi.spyOn(extractor2, 'createUsedBlocksQuery').mockReturnValue(query2);
 
-      scanner.extractors = [extractor1, extractor2];
+      scanner['extractors'] = [extractor1, extractor2];
 
       const mockLastSavedBlock = {
         id: 1,
@@ -528,7 +528,7 @@ describe('AbstractScanner', () => {
       vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue(
         dataSource.createQueryBuilder(),
       );
-      scanner.extractors = [extractor];
+      scanner['extractors'] = [extractor];
 
       const removeUnusedBlocksSpy = vi
         .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
