@@ -38,7 +38,7 @@ jobs:
         run: npm run build
 
       - name: Publish snapshot package to npm
-        uses: rosen-bridge/operation/publish-package@master
+        uses: rosen-bridge/operation/.github/actions/npm-publish-package@master
         with:
           type: 'snapshot-release'
           npm_token: ${{ secrets.NPM_TOKEN }}
