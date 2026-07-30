@@ -220,19 +220,28 @@ class PermitAction {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
    * filtered by the provided `extractorId`
    *
    * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<PermitEntity> => {
-    return this.permitRepository
-      .createQueryBuilder('permitEntity')
-      .select('permitEntity.block', 'block')
-      .where('permitEntity.extractor = :extractorId', { extractorId });
+  ): SelectQueryBuilder<PermitEntity>[] => {
+    return [
+      this.permitRepository
+        .createQueryBuilder('permitEntity')
+        .select('permitEntity.block', 'block')
+        .where('permitEntity.extractor = :extractorId', { extractorId }),
+      this.permitRepository
+        .createQueryBuilder('permitEntity')
+        .select('permitEntity.spendBlock', 'block')
+        .where(
+          'permitEntity.spendBlock IS NOT NULL AND permitEntity.extractor = :extractorId',
+          { extractorId },
+        ),
+    ];
   };
 }
 

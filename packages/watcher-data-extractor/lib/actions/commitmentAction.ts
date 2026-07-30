@@ -164,19 +164,28 @@ class CommitmentAction {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
    * filtered by the provided `extractorId`
    *
    * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<CommitmentEntity> => {
-    return this.commitmentRepository
-      .createQueryBuilder('commitmentEntity')
-      .select('commitmentEntity.block', 'block')
-      .where('commitmentEntity.extractor = :extractorId', { extractorId });
+  ): SelectQueryBuilder<CommitmentEntity>[] => {
+    return [
+      this.commitmentRepository
+        .createQueryBuilder('commitmentEntity')
+        .select('commitmentEntity.block', 'block')
+        .where('commitmentEntity.extractor = :extractorId', { extractorId }),
+      this.commitmentRepository
+        .createQueryBuilder('commitmentEntity')
+        .select('commitmentEntity.spendBlock', 'block')
+        .where(
+          'commitmentEntity.spendBlock IS NOT NULL AND commitmentEntity.extractor = :extractorId',
+          { extractorId },
+        ),
+    ];
   };
 }
 

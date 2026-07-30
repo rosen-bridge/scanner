@@ -163,12 +163,12 @@ class CommitmentExtractor extends AbstractExtractor<
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
    * filtered by the provided `extractorId`
    *
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
-  createUsedBlocksQuery = (): SelectQueryBuilder<CommitmentEntity> =>
+  createUsedBlocksQuery = (): SelectQueryBuilder<CommitmentEntity>[] =>
     this.actions.createUsedBlocksQuery(this.getId());
 }
 

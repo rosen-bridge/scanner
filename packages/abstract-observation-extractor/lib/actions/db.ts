@@ -110,18 +110,20 @@ export class ObservationEntityAction {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
    * filtered by the provided `extractorId`
    *
    * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<ObservationEntity> => {
-    return this.observationRepository
-      .createQueryBuilder('observationEntity')
-      .select('observationEntity.block', 'block')
-      .where('observationEntity.extractor = :extractorId', { extractorId });
+  ): SelectQueryBuilder<ObservationEntity>[] => {
+    return [
+      this.observationRepository
+        .createQueryBuilder('observationEntity')
+        .select('observationEntity.block', 'block')
+        .where('observationEntity.extractor = :extractorId', { extractorId }),
+    ];
   };
 }

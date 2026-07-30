@@ -291,12 +291,12 @@ class PermitExtractor extends AbstractExtractor<Transaction, PermitEntity> {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
    * filtered by the provided `extractorId`
    *
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
-  createUsedBlocksQuery = (): SelectQueryBuilder<PermitEntity> =>
+  createUsedBlocksQuery = (): SelectQueryBuilder<PermitEntity>[] =>
     this.actions.createUsedBlocksQuery(this.getId());
 }
 

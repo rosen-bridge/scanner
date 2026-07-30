@@ -159,5 +159,5 @@ export class BoxExtractor extends AbstractExtractor<
    * Create a query for blocks that are already used
    * No action needed in box-tracker extractors
    */
-  createUsedBlocksQuery = (): undefined => undefined;
+  createUsedBlocksQuery = (): [] => [];
 }

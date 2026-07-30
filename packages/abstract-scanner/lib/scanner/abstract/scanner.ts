@@ -2,7 +2,10 @@ import { difference, remove } from 'lodash-es';
 
 import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import { ObjectLiteral } from '@rosen-bridge/extended-typeorm';
+import {
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from '@rosen-bridge/extended-typeorm';
 import { Block, BlockInfo } from '@rosen-bridge/scanner-interfaces';
 import { Mutex } from '@rosen-bridge/semaphore';
 
@@ -239,24 +242,25 @@ export abstract class AbstractScanner<TransactionType> {
     try {
       this.logger.debug('Starting the process to remove old unused blocks');
 
-      const extractorUsedBlocksQueries = this.extractors.map((extracor) =>
-        extracor.createUsedBlocksQuery(),
-      );
+      const extractorUsedBlocksQueries: SelectQueryBuilder<ObjectLiteral>[] =
+        [];
+      this.extractors.forEach((extractor) => {
+        const query = extractor.createUsedBlocksQuery();
+        if (query !== undefined) {
+          extractorUsedBlocksQueries.push(...query);
+        }
+      });
       const thresholdTimestamp = lastSavedBlock
         ? lastSavedBlock.timestamp -
           this.blockCleanupConfig.blockCleanupThresholdDuration
         : 0;
-      const unusedBlockHashes = await this.action.removeUnusedBlocksInBatches(
-        extractorUsedBlocksQueries.filter((query) => query !== undefined),
+      await this.action.removeUnusedBlocksInBatches(
+        extractorUsedBlocksQueries,
         this.blockCleanupConfig.blockTrimCountInRound,
         this.name(),
         thresholdTimestamp,
       );
-      if (unusedBlockHashes.length)
-        this.logger.debug(
-          `Successfully removed old unused block hashes: ${unusedBlockHashes.join(', ')}`,
-        );
-      else this.logger.debug('No unused block hashes found to remove');
+      this.logger.debug(`Successfully removed old unused blocks`);
     } catch (error) {
       this.logger.error(
         `An error occurred while removing old unused blocks: ${error}`,

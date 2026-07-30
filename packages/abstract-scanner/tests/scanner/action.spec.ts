@@ -702,7 +702,7 @@ describe('action', () => {
         ? lastBlock.timestamp - blockAgeThreshold
         : 0;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
@@ -728,7 +728,6 @@ describe('action', () => {
       expect(remainingHashesInDb.sort()).toEqual(
         expectedRemainingHashes.sort(),
       );
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
     /**
@@ -752,17 +751,12 @@ describe('action', () => {
       await blockRepository.insert(sampleBlocks1);
       const thresholdTimestamp = 3;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
-
-      const expectBlockHashesToDelete = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter((sampleBlock) => sampleBlock.timestamp < thresholdTimestamp)
-        .map((block) => block.hash);
 
       const remainingBlocksInDb = await blockRepository.find();
       const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
@@ -771,7 +765,6 @@ describe('action', () => {
         .filter((sampleBlock) => sampleBlock.timestamp >= thresholdTimestamp)
         .map((block) => block.hash);
       expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
     /**
@@ -805,26 +798,19 @@ describe('action', () => {
       const blocks = await blockRepository.find();
       const lastBlock = blocks[blocks.length - 1];
       const thresholdTimestamp = lastBlock.timestamp + 1;
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [usedBlocksQuery],
         20,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
-
-      const expectBlockHashesToDelete = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter((sampleBlock) => sampleBlock.hash != sampleBlocks1[0]?.hash)
-        .map((block) => block.hash);
       const remainingBlocksInDb = await blockRepository.find();
       const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
       const expectBlockHashesInDb = sampleBlocks1
         .sort((block1, block2) => block1.height - block2.height)
         .filter((sampleBlock) => sampleBlock.hash == sampleBlocks1[0]?.hash)
         .map((block) => block.hash);
-      expect(blockHashesToDelete.length).toEqual(4);
       expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
     /**
@@ -851,7 +837,7 @@ describe('action', () => {
       await blockRepository.insert(sampleBlocks1);
       const thresholdTimestamp = 4;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         1,
         sampleBlocks1[0].scanner,
@@ -867,8 +853,6 @@ describe('action', () => {
       const isDeletedBlockInDb = remainingBlocksInDb.some(
         (b) => b.hash === expectedDeletedHash,
       );
-      expect(blockHashesToDelete[0]).toEqual(expectedDeletedHash);
-      expect(blockHashesToDelete.length).toEqual(1);
       expect(isDeletedBlockInDb).toBe(false);
       expect(remainingBlocksInDb.length).toEqual(sampleBlocks1.length - 1);
     });

@@ -369,28 +369,32 @@ export class BlockDbAction {
     deletedBlockCount: number,
     scannerName: string,
     thresholdTimestamp: number,
-  ): Promise<string[]> => {
+  ): Promise<void> => {
     const { queryParts, parameters } = this.generateQueriesWithUniqueParams(
       extractorUsedBlocksQueries,
     );
     const unionQuery = queryParts.map((sql) => `${sql}`).join(' UNION ');
-    const blocksToDelete = await this.blockRepository
+    const blocksToDelete = this.blockRepository
       .createQueryBuilder('blockEntity')
-      .addSelect('blockEntity.hash', 'hash')
-      .where(`blockEntity.hash NOT IN (${unionQuery})`)
-      .andWhere(`blockEntity.scanner = :scannerName`, { scannerName })
+      .select('blockEntity.id', 'id')
+      .where(`blockEntity.scanner = :scannerName`, { scannerName })
       .andWhere('blockEntity.timestamp < :thresholdTimestamp', {
         thresholdTimestamp,
       })
       .setParameters({ ...parameters })
-      .distinct(true)
       .orderBy('blockEntity.height', 'ASC')
-      .take(deletedBlockCount)
-      .getRawMany();
-    const unusedBlockHashes = blocksToDelete.map((row) => row.hash);
-    await this.blockRepository.delete({
-      hash: In(unusedBlockHashes),
-    });
-    return unusedBlockHashes;
+      .take(deletedBlockCount);
+
+    if (unionQuery.trim().length > 0) {
+      blocksToDelete.andWhere(`blockEntity.hash NOT IN (${unionQuery})`);
+    }
+    await this.blockRepository
+      .createQueryBuilder()
+      .delete()
+      .where(() => {
+        return `id IN (${blocksToDelete.getQuery()})`;
+      })
+      .setParameters(blocksToDelete.getParameters())
+      .execute();
   };
 }

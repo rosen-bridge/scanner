@@ -8,6 +8,7 @@ import {
   EntityTarget,
   FindOptionsWhere,
   QueryRunner,
+  SelectQueryBuilder,
 } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
@@ -105,5 +106,32 @@ export abstract class AbstractErgoBoxAction<
       }
     }
     return spentData.map((data) => pick(data, 'identifier'));
+  };
+
+  /**
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `ExtractorEntity` repository,
+   * filtered by the provided `extractorId`
+   *
+   * @param extractorId - Identifier of the extractor
+   * @returns A list ofquery builder selecting used blocks
+   */
+  createUsedBlocksQuery = (
+    extractorId: string,
+  ): SelectQueryBuilder<ExtractorEntity>[] => {
+    const createdQuery = this.repository
+      .createQueryBuilder('created')
+      .select('created.block', 'block')
+      .where('created.extractor = :createdExtractorId', {
+        createdExtractorId: extractorId,
+      });
+
+    const spentQuery = this.repository
+      .createQueryBuilder('spent')
+      .select('spent.spendBlock', 'block')
+      .where(
+        'spent.extractor = :spentExtractorId AND spent.spendBlock IS NOT NULL',
+        { spentExtractorId: extractorId },
+      );
+    return [createdQuery, spentQuery];
   };
 }

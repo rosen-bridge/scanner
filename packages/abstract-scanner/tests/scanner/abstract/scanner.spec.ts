@@ -486,8 +486,8 @@ describe('AbstractScanner', () => {
       const query2 = {
         text: 'query for extractor 2',
       } as unknown as SelectQueryBuilder<ObjectLiteral>;
-      vi.spyOn(extractor1, 'createUsedBlocksQuery').mockReturnValue(query1);
-      vi.spyOn(extractor2, 'createUsedBlocksQuery').mockReturnValue(query2);
+      vi.spyOn(extractor1, 'createUsedBlocksQuery').mockReturnValue([query1]);
+      vi.spyOn(extractor2, 'createUsedBlocksQuery').mockReturnValue([query2]);
 
       scanner['extractors'] = [extractor1, extractor2];
 
@@ -498,7 +498,7 @@ describe('AbstractScanner', () => {
       } as BlockEntity;
       const removeUnusedBlocksSpy = vi
         .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
-        .mockResolvedValue(['hash1', 'hash2']);
+        .mockResolvedValue(undefined);
 
       await scanner['removeOldUnusedBlocks'](mockLastSavedBlock);
 
@@ -525,22 +525,15 @@ describe('AbstractScanner', () => {
         blockCleanupConfig,
       );
       const extractor = new ExtractorTest('ext-1');
-      vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue(
-        dataSource.createQueryBuilder(),
-      );
+      vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue([]);
       scanner['extractors'] = [extractor];
 
       const removeUnusedBlocksSpy = vi
         .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
-        .mockResolvedValue([]);
+        .mockResolvedValue(undefined);
 
       await scanner['removeOldUnusedBlocks'](undefined);
-      expect(removeUnusedBlocksSpy).toBeCalledWith(
-        [dataSource.createQueryBuilder()],
-        5,
-        'first',
-        0,
-      );
+      expect(removeUnusedBlocksSpy).toBeCalledWith([], 5, 'first', 0);
     });
   });
 });
