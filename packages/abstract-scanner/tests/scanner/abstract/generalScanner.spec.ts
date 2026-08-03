@@ -2,6 +2,7 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { BlockEntity } from '../../../lib';
+import { BlockCleanupConfig } from '../../../lib/scanner/interfaces';
 import {
   ExtractorTest,
   insertBlocks,
@@ -14,8 +15,13 @@ import {
 let dataSource: DataSource;
 
 describe('generalScanner', () => {
+  let blockCleanupConfig: BlockCleanupConfig;
   beforeEach(async () => {
     dataSource = await createDatabase();
+    blockCleanupConfig = {
+      blockCleanupThresholdDuration: 2000,
+      blockTrimCountInRound: 10,
+    };
     vi.restoreAllMocks();
   });
 
@@ -28,7 +34,12 @@ describe('generalScanner', () => {
      */
     it('should return false when database is empty', async () => {
       const network = new NetworkConnectorTest();
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       expect(await scanner['isForkHappen']()).toBeFalsy();
     });
 
@@ -49,7 +60,12 @@ describe('generalScanner', () => {
           timestamp: 50,
         }),
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       await insertBlocks(scanner, 3);
       expect(await scanner['isForkHappen']()).toBeTruthy();
     });
@@ -71,7 +87,12 @@ describe('generalScanner', () => {
           timestamp: 50,
         }),
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       await insertBlocks(scanner, 3);
       expect(await scanner['isForkHappen']()).toBeFalsy();
     });
@@ -89,7 +110,12 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const txs = [{ height: 1, blockHash: '1' }];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const mockedProcessBlockTransactions = vi
         .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation(() => {});
@@ -121,6 +147,7 @@ describe('generalScanner', () => {
         'retrieveGap',
         dataSource,
         network,
+        blockCleanupConfig,
       );
       const delayMock = vi.fn().mockResolvedValue(undefined);
       Object.assign(scanner, { delayBetweenBlocksProcessing: delayMock });
@@ -150,7 +177,12 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const txs: Array<TestTransaction> = [];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const mockedProcessBlockTransactions = vi.spyOn(
         scanner as any,
         'processBlockTransactions',
@@ -180,7 +212,12 @@ describe('generalScanner', () => {
       const network = new NetworkConnectorTest();
       const txs = [{ height: 1, blockHash: '1' }];
       vi.spyOn(network, 'getBlockTxs').mockReturnValue(Promise.resolve(txs));
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const mockedProcessBlockTransactions = vi
         .spyOn(scanner as any, 'processBlockTransactions')
         .mockImplementation(() => {});
@@ -260,7 +297,13 @@ describe('generalScanner', () => {
           });
         },
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network, 2);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+        2,
+      );
       await insertBlocks(scanner, 2);
       const lastBlock = await scanner.action.getLastSavedBlock();
       vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
@@ -301,7 +344,13 @@ describe('generalScanner', () => {
           });
         },
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network, 2);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+        2,
+      );
       await insertBlocks(scanner, 2);
       const lastBlock = await scanner.action.getLastSavedBlock();
       vi.spyOn(scanner as any, 'checkExtractorsForEvents').mockResolvedValue(
@@ -345,7 +394,13 @@ describe('generalScanner', () => {
           timestamp: height * 10,
         }));
 
-      const scanner = new TestGeneralScanner('first', dataSource, network, 3);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+        3,
+      );
 
       await insertBlocks(scanner, 2);
 
@@ -395,7 +450,13 @@ describe('generalScanner', () => {
           timestamp: height * 10,
         }));
 
-      const scanner = new TestGeneralScanner('first', dataSource, network, 5);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+        5,
+      );
 
       await insertBlocks(scanner, 5);
 
@@ -417,14 +478,16 @@ describe('generalScanner', () => {
 
   describe('stepBackward', () => {
     /**
-     * Test step backward
-     * Dependency: database should be filled with data of another scanner
-     * Scenario: Insert three block to database
-     *           Mock getBlockAtHeight to return two forked block
-     *           Then call update must fork two of them
-     * Expected: extractors size must be 1
+     * @target should call stepBackward when fork is detected
+     * @dependencies database should be filled with data of another scanner
+     * @scenario
+     * - Insert three block to database
+     * - Mock getBlockAtHeight to return two forked block
+     * - Then call update must fork two of them
+     * @expected
+     * - extractors size must be 1
      */
-    it('stepBackward', async () => {
+    it('should call stepBackward when fork is detected', async () => {
       const network = new NetworkConnectorTest();
       vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
         (height: number) => {
@@ -464,7 +527,12 @@ describe('generalScanner', () => {
       vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
         new Promise((resolve) => resolve(3)),
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       await insertBlocks(scanner, 3);
       await scanner['stepBackward']();
       const blockCount = await dataSource
@@ -476,14 +544,22 @@ describe('generalScanner', () => {
 
   describe('initialize', () => {
     /**
-     * Test insert first block when database is empty
-     * Dependency: Nothing
-     * Scenario: Create an empty scanner. then call initialize
-     * Expected: must insert first block to database
+     * @target initialize should insert first block when database is empty
+     * @dependencies
+     * @scenario
+     * - Create an empty scanner.
+     * - Call initialize
+     * @expected
+     * - must insert first block to database
      */
-    it('should insert first block', async () => {
+    it('should insert first block when database is empty', async () => {
       const network = new NetworkConnectorTest();
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       await scanner['initialize']();
       const blocks = await dataSource.getRepository(BlockEntity).find();
       expect(blocks.length).toEqual(1);
@@ -496,15 +572,23 @@ describe('generalScanner', () => {
 
   describe('update', () => {
     /**
-     * Test initialize scanner when no block in database
-     * Dependency: Nothing
-     * Scenario: create scanner and mock initialize method.
-     *           then call update on it
-     * Expected: It must call initialize method
+     * @target update should initialize scanner when no block in database
+     * @dependencies
+     * @scenario
+     * - Create scanner
+     * - Mock initialize method
+     * - Call update
+     * @expected
+     * - It must call initialize method
      */
-    it('should call initialize', async () => {
+    it('should initialize scanner when no block in database', async () => {
       const network = new NetworkConnectorTest();
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const mockedInit = vi.spyOn(scanner as any, 'initialize').mockReturnValue(
         new Promise((resolve, reject) => {
           scanner.action
@@ -540,7 +624,12 @@ describe('generalScanner', () => {
      */
     it('should initialize new extractor and update the extractors list', async () => {
       const network = new NetworkConnectorTest();
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const extractor = new ExtractorTest('test');
       scanner.registerExtractor(extractor);
       const mockedInit = vi
@@ -549,8 +638,8 @@ describe('generalScanner', () => {
       await scanner.update();
       expect(mockedInit).toHaveBeenCalledTimes(1);
       expect(scanner.newExtractors.length).toBe(0);
-      expect(scanner.extractors.length).toBe(1);
-      expect(scanner.extractors[0]).toBe(extractor);
+      expect(scanner['extractors'].length).toBe(1);
+      expect(scanner['extractors'][0]).toBe(extractor);
     });
 
     /**
@@ -566,7 +655,12 @@ describe('generalScanner', () => {
      */
     it('should stop processing blocks when extractor initialization fails', async () => {
       const network = new NetworkConnectorTest();
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       const processSpy = vi.spyOn(scanner as any, 'processBlock');
       vi.spyOn(scanner as any, 'isForkHappen').mockResolvedValue(false);
       vi.spyOn(
@@ -580,13 +674,17 @@ describe('generalScanner', () => {
     });
 
     /**
-     * Test stepForward when block if not forked
-     * Dependency: Nothing
-     * Scenario: create scanner. and mock stepForward method.
-     *           with mocked network. call update
-     * Expected: It must call stepForward
+     * @target update should call stepForward when block if not forked
+     * @dependencies
+     * @scenario
+     * - create scanner. and mock stepForward method.
+     * - mocked network.
+     * - call update
+     * @expected
+     * - it must call stepForward
+     * - it must call removeOldUnusedBlocks
      */
-    it('should call stepForward', async () => {
+    it('should call stepForward when block if not forked', async () => {
       const network = new NetworkConnectorTest();
       vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
         (height: number) => {
@@ -626,13 +724,23 @@ describe('generalScanner', () => {
       vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
         new Promise((resolve) => resolve(3)),
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
+      const removeOldUnusedBlocksSpy = vi.spyOn(
+        scanner as any,
+        'removeOldUnusedBlocks',
+      );
       await insertBlocks(scanner, 2);
       const mockedStepForward = vi
         .spyOn(scanner as any, 'stepForward')
         .mockImplementation(async () => {});
       await scanner.update();
       expect(mockedStepForward).toBeCalled();
+      expect(removeOldUnusedBlocksSpy).toBeCalled();
     });
 
     /**
@@ -644,6 +752,13 @@ describe('generalScanner', () => {
      */
     it('should call stepBackward', async () => {
       const network = new NetworkConnectorTest();
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
+
       vi.spyOn(network, 'getBlockAtHeight').mockImplementation(
         (height: number) => {
           return new Promise((resolve) => {
@@ -682,12 +797,16 @@ describe('generalScanner', () => {
       vi.spyOn(network, 'getCurrentHeight').mockReturnValue(
         new Promise((resolve) => resolve(3)),
       );
-      const scanner = new TestGeneralScanner('first', dataSource, network);
       await insertBlocks(scanner, 3);
       const mockedStepBackward = vi
         .spyOn(scanner as any, 'stepBackward')
         .mockImplementation(async () => {});
+      const removeOldUnusedBlocksSpy = vi.spyOn(
+        scanner as any,
+        'removeOldUnusedBlocks',
+      );
       await scanner.update();
+      expect(removeOldUnusedBlocksSpy).toBeCalled();
       expect(mockedStepBackward).toBeCalled();
     });
 
@@ -701,7 +820,12 @@ describe('generalScanner', () => {
     it('should update block-chain last height if a newer height is available', async () => {
       const network = new NetworkConnectorTest();
       vi.spyOn(network, 'getCurrentHeight').mockImplementation(async () => 150);
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       scanner['blockChainLastHeight'] = 100;
       await scanner.update();
 
@@ -718,7 +842,12 @@ describe('generalScanner', () => {
     it('should not update block-chain last height if the new height is not greater', async () => {
       const network = new NetworkConnectorTest();
       vi.spyOn(network, 'getCurrentHeight').mockImplementation(async () => 180);
-      const scanner = new TestGeneralScanner('first', dataSource, network);
+      const scanner = new TestGeneralScanner(
+        'first',
+        dataSource,
+        network,
+        blockCleanupConfig,
+      );
       scanner['blockChainLastHeight'] = 200;
       await scanner.update();
 

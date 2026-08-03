@@ -1,54 +1,10 @@
-import { ErgoBox } from 'ergo-lib-wasm-nodejs';
-
 import { BlockEntity } from '@rosen-bridge/abstract-scanner';
-import { OutputBox, Transaction } from '@rosen-bridge/scanner-interfaces';
+import { Transaction } from '@rosen-bridge/scanner-interfaces';
 
 import { EventTriggerEntity } from '../../lib';
-import { ExtractedCommitment } from '../../lib/interfaces/extractedCommitment';
-import { JsonBI } from '../../lib/utils';
 
-export const commitmentBox: OutputBox = {
-  boxId: '94935010e7f86a493ad7584a9d5d6cebe9194dd602fdea66a7c55bb697bcf341',
-  transactionId:
-    'f58ed8166dd90117355216b4a801fa2d205f9047f746c02d933a505edbf1a7f7',
-  value: 2000000n,
-  creationHeight: 1773828,
-  index: 1,
-  ergoTree:
-    '101c04000e209ccf1988673407c6b4484ff906e3d25792b2004ff1baebd79ee032dc0bfe275f04000200020004020400010004000400040004000400040604040402050205c8010500040204000400020004000400040204000400d80bd601b2a4730000d6027301d60393cbc272017202d604e4c6a7041ad6059572037201b2a5730200d606e4c67205041ad607c67205051ad608e67207d609957208b0e472078301027303d901093c0e0eb38c7209018c7209028301027304d60ab472097305b17209d60bb2a5730600957203d801d60cb2b5a5d9010c63d801d60ec6720c041a95e6720e93e4720e72047307730800d19683040193cbc2720ce4c6a7070e938cb2db6308720c730900018cb2db6308a7730a0001efae7206d9010d0e93720483010e720d93cbb3720ab27204730b00e4c6a7060ed801d60ccbc2720b9593720c7202d806d60db5a4d9010d6393c2a7c2720dd60eb1720dd60fb2db6501fe730c00d610e4c6720f0611d611b27210730d00d6129ab27210730e009d9cb27210730f00997eb1e4c6720f041a0573107311d19683080192c1720bb0ad720dd9011363c172137312d90113599a8c7213018c72130293b1b5720dd901136393e4c67213041a72047313ae7206d901130e9383010e7213720493e4c67205060ee4c6a7070e93b17206720e93cbb3720ab27204731400e4c6a7060e93e4c6a7051a83010e957208cbb2e472077315008301027316917e720e05958f7211721272117212d19683050193c5a7c57201938cb2db6308720b731700018cb2db6308a77318000193e4c6720b041a7204938cb2db6308b2a4731900731a0001b27204731b0093720ce4c6a7070e',
-  assets: [
-    {
-      tokenId:
-        '3c6cb596273a737c3e111c31d3ec868b84676b7bad82f9888ad574b44edef267',
-      amount: 1000n,
-    },
-  ],
-  additionalRegisters: {
-    R4: '0e205ac40753ae38e6188c77fa78c983f7bb846f8c1d565e53f3aa1e32d74887a84b',
-    R5: '0e208226f7bf13b879625052d9b37199bd864914ad5a897703839b5f07172d8487e0',
-    R6: '0e205b7a0ea44088523470a54583e19eb298dc1267cabfcfb1a9c3560dd7d4a4baad',
-    R7: '0e20ab27e8b16c5ead1747b27e6631bced1250922009f56731caa7a739b1f7ba0b75',
-  },
-};
-
-const parsedBox = ErgoBox.from_json(JsonBI.stringify(commitmentBox));
-
-export const extractedCommitment: ExtractedCommitment = {
-  identifier:
-    '94935010e7f86a493ad7584a9d5d6cebe9194dd602fdea66a7c55bb697bcf341',
-  serialized: Buffer.from(parsedBox.sigma_serialize_bytes()).toString('base64'),
-  txId: 'f58ed8166dd90117355216b4a801fa2d205f9047f746c02d933a505edbf1a7f7',
-  WID: '5ac40753ae38e6188c77fa78c983f7bb846f8c1d565e53f3aa1e32d74887a84b',
-  commitment:
-    '5b7a0ea44088523470a54583e19eb298dc1267cabfcfb1a9c3560dd7d4a4baad',
-  eventId: '8226f7bf13b879625052d9b37199bd864914ad5a897703839b5f07172d8487e0',
-  rwtCount: '1000',
-};
-
-export const permitAddress =
-  'EE7687i4URb4YuSGSQXPCbAjMfN4dUt5Qx8BqKZJiZhDY8fdnSUwcAGqAsqfn1tW1byXB8nDrgkFzkAFgaaempKxfcPtDzAbnu9QfknzmtfnLYHdxPPg7Qtjy7jK5yUpPQ2M4Ps3h5kH57xWDJxcKviEMY11rQnxATjTKTQgGtfzsAPpqsUyT2ZpVYsFzUGJ4nSj4WaDZSU1Hovv6dPkSTArLQSjp38wE72ae6hbNJwXGkqgfBtdVXcZVtnqevw9xUNcE6i942CQ9hVMfbdRobnsaLgsDLQomsh8jLMXqkMde5qH2vGBUqnLKgjxCZaa7vStpPXT5EuzLn9napGwUcbJjgRk69FsRSfCrcydZbYxw4Gnh6ZB9at2USpwL1HdVkHVh8M6Kbw6ppRfeG4JeFsUw33H4sSRk6UPqfuFcRUf7Cec2vmPezXTPT7CXQqEeCjxmWXqfyEQUfnCwpiH5fQ9A8CQ3jTyFhxBTpoGDdtiVCmhqhKxjh9M7gcjpr1dUjGMCWxjir94ejfq24XQrSscrZuUT5NVHTWAkzQ';
 export const RWTId =
-  '3c6cb596273a737c3e111c31d3ec868b84676b7bad82f9888ad574b44edef267';
+  '2f3b244636a930132609f9ba6e3c42b276520aeaf7f12c291748bbe330f17ae6';
 export const commitmentAddress =
   '58grLgCGkazxJRdoVa73dDS2cFC2ZmfzWL3ibDeHPtcoXmWd72jjvjXX59Yi8S7MyLHGiWi44eRreMy1tz23AndoJVQMSatGFZnMzax3x4Xi8rJNsaKGSREEq4oY8gHJ53UtH7yW3D32HoFEkwrXNGCfzHCZ58jSuDzGxfmzWoLSFRqBAE7DFDjq1Ro6jVpJkQjNXwzKCPaSY2mLvFb9RSPLRSzMEW4A9Gjhr9MGnPaHD7L1WAk7c851Q66A3wKtFNzwts4cju48CEMMYZN3MzyzVeEAgsbnggNHA4RbQD2vDEZRNuYwruD9SWeJ337BsWnpJaXedkqu3sQREnA93U1Q2yeW2QRE3z77K7tiVjWziekFZW3Bbvy3MPURAAJpY1N3gEzhV3WLS48XZqYAVTRDBsXKWk1r5bNorRJUaXWSEvwRJNbJLsbhQD5WrZsVvkPXtjM1NG8Uyv96CSohKcuitgfpYrnvdGwyGyS2wRAf6UNveP73sJEpBFvEcFNJWmFkWwvEj9EAihGXcygTpkW5bNuEjt3jPwbavjtiRf74xD1z27FuT3bBdFF4hAr3tycJi4jzLHDMroQfaYMauwSWLrRCRq9w4HgaRAh8HeqYH1TVwi85dVrnmJCzzCPwycTk5ApgpoJLzarNMq5FSws9E6PXhTuNihgoTLQmehV2dSPLF8ATLFDxR1vaT8is3zGgs6Qg1ZfFmhe9poxvt2FjwYmnxTNMn5pgGCGf2eob8Ax1FfHLzh678kSxhGgxCa4bJeTfvZwPuXUBLrfAEbyR69XDSWruzxQffu6csRkCUEo49zTvU1YQZfLifXGo2RrZnihp545b3QuZL';
 export const eventTriggerAddress =
@@ -95,15 +51,6 @@ export const sampleEventEntity: EventTriggerEntity = {
   WIDsCount: 0,
   WIDsHash: '',
   sourceChainHeight: 10,
-};
-
-export const sampleExtractedPermit = {
-  boxId: '1',
-  boxSerialized: 'serialized1',
-  WID: 'wid1',
-  txId: 'txId1',
-  block: 'blockId',
-  height: 100,
 };
 
 export const last10BlockHeader = [
@@ -428,45 +375,6 @@ export const last10BlockHeader = [
       '2aeed311b23c92427c16f2262bde3396484e109fcddb4f1a56aa1dd5a7b2113b',
   },
 ];
-
-export const addressBoxes = {
-  items: [
-    {
-      boxId: '84c19f45cdfc7c35547deefe0e513a7e42919365c17f588536ef61b6885765f1',
-      transactionId:
-        '0734350dc4760e5596af44de772a1d00ced823a3a02a99bce807c7640e4b72db',
-      blockId:
-        '29344bbae793ed459fed6ab319ce618b3a77b4fe9c41fb7d7f8f067e4f4a24bf',
-      value: 1100000n,
-      index: 0,
-      globalIndex: 632076n,
-      creationHeight: 295143,
-      settlementHeight: 295145,
-      ergoTree:
-        '10130400040004040400040204000e20a29d9bb0d622eb8b4f83a34c4ab1b7d3f18aaaabc3aa6876912a3ebaf0da10180404040004000400010104020400040004000e2064cc72f329f5db7b69667a10af3e1726161b9b7ce918a794ea80b9c32c4ce38805020101d807d601b2a5730000d6028cb2db6308a773010001d603aeb5b4a57302b1a5d901036391b1db630872037303d9010363aedb63087203d901054d0e938c7205017202d604e4c6a7041ad605b2a5730400d606db63087205d607ae7206d901074d0e938c720701720295938cb2db63087201730500017306d196830301ef7203938cb2db6308b2a473070073080001b2720473090095720796830201938cb27206730a0001720293c27205c2a7730bd801d608c2a7d196830501ef720393c27201720893e4c67201041a7204938cb2db6308b2a4730c00730d0001b27204730e00957207d801d609b27206730f0096830701938c720901720293cbc272057310e6c67205051ae6c67205060e93e4c67205070ecb720893e4c67205041a7204938c72090273117312',
-      address:
-        'EE7687i4URb4YuSGSQXPCbAgnr73Bb67aXgwzpjguuNwyRrWwVamRPKsiE3hbewDFDzkQa2PDdQG1S3KGcPbbPqvaT15RXFcCELtrAJ5BeZJFf9EfumFNWKztr7Me5Z23TRUPNgbcYEpCkC3RJeui3Tv6jXbEF2v284inu65FisnWoicPvpbuJb3fHpLkr5JAFPcp6uGTqTaaNWMJxWrHRbpKtvwVjG2VibGBGZJPtMbG3pzryH7Aq6CtLKtCAkSivDUkQWbXpm7TuvMnRCL78LvdoqauB8fRHxxxMw5BbmhVqBsKigUa92WBJCdyM7efp5SM1EXvNskbDEtuHHiYbLPxBJHXvZWWa8XCKvbWVV5eWdWExzASe3KzPCDEFm5JY2Peq64SY5gz6yu9n23BxDtb7PueWCMYfJs2VaYcLbndFJpkcDJKDiaEm18wSd3oKQ9eENKNZ74H2JyqmjnX6yVXcecP6NUj5gE3N2b5Pm5MjL37wveibdWHeSRQZFepWQdVAK5TLTgDL9YEE4jv5RLqB6vZ5eMtfSjhZ2',
-      assets: [
-        {
-          tokenId:
-            '497287b9a1eff643791277744a74b7d598b834dc613f2ebc972e33767c61ac2b',
-          index: 0,
-          amount: BigInt(9),
-          name: 'RWT',
-          decimals: 0,
-          type: 'EIP-004',
-        },
-      ],
-      additionalRegisters: {
-        R4: '0e203582b12ab4413c9a877845e8faf18d546d1ae11ddd7bb365c0118c7abefdd157',
-      },
-      mainChain: true,
-      spentTransactionId:
-        'c5fe05781cfb76eaafd49653654d8612c246b9986cba8a7f3b4ce4cd86f0ec69',
-    },
-  ],
-  total: 1,
-};
 
 export const spendTriggerTxOldFormat: Transaction = {
   id: '28e1cbc78b5847d57278169cf685eaef37c10ac7f18d26d07b0c5539c6d539a1',
@@ -1165,5 +1073,3 @@ export const spendTriggerTx: Transaction = {
     },
   ],
 };
-
-export const testTokenMap = [];

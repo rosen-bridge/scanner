@@ -4,11 +4,10 @@ import { TokenMap } from '@rosen-bridge/tokens';
 
 import CommitmentExtractor from '../../lib/extractor/commitmentExtractor';
 import {
-  commitmentAddress,
   commitmentBox,
   extractedCommitment,
-  RWTId,
-} from './testData';
+} from './commitmentExtractorTestData';
+import { commitmentAddress, RWTId } from './testData';
 import { createDatabase } from './testUtils';
 
 let dataSource: DataSource;

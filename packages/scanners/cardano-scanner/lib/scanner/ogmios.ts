@@ -52,7 +52,13 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
   private reconnectionConfig: OgmiosReconnectionConfig;
 
   constructor(config: CardanoOgmiosConfig, logger?: AbstractLogger) {
-    super('cardano', logger, config.maxTryBlock, config.suffix);
+    super(
+      'cardano',
+      config.blockCleanupConfig,
+      logger,
+      config.maxTryBlock,
+      config.suffix,
+    );
     this.action = new BlockDbAction(config.dataSource, this.name(), logger);
     this.host = config.nodeHostOrIp;
     this.port = config.nodePort;

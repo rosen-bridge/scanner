@@ -3,7 +3,10 @@ import { DataSource } from '@rosen-bridge/extended-typeorm';
 import CommitmentAction from '../../lib/actions/commitmentAction';
 import { block } from '../extractor/testData';
 import { createDatabase } from '../extractor/testUtils';
-import { sampleCommitment1, sampleCommitment2 } from './testData';
+import {
+  sampleCommitment1,
+  sampleCommitment2,
+} from './commitmentActionTestData';
 
 let dataSource: DataSource;
 
