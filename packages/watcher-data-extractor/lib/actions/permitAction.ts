@@ -1,247 +1,51 @@
-import { chunk } from 'lodash-es';
-
-import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
-import {
-  DataSource,
-  In,
-  Repository,
-  SelectQueryBuilder,
-} from '@rosen-bridge/extended-typeorm';
+import { AbstractErgoBoxAction } from '@rosen-bridge/abstract-extractor';
+import { AbstractLogger } from '@rosen-bridge/abstract-logger';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { dbIdChunkSize } from '../constants';
 import PermitEntity from '../entities/permitEntity';
 import { ExtractedPermit } from '../interfaces/extractedPermit';
 
-class PermitAction {
-  readonly logger: AbstractLogger;
-  private readonly datasource: DataSource;
-  private readonly permitRepository: Repository<PermitEntity>;
-
+class PermitAction extends AbstractErgoBoxAction<
+  ExtractedPermit,
+  PermitEntity
+> {
   constructor(dataSource: DataSource, logger?: AbstractLogger) {
-    this.datasource = dataSource;
-    this.logger = logger ? logger : new DummyLogger();
-    this.permitRepository = dataSource.getRepository(PermitEntity);
+    super(dataSource, PermitEntity, logger);
   }
 
   /**
-   * insert a new permit boxes in the database
+   * Creates the permit entity from extracted data and block information
    * @param permits
-   * @param initialHeight
+   * @param block
    * @param extractor
+   * @returns the permit entities (without the id)
    */
-  insertPermit = async (permit: ExtractedPermit, extractor: string) => {
-    return this.permitRepository.insert({
-      boxId: permit.boxId,
-      boxSerialized: permit.boxSerialized,
-      block: permit.block,
-      height: permit.height,
-      extractor: extractor,
+  protected createEntity = (
+    permits: ExtractedPermit[],
+    block: BlockInfo,
+    extractor: string,
+  ): Array<Omit<PermitEntity, 'id'>> => {
+    return permits.map((permit) => ({
+      ...permit,
+      block: block.hash,
+      height: block.height,
+      extractor,
       WID: permit.WID,
-      txId: permit.txId,
-      spendBlock: permit.spendBlock,
-      spendHeight: permit.spendHeight,
-    });
+      spendBlock: permit.spendBlock ?? null,
+      spendHeight: permit.spendHeight ?? null,
+    }));
   };
 
   /**
-   * update an unspent permit in the database
-   * @param permit
-   * @param extractor
+   * Converts the database entity back to raw data
+   * @param entities
+   * @returns the extracted collateral data
    */
-  updatePermit = async (permit: ExtractedPermit, extractor: string) => {
-    await this.permitRepository.update(
-      { boxId: permit.boxId, extractor: extractor },
-      {
-        boxSerialized: permit.boxSerialized,
-        block: permit.block,
-        height: permit.height,
-        WID: permit.WID,
-        txId: permit.txId,
-        spendBlock: null,
-        spendHeight: null,
-      },
-    );
-  };
-
-  /**
-   * It stores list of permits in the dataSource with block id
-   * @param permits
-   * @param block
-   * @param extractor
-   */
-  storePermits = async (
-    permits: Array<ExtractedPermit>,
-    block: BlockInfo,
-    extractor: string,
-  ) => {
-    if (permits.length === 0) return true;
-    const boxIds = permits.map((permit) => permit.boxId);
-    const savedPermits = await this.permitRepository.findBy({
-      boxId: In(boxIds),
-      extractor: extractor,
-    });
-    let success = true;
-    const queryRunner = this.datasource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    const repository = await queryRunner.manager.getRepository(PermitEntity);
-    try {
-      for (const permit of permits) {
-        const saved = savedPermits.some((entity) => {
-          return entity.boxId === permit.boxId;
-        });
-        const entity = {
-          boxId: permit.boxId,
-          boxSerialized: permit.boxSerialized,
-          block: block.hash,
-          height: block.height,
-          extractor: extractor,
-          WID: permit.WID,
-          txId: permit.txId,
-        };
-        if (!saved) {
-          this.logger.debug(
-            `Saving permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`,
-          );
-          await repository.insert(entity);
-        } else {
-          this.logger.debug(
-            `Updating permit [${permit.boxId}] belonging to watcher [${permit.WID}] at height ${block.height} and extractor ${extractor}`,
-          );
-          await repository.update({ boxId: permit.boxId }, entity);
-        }
-        this.logger.debug(`Entity: ${JSON.stringify(entity)}`);
-      }
-      await queryRunner.commitTransaction();
-    } catch (e) {
-      this.logger.error(`An error occurred during store permit action: ${e}`);
-      await queryRunner.rollbackTransaction();
-      success = false;
-    } finally {
-      await queryRunner.release();
-    }
-    return success;
-  };
-
-  /**
-   * Update spendBlock and spendHeight of permits spent on the block
-   * @param spendId
-   * @param block
-   * @param extractor
-   */
-  spendPermits = async (
-    spendId: Array<string>,
-    block: BlockInfo,
-    extractor: string,
-  ): Promise<void> => {
-    const spendIdChunks = chunk(spendId, dbIdChunkSize);
-    for (const spendIdChunk of spendIdChunks) {
-      const updateResult = await this.permitRepository.update(
-        { boxId: In(spendIdChunk), extractor: extractor },
-        { spendBlock: block.hash, spendHeight: block.height },
-      );
-
-      if (updateResult.affected && updateResult.affected > 0) {
-        const spentRows = await this.permitRepository.findBy({
-          boxId: In(spendIdChunk),
-          spendBlock: block.hash,
-        });
-        for (const row of spentRows) {
-          this.logger.debug(
-            `Spent permit with boxId [${row.boxId}] belonging to watcher with WID [${row.WID}] at height ${block.height}`,
-          );
-        }
-      }
-    }
-  };
-
-  /**
-   * Delete all permits corresponding to the block(id) and extractor(id)
-   * and update all permits spent on the specified block
-   * @param block
-   * @param extractor
-   */
-  deleteBlock = async (block: string, extractor: string): Promise<void> => {
-    this.logger.info(
-      `Deleting permits at block ${block} and extractor ${extractor}`,
-    );
-    await this.permitRepository.delete({ block: block, extractor: extractor });
-    await this.permitRepository.update(
-      { spendBlock: block, extractor: extractor },
-      { spendBlock: null, spendHeight: null },
-    );
-  };
-
-  /**
-   *  Returns all stored permit box ids
-   */
-  getAllPermitBoxIds = async (extractor: string): Promise<Array<string>> => {
-    const boxIds = await this.permitRepository.find({
-      where: {
-        extractor: extractor,
-      },
-      select: {
-        boxId: true,
-      },
-    });
-    return boxIds.map((item: { boxId: string }) => item.boxId);
-  };
-
-  /**
-   * Removes specified permit
-   * @param boxId
-   * @param extractor
-   */
-  removePermit = async (boxId: string, extractor: string) => {
-    return await this.permitRepository.delete({
-      boxId: boxId,
-      extractor: extractor,
-    });
-  };
-
-  /**
-   * Update the permit spending information
-   * @param boxId
-   * @param extractor
-   * @param blockId
-   * @param blockHeight
-   */
-  updateSpendBlock = async (
-    boxId: string,
-    extractor: string,
-    blockId: string,
-    blockHeight: number,
-  ) => {
-    return await this.permitRepository.update(
-      { boxId: boxId, extractor: extractor },
-      { spendBlock: blockId, spendHeight: blockHeight },
-    );
-  };
-
-  /**
-   * Builds a list of query that returns used blocks by selecting the `block` column from the `PermitEntity` repository,
-   * filtered by the provided `extractorId`
-   *
-   * @param extractorId - Identifier of the extractor
-   * @returns A list of query builder selecting used blocks
-   */
-  createUsedBlocksQuery = (
-    extractorId: string,
-  ): SelectQueryBuilder<PermitEntity>[] => {
-    return [
-      this.permitRepository
-        .createQueryBuilder('permitEntity')
-        .select('permitEntity.block', 'block')
-        .where('permitEntity.extractor = :extractorId', { extractorId }),
-      this.permitRepository
-        .createQueryBuilder('permitEntity')
-        .select('permitEntity.spendBlock', 'block')
-        .where(
-          'permitEntity.spendBlock IS NOT NULL AND permitEntity.extractor = :extractorId',
-          { extractorId },
-        ),
-    ];
+  protected convertEntityToData = (
+    entities: PermitEntity[],
+  ): ExtractedPermit[] => {
+    return entities;
   };
 }
 
