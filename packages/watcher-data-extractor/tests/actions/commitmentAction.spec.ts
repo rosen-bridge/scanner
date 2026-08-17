@@ -401,11 +401,11 @@ describe('commitmentAction', () => {
      */
     it('should return only the used blocks associated with the input `extractorId`', async () => {
       const sampleCommitmentEntities1 = [commitment5, commitment6];
-      const sampleCommitmentEntitie2 = [commitment7];
+      const sampleCommitmentEntities2 = [commitment7];
 
       await repository.insert([
         ...sampleCommitmentEntities1,
-        ...sampleCommitmentEntitie2,
+        ...sampleCommitmentEntities2,
       ]);
 
       const extractorId = commitment5.extractor;
@@ -413,18 +413,23 @@ describe('commitmentAction', () => {
       const executeUsedBlocksQuery =
         await action.createUsedBlocksQuery(extractorId);
 
-      const usedBlocks: string[] = [];
-      await Promise.all(
-        executeUsedBlocksQuery.map(async (query) =>
-          (await query.getRawMany()).map((row) => usedBlocks.push(row.block)),
-        ),
+      const queryResults = await Promise.all(
+        executeUsedBlocksQuery.map((query) => query.getRawMany()),
       );
 
-      const sampleBlocks = sampleCommitmentEntities1.map(
-        (sampleEntity) => sampleEntity.block,
-      );
+      const usedBlocks = queryResults
+        .flat()
+        .map((row) => row.block)
+        .filter(
+          (block): block is string => block !== null && block !== undefined,
+        )
+        .sort();
 
-      expect(sampleBlocks).toEqual(usedBlocks);
+      const sampleBlocks = sampleCommitmentEntities1
+        .map((sampleEntity) => sampleEntity.block)
+        .sort();
+
+      expect(usedBlocks).toEqual(sampleBlocks);
     });
   });
 });

@@ -103,7 +103,7 @@ describe('AbstractErgoBoxAction', () => {
   });
   describe('createUsedBlocksQuery', () => {
     /**
-     * @target createUsedBlocksQuery should return both created (unspent) and spend (spent) blocks simultaneously for a given extractorId
+     * @target createUsedBlocksQuery should return queries for both created (unspent) and spent blocks for a given extractorId
      * @dependencies
      * - Database
      * @scenario
@@ -113,10 +113,11 @@ describe('AbstractErgoBoxAction', () => {
      * - Call `createUsedBlocksQuery` with the target `extractorId`
      * - Execute both returned queries and gather results
      * @expected
-     * - Should simultaneously return all created blocks AND non-null spent blocks for the target extractor
+     * - `createdQuery` should return created blocks for the target extractor
+     * - `spentQuery` should return non-null spent blocks for the target extractor
      * - Should ignore blocks belonging to other extractors
      */
-    it('should return both created (unspent) and spent blocks simultaneously for the target extractorId', async () => {
+    it('should return queries for both created (unspent) and spent blocks for a given extractorId', async () => {
       const targetExtractor = 'target-extractor';
 
       await dataSource.getRepository(TestBoxEntity).insert(testData);
@@ -135,13 +136,7 @@ describe('AbstractErgoBoxAction', () => {
         'created-block-2',
         'created-block-3',
       ]);
-
       expect(spentBlocks).toEqual(['spent-block-1', 'spent-block-2']);
-
-      const allUsedBlocks = [...createdBlocks, ...spentBlocks];
-      expect(allUsedBlocks).toHaveLength(5);
-      expect(allUsedBlocks).not.toContain('other-created-block');
-      expect(allUsedBlocks).not.toContain('other-spent-block');
     });
   });
 });

@@ -246,9 +246,7 @@ export abstract class AbstractScanner<TransactionType> {
         [];
       this.extractors.forEach((extractor) => {
         const query = extractor.createUsedBlocksQuery();
-        if (query !== undefined) {
-          extractorUsedBlocksQueries.push(...query);
-        }
+        extractorUsedBlocksQueries.push(...query);
       });
       const thresholdTimestamp = lastSavedBlock
         ? lastSavedBlock.timestamp -

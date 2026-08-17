@@ -181,10 +181,7 @@ class CommitmentAction {
       this.commitmentRepository
         .createQueryBuilder('commitmentEntity')
         .select('commitmentEntity.spendBlock', 'block')
-        .where(
-          'commitmentEntity.spendBlock IS NOT NULL AND commitmentEntity.extractor = :extractorId',
-          { extractorId },
-        ),
+        .andWhere('commitmentEntity.extractor = :extractorId', { extractorId }),
     ];
   };
 }

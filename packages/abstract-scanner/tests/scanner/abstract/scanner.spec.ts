@@ -496,9 +496,10 @@ describe('AbstractScanner', () => {
         height: 100,
         hash: 'hash',
       } as BlockEntity;
-      const removeUnusedBlocksSpy = vi
-        .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
-        .mockResolvedValue(undefined);
+      const removeUnusedBlocksSpy = vi.spyOn(
+        scanner.action,
+        'removeUnusedBlocksInBatches',
+      );
 
       await scanner['removeOldUnusedBlocks'](mockLastSavedBlock);
 
@@ -528,9 +529,10 @@ describe('AbstractScanner', () => {
       vi.spyOn(extractor, 'createUsedBlocksQuery').mockReturnValue([]);
       scanner['extractors'] = [extractor];
 
-      const removeUnusedBlocksSpy = vi
-        .spyOn(scanner.action, 'removeUnusedBlocksInBatches')
-        .mockResolvedValue(undefined);
+      const removeUnusedBlocksSpy = vi.spyOn(
+        scanner.action,
+        'removeUnusedBlocksInBatches',
+      );
 
       await scanner['removeOldUnusedBlocks'](undefined);
       expect(removeUnusedBlocksSpy).toBeCalledWith([], 5, 'first', 0);
