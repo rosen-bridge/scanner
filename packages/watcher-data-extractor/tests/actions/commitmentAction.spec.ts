@@ -401,12 +401,7 @@ describe('commitmentAction', () => {
      */
     it('should return only the used blocks associated with the input `extractorId`', async () => {
       const sampleCommitmentEntities1 = [commitment5, commitment6];
-      const sampleCommitmentEntities2 = [commitment7];
-
-      await repository.insert([
-        ...sampleCommitmentEntities1,
-        ...sampleCommitmentEntities2,
-      ]);
+      await repository.insert([...sampleCommitmentEntities1, commitment7]);
 
       const extractorId = commitment5.extractor;
 

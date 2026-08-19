@@ -775,7 +775,7 @@ describe('action', () => {
      *
      * @expected
      * - The database contains only the hash of the block referenced by the extractor query.
-     * - All unreferenced blocks are deleted from the database.
+     * - Only referenced blocks must remain in database.
      */
     it('should exclude blocks referenced by extractor-used block queries', async () => {
       await blockRepository.insert(sampleBlocks1);
