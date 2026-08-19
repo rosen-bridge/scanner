@@ -113,12 +113,12 @@ export class EvmTxExtractor extends AbstractExtractor<
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
    * filtered by the provided `extractorId`
    *
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
-  createUsedBlocksQuery = (): SelectQueryBuilder<AddressTxsEntity> =>
+  createUsedBlocksQuery = (): SelectQueryBuilder<AddressTxsEntity>[] =>
     this.action.createUsedBlocksQuery(this.getId());
 
   /**

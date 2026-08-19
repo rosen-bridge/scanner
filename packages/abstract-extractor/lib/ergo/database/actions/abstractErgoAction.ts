@@ -271,10 +271,12 @@ export abstract class AbstractErgoAction<
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<ExtractorEntity> => {
-    return this.repository
-      .createQueryBuilder('extractorEntity')
-      .select('extractorEntity.block', 'block')
-      .where('extractorEntity.extractor = :extractorId', { extractorId });
+  ): SelectQueryBuilder<ExtractorEntity>[] => {
+    return [
+      this.repository
+        .createQueryBuilder('extractorEntity')
+        .select('extractorEntity.block', 'block')
+        .where('extractorEntity.extractor = :extractorId', { extractorId }),
+    ];
   };
 }

@@ -114,11 +114,11 @@ export abstract class AbstractObservationExtractor<
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `ObservationEntity` repository,
    * filtered by the provided `extractorId`
    *
-   * @returns A query builder selecting used blocks
+   * @returns A list ofquery builder selecting used blocks
    */
-  createUsedBlocksQuery = (): SelectQueryBuilder<ObservationEntity> =>
+  createUsedBlocksQuery = (): SelectQueryBuilder<ObservationEntity>[] =>
     this.actions.createUsedBlocksQuery(this.getId());
 }

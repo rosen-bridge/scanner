@@ -124,11 +124,11 @@ export abstract class AbstractErgoExtractor<
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `ExtractorEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `ExtractorEntity` repository,
    * filtered by the provided `extractorId`
    *
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
-  createUsedBlocksQuery = (): SelectQueryBuilder<ExtractorEntity> =>
+  createUsedBlocksQuery = (): SelectQueryBuilder<ExtractorEntity>[] =>
     this.actions.createUsedBlocksQuery(this.getId());
 }
