@@ -356,11 +356,15 @@ describe('ObservationEntityAction', () => {
 
       const extractorId = observationEntity1.extractor;
 
-      const executeUsedBlocksQuery = await action
-        .createUsedBlocksQuery(extractorId)
-        .getRawMany();
+      const executeUsedBlocksQuery =
+        await action.createUsedBlocksQuery(extractorId);
 
-      const usedBlocks = executeUsedBlocksQuery.map((row) => row.block);
+      const usedBlocks: string[] = [];
+      await Promise.all(
+        executeUsedBlocksQuery.map(async (query) =>
+          (await query.getRawMany()).map((row) => usedBlocks.push(row.block)),
+        ),
+      );
 
       const sampleBlocks = [observationEntity1.block];
 

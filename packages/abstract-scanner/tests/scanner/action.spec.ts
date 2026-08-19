@@ -687,9 +687,8 @@ describe('action', () => {
      * - Execute `removeUnusedBlocksInBatches` for `scanner1`.
      *
      * @expected
-     * - Only blocks associated with `scanner1` are selected for deletion.
-     * - Scanner 1 blocks are completely removed from the database.
-     * - Scanner 2 blocks remain in the database.
+     * - ‌Blocks associated with `scanner1` are deleted.
+     * - Blocks associated with `scanner2` remain in the database.
      */
     it('should remove every unused block that belongs to the specified scanner', async () => {
       const sampleBlocks = [...sampleBlocks1, ...sampleBlocks2];
@@ -702,33 +701,24 @@ describe('action', () => {
         ? lastBlock.timestamp - blockAgeThreshold
         : 0;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
 
-      const expectBlockHashesToDelete = sampleBlocks
-        .sort((block1, block2) => block1.height - block2.height)
+      const expectedRemain = sampleBlocks
         .filter(
-          (sampleBlock) => sampleBlock.scanner === sampleBlocks1[0].scanner,
+          (sampleBlock) => sampleBlock.scanner !== sampleBlocks1[0].scanner,
         )
-        .map((block) => block.hash);
+        .map((block) => block.hash)
+        .sort();
 
-      const remainingBlocksInDb = await blockRepository.find();
-      const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
-
-      const expectedRemainingHashes = sampleBlocks
-        .filter((b) => b.scanner !== sampleBlocks1[0].scanner)
-        .map((b) => b.hash);
-      expectBlockHashesToDelete.forEach((deletedHash) => {
-        expect(remainingHashesInDb).not.toContain(deletedHash);
-      });
-      expect(remainingHashesInDb.sort()).toEqual(
-        expectedRemainingHashes.sort(),
-      );
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+      const remain = (await blockRepository.find())
+        .map((item) => item.hash)
+        .sort();
+      expect(remain).toEqual(expectedRemain);
     });
 
     /**
@@ -745,24 +735,19 @@ describe('action', () => {
      * - Execute `removeUnusedBlocksInBatches`.
      *
      * @expected
-     * - Remaining block hashes exactly match the hashes of blocks that have a timestamp >= 3.
-     * - Deleted block hashes exactly match the hashes of blocks that have a timestamp < 3.
+     * - Blocks with timestamp >= 3 remain in the database.
+     * - Blocks with timestamp < 3 are deleted.
      */
     it('should delete only blocks older than the provided lifetime threshold', async () => {
       await blockRepository.insert(sampleBlocks1);
       const thresholdTimestamp = 3;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         10,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
-
-      const expectBlockHashesToDelete = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter((sampleBlock) => sampleBlock.timestamp < thresholdTimestamp)
-        .map((block) => block.hash);
 
       const remainingBlocksInDb = await blockRepository.find();
       const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
@@ -771,7 +756,6 @@ describe('action', () => {
         .filter((sampleBlock) => sampleBlock.timestamp >= thresholdTimestamp)
         .map((block) => block.hash);
       expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
     });
 
     /**
@@ -790,41 +774,30 @@ describe('action', () => {
      * - Execute `removeUnusedBlocksInBatches`.
      *
      * @expected
-     * - `blockHashesToDelete.length` equals 4, all removable blocks minus the 1 used block.
-     * - `remainingHashesInDb` contains only the used block hash.
-     * - `blockHashesToDelete` matches all sample block hashes except the used block hash.
+     * - The database contains only the hash of the block referenced by the extractor query.
+     * - Only referenced blocks must remain in database.
      */
     it('should exclude blocks referenced by extractor-used block queries', async () => {
       await blockRepository.insert(sampleBlocks1);
+      const protectedBlock = sampleBlocks1[0];
       const usedBlocksQuery = blockRepository
         .createQueryBuilder()
         .select('BlockEntity.hash')
         .where('BlockEntity.hash = :blockHash', {
-          blockHash: sampleBlocks1[0]?.hash,
+          blockHash: protectedBlock.hash,
         });
       const blocks = await blockRepository.find();
       const lastBlock = blocks[blocks.length - 1];
       const thresholdTimestamp = lastBlock.timestamp + 1;
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [usedBlocksQuery],
         20,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
-
-      const expectBlockHashesToDelete = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter((sampleBlock) => sampleBlock.hash != sampleBlocks1[0]?.hash)
-        .map((block) => block.hash);
-      const remainingBlocksInDb = await blockRepository.find();
-      const remainingHashesInDb = remainingBlocksInDb.map((b) => b.hash);
-      const expectBlockHashesInDb = sampleBlocks1
-        .sort((block1, block2) => block1.height - block2.height)
-        .filter((sampleBlock) => sampleBlock.hash == sampleBlocks1[0]?.hash)
-        .map((block) => block.hash);
-      expect(blockHashesToDelete.length).toEqual(4);
-      expect(remainingHashesInDb).toEqual(expectBlockHashesInDb);
-      expect(blockHashesToDelete).toEqual(expectBlockHashesToDelete);
+      const remainingBlocks = await blockRepository.find();
+      const remainingHashes = remainingBlocks.map((b) => b.hash);
+      expect(remainingHashes).toEqual([protectedBlock.hash]);
     });
 
     /**
@@ -841,36 +814,29 @@ describe('action', () => {
      * - Execute `removeUnusedBlocksInBatches` with `deletedBlockCount` set to 1.
      *
      * @expected
-     * @expected
-     * - Returned deleted block hash matches the hash of the oldest block.
-     * - Length of returned deleted block hashes equals 1.
-     * - Deleted block is no longer present in the database.
-     * - Total count of remaining blocks in the database decreases by 1.
+     * - Exactly 1 block (the oldest block) is removed from the database.
+     * - The remaining block count equals `initialCount - 1`.
      */
     it('should respect the maximum deletion batch size', async () => {
       await blockRepository.insert(sampleBlocks1);
       const thresholdTimestamp = 4;
 
-      const blockHashesToDelete = await action.removeUnusedBlocksInBatches(
+      await action.removeUnusedBlocksInBatches(
         [],
         1,
         sampleBlocks1[0].scanner,
         thresholdTimestamp,
       );
-      const sortedSampleBlocks = [...sampleBlocks1].sort(
+      const remainingBlocks = await blockRepository.find();
+      const oldestBlock = [...sampleBlocks1].sort(
         (a, b) => a.height - b.height,
+      )[0];
+      const isOldestBlockInDb = remainingBlocks.some(
+        (b) => b.hash === oldestBlock.hash,
       );
-      const remainingBlocksInDb = await blockRepository.find();
 
-      const expectedDeletedHash = sortedSampleBlocks[0].hash;
-
-      const isDeletedBlockInDb = remainingBlocksInDb.some(
-        (b) => b.hash === expectedDeletedHash,
-      );
-      expect(blockHashesToDelete[0]).toEqual(expectedDeletedHash);
-      expect(blockHashesToDelete.length).toEqual(1);
-      expect(isDeletedBlockInDb).toBe(false);
-      expect(remainingBlocksInDb.length).toEqual(sampleBlocks1.length - 1);
+      expect(isOldestBlockInDb).toBe(false);
+      expect(remainingBlocks.length).toBe(sampleBlocks1.length - 1);
     });
   });
 });

@@ -62,20 +62,22 @@ export class TxAction {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `CardanoOgmiosTxIdEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `CardanoOgmiosTxIdEntity` repository,
    * filtered by the provided `extractorId`
    *
    * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<TxIdEntity> => {
-    return this.repository
-      .createQueryBuilder('cardanoOgmiosTxIdEntity')
-      .select('cardanoOgmiosTxIdEntity.blockId', 'block')
-      .where('cardanoOgmiosTxIdEntity.extractor = :extractorId', {
-        extractorId,
-      });
+  ): SelectQueryBuilder<TxIdEntity>[] => {
+    return [
+      this.repository
+        .createQueryBuilder('cardanoOgmiosTxIdEntity')
+        .select('cardanoOgmiosTxIdEntity.blockId', 'block')
+        .where('cardanoOgmiosTxIdEntity.extractor = :extractorId', {
+          extractorId,
+        }),
+    ];
   };
 }
