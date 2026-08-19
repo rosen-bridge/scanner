@@ -18,6 +18,7 @@ export class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransa
     reconnectDelay?: number,
     timeout?: number,
     logger: AbstractLogger = new DummyLogger(),
+    useTls = true,
   ) {
     super();
     this.client = new ElectrumXSocket(
@@ -26,6 +27,7 @@ export class FiroElectrumXNetwork extends AbstractNetworkConnector<FiroRpcTransa
       reconnectDelay,
       timeout,
       logger.child('electrumXSocket'),
+      useTls,
     );
   }
 

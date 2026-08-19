@@ -1,3 +1,5 @@
+import * as net from 'net';
+import * as tls from 'tls';
 import { vi } from 'vitest';
 
 import { FiroElectrumXNetwork } from '../../lib/network/firoElectrumXNetwork';
@@ -15,6 +17,9 @@ import {
 } from '../mocked/electrumxSocket.mock';
 
 vi.mock('tls', () => ({
+  connect: vi.fn(() => mockedSocket),
+}));
+vi.mock('net', () => ({
   connect: vi.fn(() => mockedSocket),
 }));
 
@@ -151,5 +156,59 @@ describe('FiroElectrumXNetwork', () => {
         network.getBlockTxs(blockHeader.hash, blockHeight),
       ).rejects.toThrow('Mocked Error');
     });
+  });
+});
+
+describe('FiroElectrumXNetwork useTls option', () => {
+  beforeEach(() => {
+    resetSocketMock();
+    mockSocketResult('server.version', ['FiroElectrumXSocket', '1.4']);
+    vi.mocked(tls.connect).mockClear();
+    vi.mocked(net.connect).mockClear();
+  });
+
+  /**
+   * @target FiroElectrumXNetwork should connect via TLS by default
+   * @dependencies
+   * - mock server.version handshake
+   * - run test
+   * @expected
+   * - should call tls.connect and not net.connect
+   */
+  it('should use tls.connect by default', () => {
+    const network = new FiroElectrumXNetwork('address', 50002);
+    network.setupSocket();
+
+    expect(tls.connect).toHaveBeenCalledWith({
+      host: 'address',
+      port: 50002,
+    });
+    expect(net.connect).not.toHaveBeenCalled();
+  });
+
+  /**
+   * @target FiroElectrumXNetwork should connect via plain TCP when useTls is false
+   * @dependencies
+   * - mock server.version handshake
+   * - run test
+   * @expected
+   * - should call net.connect and not tls.connect
+   */
+  it('should use net.connect when useTls is false', () => {
+    const network = new FiroElectrumXNetwork(
+      'address',
+      50002,
+      undefined,
+      undefined,
+      undefined,
+      false,
+    );
+    network.setupSocket();
+
+    expect(net.connect).toHaveBeenCalledWith({
+      host: 'address',
+      port: 50002,
+    });
+    expect(tls.connect).not.toHaveBeenCalled();
   });
 });
