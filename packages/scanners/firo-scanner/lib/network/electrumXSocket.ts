@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto';
+import * as net from 'node:net';
 import * as tls from 'node:tls';
 
 import { AbstractLogger, DummyLogger } from '@rosen-bridge/abstract-logger';
@@ -13,11 +14,12 @@ import {
 } from './types';
 
 export class ElectrumXSocket {
-  private socket: tls.TLSSocket | null = null;
+  private socket: net.Socket | null = null;
   private host: string;
   private port: number;
   private timeout: number; // in seconds
   private reconnectDelay: number; // in seconds
+  private useTls: boolean;
   private reconnectSocket = false;
   private connectionStatus = SocketConnectionStatus.NO_CONNECTION;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,20 +33,22 @@ export class ElectrumXSocket {
     reconnectDelay = 5,
     timeout = 10,
     logger: AbstractLogger = new DummyLogger(),
+    useTls = true,
   ) {
     this.host = host;
     this.port = port;
     this.reconnectDelay = reconnectDelay;
     this.timeout = timeout;
     this.logger = logger;
+    this.useTls = useTls;
   }
 
   /**
-   * Opens a TLS connection to the ElectrumX server, wires up data/error/close
-   * lifecycle handlers, sends an initial `server.version` handshake and then
-   * resends any requests that were queued before the connection became ready.
-   * On `close`, reconnection is automatically scheduled unless `disconnect`
-   * was called.
+   * Opens a connection (TLS or plain TCP, depending on `useTls`) to the
+   * ElectrumX server, wires up data/error/close lifecycle handlers, sends an
+   * initial `server.version` handshake and then resends any requests that
+   * were queued before the connection became ready. On `close`, reconnection
+   * is automatically scheduled unless `disconnect` was called.
    */
   setupSocket = (): void => {
     if (this.connectionStatus > SocketConnectionStatus.NO_CONNECTION)
@@ -52,17 +56,24 @@ export class ElectrumXSocket {
         `Socket is already active (status: ${this.connectionStatus})`,
       );
     this.connectionStatus = SocketConnectionStatus.IN_PROGRESS;
-    this.socket = tls.connect({
-      host: this.host,
-      port: this.port,
-    });
+    this.socket = this.useTls
+      ? tls.connect({
+          host: this.host,
+          port: this.port,
+        })
+      : net.connect({
+          host: this.host,
+          port: this.port,
+        });
     this.logger.debug(`Socket connection initiated`);
     this.reconnectSocket = true;
     this.dataBuffer = '';
 
-    // add handler on 'secureConnect' signal
-    this.socket.on('secureConnect', () => {
-      this.logger.info(`Socket connection established`);
+    // add handler on 'secureConnect' (TLS) or 'connect' (plain TCP) signal
+    this.socket.on(this.useTls ? 'secureConnect' : 'connect', () => {
+      this.logger.info(
+        `Socket connection (${this.useTls ? 'TLS' : 'TCP'}) established`,
+      );
     });
 
     // add handler on 'data' signal
@@ -120,7 +131,7 @@ export class ElectrumXSocket {
   };
 
   /**
-   * Disables auto-reconnect and gracefully closes the underlying TLS socket.
+   * Disables auto-reconnect and gracefully closes the underlying socket.
    * @throws if the socket has not been initialized via `setupSocket`
    */
   disconnect = (): void => {
