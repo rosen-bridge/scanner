@@ -5,7 +5,7 @@ import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 import { SpendInfo } from '../../../lib';
 import { block, block2, sampleEntities } from '../../testData';
 import { createDatabase, TestBoxEntity } from '../../testUtils';
-import { TestErgoBoxAction } from './abstractErgoBoxAction.mock';
+import { testData, TestErgoBoxAction } from './abstractErgoBoxAction.mock';
 
 describe('AbstractErgoBoxAction', () => {
   let dataSource: DataSource;
@@ -99,6 +99,44 @@ describe('AbstractErgoBoxAction', () => {
       expect(rowsCount).toEqual(4);
       expect(rows.map((row) => row.spendBlock)).not.toContain(block2.hash);
       expect(result).toMatchObject([sampleEntities[0]]);
+    });
+  });
+  describe('createUsedBlocksQuery', () => {
+    /**
+     * @target createUsedBlocksQuery should return queries for both created (unspent) and spent blocks for a given extractorId
+     * @dependencies
+     * - Database
+     * @scenario
+     * - Insert entities for the target extractor with both `block` (created) and `spendBlock` (spent) values
+     * - Insert entities for the target extractor where `spendBlock` is null
+     * - Insert entities for a different extractor
+     * - Call `createUsedBlocksQuery` with the target `extractorId`
+     * - Execute both returned queries and gather results
+     * @expected
+     * - `createdQuery` should return created blocks for the target extractor
+     * - `spentQuery` should return non-null spent blocks for the target extractor
+     * - Should ignore blocks belonging to other extractors
+     */
+    it('should return queries for both created (unspent) and spent blocks for a given extractorId', async () => {
+      const targetExtractor = 'target-extractor';
+
+      await dataSource.getRepository(TestBoxEntity).insert(testData);
+
+      const [createdQuery, spentQuery] =
+        action.createUsedBlocksQuery(targetExtractor);
+
+      const createdRows = await createdQuery.getRawMany();
+      const createdBlocks = createdRows.map((row) => row.block);
+
+      const spentRows = await spentQuery.getRawMany();
+      const spentBlocks = spentRows.map((row) => row.block);
+
+      expect(createdBlocks).toEqual([
+        'created-block-1',
+        'created-block-2',
+        'created-block-3',
+      ]);
+      expect(spentBlocks).toEqual(['spent-block-1', 'spent-block-2']);
     });
   });
 });

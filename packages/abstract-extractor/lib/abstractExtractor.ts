@@ -70,13 +70,11 @@ export abstract class AbstractExtractor<
   };
 
   /**
-   * Create a query for used blocks associated with the given `extractorId`
+   * Create a list of query for used blocks associated with the given `extractorId`
    * This method only builds the query and does not execute it
    *
-   * @returns A TypeORM SelectQueryBuilder that selects used block values or
+   * @returns A list of TypeORM SelectQueryBuilder that selects used block values or
    * `undefined` if the extractor has no associated entity
    */
-  abstract createUsedBlocksQuery: () =>
-    | SelectQueryBuilder<ExtractorEntity>
-    | undefined;
+  abstract createUsedBlocksQuery: () => SelectQueryBuilder<ExtractorEntity>[];
 }

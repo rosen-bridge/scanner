@@ -74,19 +74,21 @@ export class TxAction {
   };
 
   /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
+   * Builds a list of query that returns used blocks by selecting the `block` column from the `evmAddressTxEntity` repository,
    * filtered by the provided `extractorId`
    *
    * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
+   * @returns A list of query builder selecting used blocks
    */
   createUsedBlocksQuery = (
     extractorId: string,
-  ): SelectQueryBuilder<AddressTxsEntity> => {
-    return this.repository
-      .createQueryBuilder('evmAddressTxEntity')
-      .select('evmAddressTxEntity.blockId', 'block')
-      .where('evmAddressTxEntity.extractor = :extractorId', { extractorId });
+  ): SelectQueryBuilder<AddressTxsEntity>[] => {
+    return [
+      this.repository
+        .createQueryBuilder('evmAddressTxEntity')
+        .select('evmAddressTxEntity.blockId', 'block')
+        .where('evmAddressTxEntity.extractor = :extractorId', { extractorId }),
+    ];
   };
 
   /**

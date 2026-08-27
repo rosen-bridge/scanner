@@ -1,6 +1,6 @@
 import { AbstractErgoBoxAction } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import CommitmentEntity from '../entities/commitmentEntity';
@@ -47,22 +47,6 @@ class CommitmentAction extends AbstractErgoBoxAction<
     entities: CommitmentEntity[],
   ): ExtractedCommitment[] => {
     return entities;
-  };
-
-  /**
-   * Builds a query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
-   * filtered by the provided `extractorId`
-   *
-   * @param extractorId - Identifier of the extractor
-   * @returns A query builder selecting used blocks
-   */
-  createUsedBlocksQuery = (
-    extractorId: string,
-  ): SelectQueryBuilder<CommitmentEntity> => {
-    return this.repository
-      .createQueryBuilder('commitmentEntity')
-      .select('commitmentEntity.block', 'block')
-      .where('commitmentEntity.extractor = :extractorId', { extractorId });
   };
 }
 
