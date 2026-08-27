@@ -9,7 +9,7 @@ const PROCESSING = 'PROCESSING';
 const PROCEED = 'PROCEED';
 
 @Entity('block_entity')
-@Unique(['height', 'scanner'])
+@Unique(['scanner', 'height'])
 @Unique(['hash', 'scanner'])
 @Unique(['parentHash', 'scanner'])
 export class BlockEntity {
