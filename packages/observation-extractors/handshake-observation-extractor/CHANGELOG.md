@@ -1,5 +1,14 @@
 # @rosen-bridge/handshake-observation-extractor
 
+## 1.0.6
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.11
+  - @rosen-bridge/handshake-scanner@1.0.0
+  - @rosen-bridge/rosen-extractor@12.1.2
+
 ## 1.0.5
 
 ### Patch Changes
