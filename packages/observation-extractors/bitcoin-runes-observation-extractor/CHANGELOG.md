@@ -1,5 +1,14 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 3.0.7
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@1.0.11
+  - @rosen-bridge/bitcoin-scanner@2.0.0
+  - @rosen-bridge/rosen-extractor@12.1.2
+
 ## 3.0.6
 
 ### Patch Changes

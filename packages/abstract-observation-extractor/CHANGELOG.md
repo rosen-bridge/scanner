@@ -1,5 +1,12 @@
 # @rosen-bridge/abstract-observation-extractor
 
+## 1.0.11
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/rosen-extractor@12.1.2
+
 ## 1.0.10
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @rosen-bridge/abstract-scanner
 
+## 3.0.0
+
+### Major Changes
+
+- Set extractor property to be protected in `AbstractScanner` class
+- Add automatic cleanup of old unused blocks during scanner execution
+
+### Minor Changes
+
+- Optimize indexes on block_entity with flip height-scanner index to scanner-height index
+
 ## 2.0.3
 
 ### Patch Changes

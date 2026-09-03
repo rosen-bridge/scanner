@@ -1,5 +1,20 @@
 # @rosen-bridge/firo-scanner
 
+## 1.0.0
+
+### Major Changes
+
+- Add automatic cleanup of old unused blocks during scanner execution
+
+### Minor Changes
+
+- Add a `useTls` option to `FiroElectrumXNetwork`/`ElectrumXSocket` to support plain TCP connections to locally-hosted ElectrumX servers, in addition to the existing TLS connection
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@3.0.0
+
 ## 0.2.3
 
 ### Patch Changes
