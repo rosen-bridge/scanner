@@ -138,15 +138,15 @@ describe('MinFeeBoxExtractor', () => {
     });
 
     /**
-     * @target extractBoxData should set the second token to null when the
-     * box only carries the NFT
+     * @target extractBoxData should set token to 'erg' when the box has no
+     * second asset
      * @dependencies
      * @scenario
      * - run test for a box with a single asset (call `extractBoxData`)
      * @expected
-     * - extracted data has a null second token
+     * - extracted data has token set to 'erg'
      */
-    it('should set second token to null when it does not exist', () => {
+    it("should set token to 'erg' when the box has no second token", () => {
       const data = extractor.extractBoxData(
         BOX_WITHOUT_SECOND_TOKEN as unknown as OutputBox,
       );
@@ -155,7 +155,7 @@ describe('MinFeeBoxExtractor', () => {
         serialized: Buffer.from(BOX_WITHOUT_SECOND_TOKEN.boxId).toString(
           'base64',
         ),
-        token: null,
+        token: 'erg',
       });
     });
   });

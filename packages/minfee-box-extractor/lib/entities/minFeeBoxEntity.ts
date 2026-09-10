@@ -6,6 +6,6 @@ export class MinFeeBoxEntity extends AbstractErgoBoxEntity {
   /**
    * TokenId for box which this box belongs to
    */
-  @Column({ type: 'varchar', nullable: true })
-  token: string | null;
+  @Column({ type: 'varchar' })
+  token: string;
 }

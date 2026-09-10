@@ -17,7 +17,7 @@ export class Migration1789048116110 implements MigrationInterface {
                 "serialized" varchar NOT NULL,
                 "spendBlock" varchar,
                 "spendHeight" integer,
-                "token" varchar,
+                "token" varchar NOT NULL,
                 CONSTRAINT "UQ_c6c8659b5b4bdd6e2e5e59f1d1e" UNIQUE ("identifier", "extractor")
             )
         `);

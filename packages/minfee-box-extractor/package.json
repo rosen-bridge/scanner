@@ -1,5 +1,5 @@
 {
-  "name": "minfee-box-extractor",
+  "name": "@rosen-bridge/minfee-box-extractor",
   "version": "0.0.0",
   "description": "Minimum fee box extractor",
   "repository": {

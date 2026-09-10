@@ -69,7 +69,8 @@ export class MinFeeBoxExtractor extends AbstractErgoBoxExtractor<
   };
 
   /**
-   * extract box data, keeping the box's token (second asset, if any)
+   * extract box data, keeping the box's second asset id as `token`
+   * falls back to 'erg' when the box carries no second asset
    * @param box
    * @return extracted data in proper format
    */
@@ -80,7 +81,7 @@ export class MinFeeBoxExtractor extends AbstractErgoBoxExtractor<
       serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
         'base64',
       ),
-      token: box.assets.length > 1 ? box.assets[1].tokenId : null,
+      token: box.assets.length > 1 ? box.assets[1].tokenId : 'erg',
     };
   };
 }

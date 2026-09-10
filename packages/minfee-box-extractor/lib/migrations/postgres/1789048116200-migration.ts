@@ -17,7 +17,7 @@ export class Migration1789048116200 implements MigrationInterface {
                 "serialized" character varying NOT NULL,
                 "spendBlock" character varying,
                 "spendHeight" integer,
-                "token" character varying,
+                "token" character varying NOT NULL,
                 CONSTRAINT "UQ_c6c8659b5b4bdd6e2e5e59f1d1e" UNIQUE ("identifier", "extractor"),
                 CONSTRAINT "PK_9b6e0163f0d0e0f5f6d99e0b7f0" PRIMARY KEY ("id")
             )
