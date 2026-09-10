@@ -15,7 +15,7 @@ class CommitmentEntity extends AbstractErgoBoxEntity {
   @Column({ type: 'varchar' })
   WID: string;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ type: 'varchar' })
   rwtCount: string;
 
   @Column({ nullable: true, type: 'text' })

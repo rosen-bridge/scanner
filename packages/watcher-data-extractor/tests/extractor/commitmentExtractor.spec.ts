@@ -152,9 +152,52 @@ describe('commitmentExtractor', () => {
         ...commitmentBox,
         additionalRegisters: {
           R5: commitmentBox.additionalRegisters.R5,
+          R6: commitmentBox.additionalRegisters.R6,
         },
       };
       const data = extractor.hasBoxData(boxWithoutR4);
+      expect(data).toEqual(false);
+    });
+
+    /**
+     * @target hasBoxData should return false when R5 register is missing
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with box without R5 register (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it('should return false when R5 register is missing', () => {
+      const boxWithoutR5 = {
+        ...commitmentBox,
+        additionalRegisters: {
+          R4: commitmentBox.additionalRegisters.R4,
+          R6: commitmentBox.additionalRegisters.R6,
+        },
+      };
+      const data = extractor.hasBoxData(boxWithoutR5);
+      expect(data).toEqual(false);
+    });
+
+    /**
+     * @target hasBoxData should return false when R6 register is missing
+     * @dependencies
+     * @scenario
+     * - create an extractor with required address and token
+     * - run test with box without R6 register (call `hasBoxData`)
+     * @expected
+     * - to return false
+     */
+    it('should return false when R6 register is missing', () => {
+      const boxWithoutR6 = {
+        ...commitmentBox,
+        additionalRegisters: {
+          R4: commitmentBox.additionalRegisters.R4,
+          R5: commitmentBox.additionalRegisters.R5,
+        },
+      };
+      const data = extractor.hasBoxData(boxWithoutR6);
       expect(data).toEqual(false);
     });
   });
