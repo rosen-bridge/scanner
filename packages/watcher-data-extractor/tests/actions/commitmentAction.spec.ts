@@ -23,10 +23,10 @@ describe('CommitmentAction', () => {
      * @scenario
      * - 2 CommitmentBox should save successfully
      * @expected
-     * - storeBoxes should returns true and database row count should be 2
+     * - storeBoxes should return true and database row count should be 2
      */
     it('should 2 valid CommitmentExtracted data should change to commitment entities and save successfully', async () => {
-      const rows = await action['createEntity'](
+      const rows = action['createEntity'](
         [sampleCommitment1, sampleCommitment2],
         block,
         'extractor1',

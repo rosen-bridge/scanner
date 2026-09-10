@@ -53,7 +53,6 @@ export abstract class AbstractErgoExtractor<
   /**
    * hook a new callback on a callback type
    * @param type
-   * @param id
    * @param callback
    * @returns callback registered id
    */

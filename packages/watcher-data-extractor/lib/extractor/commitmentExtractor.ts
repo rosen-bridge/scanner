@@ -5,7 +5,7 @@ import {
   InitializeOptions,
 } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
-import { DataSource, SelectQueryBuilder } from '@rosen-bridge/extended-typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
@@ -72,7 +72,7 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
   /**
    * Extracts permit data from json boxes
    * and filter to fit in a specified height range
-   * @param boxes
+   * @param box
    * @returns extracted commitment
    */
   extractBoxData = (box: OutputBox): ExtractedCommitment | undefined => {
@@ -106,15 +106,6 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
       // empty
     }
   };
-
-  /**
-   * Builds a list of query that returns used blocks by selecting the `block` column from the `CommitmentEntity` repository,
-   * filtered by the provided `extractorId`
-   *
-   * @returns A list of query builder selecting used blocks
-   */
-  createUsedBlocksQuery = (): SelectQueryBuilder<CommitmentEntity>[] =>
-    this.actions.createUsedBlocksQuery(this.getId());
 }
 
 export default CommitmentExtractor;
