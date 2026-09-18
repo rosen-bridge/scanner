@@ -5,6 +5,7 @@ import * as testData from '../handshakeRpcTestData';
 import {
   axiosInstance,
   mockAxiosPost,
+  mockAxiosPostRpcError,
   resetAxiosMock,
 } from '../mocked/axiosRpc.mock';
 
@@ -52,6 +53,31 @@ describe('HandshakeRpcNetwork', () => {
         params: [testData.blockHash],
         id: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2',
       });
+    });
+
+    /**
+     * @target `HandshakeRpcNetwork.getBlockAtHeight` should throw error when
+     * the node does not have the requested height
+     * @dependencies
+     * @scenario
+     * - mock axios to return a failed rpc call
+     * - run test and expect exception thrown
+     * - check if function got called
+     * @expected
+     * - it should throw the error the node reported
+     * - axios.post should got called 1 time, without requesting the block
+     */
+    it('should throw error when the node does not have the requested height', async () => {
+      mockAxiosPostRpcError(
+        'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2',
+        -8,
+        'Block height out of range.',
+      );
+
+      await expect(
+        network.getBlockAtHeight(testData.blockHeight),
+      ).rejects.toThrow('Block height out of range.');
+      expect(axiosInstance.post).toHaveBeenCalledTimes(1);
     });
   });
 
