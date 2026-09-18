@@ -35,32 +35,49 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
   private generateRandomId = () => randomBytes(32).toString('hex');
 
   /**
+   * calls a JSON-RPC method on the node
+   *
+   * hsd answers a failed call with HTTP 200 and an `error` object in the body,
+   * so the failure has to be read from the response rather than from a rejected
+   * request
+   * @param method
+   * @param params
+   * @returns the result of the call
+   */
+  private callRpc = async <Result>(
+    method: string,
+    params: Array<unknown>,
+  ): Promise<Result> => {
+    const randomId = this.generateRandomId();
+    const response = await this.client.post<JsonRpcResult>('', {
+      method: method,
+      id: randomId,
+      params: params,
+    });
+
+    if (response.data.id !== randomId)
+      throw Error(`UnexpectedBehavior: Request and response id are different`);
+
+    const error = response.data.error;
+    if (error)
+      throw Error(
+        `Handshake RPC call '${method}' failed with code [${error.code}]: ${error.message}`,
+      );
+
+    return response.data.result as Result;
+  };
+
+  /**
    * Returns block at height
    * @param height
    * @returns Block
    */
   getBlockAtHeight = async (height: number): Promise<Block> => {
-    const randomId1 = this.generateRandomId();
     // get block hash using block height
-    const blockHashResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblockhash',
-      id: randomId1,
-      params: [height],
-    });
-    if (blockHashResponse.data.id !== randomId1)
-      throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockHash = blockHashResponse.data.result;
+    const blockHash = await this.callRpc<string>('getblockhash', [height]);
 
-    const randomId2 = this.generateRandomId();
-    // get txcount using block hash
-    const blockResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblock',
-      id: randomId2,
-      params: [blockHash],
-    });
-    if (blockResponse.data.id !== randomId2)
-      throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const block: BlockHeader = blockResponse.data.result as BlockHeader;
+    // get block header using block hash
+    const block = await this.callRpc<BlockHeader>('getblock', [blockHash]);
 
     return {
       parentHash: block.previousblockhash,
@@ -76,15 +93,12 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
    * @returns current height
    */
   getCurrentHeight = async (): Promise<number> => {
-    const randomId = this.generateRandomId();
-    const result = await this.client.post<JsonRpcResult>('', {
-      method: 'getblockchaininfo',
-      id: randomId,
-      params: [],
-    });
-    if (result.data.id !== randomId)
-      throw Error(`UnexpectedBehavior: Request and response id are different`);
-    return (result.data.result as { blocks: number }).blocks;
+    const chainInfo = await this.callRpc<{ blocks: number }>(
+      'getblockchaininfo',
+      [],
+    );
+
+    return chainInfo.blocks;
   };
 
   /**
@@ -95,18 +109,12 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
   getBlockTxs = async (
     blockHash: string,
   ): Promise<Array<HandshakeRpcTransaction>> => {
-    const randomId = this.generateRandomId();
-    const blockHashResponse = await this.client.post<JsonRpcResult>('', {
-      method: 'getblock',
-      id: randomId,
-      params: [blockHash, true, true], // verbose=true, details=true to retrieve full transaction info
-    });
-    if (blockHashResponse.data.id !== randomId)
-      throw Error(`UnexpectedBehavior: Request and response id are different`);
-    const blockTxs = (
-      blockHashResponse.data.result as { tx: Array<HandshakeRpcTransaction> }
-    ).tx;
+    // verbose=true, details=true to retrieve full transaction info
+    const block = await this.callRpc<{ tx: Array<HandshakeRpcTransaction> }>(
+      'getblock',
+      [blockHash, true, true],
+    );
 
-    return blockTxs;
+    return block.tx;
   };
 }
