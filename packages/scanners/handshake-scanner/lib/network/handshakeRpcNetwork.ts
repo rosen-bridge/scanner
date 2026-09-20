@@ -49,7 +49,7 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
     params: Array<unknown>,
   ): Promise<Result> => {
     const randomId = this.generateRandomId();
-    const response = await this.client.post<JsonRpcResult>('', {
+    const response = await this.client.post<JsonRpcResult<Result>>('', {
       method: method,
       id: randomId,
       params: params,
@@ -64,7 +64,7 @@ export class HandshakeRpcNetwork extends AbstractNetworkConnector<HandshakeRpcTr
         `Handshake RPC call '${method}' failed with code [${error.code}]: ${error.message}`,
       );
 
-    return response.data.result as Result;
+    return response.data.result;
   };
 
   /**
