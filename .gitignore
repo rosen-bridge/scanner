@@ -12,4 +12,3 @@ yarn.lock
 # yalc folder and lock-file
 **/.yalc
 **/yalc.lock
-.claude

@@ -8,6 +8,7 @@ import JsonBI from '@rosen-bridge/json-bigint';
 import { ErgoNetworkType, OutputBox } from '@rosen-bridge/scanner-interfaces';
 
 import { MinFeeBoxAction } from '../actions/minFeeBoxAction';
+import { ERG_TOKEN_ID } from '../const';
 import { MinFeeBoxEntity } from '../entities/minFeeBoxEntity';
 import { ExtractedMinFeeBox } from '../interfaces/extractedMinFeeBox';
 
@@ -34,7 +35,7 @@ export class MinFeeBoxExtractor extends AbstractErgoBoxExtractor<
     dataSource: DataSource,
     url: string,
     type: ErgoNetworkType,
-    private readonly address: string,
+    address: string,
     private readonly nft: string,
     logger: AbstractLogger = new DummyLogger(),
     initialize = true,
@@ -55,8 +56,9 @@ export class MinFeeBoxExtractor extends AbstractErgoBoxExtractor<
   getId = () => `minfee-box-extractor-${this.nft}`;
 
   /**
-   * check that the box is sent to the tracked address and its first token
-   * is the required NFT
+   * check that the box is sent to the tracked address, its first token is
+   * the required NFT, and it carries all the additional registers
+   * (R4-R9)
    * @param box
    * @return true if the box has the required data and false otherwise
    */
@@ -64,24 +66,37 @@ export class MinFeeBoxExtractor extends AbstractErgoBoxExtractor<
     return (
       box.ergoTree === this.ergoTree &&
       box.assets.length > 0 &&
-      box.assets[0].tokenId === this.nft
+      box.assets[0].tokenId === this.nft &&
+      !!box.additionalRegisters.R4 &&
+      !!box.additionalRegisters.R5 &&
+      !!box.additionalRegisters.R6 &&
+      !!box.additionalRegisters.R7 &&
+      !!box.additionalRegisters.R8 &&
+      !!box.additionalRegisters.R9
     );
   };
 
   /**
-   * extract box data, keeping the box's second asset id as `token`
+   * extract box data, keeping the box's second asset id as `token` and its
+   * additional registers (R4-R9) as raw serialized strings
    * falls back to 'erg' when the box carries no second asset
    * @param box
    * @return extracted data in proper format
    */
-  extractBoxData = (box: OutputBox): ExtractedMinFeeBox | undefined => {
+  extractBoxData = (box: OutputBox): ExtractedMinFeeBox => {
     const ergoBox = wasm.ErgoBox.from_json(JsonBI.stringify(box));
     return {
       identifier: ergoBox.box_id().to_str(),
       serialized: Buffer.from(ergoBox.sigma_serialize_bytes()).toString(
         'base64',
       ),
-      token: box.assets.length > 1 ? box.assets[1].tokenId : 'erg',
+      token: box.assets.length > 1 ? box.assets[1].tokenId : ERG_TOKEN_ID,
+      R4: box.additionalRegisters.R4!,
+      R5: box.additionalRegisters.R5!,
+      R6: box.additionalRegisters.R6!,
+      R7: box.additionalRegisters.R7!,
+      R8: box.additionalRegisters.R8!,
+      R9: box.additionalRegisters.R9!,
     };
   };
 }

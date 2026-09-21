@@ -18,6 +18,12 @@ export class Migration1789048116110 implements MigrationInterface {
                 "spendBlock" varchar,
                 "spendHeight" integer,
                 "token" varchar NOT NULL,
+                "R4" varchar NOT NULL,
+                "R5" varchar NOT NULL,
+                "R6" varchar NOT NULL,
+                "R7" varchar NOT NULL,
+                "R8" varchar NOT NULL,
+                "R9" varchar NOT NULL,
                 CONSTRAINT "UQ_c6c8659b5b4bdd6e2e5e59f1d1e" UNIQUE ("identifier", "extractor")
             )
         `);
