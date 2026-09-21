@@ -18,6 +18,12 @@ export class Migration1789048116200 implements MigrationInterface {
                 "spendBlock" character varying,
                 "spendHeight" integer,
                 "token" character varying NOT NULL,
+                "R4" character varying NOT NULL,
+                "R5" character varying NOT NULL,
+                "R6" character varying NOT NULL,
+                "R7" character varying NOT NULL,
+                "R8" character varying NOT NULL,
+                "R9" character varying NOT NULL,
                 CONSTRAINT "UQ_c6c8659b5b4bdd6e2e5e59f1d1e" UNIQUE ("identifier", "extractor"),
                 CONSTRAINT "PK_9b6e0163f0d0e0f5f6d99e0b7f0" PRIMARY KEY ("id")
             )
