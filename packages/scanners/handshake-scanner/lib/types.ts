@@ -45,9 +45,9 @@ export interface BlockHeader {
   nTx: number;
 }
 
-export interface JsonRpcResult {
+export interface JsonRpcResult<T> {
   id: string;
-  result: unknown;
+  result: T;
   error?: {
     code: number;
     message: string;
