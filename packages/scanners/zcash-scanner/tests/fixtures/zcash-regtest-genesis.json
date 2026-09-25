@@ -1,0 +1,118 @@
+{
+  "hash": "029f11d80ef9765602235e1bc9727e3eb6ba20839319f761fee920d63401e327",
+  "confirmations": 108,
+  "size": 382,
+  "height": 0,
+  "version": 4,
+  "merkleroot": "c4eaa58879081de3c24a7b117ed2b28300e7ec4c4c1dff1d3f1268b7857a4ddb",
+  "blockcommitments": "0000000000000000000000000000000000000000000000000000000000000000",
+  "finalsaplingroot": "0000000000000000000000000000000000000000000000000000000000000000",
+  "nTx": 1,
+  "tx": [
+    {
+      "in_active_chain": true,
+      "hex": "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff071f0104455a6361736830623963346565663862376363343137656535303031653335303039383462366665613335363833613763616331343161303433633432303634383335643334ffffffff010000000000000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000",
+      "height": 0,
+      "confirmations": 108,
+      "vin": [
+        {
+          "coinbase": "04ffff071f0104455a6361736830623963346565663862376363343137656535303031653335303039383462366665613335363833613763616331343161303433633432303634383335643334",
+          "sequence": 4294967295
+        }
+      ],
+      "vout": [
+        {
+          "value": 0,
+          "valueZat": 0,
+          "n": 0,
+          "scriptPubKey": {
+            "asm": "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f OP_CHECKSIG",
+            "hex": "4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac",
+            "type": "pubkey"
+          }
+        }
+      ],
+      "vShieldedSpend": [],
+      "vShieldedOutput": [],
+      "vjoinsplit": [],
+      "orchard": {
+        "actions": [],
+        "valueBalance": 0,
+        "valueBalanceZat": 0
+      },
+      "valueBalance": 0,
+      "valueBalanceZat": 0,
+      "size": 204,
+      "time": 1296688602,
+      "txid": "c4eaa58879081de3c24a7b117ed2b28300e7ec4c4c1dff1d3f1268b7857a4ddb",
+      "overwintered": false,
+      "version": 1,
+      "locktime": 0,
+      "blockhash": "029f11d80ef9765602235e1bc9727e3eb6ba20839319f761fee920d63401e327",
+      "blocktime": 1296688602
+    }
+  ],
+  "time": 1296688602,
+  "nonce": "0000000000000000000000000000000000000000000000000000000000000009",
+  "solution": "01936b7db1eb4ac39f151b8704642d0a8bda13ec547d54cd5e43ba142fc6d8877cab07b3",
+  "bits": "200f0f0f",
+  "difficulty": 1,
+  "chainSupply": {
+    "chainValue": 0,
+    "chainValueZat": 0,
+    "monitored": false
+  },
+  "valuePools": [
+    {
+      "id": "transparent",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    },
+    {
+      "id": "sprout",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    },
+    {
+      "id": "sapling",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    },
+    {
+      "id": "orchard",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    },
+    {
+      "id": "lockbox",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    },
+    {
+      "id": "ironwood",
+      "chainValue": 0,
+      "chainValueZat": 0,
+      "monitored": false,
+      "valueDelta": 0,
+      "valueDeltaZat": 0
+    }
+  ],
+  "trees": {},
+  "previousblockhash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "nextblockhash": "133901d4667b1864d0e5d8c6c00a7929453f7c0587ff49e69025a8d2476bc9ea"
+}
