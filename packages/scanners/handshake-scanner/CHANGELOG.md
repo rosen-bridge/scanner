@@ -1,5 +1,11 @@
 # @rosen-bridge/handshake-scanner
 
+## 1.0.1
+
+### Patch Changes
+
+- Raise failed RPC calls in the Handshake scanner network, which hsd reports with HTTP 200 and an `error` object in the body rather than with an error status
+
 ## 1.0.0
 
 ### Major Changes
