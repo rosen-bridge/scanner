@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/watcher-data-extractor",
-  "version": "14.0.0",
+  "version": "15.0.0",
   "description": "Extractor for rosen specific boxes on ergo blockchain",
   "repository": {
     "type": "git",
