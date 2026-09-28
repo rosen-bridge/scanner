@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "types": ["vitest/globals"]
+  },
+  "include": ["tests", "lib"],
+  "references": [
+    { "path": "../../abstract-observation-extractor" },
+    { "path": "../../scanners/zcash-scanner" }
+  ]
+}
