@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/abstract-extractor",
-  "version": "3.2.3",
+  "version": "4.0.0",
   "description": "Rosen Bridge extractor interfaces to work with scanner",
   "repository": {
     "type": "git",

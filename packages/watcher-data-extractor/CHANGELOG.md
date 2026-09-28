@@ -1,5 +1,16 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 16.0.0
+
+### Major Changes
+
+- - Refactor `createUsedBlocksQuery` to return an array of `SelectQueryBuilder` instead of a single query
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.0.0
+
 ## 15.0.0
 
 ### Major Changes

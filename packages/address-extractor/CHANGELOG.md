@@ -1,5 +1,12 @@
 # @rosen-bridge/address-extractor
 
+## 7.0.9
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.0.0
+
 ## 7.0.8
 
 ### Patch Changes
