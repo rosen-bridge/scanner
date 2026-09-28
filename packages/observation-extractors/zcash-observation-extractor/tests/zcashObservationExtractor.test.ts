@@ -13,7 +13,6 @@ import {
 const block: BlockInfo = {
   height: 106,
   hash: 'cfe65311fe34bf402a685debf1cdd968aec23a88a11d11389ec2d1bbf3ceb240',
-  parentHash: '00'.repeat(32),
 };
 
 const transaction: ZcashRpcTransaction = {
