@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- Refactor `createUsedBlocksQuery` to return an array of `SelectQueryBuilder` instead of a single query
+
 ## 3.2.3
 
 ### Patch Changes
