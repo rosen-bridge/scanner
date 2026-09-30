@@ -134,4 +134,64 @@ export abstract class AbstractErgoBoxAction<
       );
     return [createdQuery, spentQuery];
   };
+
+  /**
+   * Remove confirmed spent boxes for the given extractor in a single batch.
+   *
+   * @param currentHeight - height of the block currently being processed
+   * @param confirmationDepth - minimum confirmations before removal
+   * @param deletedBoxCount - maximum number of rows to delete in this round
+   * @param extractor - extractor id
+   * @returns number of removed rows
+   */
+  removeUnusedBlocksInBatches = async (
+    currentHeight: number,
+    confirmationDepth: number,
+    deletedBoxCount: number,
+    extractor: string,
+  ): Promise<number> => {
+    const thresholdHeight = currentHeight - confirmationDepth;
+    if (thresholdHeight < 0) {
+      this.logger.debug(
+        `Skipping confirmed spent box cleanup at height ${currentHeight}: ` +
+          `threshold ${thresholdHeight} is below zero`,
+      );
+      return 0;
+    }
+
+    this.logger.debug(
+      `Removing up to ${deletedBoxCount} confirmed spent boxes for extractor ` +
+        `${extractor} with spendHeight <= ${thresholdHeight}`,
+    );
+
+    const subQuery = this.repository
+      .createQueryBuilder('spent')
+      .select('spent.id', 'id')
+      .where('spent.extractor = :extractor', { extractor })
+      .andWhere('spent.spendHeight IS NOT NULL')
+      .andWhere('spent.spendHeight <= :thresholdHeight', { thresholdHeight })
+      .orderBy('spent.spendHeight', 'ASC')
+      .take(deletedBoxCount);
+
+    const deleteResult = await this.repository
+      .createQueryBuilder()
+      .delete()
+      .from(this.repo)
+      .where(`id IN (${subQuery.getQuery()})`)
+      .setParameters(subQuery.getParameters())
+      .execute();
+
+    const removedCount = deleteResult.affected ?? 0;
+    if (removedCount > 0) {
+      this.logger.info(
+        `Removed ${removedCount} confirmed spent boxes for extractor ` +
+          `${extractor} at height ${currentHeight}`,
+      );
+    } else {
+      this.logger.debug(
+        `No confirmed spent boxes to remove for extractor ${extractor}`,
+      );
+    }
+    return removedCount;
+  };
 }

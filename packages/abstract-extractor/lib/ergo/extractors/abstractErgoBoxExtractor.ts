@@ -7,6 +7,10 @@ import {
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
 
+import {
+  SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+  SPENT_BOX_TRIM_COUNT_IN_ROUND,
+} from '../../constants';
 import { AbstractErgoBoxEntity, AbstractErgoBoxAction } from '../database';
 import { ErgoBoxInitializer } from '../initializers';
 import {
@@ -15,6 +19,7 @@ import {
   CallbackType,
   TxExtra,
   InitializeOptions,
+  BlockCleanupConfig,
 } from '../interfaces';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
 
@@ -41,9 +46,25 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractedData,
     ExtractorEntity
   >;
+  protected blockCleanupConfig?: BlockCleanupConfig;
 
-  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
+  constructor(
+    initializeOptions?: InitializeOptions,
+    blockCleanupConfig?: BlockCleanupConfig,
+    logger?: AbstractLogger,
+  ) {
     super(initializeOptions, logger);
+    if (blockCleanupConfig?.active) {
+      this.blockCleanupConfig = {
+        active: true,
+        spentBoxCleanupThresholdDepth:
+          blockCleanupConfig.spentBoxCleanupThresholdDepth ??
+          SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+        spentBoxTrimCountInRound:
+          blockCleanupConfig.spentBoxTrimCountInRound ??
+          SPENT_BOX_TRIM_COUNT_IN_ROUND,
+      };
+    }
   }
 
   /**
@@ -148,6 +169,7 @@ export abstract class AbstractErgoBoxExtractor<
       if (spentData.length > 0) {
         this.triggerCallbacks(CallbackType.Spend, spentData);
       }
+      await this.removeOldConfirmedSpentBoxes(block);
     } catch (e) {
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
@@ -160,6 +182,37 @@ export abstract class AbstractErgoBoxExtractor<
       return false;
     }
     return true;
+  };
+
+  /**
+   * Remove spent boxes that have passed the configured confirmation depth.
+   *
+   * @param block the block currently being processed
+   */
+  protected removeOldConfirmedSpentBoxes = async (
+    block: BlockInfo,
+  ): Promise<void> => {
+    if (!this.blockCleanupConfig?.active) return;
+
+    try {
+      this.logger.debug(
+        'Starting the process to remove old confirmed spent boxes',
+      );
+      await this.actions.removeUnusedBlocksInBatches(
+        block.height,
+        this.blockCleanupConfig.spentBoxCleanupThresholdDepth,
+        this.blockCleanupConfig.spentBoxTrimCountInRound,
+        this.getId(),
+      );
+      this.logger.debug('Successfully removed old confirmed spent boxes');
+    } catch (error) {
+      this.logger.error(
+        `An error occurred while removing old confirmed spent boxes: ${error}`,
+      );
+      if (error instanceof Error && error.stack) {
+        this.logger.error(error.stack);
+      }
+    }
   };
 
   /**

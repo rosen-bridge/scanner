@@ -139,4 +139,274 @@ describe('AbstractErgoBoxAction', () => {
       expect(spentBlocks).toEqual(['spent-block-1', 'spent-block-2']);
     });
   });
+  describe('removeUnusedBlocksInBatches', () => {
+    const extractorId = 'extractor';
+
+    /**
+     * @target removeUnusedBlocksInBatches should remove spent boxes whose spendHeight is at or below the confirmation threshold
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert spent boxes with different spendHeight values
+     * - run test (call `removeUnusedBlocksInBatches` with a threshold that covers some rows)
+     * @expected
+     * - only rows with spendHeight <= threshold are removed
+     * - returns the number of removed rows
+     */
+    it('should remove spent boxes whose spendHeight is at or below the confirmation threshold', async () => {
+      await repository.insert([
+        {
+          identifier: '1',
+          extractor: extractorId,
+          block: 'b1',
+          height: 100,
+          serialized: 's1',
+          spendBlock: 'sb1',
+          spendHeight: 100,
+        },
+        {
+          identifier: '2',
+          extractor: extractorId,
+          block: 'b2',
+          height: 200,
+          serialized: 's2',
+          spendBlock: 'sb2',
+          spendHeight: 200,
+        },
+        {
+          identifier: '3',
+          extractor: extractorId,
+          block: 'b3',
+          height: 300,
+          serialized: 's3',
+          spendBlock: 'sb3',
+          spendHeight: 300,
+        },
+      ]);
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        250,
+        100,
+        100,
+        extractorId,
+      );
+
+      const remaining = await repository.find();
+      expect(removed).toEqual(1);
+      expect(remaining.map((r) => r.identifier).sort()).toEqual(['2', '3']);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should not remove spent boxes whose spendHeight is above the confirmation threshold
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert a spent box with spendHeight above the threshold
+     * - run test (call `removeUnusedBlocksInBatches`)
+     * @expected
+     * - no rows are removed, returns 0
+     */
+    it('should not remove spent boxes whose spendHeight is above the confirmation threshold', async () => {
+      await repository.insert([
+        {
+          identifier: '1',
+          extractor: extractorId,
+          block: 'b1',
+          height: 100,
+          serialized: 's1',
+          spendBlock: 'sb1',
+          spendHeight: 250,
+        },
+      ]);
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        300,
+        100,
+        100,
+        extractorId,
+      );
+
+      const remaining = await repository.find();
+      expect(removed).toEqual(0);
+      expect(remaining).toHaveLength(1);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should not remove unspent boxes
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert an unspent box (spendBlock and spendHeight are null)
+     * - run test (call `removeUnusedBlocksInBatches` with a permissive threshold)
+     * @expected
+     * - no rows are removed
+     */
+    it('should not remove unspent boxes', async () => {
+      await repository.insert([
+        {
+          identifier: '1',
+          extractor: extractorId,
+          block: 'b1',
+          height: 100,
+          serialized: 's1',
+          spendBlock: null,
+          spendHeight: null,
+        },
+      ]);
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        1000,
+        10,
+        100,
+        extractorId,
+      );
+
+      expect(removed).toEqual(0);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should not remove boxes belonging to other extractors
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert spent boxes for two different extractors
+     * - run test (call `removeUnusedBlocksInBatches` for one extractor)
+     * @expected
+     * - only the target extractor's rows are removed
+     */
+    it('should not remove boxes belonging to other extractors', async () => {
+      await repository.insert([
+        {
+          identifier: '1',
+          extractor: 'target',
+          block: 'b1',
+          height: 100,
+          serialized: 's1',
+          spendBlock: 'sb1',
+          spendHeight: 100,
+        },
+        {
+          identifier: '2',
+          extractor: 'other',
+          block: 'b2',
+          height: 100,
+          serialized: 's2',
+          spendBlock: 'sb2',
+          spendHeight: 100,
+        },
+      ]);
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        300,
+        100,
+        100,
+        'target',
+      );
+
+      const remaining = await repository.find();
+      expect(removed).toEqual(1);
+      expect(remaining.map((r) => r.identifier)).toEqual(['2']);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should return 0 and delete nothing when threshold is negative
+     * @dependencies
+     * - database
+     * @scenario
+     * - call `removeUnusedBlocksInBatches` with currentHeight < confirmationDepth
+     * @expected
+     * - return 0 and not delete anything
+     */
+    it('should return 0 and delete nothing when threshold is negative', async () => {
+      await repository.insert([
+        {
+          identifier: '1',
+          extractor: extractorId,
+          block: 'b1',
+          height: 100,
+          serialized: 's1',
+          spendBlock: 'sb1',
+          spendHeight: 50,
+        },
+      ]);
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        50,
+        100,
+        100,
+        extractorId,
+      );
+
+      const remaining = await repository.find();
+      expect(removed).toEqual(0);
+      expect(remaining).toHaveLength(1);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should respect the maximum deletion batch size
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert 5 eligible spent boxes
+     * - run test with deletedBoxCount = 2
+     * @expected
+     * - only 2 rows are removed, at most `deletedBoxCount`
+     */
+    it('should respect the maximum deletion batch size', async () => {
+      await repository.insert(
+        [1, 2, 3, 4, 5].map((i) => ({
+          identifier: `${i}`,
+          extractor: extractorId,
+          block: `b${i}`,
+          height: 100 + i,
+          serialized: `s${i}`,
+          spendBlock: `sb${i}`,
+          spendHeight: 100 + i,
+        })),
+      );
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        1000,
+        10,
+        2,
+        extractorId,
+      );
+
+      const remaining = await repository.find();
+      expect(removed).toEqual(2);
+      expect(remaining).toHaveLength(3);
+    });
+
+    /**
+     * @target removeUnusedBlocksInBatches should return the correct count of removed rows
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert 3 eligible spent boxes and call the method with a large batch size
+     * @expected
+     * - returns 3
+     */
+    it('should return the correct count of removed rows', async () => {
+      await repository.insert(
+        [1, 2, 3].map((i) => ({
+          identifier: `${i}`,
+          extractor: extractorId,
+          block: `b${i}`,
+          height: 100,
+          serialized: `s${i}`,
+          spendBlock: `sb${i}`,
+          spendHeight: 100,
+        })),
+      );
+
+      const removed = await action.removeUnusedBlocksInBatches(
+        1000,
+        10,
+        100,
+        extractorId,
+      );
+
+      expect(removed).toEqual(3);
+    });
+  });
 });
