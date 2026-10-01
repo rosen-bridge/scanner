@@ -28,6 +28,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@bitauth/libauth": "3.0.0",
     "@rosen-bridge/abstract-scanner": "^4.0.0",
     "@rosen-bridge/scanner-interfaces": "^1.0.0",
     "@rosen-clients/rate-limited-axios": "^2.0.1"

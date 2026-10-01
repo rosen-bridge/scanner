@@ -33,6 +33,12 @@
     "@rosen-bridge/rosen-extractor": "^12.1.2",
     "@rosen-bridge/tokens": "^6.0.2"
   },
+  "devDependencies": {
+    "@bitauth/libauth": "3.0.0",
+    "@rosen-bridge/address-codec": "^2.1.0",
+    "@rosen-bridge/address-manager": "^0.1.0",
+    "blakejs": "^1.2.1"
+  },
   "engines": {
     "node": ">=22.18.0",
     "npm": "11.6.2"

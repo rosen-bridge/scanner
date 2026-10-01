@@ -6,3 +6,6 @@ export * from './scanner/bitcoinRpcScanner';
 export * from './scanner/dogeRpcScanner';
 export * from './network/bitcoinRpcNetwork';
 export * from './network/dogeRpcNetwork';
+export * from './bitcoinCashTypes';
+export * from './network/bitcoinCashRpcNetwork';
+export * from './scanner/bitcoinCashRpcScanner';
