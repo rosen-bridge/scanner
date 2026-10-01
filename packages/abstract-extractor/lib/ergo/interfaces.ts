@@ -73,6 +73,7 @@ export interface InitializeOptions {
   url: string;
   address: string;
   maxParallelRequests?: number;
+  blockCleanupConfig?: BlockCleanupConfig;
 }
 
 export interface BlockCleanupConfig {

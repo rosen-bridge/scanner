@@ -48,20 +48,16 @@ export abstract class AbstractErgoBoxExtractor<
   >;
   protected blockCleanupConfig?: BlockCleanupConfig;
 
-  constructor(
-    initializeOptions?: InitializeOptions,
-    blockCleanupConfig?: BlockCleanupConfig,
-    logger?: AbstractLogger,
-  ) {
+  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
     super(initializeOptions, logger);
-    if (blockCleanupConfig?.active) {
+    if (initializeOptions?.blockCleanupConfig?.active) {
       this.blockCleanupConfig = {
         active: true,
         spentBoxCleanupThresholdDepth:
-          blockCleanupConfig.spentBoxCleanupThresholdDepth ??
+          initializeOptions.blockCleanupConfig.spentBoxCleanupThresholdDepth ??
           SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
         spentBoxTrimCountInRound:
-          blockCleanupConfig.spentBoxTrimCountInRound ??
+          initializeOptions.blockCleanupConfig.spentBoxTrimCountInRound ??
           SPENT_BOX_TRIM_COUNT_IN_ROUND,
       };
     }
