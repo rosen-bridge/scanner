@@ -24,6 +24,7 @@ import {
 export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashRpcTransaction> {
   private readonly client: Axios;
 
+  /** Creates a bounded RPC client for the explicitly selected BCHN chain. */
   constructor(
     url: string,
     timeout: number,
@@ -42,6 +43,7 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     });
   }
 
+  /** Sends one RPC request and validates its response ID, result and error. */
   private rpc = async (method: string, params: unknown[]): Promise<unknown> => {
     const id = randomBytes(32).toString('hex');
     const response = await this.client.post<unknown>('', {
@@ -66,6 +68,7 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     return data.result;
   };
 
+  /** Rechecks configured chain and BCHN daemon identity without cached trust. */
   private verifyNetwork = async (): Promise<Record<string, unknown>> => {
     const info = await this.rpc('getblockchaininfo', []);
     if (
@@ -85,6 +88,7 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     return info;
   };
 
+  /** Validates block identity and bounds before returning scanner metadata. */
   private header = (
     value: unknown,
     blockHash: string,
@@ -114,9 +118,11 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     };
   };
 
+  /** Returns the current height after checking the endpoint identity. */
   getCurrentHeight = async (): Promise<number> =>
     (await this.verifyNetwork()).blocks as number;
 
+  /** Fetches and validates the exact requested block header. */
   getBlockAtHeight = async (height: number): Promise<Block> => {
     if (!isUint(height)) throw Error('Invalid BCH block height');
     await this.verifyNetwork();
@@ -129,6 +135,7 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     );
   };
 
+  /** Fetches bounded block transactions and authenticates their raw metadata. */
   getBlockTxs = async (
     blockHash: string,
     height: number,

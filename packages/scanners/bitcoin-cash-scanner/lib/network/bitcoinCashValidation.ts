@@ -17,16 +17,22 @@ export const BITCOIN_CASH_RPC_LIMITS = Object.freeze({
   responseBytes: 64_000_000,
 });
 
+/** Recognizes plain RPC record containers, excluding arrays and null. */
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+/** Recognizes canonical lowercase 32-byte RPC hashes. */
 export const isHash = (value: unknown): value is string =>
   typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+/** Recognizes nonnegative safe integer RPC counters. */
 export const isUint = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+/** Converts authoritative raw bytes to lowercase hex without a prefix. */
 const hex = (bytes: Uint8Array): string => Buffer.from(bytes).toString('hex');
+/** Recognizes byte-aligned hex, allowing an empty script. */
 const isHex = (value: unknown): value is string =>
   typeof value === 'string' && /^(?:[0-9a-fA-F]{2})*$/.test(value);
 
+/** Converts an RPC decimal amount to exact uint64 satoshis, rejecting loss. */
 const satoshis = (value: unknown): bigint => {
   if (
     (typeof value !== 'number' && typeof value !== 'string') ||
@@ -49,6 +55,7 @@ const satoshis = (value: unknown): bigint => {
   return amount;
 };
 
+/** Checks optional RPC CashToken metadata against the decoded output bytes. */
 const validateToken = (metadata: unknown, output: Output): void => {
   if (metadata === undefined) return;
   if (!output.token) {
@@ -132,6 +139,7 @@ export const validateBitcoinCashTransactionMetadata = (
   });
 };
 
+/** Authenticates bounded raw transaction bytes, identity and RPC metadata. */
 export const validateBitcoinCashRawTransaction = (
   value: unknown,
   expectedTxId: string,

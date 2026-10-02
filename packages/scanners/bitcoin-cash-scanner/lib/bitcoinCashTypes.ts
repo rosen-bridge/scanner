@@ -1,3 +1,4 @@
+/** Explicit BCHN chain identity required for every scanner RPC call. */
 export type BitcoinCashRpcChain = 'main' | 'test' | 'regtest';
 
 export interface BitcoinCashRpcTokenData {

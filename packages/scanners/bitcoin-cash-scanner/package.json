@@ -1,37 +1,41 @@
 {
-  "name": "@rosen-bridge/bitcoin-observation-extractor",
-  "version": "8.0.7",
-  "description": "Event observation data extractor for Bitcoin chain",
+  "name": "@rosen-bridge/bitcoin-cash-scanner",
+  "version": "0.0.0",
+  "description": "All scanners for the Bitcoin Cash blockchain",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rosen-bridge/scanner.git"
+    "url": "git+https://github.com/rosen-bridge/scanner.git",
+    "directory": "packages/scanners/bitcoin-cash-scanner"
   },
   "license": "MIT",
-  "author": "Rosen Team",
+  "author": "A. Shannon",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
     "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
+    "coverage": "npm run test -- --run --coverage",
     "lint": "eslint --fix . && npm run prettify",
     "lint:check": "eslint . && npm run prettify:check",
     "prettify": "prettier --write . --ignore-path ../../../.gitignore",
     "prettify:check": "prettier --check . --ignore-path ../../../.gitignore",
     "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
+    "test": "cross-env NODE_OPTIONS=\"--import tsx\" vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-logger": "^4.0.0",
-    "@rosen-bridge/abstract-observation-extractor": "^2.0.0",
-    "@rosen-bridge/bitcoin-scanner": "^2.0.1",
-    "@rosen-bridge/extended-typeorm": "^1.1.0",
-    "@rosen-bridge/rosen-extractor": "^12.1.2",
-    "@rosen-bridge/tokens": "^6.0.2"
+    "@bitauth/libauth": "3.0.0",
+    "@rosen-bridge/abstract-scanner": "^4.0.0",
+    "@rosen-bridge/scanner-interfaces": "^1.0.0",
+    "@rosen-clients/rate-limited-axios": "^2.0.1"
   },
   "engines": {
     "node": ">=22.18.0",

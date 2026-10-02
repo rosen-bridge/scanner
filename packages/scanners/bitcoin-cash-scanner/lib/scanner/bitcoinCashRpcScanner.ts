@@ -3,6 +3,7 @@ import { GeneralScanner, ScannerConfig } from '@rosen-bridge/abstract-scanner';
 import { BitcoinCashRpcTransaction } from '../bitcoinCashTypes';
 
 export class BitcoinCashRpcScanner extends GeneralScanner<BitcoinCashRpcTransaction> {
+  /** Registers the general scanner with BCH's distinct persistent identity. */
   constructor(config: ScannerConfig<BitcoinCashRpcTransaction>) {
     super(
       'bitcoin-cash',
