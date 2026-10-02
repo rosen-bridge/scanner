@@ -44,6 +44,29 @@ npm run build
 
 TBD
 
+### PostgreSQL block cleanup tests
+
+Set `SCANNER_POSTGRES_TEST_URL` privately to a dedicated PostgreSQL test database,
+then run the following command from the repository root:
+
+```shell
+npm run test:postgres --workspace=@rosen-bridge/abstract-scanner
+```
+
+The selected account must be allowed to create schemas in that database. The
+tests create eight randomly named schemas, run the actual PostgreSQL migrations
+and block cleanup action, and check batch sizes, query limits, colliding
+parameters, NULL and empty references, multiple reference rows, and preservation
+of other scanners' blocks. Each connection uses and verifies its generated
+schema as the search path before migrations. Cleanup closes the data source,
+checks the schema's recorded name, OID and ownership token, and removes only that
+schema. An ownership mismatch leaves the schema for inspection.
+
+Use a database reserved for tests; do not select an operational database. Keep
+the URL and its credentials out of shell history and logs. Default test runs skip
+the PostgreSQL scenarios when the URL is absent; `test:postgres` requires it.
+These tests validate database behavior and do not contact a chain endpoint.
+
 ## License
 
 TBD

@@ -8,10 +8,72 @@ import {
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 import { BlockDbAction } from '../../lib/scanner/action';
 import { createDatabase } from './abstract/abstract.mock';
+import {
+  assertOwnedSchema,
+  postgresScenarios,
+  runPostgresCleanupScenario,
+} from './actionPostgresTestUtils';
 import { sampleBlocks1, sampleBlocks2 } from './scannerActionData';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
+
+const postgresUrl = process.env.SCANNER_POSTGRES_TEST_URL;
+if (process.env.SCANNER_POSTGRES_TEST_REQUIRED === '1' && !postgresUrl) {
+  throw new Error('SCANNER_POSTGRES_TEST_URL is required for test:postgres');
+}
+
+describe('BlockDbAction PostgreSQL schema ownership', () => {
+  /**
+   * Test cleanup rejects an unowned or replaced schema
+   * Dependency: a recorded schema identity created by this run
+   * Scenario: change only the creation record, OID, name or ownership token
+   * Expected: cleanup refuses each mismatched identity before issuing DROP
+   */
+  it.each(['creation', 'oid', 'name', 'token'] as const)(
+    'rejects changed %s',
+    (field) => {
+      const identity = {
+        name: `scanner_test_${'a'.repeat(32)}`,
+        oid: 1,
+        token: 'b'.repeat(32),
+      };
+      const observed = { ...identity };
+      if (field === 'oid') observed.oid = 2;
+      if (field === 'name') observed.name = `scanner_test_${'c'.repeat(32)}`;
+      if (field === 'token') observed.token = 'd'.repeat(32);
+      expect(() =>
+        assertOwnedSchema(
+          field === 'creation' ? undefined : identity,
+          observed,
+        ),
+      ).toThrow();
+    },
+  );
+});
+
+describe.skipIf(!postgresUrl)('BlockDbAction PostgreSQL', () => {
+  describe('removeUnusedBlocksInBatches', () => {
+    /**
+     * Test block cleanup through the native PostgreSQL driver and migrations
+     * Dependency: an explicitly selected test database allowing schema creation
+     * Scenario: run batch guards, branch limits, colliding parameters, NULL, empty and multi-row references
+     * Expected: exact target rows and foreign-scanner rows survive, migrations replay none, and the owned schema is removed
+     */
+    it.each(postgresScenarios)(
+      'preserves expected rows for %s',
+      async (scenario) => {
+        const result = await runPostgresCleanupScenario(postgresUrl!, scenario);
+        expect(result.migrationNames).toHaveLength(7);
+        expect(result.migrationReplayCount).toBe(0);
+        expect(result.remaining.map((row) => row.hash)).toEqual(
+          result.expected,
+        );
+      },
+      60000,
+    );
+  });
+});
 
 describe('BlockDbAction', () => {
   beforeEach(async () => {
