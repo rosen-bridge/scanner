@@ -9,6 +9,72 @@ and aggregate block work. Missing raw bytes use block-qualified lookups.
 `bitcoin-cash` identity. Configure an explicit `main`, `test` or `regtest`
 network and independent operator endpoints. Unit tests mock the HTTP client.
 
+Remote endpoints require HTTPS. HTTP is accepted only for literal IPv4 addresses
+in `127.0.0.0/8` and IPv6 loopback `::1`; use the literal address for a local
+daemon instead of `localhost`. URL credentials, fragments, ambiguous numeric
+IPv4 aliases and redirects are rejected. Supply credentials in the separate
+constructor argument. Each credential must contain 1–1,024 characters, without
+control characters or surrounding whitespace; usernames cannot contain `:`.
+The per-request timeout must be an integer from 1 to 300,000 milliseconds.
+
+## Resource budgets and recovery
+
+The optional fifth constructor argument is `Partial<BitcoinCashRpcLimits>`.
+Every supplied value must be a positive safe integer within the following
+implementation ceilings. Unknown keys are rejected.
+
+| Resource                                  |    Default | Hard ceiling |
+| ----------------------------------------- | ---------: | -----------: |
+| `transactionBytes`                        |  1,000,000 |    8,000,000 |
+| `transactionIO` (each input/output count) |      4,096 |      100,000 |
+| `blockTransactions`                       |     10,000 |      250,000 |
+| `blockTransactionBytes`                   | 32,000,000 |  128,000,000 |
+| `responseBytes`                           | 64,000,000 |  256,000,000 |
+
+These are operator work budgets, not BCH consensus limits. A valid block can
+exceed them. The connector raises `BitcoinCashResourceLimitError`, with code
+`BCH_RPC_RESOURCE_LIMIT`, `resource`, `limit` and, when available, `observed`.
+It returns no partial block. Alert on this error; retries with the same budget
+will continue to fail. Preserve the scanner checkpoint, qualify the same block
+with a larger budget and sufficient process memory, then restart with that
+configuration. Never advance the checkpoint to bypass the block.
+
+For example, `{ transactionIO: 8192, blockTransactions: 20000 }` raises those
+two budgets while retaining the remaining defaults. Raw byte identity, canonical
+encoding and metadata validation still apply. Response size limits constrain
+wire data; parsed JSON, hex strings, decoded transactions and returned metadata
+can consume substantially more heap. The hard ceilings prevent unlimited
+configuration but do not certify deployment memory capacity or full-chain
+coverage. Qualify intended historical and large-block samples under the actual
+memory limit before increasing a budget. If a required block exceeds a hard
+ceiling, keep scanning stopped until a separately validated implementation
+supports it.
+
+## Finalization eligibility
+
+Call `await network.assertFinalizedBlock(observedBlockHash, observedHeight)`
+before a value-bearing action. The method rechecks the configured chain and BCHN
+identity, requires a synchronized node, and checks that the exact observed block
+and the node's finalized block are on the active chain. It rejects a parked
+branch whose common ancestor precedes the observed block, even if that branch
+is currently shorter. A parked branch whose common ancestor includes the
+observed block is allowed. Unknown tip statuses, more than 1,024 tip records,
+missing finalization, RPC errors and malformed responses reject the check.
+
+The captured tip and finalized hash must remain unchanged across the sequence.
+The method makes at most nine sequential RPC calls, with a shared 30-second
+abort deadline in addition to the configured per-request timeout. Success is
+never cached. The caller must repeat the check at each authorization boundary
+and fail closed on rejection. The scanner's ordinary block reads do not call
+this method automatically.
+
+This policy uses trusted operator RPC observations, including BCHN's local
+finalization decision. Separate RPC calls are not an atomic node snapshot;
+matching beginning and ending values cannot exclude an intermediate change and
+return. A successful check does not verify proof of work, a Merkle inclusion
+proof or endpoint independence. The interface and parked-fork interpretation
+follow [BCHN 29.2.0 RPC source](https://github.com/bitcoin-cash-node/bitcoin-cash-node/blob/07576013c91ff4a3a74acd85f189c69121cdad1b/src/rpc/blockchain.cpp).
+
 ## Read-only endpoint qualification
 
 Qualify each operator-selected endpoint separately. Keep its URL, credentials,
@@ -77,10 +143,8 @@ fields; keep detailed RPC diagnostics private and omit credentials, sample IDs
 and raw transaction bytes from shared results. A passed result covers that sample
 on that endpoint. It does not verify proof of work or chain finality.
 
-The 5,000 ms timeout applies to each RPC request. Fixed connector limits are
-64,000,000 response bytes, 10,000 transactions per block, 1,000,000 raw bytes per
-transaction, 4,096 inputs and outputs each, and 32,000,000 aggregate transaction
-bytes per block. Missing transaction hex causes sequential block-qualified
+The 5,000 ms timeout applies to each RPC request. The example uses the default
+resource budgets above. Missing transaction hex causes sequential block-qualified
 `getrawtransaction` requests, at most one per transaction. This example can make
 9 plus the number of missing-hex requests, at most 10,009 RPC requests; it has no
 shared request budget, whole-run deadline or cancellation API. Select a small

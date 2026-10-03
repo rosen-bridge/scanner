@@ -21,6 +21,7 @@ export const fixture = (
   nft = false,
   unlockingBytes = 1,
   sequenceNumber = 0xffffffff,
+  outputCount = 1,
 ): BitcoinCashRpcTransaction => {
   const output: Output = {
     lockingBytecode: Uint8Array.of(0x51),
@@ -46,28 +47,24 @@ export const fixture = (
         unlockingBytecode: new Uint8Array(unlockingBytes).fill(0x51),
       },
     ],
-    outputs: [output],
+    outputs: Array.from({ length: outputCount }, () => output),
   });
   return {
     hex: Buffer.from(bytes).toString('hex'),
     txid: hashTransaction(bytes),
     blockhash: blockHash,
     vin: [{ txid: Buffer.from(sourceId).toString('hex'), vout: 7 }],
-    vout: [
-      {
-        n: 0,
-        value: 1e-8,
-        scriptPubKey: { hex: '51' },
-        tokenData: token
-          ? {
-              category: '02'.repeat(32),
-              amount: '5',
-              nft: nft
-                ? { capability: 'mutable', commitment: '01' }
-                : undefined,
-            }
-          : undefined,
-      },
-    ],
+    vout: Array.from({ length: outputCount }, (_, index) => ({
+      n: index,
+      value: 1e-8,
+      scriptPubKey: { hex: '51' },
+      tokenData: token
+        ? {
+            category: '02'.repeat(32),
+            amount: '5',
+            nft: nft ? { capability: 'mutable', commitment: '01' } : undefined,
+          }
+        : undefined,
+    })),
   };
 };

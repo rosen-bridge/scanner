@@ -6,4 +6,5 @@ export {
   migrations as bitcoinCashScannerMigrations,
 } from '@rosen-bridge/abstract-scanner';
 export * from './network/bitcoinCashRpcNetwork';
+export * from './network/bitcoinCashRpcPolicy';
 export * from './scanner/bitcoinCashRpcScanner';

@@ -7,15 +7,13 @@ import {
 } from '@bitauth/libauth';
 
 import { BitcoinCashRpcTransaction } from '../bitcoinCashTypes';
+import {
+  BITCOIN_CASH_RPC_LIMITS,
+  BitcoinCashRpcLimits,
+  checkBitcoinCashRpcLimit,
+} from './bitcoinCashRpcPolicy';
 
-// Local work limits, independent of BCH consensus limits.
-export const BITCOIN_CASH_RPC_LIMITS = Object.freeze({
-  transactionBytes: 1_000_000,
-  transactionIO: 4096,
-  blockTransactions: 10000,
-  blockTransactionBytes: 32_000_000,
-  responseBytes: 64_000_000,
-});
+export { BITCOIN_CASH_RPC_LIMITS } from './bitcoinCashRpcPolicy';
 
 /** Recognizes plain RPC record containers, excluding arrays and null. */
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -145,6 +143,7 @@ export const validateBitcoinCashRawTransaction = (
   expectedTxId: string,
   blockHash: string,
   requireBlockHash: boolean,
+  limits: Readonly<BitcoinCashRpcLimits> = BITCOIN_CASH_RPC_LIMITS,
 ): {
   transaction: BitcoinCashRpcTransaction;
   decoded: TransactionCommon;
@@ -154,12 +153,12 @@ export const validateBitcoinCashRawTransaction = (
     !isRecord(value) ||
     typeof value.hex !== 'string' ||
     !value.hex.length ||
-    value.hex.length > BITCOIN_CASH_RPC_LIMITS.transactionBytes * 2 ||
     !isHex(value.hex) ||
     ((requireBlockHash || value.blockhash !== undefined) &&
       value.blockhash !== blockHash)
   )
     throw Error('Missing or invalid BCH raw transaction/block identity');
+  checkBitcoinCashRpcLimit(limits, 'transactionBytes', value.hex.length / 2);
   // Buffer.slice() aliases bytes; libauth requires real Uint8Array copies.
   const bytes = Uint8Array.from(Buffer.from(value.hex, 'hex'));
   const decoded = decodeTransactionBCH(bytes);
@@ -168,11 +167,11 @@ export const validateBitcoinCashRawTransaction = (
     hashTransaction(bytes) !== expectedTxId ||
     hex(encodeTransactionBCH(decoded)) !== value.hex.toLowerCase() ||
     decoded.inputs.length < 1 ||
-    decoded.inputs.length > BITCOIN_CASH_RPC_LIMITS.transactionIO ||
-    decoded.outputs.length < 1 ||
-    decoded.outputs.length > BITCOIN_CASH_RPC_LIMITS.transactionIO
+    decoded.outputs.length < 1
   )
     throw Error('BCH raw bytes mismatch or bounded decoding failure');
+  checkBitcoinCashRpcLimit(limits, 'transactionIO', decoded.inputs.length);
+  checkBitcoinCashRpcLimit(limits, 'transactionIO', decoded.outputs.length);
   if (value.size !== undefined && value.size !== bytes.length)
     throw Error('BCH raw transaction size mismatch');
   validateBitcoinCashTransactionMetadata(value, decoded, expectedTxId);

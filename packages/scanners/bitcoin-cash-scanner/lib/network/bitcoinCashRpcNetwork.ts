@@ -11,8 +11,16 @@ import {
   BitcoinCashRpcTokenData,
   BitcoinCashRpcTransaction,
 } from '../bitcoinCashTypes';
+import { assertBitcoinCashFinalizedBlock } from './bitcoinCashFinality';
 import {
-  BITCOIN_CASH_RPC_LIMITS,
+  BitcoinCashRpcLimits,
+  BitcoinCashResourceLimitError,
+  checkBitcoinCashRpcLimit,
+  resolveBitcoinCashRpcLimits,
+  validateBitcoinCashRpcCredentials,
+  validateBitcoinCashRpcUrl,
+} from './bitcoinCashRpcPolicy';
+import {
   isHash,
   isRecord,
   isUint,
@@ -23,6 +31,7 @@ import {
 /** BCHN-only connector. Daemon identity is trusted operator RPC metadata. */
 export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashRpcTransaction> {
   private readonly client: Axios;
+  private readonly limits: Readonly<BitcoinCashRpcLimits>;
 
   /** Creates a bounded RPC client for the explicitly selected BCHN chain. */
   constructor(
@@ -30,28 +39,56 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
     timeout: number,
     private readonly expectedChain: BitcoinCashRpcChain,
     auth?: { username: string; password: string },
+    limits?: Partial<BitcoinCashRpcLimits>,
   ) {
     super();
     if (!['main', 'test', 'regtest'].includes(expectedChain))
       throw Error('Explicit BCH RPC chain policy required');
+    const endpoint = validateBitcoinCashRpcUrl(url);
+    validateBitcoinCashRpcCredentials(auth);
+    if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000)
+      throw Error('BCH RPC timeout must be an integer from 1 to 300000 ms');
+    this.limits = resolveBitcoinCashRpcLimits(limits);
     this.client = axios.create({
-      baseURL: url,
+      baseURL: endpoint,
       timeout,
       headers: { 'Content-Type': 'application/json' },
       auth,
-      maxContentLength: BITCOIN_CASH_RPC_LIMITS.responseBytes,
+      maxRedirects: 0,
+      maxContentLength: this.limits.responseBytes,
     });
   }
 
   /** Sends one RPC request and validates its response ID, result and error. */
-  private rpc = async (method: string, params: unknown[]): Promise<unknown> => {
+  private rpc = async (
+    method: string,
+    params: unknown[],
+    signal?: AbortSignal,
+  ): Promise<unknown> => {
     const id = randomBytes(32).toString('hex');
-    const response = await this.client.post<unknown>('', {
-      jsonrpc: '1.0',
-      method,
-      id,
-      params,
-    });
+    const response = await this.client
+      .post<unknown>(
+        '',
+        {
+          jsonrpc: '1.0',
+          method,
+          id,
+          params,
+        },
+        { signal },
+      )
+      .catch((error: unknown) => {
+        if (
+          error instanceof Error &&
+          error.message ===
+            `maxContentLength size of ${this.limits.responseBytes} exceeded`
+        )
+          throw new BitcoinCashResourceLimitError(
+            'responseBytes',
+            this.limits.responseBytes,
+          );
+        throw error;
+      });
     const data = response.data;
     if (
       !isRecord(data) ||
@@ -69,8 +106,10 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
   };
 
   /** Rechecks configured chain and BCHN daemon identity without cached trust. */
-  private verifyNetwork = async (): Promise<Record<string, unknown>> => {
-    const info = await this.rpc('getblockchaininfo', []);
+  private verifyNetwork = async (
+    signal?: AbortSignal,
+  ): Promise<Record<string, unknown>> => {
+    const info = await this.rpc('getblockchaininfo', [], signal);
     if (
       !isRecord(info) ||
       info.chain !== this.expectedChain ||
@@ -78,7 +117,7 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
       !isHash(info.bestblockhash)
     )
       throw Error('BCH RPC blockchain identity/height mismatch');
-    const network = await this.rpc('getnetworkinfo', []);
+    const network = await this.rpc('getnetworkinfo', [], signal);
     if (
       !isRecord(network) ||
       typeof network.subversion !== 'string' ||
@@ -101,13 +140,13 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
       !isUint(value.time) ||
       !isUint(value.nTx) ||
       value.nTx < 1 ||
-      value.nTx > BITCOIN_CASH_RPC_LIMITS.blockTransactions ||
       (height !== 0
         ? !isHash(value.previousblockhash)
         : value.previousblockhash !== undefined &&
           value.previousblockhash !== '00'.repeat(32))
     )
       throw Error('BCH RPC block header identity/schema mismatch');
+    checkBitcoinCashRpcLimit(this.limits, 'blockTransactions', value.nTx);
     return {
       hash: blockHash,
       height,
@@ -121,6 +160,22 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
   /** Returns the current height after checking the endpoint identity. */
   getCurrentHeight = async (): Promise<number> =>
     (await this.verifyNetwork()).blocks as number;
+
+  /** Checks exact observed ancestry against current, stable BCHN operator finalization evidence. */
+  assertFinalizedBlock = async (
+    blockHash: string,
+    height: number,
+  ): Promise<void> => {
+    if (!isHash(blockHash) || !isUint(height))
+      throw Error('Invalid BCH finality block reference');
+    const signal = AbortSignal.timeout(30_000);
+    await assertBitcoinCashFinalizedBlock(
+      (method, params) => this.rpc(method, params, signal),
+      await this.verifyNetwork(signal),
+      blockHash,
+      height,
+    );
+  };
 
   /** Fetches and validates the exact requested block header. */
   getBlockAtHeight = async (height: number): Promise<Block> => {
@@ -162,11 +217,11 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
         seen.has(tx.txid) ||
         (tx.blockhash !== undefined && tx.blockhash !== blockHash) ||
         !Array.isArray(tx.vin) ||
-        !Array.isArray(tx.vout) ||
-        tx.vin.length > BITCOIN_CASH_RPC_LIMITS.transactionIO ||
-        tx.vout.length > BITCOIN_CASH_RPC_LIMITS.transactionIO
+        !Array.isArray(tx.vout)
       )
         throw Error('Invalid or duplicate BCH transaction metadata');
+      checkBitcoinCashRpcLimit(this.limits, 'transactionIO', tx.vin.length);
+      checkBitcoinCashRpcLimit(this.limits, 'transactionIO', tx.vout.length);
       seen.add(tx.txid);
       const fetched = tx.hex === undefined;
       const value = fetched
@@ -176,25 +231,28 @@ export class BitcoinCashRpcNetwork extends AbstractNetworkConnector<BitcoinCashR
         !isRecord(value) ||
         typeof value.hex !== 'string' ||
         value.hex.length === 0 ||
-        value.hex.length % 2 !== 0 ||
-        value.hex.length > BITCOIN_CASH_RPC_LIMITS.transactionBytes * 2
+        value.hex.length % 2 !== 0
       )
         throw Error('Missing or invalid BCH raw transaction bytes');
-      if (
-        value.hex.length / 2 >
-        BITCOIN_CASH_RPC_LIMITS.blockTransactionBytes - totalBytes
-      )
-        throw Error('BCH block transaction byte work limit exceeded');
+      checkBitcoinCashRpcLimit(
+        this.limits,
+        'transactionBytes',
+        value.hex.length / 2,
+      );
+      checkBitcoinCashRpcLimit(
+        this.limits,
+        'blockTransactionBytes',
+        totalBytes + value.hex.length / 2,
+      );
       const parsed = validateBitcoinCashRawTransaction(
         value,
         tx.txid,
         blockHash,
         fetched,
+        this.limits,
       );
       validateBitcoinCashTransactionMetadata(tx, parsed.decoded, tx.txid);
       totalBytes += parsed.byteLength;
-      if (totalBytes > BITCOIN_CASH_RPC_LIMITS.blockTransactionBytes)
-        throw Error('BCH block transaction byte work limit exceeded');
       // getblock can expose token metadata omitted by getrawtransaction. Preserve
       // that validated metadata while raw bytes remain the token authority.
       const parentOutputs = tx.vout;

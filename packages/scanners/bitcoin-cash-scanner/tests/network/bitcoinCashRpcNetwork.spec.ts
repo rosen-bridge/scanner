@@ -1,6 +1,17 @@
-import { BitcoinCashRpcNetwork, BitcoinCashRpcTransaction } from '../../lib';
+import { createServer } from 'http';
+import { AddressInfo } from 'net';
+
+import axios from '@rosen-clients/rate-limited-axios';
+
+import {
+  BitcoinCashRpcNetwork,
+  BitcoinCashRpcTransaction,
+  BitcoinCashResourceLimitError,
+} from '../../lib';
+import { validateBitcoinCashRpcUrl } from '../../lib/network/bitcoinCashRpcPolicy';
 import { BITCOIN_CASH_RPC_LIMITS } from '../../lib/network/bitcoinCashValidation';
 import { axiosInstance, resetAxiosMock } from '../mocked/axiosRpc.mock';
+import { createFinalityRpc } from '../mocked/bitcoinCashFinality.mock';
 import {
   blockHash,
   parentHash,
@@ -31,7 +42,7 @@ describe('BitcoinCashRpcNetwork', () => {
 
   beforeEach(() => {
     resetAxiosMock();
-    network = new BitcoinCashRpcNetwork('', 1, 'regtest');
+    network = new BitcoinCashRpcNetwork('http://127.0.0.1', 1, 'regtest');
     results = {
       getblockchaininfo: {
         chain: 'regtest',
@@ -87,7 +98,11 @@ describe('BitcoinCashRpcNetwork', () => {
           bestblockhash: blockHash,
         };
         expect(
-          await new BitcoinCashRpcNetwork('', 1, chain).getCurrentHeight(),
+          await new BitcoinCashRpcNetwork(
+            'http://127.0.0.1',
+            1,
+            chain,
+          ).getCurrentHeight(),
         ).toEqual(4);
       },
     );
@@ -202,6 +217,77 @@ describe('BitcoinCashRpcNetwork', () => {
   });
   describe('getBlockTxs', () => {
     /**
+     * @target getBlockTxs retries the same block with a qualified larger budget
+     * @dependencies mocked RPC and syntactically valid raw transaction fixtures
+     * @scenario exceed each local byte or IO budget, then raise that budget alone
+     * @expected typed limit diagnostics precede a successful exact-byte retry
+     */
+    it.each([
+      'transactionBytes',
+      'transactionIO',
+      'blockTransactionBytes',
+    ] as const)(
+      'recovers from %s without skipping or relaxing identity',
+      async (resource) => {
+        const tx =
+          resource === 'transactionIO'
+            ? fixture(false, false, 1, 0xffffffff, 4097)
+            : fixture();
+        const observed =
+          resource === 'transactionIO' ? 4097 : tx.hex.length / 2;
+        const initial = resource === 'transactionIO' ? 4096 : observed - 1;
+        results.getblock = { ...header(), tx: [tx] };
+        const blocked = new BitcoinCashRpcNetwork(
+          'http://127.0.0.1',
+          1,
+          'regtest',
+          undefined,
+          { [resource]: initial },
+        );
+        await expect(blocked.getBlockTxs(blockHash, 4)).rejects.toMatchObject({
+          code: 'BCH_RPC_RESOURCE_LIMIT',
+          resource,
+          observed,
+          limit: initial,
+        });
+        const recovered = new BitcoinCashRpcNetwork(
+          'http://127.0.0.1',
+          1,
+          'regtest',
+          undefined,
+          { [resource]: observed },
+        );
+        expect(await recovered.getBlockTxs(blockHash, 4)).toEqual([tx]);
+        tx.txid = parentHash;
+        await expect(
+          recovered.getBlockTxs(blockHash, 4),
+        ).rejects.not.toBeInstanceOf(BitcoinCashResourceLimitError);
+      },
+    );
+
+    /**
+     * @target block count is a configurable resource budget rather than a schema rule
+     * @dependencies mocked header RPC
+     * @scenario retry the same header at the default plus one count
+     * @expected the default reports a resource failure and an exact override admits metadata
+     */
+    it('recovers header metadata above the default transaction count', async () => {
+      const count = BITCOIN_CASH_RPC_LIMITS.blockTransactions + 1;
+      results.getblockheader = { ...header(), nTx: count };
+      await expect(network.getBlockAtHeight(4)).rejects.toMatchObject({
+        resource: 'blockTransactions',
+        observed: count,
+      });
+      const recovered = new BitcoinCashRpcNetwork(
+        'http://127.0.0.1',
+        1,
+        'regtest',
+        undefined,
+        { blockTransactions: count },
+      );
+      expect((await recovered.getBlockAtHeight(4)).txCount).toEqual(count);
+    });
+    /**
      * @target getBlockTxs should recover missing raw bytes without losing token data
      * @dependencies
      * - Mocked RateLimitedAxios and synthetic libauth transaction fixtures
@@ -223,6 +309,7 @@ describe('BitcoinCashRpcNetwork', () => {
           method: 'getrawtransaction',
           params: [tx.txid, true, blockHash],
         }),
+        { signal: undefined },
       );
     });
 
@@ -583,7 +670,7 @@ describe('BitcoinCashRpcNetwork', () => {
         },
       }));
       await expect(network.getBlockTxs(blockHash, 4)).rejects.toThrow(
-        'byte work limit exceeded',
+        'resource limit exceeded: blockTransactionBytes',
       );
       expect(axiosInstance.post).toHaveBeenCalledTimes(36);
     });
@@ -611,5 +698,335 @@ describe('BitcoinCashRpcNetwork', () => {
       expect(transactions[31].hex).toEqual(txs[31].hex);
       expect(axiosInstance.post).toHaveBeenCalledTimes(3);
     });
+  });
+});
+
+describe('BitcoinCashRpcNetwork transport', () => {
+  beforeEach(() => vi.restoreAllMocks());
+  afterEach(() => vi.restoreAllMocks());
+
+  describe('assertFinalizedBlock', () => {
+    /**
+     * @target assertFinalizedBlock aborts an in-flight finality RPC at its aggregate deadline
+     * @dependencies real loopback HTTP server and injected deadline signal
+     * @scenario abort after identity succeeds while finalization response is pending
+     * @expected the request cancels, deadline is 30 seconds and no later RPC starts
+     */
+    it('cancels the finality sequence with one shared 30-second signal', async () => {
+      const fixture = createFinalityRpc();
+      const controller = new AbortController();
+      const deadline = vi
+        .spyOn(AbortSignal, 'timeout')
+        .mockReturnValue(controller.signal);
+      let requests = 0;
+      const server = createServer((request, response) => {
+        let body = '';
+        request.on('data', (chunk) => {
+          body += chunk;
+        });
+        request.on('end', () => {
+          requests++;
+          const data = JSON.parse(body);
+          if (data.method === 'getfinalizedblockhash') {
+            controller.abort();
+            return;
+          }
+          response.setHeader('Content-Type', 'application/json');
+          response.end(
+            JSON.stringify({
+              id: data.id,
+              error: null,
+              result:
+                data.method === 'getnetworkinfo'
+                  ? { subversion: '/Bitcoin Cash Node:29.2.0/' }
+                  : fixture.info,
+            }),
+          );
+        });
+      });
+      await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve),
+      );
+      try {
+        const network = new BitcoinCashRpcNetwork(
+          `http://127.0.0.1:${(server.address() as AddressInfo).port}`,
+          1000,
+          'regtest',
+        );
+        await expect(
+          network.assertFinalizedBlock(fixture.hashes.observed, 4),
+        ).rejects.toMatchObject({ code: 'ERR_CANCELED' });
+        expect(deadline).toHaveBeenCalledExactlyOnceWith(30000);
+        expect(requests).toEqual(3);
+      } finally {
+        server.closeAllConnections();
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+      }
+    });
+
+    /**
+     * @target assertFinalizedBlock uses authenticated RPC envelopes and exact parameters
+     * @dependencies real loopback HTTP server and synthetic BCHN finalization responses
+     * @scenario check an eligible block, then change its active hash and repeat
+     * @expected exact method/parameter forwarding, unique echoed IDs and no cached success
+     */
+    it('forwards finality requests through the real authenticated bounded client', async () => {
+      const fixture = createFinalityRpc();
+      const calls: {
+        method: string;
+        params: unknown[];
+        id: string;
+        auth?: string;
+      }[] = [];
+      const server = createServer((request, response) => {
+        let body = '';
+        request.on('data', (chunk) => {
+          body += chunk;
+        });
+        request.on('end', async () => {
+          const data = JSON.parse(body);
+          calls.push({
+            method: data.method,
+            params: data.params,
+            id: data.id,
+            auth: request.headers.authorization,
+          });
+          const result =
+            data.method === 'getnetworkinfo'
+              ? { subversion: '/Bitcoin Cash Node:29.2.0/' }
+              : data.method === 'getblockchaininfo'
+                ? fixture.info
+                : await fixture.rpc(data.method, data.params);
+          response.setHeader('Content-Type', 'application/json');
+          response.end(JSON.stringify({ result, error: null, id: data.id }));
+        });
+      });
+      await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve),
+      );
+      try {
+        const network = new BitcoinCashRpcNetwork(
+          `http://127.0.0.1:${(server.address() as AddressInfo).port}`,
+          1000,
+          'regtest',
+          { username: 'test', password: 'test' },
+        );
+        await expect(
+          network.assertFinalizedBlock(fixture.hashes.observed, 4),
+        ).resolves.toBeUndefined();
+        expect(calls.map(({ method, params }) => [method, params])).toEqual([
+          ['getblockchaininfo', []],
+          ['getnetworkinfo', []],
+          ['getfinalizedblockhash', []],
+          ['getblockheader', [fixture.hashes.finalized, true]],
+          ['getblockhash', [8]],
+          ['getblockhash', [4]],
+          ['getchaintips', []],
+          ['getblockchaininfo', []],
+          ['getfinalizedblockhash', []],
+        ]);
+        expect(new Set(calls.map((call) => call.id)).size).toEqual(9);
+        expect(
+          calls.every(
+            (call) =>
+              /^[0-9a-f]{64}$/.test(call.id) &&
+              call.auth === 'Basic dGVzdDp0ZXN0',
+          ),
+        ).toEqual(true);
+        fixture.state.observedActiveHash = 'ee'.repeat(32);
+        await expect(
+          network.assertFinalizedBlock(fixture.hashes.observed, 4),
+        ).rejects.toThrow('observed block');
+        expect(calls).toHaveLength(15);
+      } finally {
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+      }
+    });
+
+    /**
+     * @target assertFinalizedBlock keeps RPC errors and response identity fail-closed
+     * @dependencies mocked axios and otherwise valid BCHN chain identity
+     * @scenario corrupt only the finalization response envelope or return no finalization
+     * @expected the finality call rejects at the finalization request
+     */
+    it.each(['wrong-id', 'rpc-error', 'empty-finalization'])(
+      'rejects %s at the connector seam',
+      async (fault) => {
+        resetAxiosMock();
+        const fixture = createFinalityRpc();
+        axiosInstance.post.mockImplementation(async (_url, request) => ({
+          data: {
+            id:
+              request.method === 'getfinalizedblockhash' && fault === 'wrong-id'
+                ? 'bad'
+                : request.id,
+            error:
+              request.method === 'getfinalizedblockhash' &&
+              fault === 'rpc-error'
+                ? { code: -32601 }
+                : null,
+            result:
+              request.method === 'getnetworkinfo'
+                ? { subversion: '/Bitcoin Cash Node:29.2.0/' }
+                : request.method === 'getblockchaininfo'
+                  ? fixture.info
+                  : fault === 'empty-finalization'
+                    ? ''
+                    : fixture.hashes.finalized,
+          },
+        }));
+        const network = new BitcoinCashRpcNetwork(
+          'http://127.0.0.1',
+          1000,
+          'regtest',
+        );
+        await expect(
+          network.assertFinalizedBlock(fixture.hashes.observed, 4),
+        ).rejects.toThrow();
+        expect(axiosInstance.post).toHaveBeenCalledTimes(3);
+      },
+    );
+  });
+
+  /**
+   * @target constructor rejects insecure or ambiguous URLs before attaching credentials
+   * @dependencies real URL parser and constructor
+   * @scenario independently supply remote HTTP, ambiguous literals and URL credentials
+   * @expected each invalid URL is rejected without creating a client
+   */
+  it.each([
+    '',
+    'http://example.com',
+    'http://localhost',
+    'http://127.1',
+    'http://0x7f000001',
+    'http://2130706433',
+    'http://0177.0.0.1',
+    'http://[::ffff:127.0.0.1]',
+    'ftp://127.0.0.1',
+    'https:///example.com',
+    'https://user:password@example.com',
+    'https://@example.com',
+    'https://example.com#',
+    ' https://example.com',
+    'https://example.com\\path',
+    'https://exam\nple.com',
+  ])('rejects %s', (url) => {
+    const create = vi.spyOn(axios, 'create');
+    expect(() => new BitcoinCashRpcNetwork(url, 100, 'regtest')).toThrow();
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  /**
+   * @target constructor accepts TLS endpoints and exact IP loopbacks with redirects disabled
+   * @dependencies real URL parser and constructor
+   * @scenario inspect client options for each allowed transport
+   * @expected normalized URL, finite response limit and zero redirects reach axios
+   */
+  it.each([
+    'https://example.com',
+    'http://127.0.0.1',
+    'http://127.2.3.4',
+    'http://[::1]',
+    'http://[0:0:0:0:0:0:0:1]',
+  ])('accepts %s', (url) => {
+    const create = vi.spyOn(axios, 'create');
+    new BitcoinCashRpcNetwork(url, 100, 'regtest');
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseURL: validateBitcoinCashRpcUrl(url),
+        maxRedirects: 0,
+        maxContentLength: BITCOIN_CASH_RPC_LIMITS.responseBytes,
+      }),
+    );
+  });
+
+  /**
+   * @target constructor rejects unsafe timeout and credential policies
+   * @dependencies real constructor
+   * @scenario vary one bound or credential component at a time
+   * @expected configuration fails before any request
+   */
+  it('validates finite timeouts and paired bounded credentials', () => {
+    for (const timeout of [0, -1, 0.5, NaN, Infinity, 300001])
+      expect(
+        () => new BitcoinCashRpcNetwork('http://127.0.0.1', timeout, 'regtest'),
+      ).toThrow('timeout');
+    for (const auth of [
+      { username: '', password: 'p' },
+      { username: 'u', password: '' },
+      { username: 'u:p', password: 'p' },
+      { username: 'u\n', password: 'p' },
+      { username: 'u', password: ' p' },
+      { username: 'u', password: 'p'.repeat(1025) },
+    ])
+      expect(
+        () => new BitcoinCashRpcNetwork('http://127.0.0.1', 1, 'regtest', auth),
+      ).toThrow('credentials');
+  });
+
+  /**
+   * @target real HTTP transport must never follow a redirect with RPC credentials
+   * @dependencies loopback HTTP server and real rate-limited axios
+   * @scenario server redirects each standard redirect status to another path
+   * @expected request fails and only the original authenticated request arrives
+   */
+  it.each([301, 302, 303, 307, 308])(
+    'rejects HTTP %s without a follow-up request',
+    async (status) => {
+      let requests = 0;
+      const server = createServer((_request, response) => {
+        requests++;
+        response.writeHead(status, { Location: '/redirected' });
+        response.end();
+      });
+      await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve),
+      );
+      try {
+        const network = new BitcoinCashRpcNetwork(
+          `http://127.0.0.1:${(server.address() as AddressInfo).port}`,
+          1000,
+          'regtest',
+          { username: 'test', password: 'test' },
+        );
+        await expect(network.getCurrentHeight()).rejects.toThrow();
+        expect(requests).toEqual(1);
+      } finally {
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+      }
+    },
+  );
+
+  /**
+   * @target response overflow reports the typed resource failure from real transport
+   * @dependencies loopback HTTP server and real rate-limited axios
+   * @scenario return a response one byte larger than a configured 100-byte budget
+   * @expected overflow retains a sanitized resource diagnostic and operator recovery
+   */
+  it('reports real response byte overflow separately from malformed RPC', async () => {
+    const server = createServer((_request, response) =>
+      response.end(' '.repeat(101)),
+    );
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve),
+    );
+    try {
+      const network = new BitcoinCashRpcNetwork(
+        `http://127.0.0.1:${(server.address() as AddressInfo).port}`,
+        1000,
+        'regtest',
+        undefined,
+        { responseBytes: 100 },
+      );
+      await expect(network.getCurrentHeight()).rejects.toMatchObject({
+        name: 'BitcoinCashResourceLimitError',
+        code: 'BCH_RPC_RESOURCE_LIMIT',
+        resource: 'responseBytes',
+        limit: 100,
+      });
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });
