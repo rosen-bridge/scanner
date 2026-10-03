@@ -384,10 +384,8 @@ export class BlockDbAction {
       .orderBy('blockEntity.height', 'ASC')
       .take(deletedBlockCount);
 
-    if (queryParts.length > 0) {
-      const unionQuery = queryParts.map((sql) => `(${sql})`).join(' UNION ');
-      blocksToDelete.andWhere(`blockEntity.hash NOT IN (${unionQuery})`);
-    }
+    for (const queryPart of queryParts)
+      blocksToDelete.andWhere(`blockEntity.hash NOT IN (${queryPart})`);
     await this.blockRepository
       .createQueryBuilder()
       .delete()

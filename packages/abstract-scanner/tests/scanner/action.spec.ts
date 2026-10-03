@@ -8,12 +8,74 @@ import {
 import { ExtractorStatusEntity } from '../../lib/entities/extractorStatusEntity';
 import { BlockDbAction } from '../../lib/scanner/action';
 import { createDatabase } from './abstract/abstract.mock';
+import {
+  assertOwnedSchema,
+  postgresScenarios,
+  runPostgresCleanupScenario,
+} from './actionPostgresTestUtils';
 import { sampleBlocks1, sampleBlocks2 } from './scannerActionData';
 
 let dataSource: DataSource;
 let action: BlockDbAction;
 
-describe('action', () => {
+const postgresUrl = process.env.SCANNER_POSTGRES_TEST_URL;
+if (process.env.SCANNER_POSTGRES_TEST_REQUIRED === '1' && !postgresUrl) {
+  throw new Error('SCANNER_POSTGRES_TEST_URL is required for test:postgres');
+}
+
+describe('BlockDbAction PostgreSQL schema ownership', () => {
+  /**
+   * Test cleanup rejects an unowned or replaced schema
+   * Dependency: a recorded schema identity created by this run
+   * Scenario: change only the creation record, OID, name or ownership token
+   * Expected: cleanup refuses each mismatched identity before issuing DROP
+   */
+  it.each(['creation', 'oid', 'name', 'token'] as const)(
+    'rejects changed %s',
+    (field) => {
+      const identity = {
+        name: `scanner_test_${'a'.repeat(32)}`,
+        oid: 1,
+        token: 'b'.repeat(32),
+      };
+      const observed = { ...identity };
+      if (field === 'oid') observed.oid = 2;
+      if (field === 'name') observed.name = `scanner_test_${'c'.repeat(32)}`;
+      if (field === 'token') observed.token = 'd'.repeat(32);
+      expect(() =>
+        assertOwnedSchema(
+          field === 'creation' ? undefined : identity,
+          observed,
+        ),
+      ).toThrow();
+    },
+  );
+});
+
+describe.skipIf(!postgresUrl)('BlockDbAction PostgreSQL', () => {
+  describe('removeUnusedBlocksInBatches', () => {
+    /**
+     * Test block cleanup through the native PostgreSQL driver and migrations
+     * Dependency: an explicitly selected test database allowing schema creation
+     * Scenario: run batch guards, branch limits, colliding parameters, NULL, empty and multi-row references
+     * Expected: exact target rows and foreign-scanner rows survive, migrations replay none, and the owned schema is removed
+     */
+    it.each(postgresScenarios)(
+      'preserves expected rows for %s',
+      async (scenario) => {
+        const result = await runPostgresCleanupScenario(postgresUrl!, scenario);
+        expect(result.migrationNames).toHaveLength(7);
+        expect(result.migrationReplayCount).toBe(0);
+        expect(result.remaining.map((row) => row.hash)).toEqual(
+          result.expected,
+        );
+      },
+      60000,
+    );
+  });
+});
+
+describe('BlockDbAction', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
     action = new BlockDbAction(dataSource, 'testScannerName');
@@ -837,6 +899,190 @@ describe('action', () => {
 
       expect(isOldestBlockInDb).toBe(false);
       expect(remainingBlocks.length).toBe(sampleBlocks1.length - 1);
+    });
+
+    describe('SQLite reference queries', () => {
+      /** Closes the SQLite database owned by the current regression fixture. */
+      afterEach(async () => {
+        await dataSource.destroy();
+      });
+
+      /** Creates one used-block query with the caller's owned parameters. */
+      const usedBlocksQuery = (
+        condition: string,
+        parameters: Record<string, unknown>,
+      ) =>
+        blockRepository
+          .createQueryBuilder('used')
+          .select('used.hash', 'block')
+          .where(condition, parameters);
+
+      /** Returns the remaining hashes in their scanner height order. */
+      const remainingHashes = async () =>
+        (await blockRepository.find({ order: { height: 'ASC' } })).map(
+          (block) => block.hash,
+        );
+
+      /**
+       * @target removeUnusedBlocksInBatches protects every hash from one query
+       * @dependencies Real SQLite, BlockEntity repository and QueryBuilder
+       * @scenario Insert five blocks and reference the first two in one query
+       * @expected Both referenced hashes remain after eligible blocks are removed
+       */
+      it('should preserve multiple hashes returned by one reference query', async () => {
+        await blockRepository.insert(sampleBlocks1);
+        const references = usedBlocksQuery('used.height <= :height', {
+          height: sampleBlocks1[1].height,
+        });
+
+        await action.removeUnusedBlocksInBatches(
+          [references],
+          10,
+          sampleBlocks1[0].scanner,
+          6,
+        );
+
+        expect(await remainingHashes()).toEqual(
+          sampleBlocks1.slice(0, 2).map((block) => block.hash),
+        );
+      });
+
+      /**
+       * @target removeUnusedBlocksInBatches isolates extractor query parameters
+       * @dependencies Real SQLite, BlockEntity repository and QueryBuilder
+       * @scenario Give two queries the same parameter key with distinct hashes
+       * @expected Both independently referenced hashes survive deletion
+       */
+      it('should preserve references from extractors with colliding parameter keys', async () => {
+        await blockRepository.insert(sampleBlocks1);
+        const first = usedBlocksQuery('used.hash = :blockHash', {
+          blockHash: sampleBlocks1[0].hash,
+        });
+        const second = usedBlocksQuery('used.hash = :blockHash', {
+          blockHash: sampleBlocks1[1].hash,
+        });
+
+        await action.removeUnusedBlocksInBatches(
+          [first, second],
+          10,
+          sampleBlocks1[0].scanner,
+          6,
+        );
+
+        expect(await remainingHashes()).toEqual(
+          sampleBlocks1.slice(0, 2).map((block) => block.hash),
+        );
+      });
+
+      /**
+       * @target removeUnusedBlocksInBatches retains each query's ORDER and LIMIT
+       * @dependencies Real SQLite, BlockEntity repository and QueryBuilder
+       * @scenario Reference one descending and one ascending limited selection
+       * @expected Exactly the two individually selected hashes remain
+       */
+      it('should retain ordering and limits within each reference query', async () => {
+        await blockRepository.insert(sampleBlocks1);
+        const descending = usedBlocksQuery('used.height < :height', {
+          height: sampleBlocks1[4].height,
+        })
+          .orderBy('used.height', 'DESC')
+          .take(1);
+        const ascending = usedBlocksQuery('used.height < :height', {
+          height: sampleBlocks1[2].height,
+        })
+          .orderBy('used.height', 'ASC')
+          .take(1);
+
+        await action.removeUnusedBlocksInBatches(
+          [descending, ascending],
+          10,
+          sampleBlocks1[0].scanner,
+          6,
+        );
+
+        expect(await remainingHashes()).toEqual([
+          sampleBlocks1[0].hash,
+          sampleBlocks1[3].hash,
+        ]);
+      });
+
+      /**
+       * @target removeUnusedBlocksInBatches preserves NULL and empty-set behavior
+       * @dependencies Real SQLite, BlockEntity repository and QueryBuilder
+       * @scenario Combine a valid reference with a NULL or an empty branch
+       * @expected NULL prevents deletion; an empty branch adds no protection
+       */
+      it.each(['null', 'empty'] as const)(
+        'should preserve conservative reference behavior for a %s branch',
+        async (kind) => {
+          await blockRepository.insert(sampleBlocks1);
+          const first = usedBlocksQuery('used.hash = :blockHash', {
+            blockHash: sampleBlocks1[0].hash,
+          });
+          const second = usedBlocksQuery('used.hash = :blockHash', {
+            blockHash: kind === 'null' ? sampleBlocks1[1].hash : 'absent',
+          });
+          if (kind === 'null') second.select('NULL', 'block');
+
+          await action.removeUnusedBlocksInBatches(
+            [first, second],
+            10,
+            sampleBlocks1[0].scanner,
+            6,
+          );
+
+          expect(await remainingHashes()).toEqual(
+            (kind === 'null' ? sampleBlocks1 : sampleBlocks1.slice(0, 1)).map(
+              (block) => block.hash,
+            ),
+          );
+        },
+      );
+
+      /**
+       * @target removeUnusedBlocksInBatches retains age, scanner and batch guards
+       * @dependencies Real SQLite, BlockEntity repository and QueryBuilder
+       * @scenario Reference two target blocks and add older foreign-scanner rows
+       * @expected Only bounded unused target blocks below the age threshold are deleted
+       */
+      it.each([
+        { batch: 0, removed: [] },
+        { batch: 1, removed: [sampleBlocks1[1].hash] },
+        {
+          batch: 10,
+          removed: [sampleBlocks1[1].hash, sampleBlocks1[2].hash],
+        },
+      ])(
+        'should retain all deletion guards with a batch of $batch',
+        async ({ batch, removed }) => {
+          const foreignBlocks = sampleBlocks2.map((block) => ({
+            ...block,
+            timestamp: 0,
+          }));
+          await blockRepository.insert([...sampleBlocks1, ...foreignBlocks]);
+          const first = usedBlocksQuery('used.hash = :blockHash', {
+            blockHash: sampleBlocks1[0].hash,
+          });
+          const second = usedBlocksQuery('used.hash = :blockHash', {
+            blockHash: sampleBlocks1[3].hash,
+          });
+
+          await action.removeUnusedBlocksInBatches(
+            [first, second],
+            batch,
+            sampleBlocks1[0].scanner,
+            sampleBlocks1[4].timestamp,
+          );
+
+          const remaining = await blockRepository.find();
+          expect(remaining.map((block) => block.hash).sort()).toEqual(
+            [...sampleBlocks1, ...foreignBlocks]
+              .filter((block) => !removed.includes(block.hash))
+              .map((block) => block.hash)
+              .sort(),
+          );
+        },
+      );
     });
   });
 });
