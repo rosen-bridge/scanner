@@ -1,3 +1,4 @@
+import { BitcoinCashFinalityError } from './bitcoinCashFinalityError';
 import { isHash, isRecord, isUint } from './bitcoinCashValidation';
 
 type Rpc = (method: string, params: unknown[]) => Promise<unknown>;
@@ -19,7 +20,10 @@ const synchronized = (info: Record<string, unknown>): void => {
     info.headers !== info.blocks ||
     !isHash(info.bestblockhash)
   )
-    throw Error('BCH RPC finality requires a synchronized node');
+    throw new BitcoinCashFinalityError(
+      'node-unsynchronized',
+      'BCH RPC finality requires a synchronized node',
+    );
 };
 
 /**
@@ -34,29 +38,58 @@ export const assertBitcoinCashFinalizedBlock = async (
   height: number,
 ): Promise<void> => {
   if (!isHash(blockHash) || !isUint(height))
-    throw Error('Invalid BCH finality block reference');
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'Invalid BCH finality block reference',
+    );
   synchronized(info);
   const finalizedHash = await rpc('getfinalizedblockhash', []);
-  if (!isHash(finalizedHash)) throw Error('Invalid BCH finalized block hash');
+  // BCHN returns an empty string while no checkpoint has been finalized.
+  if (finalizedHash === '')
+    throw new BitcoinCashFinalityError(
+      'waiting-finalization',
+      'BCH node has not finalized a checkpoint',
+    );
+  if (!isHash(finalizedHash))
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'Invalid BCH finalized block hash',
+    );
   const finalized = await rpc('getblockheader', [finalizedHash, true]);
   if (
     !isRecord(finalized) ||
     finalized.hash !== finalizedHash ||
     !isUint(finalized.height) ||
-    finalized.height < height ||
     finalized.height > (info.blocks as number) ||
     !isUint(finalized.confirmations) ||
     finalized.confirmations !== (info.blocks as number) - finalized.height + 1
   )
-    throw Error('BCH finalized header does not cover the observed block');
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'BCH finalized header does not cover the observed block',
+    );
+  if (finalized.height < height)
+    throw new BitcoinCashFinalityError(
+      'waiting-finalization',
+      'BCH finalized header does not cover the observed block',
+    );
   if ((await rpc('getblockhash', [finalized.height])) !== finalizedHash)
-    throw Error('BCH finalized block is not on the active chain');
+    throw new BitcoinCashFinalityError(
+      'branch-disagreement',
+      'BCH finalized block is not on the active chain',
+    );
   if ((await rpc('getblockhash', [height])) !== blockHash)
-    throw Error('BCH observed block is not on the active chain');
+    throw new BitcoinCashFinalityError(
+      'branch-disagreement',
+      'BCH observed block is not on the active chain',
+    );
 
   const tips = await rpc('getchaintips', []);
   if (!Array.isArray(tips) || tips.length < 1 || tips.length > 1024)
-    throw Error('BCH RPC finality chain tips schema or limit exceeded');
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'BCH RPC finality chain tips schema or limit exceeded',
+    );
   const seen = new Set<string>();
   let active = 0;
   for (const tip of tips) {
@@ -70,7 +103,10 @@ export const assertBitcoinCashFinalizedBlock = async (
       typeof tip.status !== 'string' ||
       !statuses.has(tip.status)
     )
-      throw Error('Invalid BCH RPC finality chain tip');
+      throw new BitcoinCashFinalityError(
+        'invalid-evidence',
+        'Invalid BCH RPC finality chain tip',
+      );
     seen.add(tip.hash);
     if (tip.status === 'active') {
       active++;
@@ -79,22 +115,41 @@ export const assertBitcoinCashFinalizedBlock = async (
         tip.height !== info.blocks ||
         tip.branchlen !== 0
       )
-        throw Error('BCH RPC active tip does not match captured chain');
+        throw new BitcoinCashFinalityError(
+          'snapshot-changed',
+          'BCH RPC active tip does not match captured chain',
+        );
     }
     if (tip.status === 'parked' && tip.height - tip.branchlen < height)
-      throw Error('BCH parked branch can replace the observed block');
+      throw new BitcoinCashFinalityError(
+        'parked-fork',
+        'BCH parked branch can replace the observed block',
+      );
   }
   if (active !== 1)
-    throw Error('BCH RPC finality requires exactly one active tip');
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'BCH RPC finality requires exactly one active tip',
+    );
   const end = await rpc('getblockchaininfo', []);
-  if (!isRecord(end)) throw Error('Invalid BCH RPC finality ending snapshot');
+  if (!isRecord(end))
+    throw new BitcoinCashFinalityError(
+      'invalid-evidence',
+      'Invalid BCH RPC finality ending snapshot',
+    );
   synchronized(end);
   if (
     end.chain !== info.chain ||
     end.bestblockhash !== info.bestblockhash ||
     end.blocks !== info.blocks
   )
-    throw Error('BCH RPC chain changed during finality check');
+    throw new BitcoinCashFinalityError(
+      'snapshot-changed',
+      'BCH RPC chain changed during finality check',
+    );
   if ((await rpc('getfinalizedblockhash', [])) !== finalizedHash)
-    throw Error('BCH RPC finalized block changed during finality check');
+    throw new BitcoinCashFinalityError(
+      'snapshot-changed',
+      'BCH RPC finalized block changed during finality check',
+    );
 };

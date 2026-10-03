@@ -8,9 +8,38 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock accepts the exact tip-count resource boundary
-   * @dependencies deterministic BCHN RPC fixture with unique known invalid tips
-   * @scenario supply exactly 1024 schema-valid records including one active tip
+   * @target assertBitcoinCashFinalizedBlock classifies finalized hash
+   * %j as %s
+   * @dependencies deterministic RPC fixture differing only in
+   * finalized-hash response
+   * @scenario BCHN reports an empty string or a malformed nonempty
+   * string
+   * @expected only the documented empty checkpoint is routine waiting;
+   * no header is queried
+   */
+  it.each([
+    ['', 'waiting-finalization'],
+    ['bad', 'invalid-evidence'],
+  ])('classifies finalized hash %j as %s', async (hash, code) => {
+    fixture.state.finalizedHash = hash;
+    await expect(
+      assertBitcoinCashFinalizedBlock(
+        fixture.rpc,
+        fixture.info,
+        fixture.hashes.observed,
+        4,
+      ),
+    ).rejects.toMatchObject({ code });
+    expect(fixture.rpc.mock.calls).toEqual([['getfinalizedblockhash', []]]);
+  });
+
+  /**
+   * @target assertBitcoinCashFinalizedBlock accepts the exact
+   * tip-count resource boundary
+   * @dependencies deterministic BCHN RPC fixture with unique known
+   * invalid tips
+   * @scenario supply exactly 1024 schema-valid records including one
+   * active tip
    * @expected the finite ceiling is inclusive
    */
   it('accepts exactly 1024 distinct tip records', async () => {
@@ -32,7 +61,8 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock includes the finalized block itself
+   * @target assertBitcoinCashFinalizedBlock includes the finalized
+   * block itself
    * @dependencies deterministic BCHN RPC fixture
    * @scenario check the exact finalized block at height eight
    * @expected equality of observed and finalized height is accepted
@@ -49,10 +79,14 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires a coherent confirmation count
-   * @dependencies deterministic BCHN RPC fixture with all other fields unchanged
-   * @scenario report 99 confirmations for height eight beneath the height-ten tip
-   * @expected reject at the finalized header predicate instead of accepting positive counts
+   * @target assertBitcoinCashFinalizedBlock requires a coherent
+   * confirmation count
+   * @dependencies deterministic BCHN RPC fixture with all other fields
+   * unchanged
+   * @scenario report 99 confirmations for height eight beneath the
+   * height-ten tip
+   * @expected reject at the finalized header predicate instead of
+   * accepting positive counts
    */
   it('rejects positive confirmations inconsistent with the captured tip', async () => {
     (fixture.state.header as Record<string, unknown>).confirmations = 99;
@@ -63,15 +97,78 @@ describe('assertBitcoinCashFinalizedBlock', () => {
         fixture.hashes.observed,
         4,
       ),
-    ).rejects.toThrow('finalized header');
+    ).rejects.toMatchObject({
+      name: 'BitcoinCashFinalityError',
+      code: 'invalid-evidence',
+    });
     expect(fixture.rpc.mock.calls).toHaveLength(2);
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock accepts stable exact ancestry
+   * @target assertBitcoinCashFinalizedBlock reports a coherent
+   * finalized header below the event as waiting
+   * @dependencies coherent lower finalized header and unchanged
+   * synchronized tip
+   * @scenario the finalized height is three while the observed height
+   * is four
+   * @expected reject with waiting-finalization without consulting
+   * active ancestry
+   */
+  it('reports a coherent finalized header below the event as waiting', async () => {
+    fixture.state.header = {
+      hash: fixture.hashes.finalized,
+      height: 3,
+      confirmations: 8,
+    };
+    await expect(
+      assertBitcoinCashFinalizedBlock(
+        fixture.rpc,
+        fixture.info,
+        fixture.hashes.observed,
+        4,
+      ),
+    ).rejects.toMatchObject({
+      name: 'BitcoinCashFinalityError',
+      code: 'waiting-finalization',
+    });
+    expect(fixture.rpc.mock.calls).toHaveLength(2);
+  });
+
+  /**
+   * @target assertBitcoinCashFinalizedBlock does not classify an
+   * incoherent lower header as routine waiting
+   * @dependencies lower finalized height with an independently
+   * inconsistent count
+   * @scenario the header is below the event but its confirmations do
+   * not fit the tip
+   * @expected report invalid-evidence instead of suppressing an
+   * operator fault as waiting
+   */
+  it('does not classify an incoherent lower header as routine waiting', async () => {
+    fixture.state.header = {
+      hash: fixture.hashes.finalized,
+      height: 3,
+      confirmations: 3,
+    };
+    await expect(
+      assertBitcoinCashFinalizedBlock(
+        fixture.rpc,
+        fixture.info,
+        fixture.hashes.observed,
+        4,
+      ),
+    ).rejects.toMatchObject({ code: 'invalid-evidence' });
+    expect(fixture.rpc.mock.calls).toHaveLength(2);
+  });
+
+  /**
+   * @target assertBitcoinCashFinalizedBlock accepts stable exact
+   * ancestry
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario cover the event with finalized height eight and a stable height-ten tip
-   * @expected all seven bounded reads use the exact hashes, heights and verbosity
+   * @scenario cover the event with finalized height eight and a stable
+   * height-ten tip
+   * @expected all seven bounded reads use the exact hashes, heights
+   * and verbosity
    */
   it('checks exact observed and finalized active hashes in a stable snapshot', async () => {
     await assertBitcoinCashFinalizedBlock(
@@ -92,7 +189,8 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects malformed observed references before RPC
+   * @target assertBitcoinCashFinalizedBlock rejects malformed observed
+   * references before RPC
    * @dependencies deterministic BCHN RPC fixture
    * @scenario vary the observed hash and height independently
    * @expected every invalid reference is rejected with zero calls
@@ -116,7 +214,8 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires a synchronized captured node
+   * @target assertBitcoinCashFinalizedBlock requires a synchronized
+   * captured node
    * @dependencies deterministic BCHN RPC fixture
    * @scenario mutate each synchronization field independently
    * @expected each malformed snapshot rejects before RPC
@@ -138,14 +237,16 @@ describe('assertBitcoinCashFinalizedBlock', () => {
         fixture.hashes.observed,
         4,
       ),
-    ).rejects.toThrow('synchronized');
+    ).rejects.toMatchObject({ code: 'node-unsynchronized' });
     expect(fixture.rpc).not.toHaveBeenCalled();
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires available canonical finalization and active ancestry
+   * @target assertBitcoinCashFinalizedBlock requires available
+   * canonical finalization and active ancestry
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario independently corrupt finalization, header, ancestry or ending responses
+   * @scenario independently corrupt finalization, header, ancestry or
+   * ending responses
    * @expected each isolated fault rejects the eligibility check
    */
   it.each([
@@ -175,9 +276,11 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock validates each finalized header field
+   * @target assertBitcoinCashFinalizedBlock validates each finalized
+   * header field
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario vary identity, height coverage and active confirmations independently
+   * @scenario vary identity, height coverage and active confirmations
+   * independently
    * @expected every header fault rejects
    */
   it.each([
@@ -205,9 +308,11 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock bounds and authenticates every tip record
+   * @target assertBitcoinCashFinalizedBlock bounds and authenticates
+   * every tip record
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario add one independently malformed non-active tip to the valid active tip
+   * @scenario add one independently malformed non-active tip to the
+   * valid active tip
    * @expected each malformed record rejects without trusting its status
    */
   it.each([
@@ -239,7 +344,8 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires one active tip matching captured state
+   * @target assertBitcoinCashFinalizedBlock requires one active tip
+   * matching captured state
    * @dependencies deterministic BCHN RPC fixture
    * @scenario alter each active-tip binding or remove active status
    * @expected every mismatch rejects
@@ -262,10 +368,12 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects duplicate tip identity
+   * @target assertBitcoinCashFinalizedBlock rejects duplicate tip
+   * identity
    * @dependencies deterministic BCHN RPC fixture
    * @scenario duplicate a valid active tip
-   * @expected duplicate identity cannot create multiple accepted active tips
+   * @expected duplicate identity cannot create multiple accepted
+   * active tips
    */
   it('rejects duplicate active tips', async () => {
     (fixture.state.tips as unknown[]).push(
@@ -282,10 +390,13 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects parked branches that can replace the event
+   * @target assertBitcoinCashFinalizedBlock rejects parked branches
+   * that can replace the event
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario test a shorter, equal and longer parked branch with fork height three
-   * @expected every relevant parked fork rejects regardless of present branch length
+   * @scenario test a shorter, equal and longer parked branch with fork
+   * height three
+   * @expected every relevant parked fork rejects regardless of present
+   * branch length
    */
   it.each([6, 10, 12])(
     'rejects relevant parked branch at height %s',
@@ -303,15 +414,18 @@ describe('assertBitcoinCashFinalizedBlock', () => {
           fixture.hashes.observed,
           4,
         ),
-      ).rejects.toThrow('parked');
+      ).rejects.toMatchObject({ code: 'parked-fork' });
     },
   );
 
   /**
-   * @target assertBitcoinCashFinalizedBlock admits branches whose common ancestor includes the event
+   * @target assertBitcoinCashFinalizedBlock admits branches whose
+   * common ancestor includes the event
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario test exact event fork boundary, later parked fork and known non-parked statuses
-   * @expected safe parked fork boundaries and documented non-parked statuses are accepted
+   * @scenario test exact event fork boundary, later parked fork and
+   * known non-parked statuses
+   * @expected safe parked fork boundaries and documented non-parked
+   * statuses are accepted
    */
   it.each([
     ['parked', 4],
@@ -338,9 +452,11 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects drift in the ending snapshot
+   * @target assertBitcoinCashFinalizedBlock rejects drift in the
+   * ending snapshot
    * @dependencies deterministic BCHN RPC fixture
-   * @scenario change identity, best hash, synchronization or synchronized height at the final read
+   * @scenario change identity, best hash, synchronization or
+   * synchronized height at the final read
    * @expected no stale success is returned
    */
   it.each([

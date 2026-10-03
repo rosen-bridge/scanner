@@ -2,7 +2,7 @@ import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { AbstractObservationExtractor } from '@rosen-bridge/abstract-observation-extractor';
 import { BitcoinCashRpcTransaction } from '@rosen-bridge/bitcoin-cash-scanner';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { BitcoinCashRpcRosenExtractor } from '@rosen-bridge/rosen-extractor';
+import { BitcoinCashRpcRosenExtractor } from '@rosen-bridge/rosen-extractor/dist/bitcoinCash.js';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 export class BitcoinCashRpcObservationExtractor extends AbstractObservationExtractor<BitcoinCashRpcTransaction> {

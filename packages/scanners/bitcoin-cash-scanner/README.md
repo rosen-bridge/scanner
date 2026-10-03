@@ -68,6 +68,36 @@ never cached. The caller must repeat the check at each authorization boundary
 and fail closed on rejection. The scanner's ordinary block reads do not call
 this method automatically.
 
+`BitcoinCashFinalityError.code` distinguishes `waiting-finalization`,
+`node-unsynchronized`, `branch-disagreement`, `parked-fork`, `snapshot-changed`
+and `invalid-evidence`. An uncovered event is a routine wait only when the
+returned finalized header is otherwise structurally consistent. Transport,
+authentication, daemon-identity and RPC-envelope failures may throw other
+errors; consumers must treat these as failed evidence too. Never turn a
+diagnostic classification into permission to proceed.
+
+The witness role only needs the header/index RPCs above. A pruned primary
+scanner additionally needs every block body in its scan and recovery range.
+BCHN 29.2.0 defaults require a header known for 7,200 seconds and ten descendant
+blocks; node uptime and the next connected block can delay finalization further.
+This is an approximate two-hour minimum for a fresh deposit, not an exact ETA.
+
+The native fixture builds its own pruned history and separately checks default
+age/depth boundaries using simulated time. From this package directory in an
+installed and built Scanner checkout:
+
+```sh
+node --import tsx scripts/bchn-witness-qualification.mjs <BCHN-29.2.0-bitcoind> . <new-output-directory>
+```
+
+It needs free loopback ports 29959 and 29960, and about 300 MiB of temporary
+storage. The output directory must not exist. It preserves its evidence and
+datadirs, disables wallets and peers, and stops its own nodes. The prune case
+uses explicit regtest finalization; the separate latency cases keep the daemon's
+default finalization policy. This does not qualify production endpoint
+independence, automatic-pruning thresholds or full scanning history. Keep raw
+receipts private because they identify the local runtime and file paths.
+
 This policy uses trusted operator RPC observations, including BCHN's local
 finalization decision. Separate RPC calls are not an atomic node snapshot;
 matching beginning and ending values cannot exclude an intermediate change and
