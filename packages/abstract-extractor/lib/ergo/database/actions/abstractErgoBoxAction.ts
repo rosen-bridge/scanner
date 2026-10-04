@@ -138,22 +138,19 @@ export abstract class AbstractErgoBoxAction<
   /**
    * Remove confirmed spent boxes for the given extractor in a single batch.
    *
-   * @param currentHeight - height of the block currently being processed
-   * @param confirmationDepth - minimum confirmations before removal
+   * @param thresholdHeight - height to determine which boxes are considered confirmed spent
    * @param deletedBoxCount - maximum number of rows to delete in this round
    * @param extractor - extractor id
    * @returns number of removed rows
    */
-  removeUnusedBlocksInBatches = async (
-    currentHeight: number,
-    confirmationDepth: number,
+  removeUnusedBoxesInBatches = async (
+    thresholdHeight: number,
     deletedBoxCount: number,
     extractor: string,
   ): Promise<number> => {
-    const thresholdHeight = currentHeight - confirmationDepth;
     if (thresholdHeight < 0) {
       this.logger.debug(
-        `Skipping confirmed spent box cleanup at height ${currentHeight}: ` +
+        `Skipping confirmed spent box cleanup at height ${thresholdHeight}: ` +
           `threshold ${thresholdHeight} is below zero`,
       );
       return 0;
@@ -168,7 +165,6 @@ export abstract class AbstractErgoBoxAction<
       .createQueryBuilder('spent')
       .select('spent.id', 'id')
       .where('spent.extractor = :extractor', { extractor })
-      .andWhere('spent.spendHeight IS NOT NULL')
       .andWhere('spent.spendHeight <= :thresholdHeight', { thresholdHeight })
       .orderBy('spent.spendHeight', 'ASC')
       .take(deletedBoxCount);
@@ -185,7 +181,7 @@ export abstract class AbstractErgoBoxAction<
     if (removedCount > 0) {
       this.logger.info(
         `Removed ${removedCount} confirmed spent boxes for extractor ` +
-          `${extractor} at height ${currentHeight}`,
+          `${extractor} with spendHeight <= ${thresholdHeight}`,
       );
     } else {
       this.logger.debug(

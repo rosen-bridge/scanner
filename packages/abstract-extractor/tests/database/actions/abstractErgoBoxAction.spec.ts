@@ -139,16 +139,16 @@ describe('AbstractErgoBoxAction', () => {
       expect(spentBlocks).toEqual(['spent-block-1', 'spent-block-2']);
     });
   });
-  describe('removeUnusedBlocksInBatches', () => {
+  describe('removeUnusedBoxesInBatches', () => {
     const extractorId = 'extractor';
 
     /**
-     * @target removeUnusedBlocksInBatches should remove spent boxes whose spendHeight is at or below the confirmation threshold
+     * @target removeUnusedBoxesInBatches should remove spent boxes whose spendHeight is at or below the confirmation threshold
      * @dependencies
      * - database
      * @scenario
      * - insert spent boxes with different spendHeight values
-     * - run test (call `removeUnusedBlocksInBatches` with a threshold that covers some rows)
+     * - run test (call `removeUnusedBoxesInBatches` with a threshold that covers some rows)
      * @expected
      * - only rows with spendHeight <= threshold are removed
      * - returns the number of removed rows
@@ -184,9 +184,8 @@ describe('AbstractErgoBoxAction', () => {
         },
       ]);
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        250,
-        100,
+      const removed = await action.removeUnusedBoxesInBatches(
+        150,
         100,
         extractorId,
       );
@@ -197,12 +196,12 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should not remove spent boxes whose spendHeight is above the confirmation threshold
+     * @target removeUnusedBoxesInBatches should not remove spent boxes whose spendHeight is above the confirmation threshold
      * @dependencies
      * - database
      * @scenario
      * - insert a spent box with spendHeight above the threshold
-     * - run test (call `removeUnusedBlocksInBatches`)
+     * - run test (call `removeUnusedBoxesInBatches`)
      * @expected
      * - no rows are removed, returns 0
      */
@@ -219,9 +218,8 @@ describe('AbstractErgoBoxAction', () => {
         },
       ]);
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        300,
-        100,
+      const removed = await action.removeUnusedBoxesInBatches(
+        200,
         100,
         extractorId,
       );
@@ -232,12 +230,12 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should not remove unspent boxes
+     * @target removeUnusedBoxesInBatches should not remove unspent boxes
      * @dependencies
      * - database
      * @scenario
      * - insert an unspent box (spendBlock and spendHeight are null)
-     * - run test (call `removeUnusedBlocksInBatches` with a permissive threshold)
+     * - run test (call `removeUnusedBoxesInBatches` with a permissive threshold)
      * @expected
      * - no rows are removed
      */
@@ -254,9 +252,8 @@ describe('AbstractErgoBoxAction', () => {
         },
       ]);
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        1000,
-        10,
+      const removed = await action.removeUnusedBoxesInBatches(
+        990,
         100,
         extractorId,
       );
@@ -265,12 +262,12 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should not remove boxes belonging to other extractors
+     * @target removeUnusedBoxesInBatches should not remove boxes belonging to other extractors
      * @dependencies
      * - database
      * @scenario
      * - insert spent boxes for two different extractors
-     * - run test (call `removeUnusedBlocksInBatches` for one extractor)
+     * - run test (call `removeUnusedBoxesInBatches` for one extractor)
      * @expected
      * - only the target extractor's rows are removed
      */
@@ -296,9 +293,8 @@ describe('AbstractErgoBoxAction', () => {
         },
       ]);
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        300,
-        100,
+      const removed = await action.removeUnusedBoxesInBatches(
+        200,
         100,
         'target',
       );
@@ -309,11 +305,11 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should return 0 and delete nothing when threshold is negative
+     * @target removeUnusedBoxesInBatches should return 0 and delete nothing when threshold is negative
      * @dependencies
      * - database
      * @scenario
-     * - call `removeUnusedBlocksInBatches` with currentHeight < confirmationDepth
+     * - call `removeUnusedBoxesInBatches` with currentHeight < confirmationDepth
      * @expected
      * - return 0 and not delete anything
      */
@@ -330,9 +326,8 @@ describe('AbstractErgoBoxAction', () => {
         },
       ]);
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        50,
-        100,
+      const removed = await action.removeUnusedBoxesInBatches(
+        -50,
         100,
         extractorId,
       );
@@ -343,7 +338,7 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should respect the maximum deletion batch size
+     * @target removeUnusedBoxesInBatches should respect the maximum deletion batch size
      * @dependencies
      * - database
      * @scenario
@@ -365,9 +360,8 @@ describe('AbstractErgoBoxAction', () => {
         })),
       );
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        1000,
-        10,
+      const removed = await action.removeUnusedBoxesInBatches(
+        990,
         2,
         extractorId,
       );
@@ -378,7 +372,7 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBlocksInBatches should return the correct count of removed rows
+     * @target removeUnusedBoxesInBatches should return the correct count of removed rows
      * @dependencies
      * - database
      * @scenario
@@ -399,9 +393,8 @@ describe('AbstractErgoBoxAction', () => {
         })),
       );
 
-      const removed = await action.removeUnusedBlocksInBatches(
-        1000,
-        10,
+      const removed = await action.removeUnusedBoxesInBatches(
+        990,
         100,
         extractorId,
       );

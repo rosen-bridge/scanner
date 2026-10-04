@@ -6,6 +6,7 @@ import {
   OutputBox,
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
+import { Mutex } from '@rosen-bridge/semaphore';
 
 import {
   SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
@@ -19,7 +20,7 @@ import {
   CallbackType,
   TxExtra,
   InitializeOptions,
-  BlockCleanupConfig,
+  BoxCleanupConfig,
 } from '../interfaces';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
 
@@ -46,18 +47,19 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractedData,
     ExtractorEntity
   >;
-  protected blockCleanupConfig?: BlockCleanupConfig;
+  protected boxCleanupConfig?: BoxCleanupConfig;
+  private cleanupMutex = new Mutex();
 
   constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
     super(initializeOptions, logger);
-    if (initializeOptions?.blockCleanupConfig?.active) {
-      this.blockCleanupConfig = {
+    if (initializeOptions?.boxCleanupConfig?.active) {
+      this.boxCleanupConfig = {
         active: true,
         spentBoxCleanupThresholdDepth:
-          initializeOptions.blockCleanupConfig.spentBoxCleanupThresholdDepth ??
+          initializeOptions.boxCleanupConfig.spentBoxCleanupThresholdDepth ??
           SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
         spentBoxTrimCountInRound:
-          initializeOptions.blockCleanupConfig.spentBoxTrimCountInRound ??
+          initializeOptions.boxCleanupConfig.spentBoxTrimCountInRound ??
           SPENT_BOX_TRIM_COUNT_IN_ROUND,
       };
     }
@@ -165,7 +167,7 @@ export abstract class AbstractErgoBoxExtractor<
       if (spentData.length > 0) {
         this.triggerCallbacks(CallbackType.Spend, spentData);
       }
-      await this.removeOldConfirmedSpentBoxes(block);
+      this.removeOldConfirmedSpentBoxes(block).catch(() => {});
     } catch (e) {
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
@@ -188,16 +190,19 @@ export abstract class AbstractErgoBoxExtractor<
   protected removeOldConfirmedSpentBoxes = async (
     block: BlockInfo,
   ): Promise<void> => {
-    if (!this.blockCleanupConfig?.active) return;
+    if (!this.boxCleanupConfig?.active) return;
 
+    const release = await this.cleanupMutex.acquire();
     try {
       this.logger.debug(
         'Starting the process to remove old confirmed spent boxes',
       );
-      await this.actions.removeUnusedBlocksInBatches(
-        block.height,
-        this.blockCleanupConfig.spentBoxCleanupThresholdDepth,
-        this.blockCleanupConfig.spentBoxTrimCountInRound,
+      const thresholdHeight =
+        block.height - this.boxCleanupConfig.spentBoxCleanupThresholdDepth;
+
+      await this.actions.removeUnusedBoxesInBatches(
+        thresholdHeight,
+        this.boxCleanupConfig.spentBoxTrimCountInRound,
         this.getId(),
       );
       this.logger.debug('Successfully removed old confirmed spent boxes');
@@ -208,6 +213,8 @@ export abstract class AbstractErgoBoxExtractor<
       if (error instanceof Error && error.stack) {
         this.logger.error(error.stack);
       }
+    } finally {
+      release();
     }
   };
 

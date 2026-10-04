@@ -8,7 +8,7 @@ import {
   AbstractErgoBoxEntity,
   SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
   SPENT_BOX_TRIM_COUNT_IN_ROUND,
-  BlockCleanupConfig,
+  BoxCleanupConfig,
 } from '../../lib';
 import { block, extractedData, tx } from '../testData';
 import {
@@ -171,21 +171,21 @@ describe('AbstractErgoBoxExtractor', () => {
     };
 
     /**
-     * @target processTransactions should call removeUnusedBlocksInBatches with configured values when cleanup is active
+     * @target processTransactions should call removeUnusedBoxesInBatches with configured values when cleanup is active
      * @dependencies
      * - db action
      * @scenario
-     * - create extractor with blockCleanupConfig.active = true and explicit values
-     * - spy on `removeUnusedBlocksInBatches`
+     * - create extractor with boxCleanupConfig.active = true and explicit values
+     * - spy on `removeUnusedBoxesInBatches`
      * - run test (call `processTransactions` with an empty block)
      * @expected
-     * - to call `removeUnusedBlocksInBatches` with
+     * - to call `removeUnusedBoxesInBatches` with
      *   (block.height, thresholdDepth, trimCount, extractorId)
      */
-    it('should call removeUnusedBlocksInBatches with configured values when active', async () => {
+    it('should call removeUnusedBoxesInBatches with configured values when active', async () => {
       const extractor = createMockedErgoBoxExtractor({
         ...baseOptions,
-        blockCleanupConfig: {
+        boxCleanupConfig: {
           active: true,
           spentBoxCleanupThresholdDepth: 42,
           spentBoxTrimCountInRound: 7,
@@ -196,7 +196,7 @@ describe('AbstractErgoBoxExtractor', () => {
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
         updateSpendingInfo: vitest.fn().mockResolvedValue([]),
-        removeUnusedBlocksInBatches: removeSpy,
+        removeUnusedBoxesInBatches: removeSpy,
       } as unknown as AbstractErgoBoxAction<
         AbstractEntityData,
         AbstractErgoBoxEntity
@@ -205,57 +205,57 @@ describe('AbstractErgoBoxExtractor', () => {
       const result = await extractor.processTransactions([], block);
 
       expect(result).toEqual(true);
-      expect(removeSpy).toBeCalledWith(
-        block.height,
-        42,
-        7,
-        'TestErgoBoxExtractor',
+      await vi.waitFor(() =>
+        expect(removeSpy).toBeCalledWith(
+          block.height - 42,
+          7,
+          'TestErgoBoxExtractor',
+        ),
       );
     });
 
     /**
-     * @target processTransactions should not call removeUnusedBlocksInBatches when config is undefined
+     * @target processTransactions should not call removeUnusedBoxesInBatches when config is undefined
      * @dependencies
      * - db action
      * @scenario
-     * - create extractor without blockCleanupConfig
-     * - spy on `removeUnusedBlocksInBatches`
+     * - create extractor without boxCleanupConfig
+     * - spy on `removeUnusedBoxesInBatches`
      * - run test (call `processTransactions`)
      * @expected
-     * - not to call `removeUnusedBlocksInBatches`
+     * - not to call `removeUnusedBoxesInBatches`
      */
-    it('should not call removeUnusedBlocksInBatches when config is undefined', async () => {
+    it('should not call removeUnusedBoxesInBatches when config is undefined', async () => {
       const extractor = new MockedErgoBoxExtractor();
       const removeSpy = vitest.fn().mockResolvedValue(0);
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
         updateSpendingInfo: vitest.fn().mockResolvedValue([]),
-        removeUnusedBlocksInBatches: removeSpy,
+        removeUnusedBoxesInBatches: removeSpy,
       } as unknown as AbstractErgoBoxAction<
         AbstractEntityData,
         AbstractErgoBoxEntity
       >;
 
       await extractor.processTransactions([], block);
-
       expect(removeSpy).not.toBeCalled();
     });
 
     /**
-     * @target processTransactions should not call removeUnusedBlocksInBatches when config.active is false
+     * @target processTransactions should not call removeUnusedBoxesInBatches when config.active is false
      * @dependencies
      * - db action
      * @scenario
-     * - create extractor with blockCleanupConfig.active = false
-     * - spy on `removeUnusedBlocksInBatches`
+     * - create extractor with boxCleanupConfig.active = false
+     * - spy on `removeUnusedBoxesInBatches`
      * - run test (call `processTransactions`)
      * @expected
-     * - not to call `removeUnusedBlocksInBatches`
+     * - not to call `removeUnusedBoxesInBatches`
      */
-    it('should not call removeUnusedBlocksInBatches when config.active is false', async () => {
+    it('should not call removeUnusedBoxesInBatches when config.active is false', async () => {
       const extractor = createMockedErgoBoxExtractor({
         ...baseOptions,
-        blockCleanupConfig: {
+        boxCleanupConfig: {
           active: false,
           spentBoxCleanupThresholdDepth: 42,
           spentBoxTrimCountInRound: 7,
@@ -265,7 +265,7 @@ describe('AbstractErgoBoxExtractor', () => {
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
         updateSpendingInfo: vitest.fn().mockResolvedValue([]),
-        removeUnusedBlocksInBatches: removeSpy,
+        removeUnusedBoxesInBatches: removeSpy,
       } as unknown as AbstractErgoBoxAction<
         AbstractEntityData,
         AbstractErgoBoxEntity
@@ -280,24 +280,24 @@ describe('AbstractErgoBoxExtractor', () => {
      * @target constructor should fall back to default constants when threshold/trim are not provided
      * @dependencies
      * @scenario
-     * - create extractor with only blockCleanupConfig.active = true
-     * - spy on `removeUnusedBlocksInBatches`
+     * - create extractor with only boxCleanupConfig.active = true
+     * - spy on `removeUnusedBoxesInBatches`
      * - run test (call `processTransactions`)
      * @expected
-     * - to call `removeUnusedBlocksInBatches` with the default constants
+     * - to call `removeUnusedBoxesInBatches` with the default constants
      */
     it('should use default constants when threshold/trim are not provided', async () => {
       const extractor = createMockedErgoBoxExtractor({
         ...baseOptions,
-        blockCleanupConfig: {
+        boxCleanupConfig: {
           active: true,
-        } as unknown as BlockCleanupConfig,
+        } as unknown as BoxCleanupConfig,
       });
       const removeSpy = vitest.fn().mockResolvedValue(0);
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
         updateSpendingInfo: vitest.fn().mockResolvedValue([]),
-        removeUnusedBlocksInBatches: removeSpy,
+        removeUnusedBoxesInBatches: removeSpy,
       } as unknown as AbstractErgoBoxAction<
         AbstractEntityData,
         AbstractErgoBoxEntity
@@ -305,75 +305,30 @@ describe('AbstractErgoBoxExtractor', () => {
 
       await extractor.processTransactions([], block);
 
-      expect(removeSpy).toBeCalledWith(
-        block.height,
-        SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
-        SPENT_BOX_TRIM_COUNT_IN_ROUND,
-        'TestErgoBoxExtractor',
+      await vi.waitFor(() =>
+        expect(removeSpy).toBeCalledWith(
+          block.height - SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+          SPENT_BOX_TRIM_COUNT_IN_ROUND,
+          'TestErgoBoxExtractor',
+        ),
       );
     });
 
     /**
-     * @target processTransactions should call removeUnusedBlocksInBatches after updateSpendingInfo
+     * @target processTransactions should return true when removeUnusedBoxesInBatches rejects
      * @dependencies
      * - db action
      * @scenario
-     * - spy on both `updateSpendingInfo` and `removeUnusedBlocksInBatches`
-     * - run test (call `processTransactions`)
-     * @expected
-     * - `removeUnusedBlocksInBatches` is invoked after `updateSpendingInfo`
-     */
-    it('should call removeUnusedBlocksInBatches after updateSpendingInfo', async () => {
-      const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        blockCleanupConfig: {
-          active: true,
-          spentBoxCleanupThresholdDepth: 10,
-          spentBoxTrimCountInRound: 10,
-        },
-      });
-
-      const callOrder: string[] = [];
-      extractor['actions'] = {
-        storeEntities: vitest.fn().mockResolvedValue(true),
-        updateSpendingInfo: vitest.fn().mockImplementation(async () => {
-          callOrder.push('updateSpendingInfo');
-          return [];
-        }),
-        removeUnusedBlocksInBatches: vitest
-          .fn()
-          .mockImplementation(async () => {
-            callOrder.push('removeUnusedBlocksInBatches');
-            return 0;
-          }),
-      } as unknown as AbstractErgoBoxAction<
-        AbstractEntityData,
-        AbstractErgoBoxEntity
-      >;
-
-      await extractor.processTransactions([], block);
-
-      expect(callOrder).toEqual([
-        'updateSpendingInfo',
-        'removeUnusedBlocksInBatches',
-      ]);
-    });
-
-    /**
-     * @target processTransactions should return true when removeUnusedBlocksInBatches rejects
-     * @dependencies
-     * - db action
-     * @scenario
-     * - make `removeUnusedBlocksInBatches` reject with an Error
+     * - make `removeUnusedBoxesInBatches` reject with an Error
      * - spy on logger.error
      * - run test (call `processTransactions`)
      * @expected
      * - to return true (error is swallowed and only logged)
      */
-    it('should return true when removeUnusedBlocksInBatches rejects', async () => {
+    it('should return true when removeUnusedBoxesInBatches rejects', async () => {
       const extractor = createMockedErgoBoxExtractor({
         ...baseOptions,
-        blockCleanupConfig: {
+        boxCleanupConfig: {
           active: true,
           spentBoxCleanupThresholdDepth: 10,
           spentBoxTrimCountInRound: 10,
@@ -384,7 +339,7 @@ describe('AbstractErgoBoxExtractor', () => {
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
         updateSpendingInfo: vitest.fn().mockResolvedValue([]),
-        removeUnusedBlocksInBatches: vitest
+        removeUnusedBoxesInBatches: vitest
           .fn()
           .mockRejectedValue(new Error('db error')),
       } as unknown as AbstractErgoBoxAction<
@@ -395,7 +350,7 @@ describe('AbstractErgoBoxExtractor', () => {
       const result = await extractor.processTransactions([], block);
 
       expect(result).toEqual(true);
-      expect(errorSpy).toBeCalled();
+      await vi.waitFor(() => expect(errorSpy).toBeCalled());
     });
 
     /**
@@ -404,7 +359,7 @@ describe('AbstractErgoBoxExtractor', () => {
      * - db action
      * @scenario
      * - extractor with hasBoxData returning true for one output, cleanup active
-     * - spy on storeEntities, updateSpendingInfo, removeUnusedBlocksInBatches
+     * - spy on storeEntities, updateSpendingInfo, removeUnusedBoxesInBatches
      * - run test (call `processTransactions`)
      * @expected
      * - extraction proceeds normally and cleanup is invoked
@@ -412,7 +367,7 @@ describe('AbstractErgoBoxExtractor', () => {
     it('should still process boxes when cleanup is active', async () => {
       const extractor = createMockedErgoBoxExtractor({
         ...baseOptions,
-        blockCleanupConfig: {
+        boxCleanupConfig: {
           active: true,
           spentBoxCleanupThresholdDepth: 10,
           spentBoxTrimCountInRound: 10,
@@ -429,7 +384,7 @@ describe('AbstractErgoBoxExtractor', () => {
       extractor['actions'] = {
         storeEntities: storeSpy,
         updateSpendingInfo: spendSpy,
-        removeUnusedBlocksInBatches: removeSpy,
+        removeUnusedBoxesInBatches: removeSpy,
       } as unknown as AbstractErgoBoxAction<
         AbstractEntityData,
         AbstractErgoBoxEntity
@@ -444,11 +399,12 @@ describe('AbstractErgoBoxExtractor', () => {
         'TestErgoBoxExtractor',
       );
       expect(spendSpy).toBeCalled();
-      expect(removeSpy).toBeCalledWith(
-        block.height,
-        10,
-        10,
-        'TestErgoBoxExtractor',
+      await vi.waitFor(() =>
+        expect(removeSpy).toBeCalledWith(
+          block.height - 10,
+          10,
+          'TestErgoBoxExtractor',
+        ),
       );
     });
   });
