@@ -7,7 +7,7 @@ import { blockHash, fixture } from './bitcoinCashTestUtils';
 
 describe('validateBitcoinCashRawTransaction', () => {
   /**
-   * @target raw decoding can recover above the default byte budget without losing identity checks
+   * @target validateBitcoinCashRawTransaction accepts an exact enlarged raw-byte budget after default rejection
    * @dependencies syntactically valid synthetic libauth transaction; no node-validity claim
    * @scenario validate one oversized fixture with default and exact enlarged budgets
    * @expected default emits the typed resource failure, override preserves exact raw bytes
@@ -29,7 +29,7 @@ describe('validateBitcoinCashRawTransaction', () => {
     expect(parsed.transaction.hex).toEqual(tx.hex);
   });
   /**
-   * @target validateBitcoinCashRawTransaction should enforce its byte bound
+   * @target validateBitcoinCashRawTransaction rejects oversized raw bytes before native parsing
    * @dependencies
    * - Real raw validator and oversized libauth transaction fixture
    * @scenario

@@ -7,7 +7,7 @@ import {
 
 describe('resolveBitcoinCashRpcLimits', () => {
   /**
-   * @target every configurable resource remains a bounded positive safe integer
+   * @target resolveBitcoinCashRpcLimits validates defaults, every override and hard ceiling
    * @dependencies real budget resolver and exported defaults/ceilings
    * @scenario test defaults, each exact ceiling and isolated invalid overrides
    * @expected defaults are frozen, ceilings accepted, invalid values rejected

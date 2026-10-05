@@ -8,8 +8,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock classifies finalized hash
-   * %j as %s
+   * @target assertBitcoinCashFinalizedBlock classifies finalized hash %j as %s
    * @dependencies deterministic RPC fixture differing only in
    * finalized-hash response
    * @scenario BCHN reports an empty string or a malformed nonempty
@@ -34,8 +33,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock accepts the exact
-   * tip-count resource boundary
+   * @target assertBitcoinCashFinalizedBlock accepts exactly 1024 distinct tip records
    * @dependencies deterministic BCHN RPC fixture with unique known
    * invalid tips
    * @scenario supply exactly 1024 schema-valid records including one
@@ -61,8 +59,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock includes the finalized
-   * block itself
+   * @target assertBitcoinCashFinalizedBlock accepts an observation at the exact finalized height
    * @dependencies deterministic BCHN RPC fixture
    * @scenario check the exact finalized block at height eight
    * @expected equality of observed and finalized height is accepted
@@ -79,8 +76,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires a coherent
-   * confirmation count
+   * @target assertBitcoinCashFinalizedBlock rejects positive confirmations inconsistent with the captured tip
    * @dependencies deterministic BCHN RPC fixture with all other fields
    * unchanged
    * @scenario report 99 confirmations for height eight beneath the
@@ -105,8 +101,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock reports a coherent
-   * finalized header below the event as waiting
+   * @target assertBitcoinCashFinalizedBlock reports a coherent finalized header below the event as waiting
    * @dependencies coherent lower finalized header and unchanged
    * synchronized tip
    * @scenario the finalized height is three while the observed height
@@ -135,8 +130,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock does not classify an
-   * incoherent lower header as routine waiting
+   * @target assertBitcoinCashFinalizedBlock does not classify an incoherent lower header as routine waiting
    * @dependencies lower finalized height with an independently
    * inconsistent count
    * @scenario the header is below the event but its confirmations do
@@ -162,8 +156,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock accepts stable exact
-   * ancestry
+   * @target assertBitcoinCashFinalizedBlock checks exact observed and finalized active hashes in a stable snapshot
    * @dependencies deterministic BCHN RPC fixture
    * @scenario cover the event with finalized height eight and a stable
    * height-ten tip
@@ -189,8 +182,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects malformed observed
-   * references before RPC
+   * @target assertBitcoinCashFinalizedBlock rejects reference %s at %s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario vary the observed hash and height independently
    * @expected every invalid reference is rejected with zero calls
@@ -214,8 +206,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires a synchronized
-   * captured node
+   * @target assertBitcoinCashFinalizedBlock rejects captured %s=%s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario mutate each synchronization field independently
    * @expected each malformed snapshot rejects before RPC
@@ -242,8 +233,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires available
-   * canonical finalization and active ancestry
+   * @target assertBitcoinCashFinalizedBlock rejects %s response %j
    * @dependencies deterministic BCHN RPC fixture
    * @scenario independently corrupt finalization, header, ancestry or
    * ending responses
@@ -276,8 +266,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock validates each finalized
-   * header field
+   * @target assertBitcoinCashFinalizedBlock rejects finalized header %s=%s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario vary identity, height coverage and active confirmations
    * independently
@@ -308,8 +297,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock bounds and authenticates
-   * every tip record
+   * @target assertBitcoinCashFinalizedBlock rejects additional tip %s=%s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario add one independently malformed non-active tip to the
    * valid active tip
@@ -344,8 +332,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock requires one active tip
-   * matching captured state
+   * @target assertBitcoinCashFinalizedBlock rejects active tip %s=%s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario alter each active-tip binding or remove active status
    * @expected every mismatch rejects
@@ -368,8 +355,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects duplicate tip
-   * identity
+   * @target assertBitcoinCashFinalizedBlock rejects duplicate active tips
    * @dependencies deterministic BCHN RPC fixture
    * @scenario duplicate a valid active tip
    * @expected duplicate identity cannot create multiple accepted
@@ -390,8 +376,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects parked branches
-   * that can replace the event
+   * @target assertBitcoinCashFinalizedBlock rejects relevant parked branch at height %s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario test a shorter, equal and longer parked branch with fork
    * height three
@@ -419,8 +404,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   );
 
   /**
-   * @target assertBitcoinCashFinalizedBlock admits branches whose
-   * common ancestor includes the event
+   * @target assertBitcoinCashFinalizedBlock accepts %s fork at %s
    * @dependencies deterministic BCHN RPC fixture
    * @scenario test exact event fork boundary, later parked fork and
    * known non-parked statuses
@@ -452,8 +436,7 @@ describe('assertBitcoinCashFinalizedBlock', () => {
   });
 
   /**
-   * @target assertBitcoinCashFinalizedBlock rejects drift in the
-   * ending snapshot
+   * @target assertBitcoinCashFinalizedBlock rejects ending %s drift
    * @dependencies deterministic BCHN RPC fixture
    * @scenario change identity, best hash, synchronization or
    * synchronized height at the final read

@@ -25,7 +25,6 @@
     "prettify:check": "prettier --check . --ignore-path ../../.gitignore",
     "release": "npm run test -- --run && npm run clean && npm run build && npm publish --access public",
     "test": "NODE_OPTIONS='--import tsx' vitest",
-    "test:postgres": "cross-env NODE_OPTIONS=--import=tsx SCANNER_POSTGRES_TEST_REQUIRED=1 vitest run tests/scanner/action.spec.ts --testNamePattern=PostgreSQL",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,8 +37,7 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "pg": "8.11.3"
+    "@types/lodash-es": "^4.17.12"
   },
   "engines": {
     "node": ">=22.18.0",

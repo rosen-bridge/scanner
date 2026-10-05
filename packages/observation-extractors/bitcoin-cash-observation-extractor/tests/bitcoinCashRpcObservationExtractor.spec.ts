@@ -1,85 +1,19 @@
-import {
-  CashAddressType,
-  encodeCashAddress,
-  encodeTransactionBCH,
-  hashTransaction,
-} from '@bitauth/libauth';
 import { blake2b } from 'blakejs';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  chainValidators,
-  chainDecoders,
-  encodeAddress,
-} from '@rosen-bridge/address-codec';
+import { chainValidators, chainDecoders } from '@rosen-bridge/address-codec';
 import { AddressManager } from '@rosen-bridge/address-manager';
 import { BitcoinCashRpcTransaction } from '@rosen-bridge/bitcoin-cash-scanner';
-import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { TokenMap } from '@rosen-bridge/tokens';
 
-import { BitcoinCashRpcObservationExtractor } from '../lib';
+import { receiver } from './bitcoinCashObservationTestData';
+import {
+  eventScript,
+  inputId,
+  fixture,
+  TestBitcoinCashObservationExtractor,
+} from './bitcoinCashObservationTestUtils';
 
-const address = encodeCashAddress({
-  prefix: 'bitcoincash',
-  type: CashAddressType.p2pkh,
-  payload: new Uint8Array(20).fill(1),
-}).address;
-const script = encodeAddress('bitcoin-cash', address);
-const receiver = '9iMjQx8PzwBKXRvsFUJFJAPoy31znfEeBUGz8DRkcnJX4rJYjVd';
-const receiverScript = encodeAddress('ergo', receiver);
-const payload = `000000000000000123000000000000045621${receiverScript}`;
-const eventScript = `6a33${payload}`;
-const inputId = Uint8Array.from({ length: 32 }, (_, index) => index + 1);
-/** Encodes a synthetic BCH lock with an optionally token-bearing treasury. */
-const fixture = (token = false): BitcoinCashRpcTransaction => {
-  const bytes = encodeTransactionBCH({
-    version: 2,
-    locktime: 0,
-    inputs: [
-      {
-        outpointTransactionHash: inputId,
-        outpointIndex: 7,
-        sequenceNumber: 0xffffffff,
-        unlockingBytecode: Uint8Array.of(0x51),
-      },
-    ],
-    outputs: [
-      {
-        valueSatoshis: 123456789n,
-        lockingBytecode: Uint8Array.from(Buffer.from(script, 'hex')),
-        token: token
-          ? { amount: 1n, category: new Uint8Array(32).fill(2) }
-          : undefined,
-      },
-      {
-        valueSatoshis: 0n,
-        lockingBytecode: Uint8Array.from(Buffer.from(eventScript, 'hex')),
-      },
-    ],
-  });
-  return {
-    hex: Buffer.from(bytes).toString('hex'),
-    txid: hashTransaction(bytes),
-    vin: [{ txid: Buffer.from(inputId).toString('hex'), vout: 7 }],
-    vout: [
-      { n: 0, value: '1.23456789', scriptPubKey: { hex: script } },
-      { n: 1, value: '0', scriptPubKey: { hex: eventScript } },
-    ],
-  };
-};
-
-class TestBitcoinCashObservationExtractor extends BitcoinCashRpcObservationExtractor {
-  stored = vi.fn().mockResolvedValue(true);
-  /** Uses real native extraction while replacing observation storage. */
-  constructor(tokens: TokenMap, storeRawData = true) {
-    // The storage seam is mocked; native parsing, AddressManager and TokenMap are real.
-    const dataSource = {
-      getRepository: vi.fn().mockReturnValue({}),
-    } as unknown as DataSource;
-    super(address, dataSource, tokens, undefined, storeRawData);
-    this.actions.storeObservations = this.stored;
-  }
-}
 describe('BitcoinCashRpcObservationExtractor', () => {
   let tokens: TokenMap;
 
@@ -114,7 +48,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
   });
   describe('getId', () => {
     /**
-     * @target BitcoinCashRpcObservationExtractor.getId returns the canonical adapter or transaction identity
+     * @target BitcoinCashRpcObservationExtractor.getId returns its persistent extractor ID
      * @dependencies Actual adapter and native transaction fixture with mocked storage
      * @scenario Read the adapter identity
      * @expected Preserve the original exact identity assertion
@@ -126,7 +60,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
   });
   describe('getTxId', () => {
     /**
-     * @target BitcoinCashRpcObservationExtractor.getTxId returns the canonical adapter or transaction identity
+     * @target BitcoinCashRpcObservationExtractor.getTxId returns the canonical transaction ID
      * @dependencies Actual adapter and native transaction fixture with mocked storage
      * @scenario Read the canonical transaction identifier
      * @expected Preserve the original exact identity assertion
@@ -137,7 +71,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
       expect(adapter.getTxId(tx)).toEqual(tx.txid);
     });
     /**
-     * @target BitcoinCashRpcObservationExtractor.getTxId returns the canonical adapter or transaction identity
+     * @target BitcoinCashRpcObservationExtractor.getTxId normalizes the uppercase transaction ID
      * @dependencies Actual adapter and native transaction fixture with mocked storage
      * @scenario Read the uppercase transaction identifier
      * @expected Preserve the original exact identity assertion
@@ -152,7 +86,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
   });
   describe('processTransactions', () => {
     /**
-     * @target BitcoinCashRpcObservationExtractor.processTransactions joins extraction and persistence
+     * @target BitcoinCashRpcObservationExtractor.processTransactions joins inherited observation processing with actual native extraction and TokenMap
      * @dependencies
      * - Real parsing, codecs and TokenMap with mocked observation storage
      * @scenario
@@ -190,7 +124,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
     });
 
     /**
-     * @target BitcoinCashRpcObservationExtractor.processTransactions should preserve raw-data suppression
+     * @target BitcoinCashRpcObservationExtractor.processTransactions preserves configured raw-data suppression
      * @dependencies
      * - Real parsing, codecs and TokenMap with mocked observation storage
      * @scenario
@@ -207,7 +141,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
     });
 
     /**
-     * @target BitcoinCashRpcObservationExtractor.processTransactions should discard inconsistent native requests
+     * @target BitcoinCashRpcObservationExtractor.processTransactions stores no observation for %s
      * @dependencies
      * - Real parsing, codecs and TokenMap with mocked observation storage
      * @scenario
@@ -253,7 +187,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
     });
 
     /**
-     * @target BitcoinCashRpcObservationExtractor.processTransactions should reject an unknown native asset
+     * @target BitcoinCashRpcObservationExtractor.processTransactions stores no observation for unknown native token map
      * @dependencies
      * - Real parsing, codecs and TokenMap with mocked observation storage
      * @scenario
@@ -272,7 +206,7 @@ describe('BitcoinCashRpcObservationExtractor', () => {
     });
 
     /**
-     * @target BitcoinCashRpcObservationExtractor.processTransactions should use raw treasury token authority
+     * @target BitcoinCashRpcObservationExtractor.processTransactions excludes token-bearing treasury raw bytes when RPC omits token metadata
      * @dependencies
      * - Real parsing, codecs and TokenMap with mocked observation storage
      * @scenario

@@ -3,58 +3,28 @@ import { rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-import { AbstractExtractor } from '@rosen-bridge/abstract-extractor';
 import {
   BlockEntity,
   ExtractorStatusEntity,
   migrations,
   PROCEED,
 } from '@rosen-bridge/abstract-scanner';
-import { DataSource, ObjectLiteral } from '@rosen-bridge/extended-typeorm';
+import { DataSource } from '@rosen-bridge/extended-typeorm';
 import '@rosen-bridge/extended-typeorm/bootstrap';
-import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import {
-  BitcoinCashRpcNetwork,
-  BitcoinCashRpcScanner,
-  BitcoinCashRpcTransaction,
-} from '../../lib';
+import { BitcoinCashRpcNetwork, BitcoinCashRpcScanner } from '../../lib';
 import { axiosInstance, resetAxiosMock } from '../mocked/axiosRpc.mock';
 import {
   blockHash,
   fixture,
   parentHash,
 } from '../network/bitcoinCashTestUtils';
-
-/** Records the extractor port while scanner-owned progress uses real SQL. */
-class RecordingExtractor extends AbstractExtractor<
-  BitcoinCashRpcTransaction,
-  ObjectLiteral
-> {
-  initialized: BlockInfo[] = [];
-  processed: { block: BlockInfo; txs: BitcoinCashRpcTransaction[] }[] = [];
-
-  getId = () => 'resource-limit-persistence';
-  initializeData = async (block: BlockInfo) => {
-    this.initialized.push(block);
-  };
-  processTransactions = async (
-    txs: BitcoinCashRpcTransaction[],
-    block: BlockInfo,
-  ) => {
-    this.processed.push({ block, txs });
-    return true;
-  };
-  forkBlock = async () => {
-    throw Error('Unexpected fork in continuous synthetic fixture');
-  };
-  createUsedBlocksQuery = () => [];
-}
+import { TestRecordingExtractor } from './bitcoinCashRpcScannerTestUtils';
 
 describe('BitcoinCashRpcScanner', () => {
   describe('update', () => {
     /**
-     * @target update should persist its checkpoint across resource-limit failures and restart
+     * @target BitcoinCashRpcScanner.update keeps durable progress on a resource limit and resumes the same block once after restart
      * @dependencies
      * - Real GeneralScanner, RPC connector, SQLite file and scanner migrations
      * - Mocked HTTP responses and a recording extractor port
@@ -159,7 +129,7 @@ describe('BitcoinCashRpcScanner', () => {
               blockTrimCountInRound: 100,
             },
           });
-          const extractor = new RecordingExtractor();
+          const extractor = new TestRecordingExtractor();
           await scanner.registerExtractor(extractor);
           return { scanner, network, extractor };
         };

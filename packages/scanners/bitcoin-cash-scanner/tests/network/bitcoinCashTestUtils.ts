@@ -68,3 +68,18 @@ export const fixture = (
     })),
   };
 };
+
+/** Provides matching synthetic block metadata for the RPC response seam. */
+export const header = () => ({
+  hash: blockHash,
+  height: 4,
+  time: 123,
+  nTx: 1,
+  previousblockhash: parentHash,
+});
+/** Removes inline bytes to exercise block-qualified raw transaction lookup. */
+export const missingHex = (tx: BitcoinCashRpcTransaction) => {
+  const result: Partial<BitcoinCashRpcTransaction> = structuredClone(tx);
+  delete result.hex;
+  return result;
+};
