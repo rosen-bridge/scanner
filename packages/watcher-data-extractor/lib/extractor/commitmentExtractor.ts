@@ -115,6 +115,9 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
   initializeData = async (initialBlock: BlockInfo): Promise<void> => {
     if (this.initializeOptions && this.initializeOptions.active) {
       for (const address of this.addresses) {
+        this.logger.debug(
+          `Initializing [${this.getId()}] for address [${address}]`,
+        );
         const initializer = new ErgoBoxInitializer(
           this.initializeOptions.type,
           this.initializeOptions.url,
@@ -127,9 +130,12 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
           this.logger.child('ergoBoxInitializer'),
         );
         await initializer.initializeData(initialBlock);
+        this.logger.info(
+          `Initialized [${this.getId()}] for address [${address}]`,
+        );
       }
     } else
-      this.logger.info(`Initializiation for [${this.getId()}] is turned off`);
+      this.logger.info(`Initialization for [${this.getId()}] is turned off`);
   };
 }
 
