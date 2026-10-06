@@ -17,6 +17,8 @@ export class Migration1789048116110 implements MigrationInterface {
                 "serialized" varchar NOT NULL,
                 "spendBlock" varchar,
                 "spendHeight" integer,
+                "spendTxId" text,
+                "spendIndex" integer,
                 "token" varchar NOT NULL,
                 "R4" varchar NOT NULL,
                 "R5" varchar NOT NULL,
@@ -24,7 +26,7 @@ export class Migration1789048116110 implements MigrationInterface {
                 "R7" varchar NOT NULL,
                 "R8" varchar NOT NULL,
                 "R9" varchar NOT NULL,
-                CONSTRAINT "UQ_c6c8659b5b4bdd6e2e5e59f1d1e" UNIQUE ("identifier", "extractor")
+                CONSTRAINT "UQ_d411bef8531285c296e9841b24e" UNIQUE ("identifier", "extractor")
             )
         `);
   }
