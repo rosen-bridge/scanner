@@ -6,7 +6,7 @@ import {
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
 import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
-import { BlockCleanupConfig } from '../../../lib/scanner/interfaces';
+import { BlockCleanupConfig } from '../../../lib';
 import {
   ExtractorTest,
   TestAbstractScanner,
@@ -22,6 +22,7 @@ describe('AbstractScanner', () => {
     dataSource = await createDatabase();
   });
   blockCleanupConfig = {
+    active: true,
     blockCleanupThresholdDuration: 1000,
     blockTrimCountInRound: 5,
   };
@@ -468,6 +469,7 @@ describe('AbstractScanner', () => {
      */
     it('should call database action with correct parameters', async () => {
       const customBlockCleanupConfig: BlockCleanupConfig = {
+        active: true,
         blockCleanupThresholdDuration: 3600,
         blockTrimCountInRound: 50,
       };

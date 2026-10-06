@@ -21,7 +21,7 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
       new DogeRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('DogeRpcRosenExtractor'),
+        logger?.child('dogeRpcRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -31,7 +31,7 @@ export class DogeRpcObservationExtractor extends AbstractObservationExtractor<Do
   /**
    * gets Id for current extractor
    */
-  getId = () => 'doge-rpc-extractor';
+  getId = () => 'doge-observation-extractor';
 
   /**
    * gets transaction id from TransactionType

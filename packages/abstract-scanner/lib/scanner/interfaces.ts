@@ -13,7 +13,11 @@ export interface ScannerConfig<TransactionType> {
   logger?: AbstractLogger;
 }
 
-export interface BlockCleanupConfig {
+export interface BlockCleanup {
   blockCleanupThresholdDuration: number;
   blockTrimCountInRound: number;
+}
+
+export interface BlockCleanupConfig extends Partial<BlockCleanup> {
+  active: boolean;
 }

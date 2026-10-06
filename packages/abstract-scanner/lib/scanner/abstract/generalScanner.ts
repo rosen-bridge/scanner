@@ -40,7 +40,7 @@ abstract class GeneralScanner<
     this.action = new BlockDbAction(
       this.dataSource,
       this.name(),
-      this.logger.child('BlockDbAction'),
+      this.logger.child('blockDbAction'),
     );
   }
 

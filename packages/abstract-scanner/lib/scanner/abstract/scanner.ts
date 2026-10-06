@@ -15,7 +15,7 @@ import {
 } from '../../constants';
 import { BlockEntity } from '../../entities/blockEntity';
 import { BlockDbAction } from '../action';
-import { BlockCleanupConfig } from '../interfaces';
+import { BlockCleanup, BlockCleanupConfig } from '../interfaces';
 
 export abstract class AbstractScanner<TransactionType> {
   action: BlockDbAction;
@@ -25,23 +25,24 @@ export abstract class AbstractScanner<TransactionType> {
   newExtractors: Array<AbstractExtractor<TransactionType, ObjectLiteral>>;
   logger: AbstractLogger;
   initializeMutex: Mutex;
-  blockCleanupConfig: BlockCleanupConfig;
+  cleanup: BlockCleanup;
 
   constructor(
-    blockCleanupConfig?: BlockCleanupConfig,
+    blockCleanupConfig: BlockCleanupConfig = { active: false },
     logger?: AbstractLogger,
   ) {
     this.extractors = [];
     this.newExtractors = [];
     this.logger = logger ? logger : new DummyLogger();
     this.initializeMutex = new Mutex();
-
-    this.blockCleanupConfig = {
+    this.cleanup = {
       blockCleanupThresholdDuration:
-        blockCleanupConfig?.blockCleanupThresholdDuration ??
+        blockCleanupConfig.blockCleanupThresholdDuration ??
         BLOCK_CLEANUP_THRESHOLD_DURATION,
-      blockTrimCountInRound:
-        blockCleanupConfig?.blockTrimCountInRound ?? BLOCK_TRIM_COUNT_IN_ROUND,
+      blockTrimCountInRound: blockCleanupConfig.active
+        ? (blockCleanupConfig.blockTrimCountInRound ??
+          BLOCK_TRIM_COUNT_IN_ROUND)
+        : 0,
     };
   }
 
@@ -49,7 +50,7 @@ export abstract class AbstractScanner<TransactionType> {
 
   /**
    * fork blocks from specific height from scanner.
-   * @param height: selected height
+   * @param height : selected height
    */
   protected forkBlock = async (height: number) => {
     let lastBlock = await this.action.getLastSavedBlock();
@@ -72,8 +73,8 @@ export abstract class AbstractScanner<TransactionType> {
 
   /**
    * process a block and all of its transactions. store any information into database
-   * @param block: selected block
-   * @param transactions: list of transaction for selected block
+   * @param block : selected block
+   * @param transactions : list of transaction for selected block
    */
   protected processBlockTransactions = async (
     block: Block,
@@ -132,7 +133,7 @@ export abstract class AbstractScanner<TransactionType> {
   };
 
   /**
-   * remove an extractor from scanner
+   * remove an extractor from the scanner
    * @param extractor
    */
   removeExtractor = async (
@@ -150,7 +151,7 @@ export abstract class AbstractScanner<TransactionType> {
   /**
    * Initialize all specified extractors and store the updated status
    * @param extractorIds
-   * @param height
+   * @param block
    */
   private initializeExtractors = async (
     extractorIds: string[],
@@ -248,17 +249,17 @@ export abstract class AbstractScanner<TransactionType> {
         const query = extractor.createUsedBlocksQuery();
         extractorUsedBlocksQueries.push(...query);
       });
-      const thresholdTimestamp = lastSavedBlock
-        ? lastSavedBlock.timestamp -
-          this.blockCleanupConfig.blockCleanupThresholdDuration
-        : 0;
-      await this.action.removeUnusedBlocksInBatches(
-        extractorUsedBlocksQueries,
-        this.blockCleanupConfig.blockTrimCountInRound,
-        this.name(),
-        thresholdTimestamp,
-      );
-      this.logger.debug(`Successfully removed old unused blocks`);
+      if (this.cleanup.blockTrimCountInRound > 0 && lastSavedBlock) {
+        const thresholdTimestamp =
+          lastSavedBlock.timestamp - this.cleanup.blockCleanupThresholdDuration;
+        await this.action.removeUnusedBlocksInBatches(
+          extractorUsedBlocksQueries,
+          this.cleanup.blockTrimCountInRound,
+          this.name(),
+          thresholdTimestamp,
+        );
+        this.logger.debug(`Successfully removed old unused blocks`);
+      }
     } catch (error) {
       this.logger.error(
         `An error occurred while removing old unused blocks: ${error}`,

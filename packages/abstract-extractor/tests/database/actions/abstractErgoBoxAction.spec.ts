@@ -2,7 +2,7 @@ import { pick } from 'lodash-es';
 
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
-import { SpendInfo } from '../../../lib';
+import { SpendInfo, DB_CHUNK_SIZE } from '../../../lib';
 import { block, block2, sampleEntities } from '../../testData';
 import { createDatabase, TestBoxEntity } from '../../testUtils';
 import { testData, TestErgoBoxAction } from './abstractErgoBoxAction.mock';
@@ -19,7 +19,7 @@ describe('AbstractErgoBoxAction', () => {
 
   describe('updateSpendingInfo', () => {
     /**
-     * @target updateSpendingInfo should set spendBlock and spendHeight for a set of boxes
+     * @target updateSpendingInfo should set spending info for a set of boxes
      * @dependencies
      * - database
      * @scenario
@@ -27,10 +27,11 @@ describe('AbstractErgoBoxAction', () => {
      * - mock spending information for the first box
      * - run test (call `updateSpendingInfo`)
      * @expected
-     * - spend the first box
-     * - return boxId and serialized of spent box
+     * - set spendBlock, spendHeight, spendTxId and spendIndex of the first box
+     * - keep the second box unspent
+     * - return identifier of spent box
      */
-    it(`should set spendBlock and spendHeight for a set of boxes`, async () => {
+    it(`should set spending info for a set of boxes`, async () => {
       await action.storeEntities(
         sampleEntities.slice(0, 2),
         block,
@@ -48,20 +49,223 @@ describe('AbstractErgoBoxAction', () => {
         'extractor1',
       );
 
-      const spentBoxes = await repository.findOneBy({
+      const spentBox = await repository.findOneBy({
         identifier: sampleEntities[0].identifier,
         extractor: 'extractor1',
       });
+      const unspentBox = await repository.findOneBy({
+        identifier: sampleEntities[1].identifier,
+        extractor: 'extractor1',
+      });
 
-      expect(spentBoxes).toMatchObject({
+      expect(spentBox).toMatchObject({
         ...sampleEntities[0],
         block: block.hash,
         height: block.height,
         extractor: 'extractor1',
         spendBlock: spendBlock.hash,
         spendHeight: spendBlock.height,
+        spendTxId: 'txId',
+        spendIndex: 0,
+      });
+      expect(unspentBox).toMatchObject({
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
       });
       expect(spentBoxIds).toEqual([pick(sampleEntities[0], ['identifier'])]);
+    });
+
+    /**
+     * @target updateSpendingInfo should set the matching spendTxId and
+     * spendIndex for each spent box
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert three boxes
+     * - mock spending information for all boxes in different transactions
+     *   and input indexes
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - set spendTxId and spendIndex of each box from its own spend info
+     * - return identifiers of all spent boxes
+     */
+    it(`should set the matching spendTxId and spendIndex for each spent box`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 3),
+        block,
+        'extractor1',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId1', boxId: sampleEntities[0].identifier, index: 1 },
+        { txId: 'txId1', boxId: sampleEntities[1].identifier, index: 2 },
+        { txId: 'txId2', boxId: sampleEntities[2].identifier, index: 1 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      for (const spendInfo of spendInfos) {
+        const box = await repository.findOneBy({
+          identifier: spendInfo.boxId,
+          extractor: 'extractor1',
+        });
+        expect(box).toMatchObject({
+          spendBlock: block2.hash,
+          spendHeight: block2.height,
+          spendTxId: spendInfo.txId,
+          spendIndex: spendInfo.index,
+        });
+      }
+      expect(spentBoxIds).toHaveLength(3);
+      expect(spentBoxIds).toEqual(
+        expect.arrayContaining(
+          sampleEntities
+            .slice(0, 3)
+            .map((entity) => pick(entity, ['identifier'])),
+        ),
+      );
+    });
+
+    /**
+     * @target updateSpendingInfo should only spend stored boxes of the
+     * specified extractor
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert two boxes for extractor1 and one box for extractor2
+     * - mock spending information for an extractor1 box, the extractor2 box
+     *   and a box that is not stored
+     * - run test (call `updateSpendingInfo` for extractor1)
+     * @expected
+     * - spend only the extractor1 box
+     * - keep the extractor2 box unspent
+     * - return only identifier of the extractor1 box
+     */
+    it(`should only spend stored boxes of the specified extractor`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 2),
+        block,
+        'extractor1',
+      );
+      await action.storeEntities(
+        sampleEntities.slice(2, 3),
+        block,
+        'extractor2',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId', boxId: sampleEntities[0].identifier, index: 1 },
+        { txId: 'txId', boxId: sampleEntities[2].identifier, index: 2 },
+        { txId: 'txId', boxId: 'notStoredBoxId', index: 3 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const otherExtractorBox = await repository.findOneBy({
+        identifier: sampleEntities[2].identifier,
+        extractor: 'extractor2',
+      });
+      expect(otherExtractorBox).toMatchObject({
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
+      });
+      expect(spentBoxIds).toEqual([pick(sampleEntities[0], ['identifier'])]);
+    });
+
+    /**
+     * @target updateSpendingInfo should return an empty array when no stored
+     * box is spent
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert two boxes
+     * - mock spending information for boxes that are not stored
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - keep all boxes unspent
+     * - return an empty array
+     */
+    it(`should return an empty array when no stored box is spent`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 2),
+        block,
+        'extractor1',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId', boxId: 'notStoredBoxId', index: 1 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const spentCount = await repository.countBy({
+        spendBlock: block2.hash,
+      });
+      expect(spentCount).toEqual(0);
+      expect(spentBoxIds).toEqual([]);
+    });
+
+    /**
+     * @target updateSpendingInfo should spend boxes in all chunks when spend
+     * infos exceed the chunk size
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert more boxes than the database chunk size
+     * - mock spending information for all boxes
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - set spending info of all boxes
+     * - return identifiers of all boxes
+     */
+    it(`should spend boxes in all chunks when spend infos exceed the chunk size`, async () => {
+      const boxCount = DB_CHUNK_SIZE + 5;
+      const boxes = Array.from({ length: boxCount }, (_, index) => ({
+        identifier: `boxId${index}`,
+        serialized: `serialized${index}`,
+      }));
+      await action.storeEntities(boxes, block, 'extractor1');
+
+      const spendInfos: Array<SpendInfo> = boxes.map((box, index) => ({
+        txId: 'txId',
+        boxId: box.identifier,
+        index,
+      }));
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const lastBox = await repository.findOneBy({
+        identifier: `boxId${boxCount - 1}`,
+      });
+      expect(lastBox).toMatchObject({
+        spendBlock: block2.hash,
+        spendTxId: 'txId',
+        spendIndex: boxCount - 1,
+      });
+      expect(await repository.countBy({ spendBlock: block2.hash })).toEqual(
+        boxCount,
+      );
+      expect(spentBoxIds).toHaveLength(boxCount);
     });
   });
 
@@ -76,6 +280,7 @@ describe('AbstractErgoBoxAction', () => {
      * - run test(call `revertBlockUpdates` to delete block2)
      * @expected
      * - to update the box spent in block2
+     * - to clear spendTxId and spendIndex of the box spent in block2
      * - to return the updated entity boxId and serialized
      */
     it(`should update the boxes spent in the specified block`, async () => {
@@ -98,6 +303,8 @@ describe('AbstractErgoBoxAction', () => {
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(4);
       expect(rows.map((row) => row.spendBlock)).not.toContain(block2.hash);
+      expect(rows.map((row) => row.spendTxId)).not.toContain('txId');
+      expect(rows.map((row) => row.spendIndex)).not.toContain(0);
       expect(result).toMatchObject([sampleEntities[0]]);
     });
   });

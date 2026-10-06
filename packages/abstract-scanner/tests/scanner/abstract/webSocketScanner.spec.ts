@@ -1,7 +1,7 @@
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
 import { BlockEntity, PROCEED } from '../../../lib';
-import { BlockCleanupConfig } from './../../../lib/scanner/interfaces';
+import { BlockCleanupConfig } from '../../../lib';
 import {
   createDatabase,
   FailExtractor,
@@ -15,6 +15,7 @@ let repository: Repository<BlockEntity>;
 describe('webSocketScanner', () => {
   beforeEach(async () => {
     const blockCleanupConfig: BlockCleanupConfig = {
+      active: true,
       blockCleanupThresholdDuration: 1000,
       blockTrimCountInRound: 5,
     };

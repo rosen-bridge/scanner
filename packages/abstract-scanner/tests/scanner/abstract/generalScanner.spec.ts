@@ -2,7 +2,7 @@
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 
 import { BlockEntity } from '../../../lib';
-import { BlockCleanupConfig } from '../../../lib/scanner/interfaces';
+import { BlockCleanupConfig } from '../../../lib';
 import {
   ExtractorTest,
   insertBlocks,
@@ -19,6 +19,7 @@ describe('generalScanner', () => {
   beforeEach(async () => {
     dataSource = await createDatabase();
     blockCleanupConfig = {
+      active: true,
       blockCleanupThresholdDuration: 2000,
       blockTrimCountInRound: 10,
     };

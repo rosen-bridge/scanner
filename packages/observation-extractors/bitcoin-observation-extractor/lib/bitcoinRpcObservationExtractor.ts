@@ -21,7 +21,7 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
       new BitcoinRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('BitcoinRpcRosenExtractor'),
+        logger?.child('bitcoinRpcRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -31,7 +31,7 @@ export class BitcoinRpcObservationExtractor extends AbstractObservationExtractor
   /**
    * gets Id for current extractor
    */
-  getId = () => 'bitcoin-rpc-extractor';
+  getId = () => 'bitcoin-observation-extractor';
 
   /**
    * gets transaction id from TransactionType
