@@ -1,5 +1,13 @@
 # @rosen-bridge/firo-observation-extractor
 
+## 1.1.6
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@3.0.0
+  - @rosen-bridge/firo-scanner@1.0.2
+
 ## 1.1.5
 
 ### Patch Changes

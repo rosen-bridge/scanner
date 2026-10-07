@@ -1,5 +1,12 @@
 # @rosen-bridge/tx-id-extractor
 
+## 4.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+
 ## 4.0.0
 
 ### Major Changes

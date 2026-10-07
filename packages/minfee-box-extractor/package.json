@@ -1,6 +1,6 @@
 {
   "name": "@rosen-bridge/minfee-box-extractor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Minimum fee box extractor",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@rosen-bridge/abstract-extractor": "^4.0.0",
+    "@rosen-bridge/abstract-extractor": "^4.1.0",
     "@rosen-bridge/abstract-logger": "^4.0.0",
     "@rosen-bridge/extended-typeorm": "^1.1.0",
     "@rosen-bridge/json-bigint": "^1.1.0",

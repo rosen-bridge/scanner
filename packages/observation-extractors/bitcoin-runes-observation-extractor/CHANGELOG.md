@@ -1,5 +1,18 @@
 # @rosen-bridge/bitcoin-runes-observation-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- Rename and standardize observation extractor ids to `<chain>-observation-extractor` and add a migration to rename the stored ids in `observation_entity` and `extractor_status_entity`:
+  - `bitcoin-runes-esplora-extractor`, `bitcoin-runes-rpc-extractor` → `bitcoin-runes-observation-extractor`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@3.0.0
+  - @rosen-bridge/bitcoin-scanner@2.0.2
+
 ## 3.0.8
 
 ### Patch Changes

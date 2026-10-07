@@ -1,5 +1,13 @@
 # @rosen-bridge/evm-address-tx-extractor
 
+## 4.0.1
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+  - @rosen-bridge/abstract-scanner@4.1.0
+
 ## 4.0.0
 
 ### Major Changes

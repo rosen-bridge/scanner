@@ -1,5 +1,12 @@
 # @rosen-bridge/reward-extractor
 
+## 0.0.7
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+
 ## 0.0.6
 
 ### Patch Changes

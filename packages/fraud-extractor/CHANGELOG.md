@@ -1,5 +1,16 @@
 # @rosen-bridge/fraud-extractor
 
+## 3.1.0
+
+### Minor Changes
+
+- Store `spendTxId` and `spendIndex`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+
 ## 3.0.9
 
 ### Patch Changes

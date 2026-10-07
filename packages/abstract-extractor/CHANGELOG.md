@@ -1,5 +1,11 @@
 # @rosen-bridge/abstract-extractor
 
+## 4.1.0
+
+### Minor Changes
+
+- Store `spendTxId` and `spendIndex`
+
 ## 4.0.0
 
 ### Major Changes

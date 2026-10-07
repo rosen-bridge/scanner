@@ -1,5 +1,17 @@
 # @rosen-bridge/cardano-observation-extractor
 
+## 4.0.0
+
+### Major Changes
+
+- Rename and standardize observation extractor ids to `<chain>-observation-extractor` and add a migration to rename the stored ids in `observation_entity` and `extractor_status_entity`:
+  - `cardano-blockfrost-extractor`, `cardano-koios-extractor`, `cardano-ogmios-extractor` → `cardano-observation-extractor`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@3.0.0
+
 ## 3.0.8
 
 ### Patch Changes
