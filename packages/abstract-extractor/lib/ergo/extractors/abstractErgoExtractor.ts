@@ -77,16 +77,19 @@ export abstract class AbstractErgoExtractor<
    */
   unhook = async (type: CallbackType, id: string): Promise<boolean> => {
     const release = await this.callbackMutex.acquire();
-    const callbackMap = this.callbacks[type];
-    if (!callbackMap.has(id)) {
-      this.logger.warn(
-        `Callback with Id [${id}] is not registered for type [${type}].`,
-      );
-      return false;
+    try {
+      const callbackMap = this.callbacks[type];
+      if (!callbackMap.has(id)) {
+        this.logger.warn(
+          `Callback with Id [${id}] is not registered for type [${type}].`,
+        );
+        return false;
+      }
+      callbackMap.delete(id);
+      return true;
+    } finally {
+      release();
     }
-    callbackMap.delete(id);
-    release();
-    return true;
   };
 
   /**

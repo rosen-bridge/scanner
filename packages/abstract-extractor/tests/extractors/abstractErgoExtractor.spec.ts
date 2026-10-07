@@ -95,6 +95,28 @@ describe('AbstractErgoExtractor', () => {
     });
 
     /**
+     * @target unhook should release the callback mutex when the callback id is not registered
+     * @dependencies
+     * @scenario
+     * - mock extractor
+     * - run test (call `unhook` with an unknown id)
+     * - hook a new callback, raced against a timeout
+     * @expected
+     * - return false for the unknown id
+     * - to still hook the new callback (the mutex is released)
+     */
+    it('should release the callback mutex when the callback id is not registered', async () => {
+      const extractor = new MockedErgoExtractor();
+      const result = await extractor.unhook(CallbackType.Insert, 'unknown-id');
+      expect(result).toBeFalsy();
+      const completed = await Promise.race([
+        extractor.hook(CallbackType.Insert, vitest.fn()).then(() => true),
+        new Promise<false>((resolve) => setTimeout(() => resolve(false), 1000)),
+      ]);
+      expect(completed).toEqual(true);
+    });
+
+    /**
      * @target unhook should not unhook callbacks with the same id on other types
      * @dependencies
      * @scenario
