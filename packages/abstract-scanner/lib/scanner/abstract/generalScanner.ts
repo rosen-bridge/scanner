@@ -25,14 +25,14 @@ abstract class GeneralScanner<
     initialHeight: number,
     private network: AbstractNetworkConnector<TransactionType>,
     private blockRetrieveGap = 0,
-    blockCleanupConfig: BlockCleanupConfig,
+    blockCleanupConfig?: BlockCleanupConfig,
     logger?: AbstractLogger,
     private suffix?: string,
     private heightGap = 1,
   ) {
     super(blockCleanupConfig, logger);
     /**
-     * In order to keep the scanners functionalities consistent, we add config
+     * To keep the scanner functionalities consistent, we add config
      * `initialHeight` by one so that it matches how other scanners work.
      */
     this.initialHeight = initialHeight + 1;
