@@ -117,17 +117,31 @@ export class ElectrumXSocket {
     });
 
     // send version
+    const socket = this.socket;
     this.sendRequest<string[]>(
       'server.version',
       ['FiroElectrumXSocket', '1.4'],
       true,
-    ).then((result) => {
-      this.logger.info(
-        `Connected to Firo ElectrumX. Received parameters: [${result.join(',')}]`,
-      );
-      this.connectionStatus = SocketConnectionStatus.CONNECTED;
-      this.resendAllRequests();
-    });
+    )
+      .then((result) => {
+        this.logger.info(
+          `Connected to Firo ElectrumX. Received parameters: [${result.join(',')}]`,
+        );
+        this.connectionStatus = SocketConnectionStatus.CONNECTED;
+        this.resendAllRequests();
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Failed to connect to Firo ElectrumX. Reason: ${error}`,
+        );
+        // A failed handshake leaves the socket open but stuck in
+        // IN_PROGRESS: it never becomes CONNECTED and setupSocket refuses
+        // to run again while it is open. Destroy it so the 'close' handler
+        // resets the status and schedules a reconnect. Only destroy the
+        // socket this handshake belongs to — a late rejection must not
+        // kill a newer socket.
+        if (this.socket === socket) socket.destroy();
+      });
   };
 
   /**
