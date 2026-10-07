@@ -10,6 +10,8 @@ interface ResponseEntry {
 export class ElectrumXSocketMock {
   private handlers = new Map<string, (...args: unknown[]) => void>();
   responses = new Map<string, ResponseEntry[]>();
+  destroyed = false;
+  ended = false;
 
   /**
    * Registers a handler for the given socket event (e.g. `'data'`).
@@ -44,6 +46,24 @@ export class ElectrumXSocketMock {
       else throw new Error(`The "data" event is not registered!`);
     }
     return true;
+  };
+
+  /**
+   * Marks the socket destroyed and emits `'close'` asynchronously, like a
+   * real socket does after `destroy()`.
+   */
+  destroy = (): void => {
+    this.destroyed = true;
+    const closeHandler = this.handlers.get('close');
+    if (closeHandler) setTimeout(() => closeHandler());
+  };
+
+  /**
+   * Marks the socket as gracefully ended (no `'close'` emission; tests
+   * drive lifecycle events through `destroy`).
+   */
+  end = (): void => {
+    this.ended = true;
   };
 }
 
