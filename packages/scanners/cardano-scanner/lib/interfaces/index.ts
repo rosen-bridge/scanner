@@ -14,7 +14,7 @@ interface CardanoOgmiosConfig {
   initialHash: string;
   maxTryBlock?: number;
   dataSource: DataSource;
-  blockCleanupConfig: BlockCleanupConfig;
+  blockCleanupConfig?: BlockCleanupConfig;
   useTls?: boolean;
   reconnectionConfig?: OgmiosReconnectionConfig;
   suffix?: string;

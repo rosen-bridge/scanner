@@ -25,7 +25,7 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
       new HandshakeRpcRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('HandshakeRpcRosenExtractor'),
+        logger?.child('handshakeRpcRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -35,7 +35,7 @@ export class HandshakeRpcObservationExtractor extends AbstractObservationExtract
   /**
    * gets Id for current extractor
    */
-  getId = () => 'handshake-rpc-extractor';
+  getId = () => 'handshake-observation-extractor';
 
   /**
    * gets transaction id from TransactionType

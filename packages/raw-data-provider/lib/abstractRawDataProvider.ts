@@ -19,7 +19,7 @@ export abstract class AbstractRawDataProvider<TxType> {
   ) {
     this.action = new RawDataProviderStateEntityAction(
       dataSource,
-      logger.child('RawDataProviderStateEntityAction'),
+      logger.child('rawDataProviderStateEntityAction'),
     );
   }
 

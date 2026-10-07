@@ -21,7 +21,7 @@ export class DogeEsploraObservationExtractor extends AbstractObservationExtracto
       new DogeEsploraRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('DogeEsploraRosenExtractor'),
+        logger?.child('dogeEsploraRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -31,7 +31,7 @@ export class DogeEsploraObservationExtractor extends AbstractObservationExtracto
   /**
    * gets Id for current extractor
    */
-  getId = () => 'doge-esplora-extractor';
+  getId = () => 'doge-observation-extractor';
 
   /**
    * gets transaction id from TransactionType

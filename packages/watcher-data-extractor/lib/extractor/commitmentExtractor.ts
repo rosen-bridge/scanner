@@ -2,11 +2,12 @@ import * as wasm from 'ergo-lib-wasm-nodejs';
 
 import {
   AbstractErgoBoxExtractor,
+  ErgoBoxInitializer,
   InitializeOptions,
 } from '@rosen-bridge/abstract-extractor';
 import { AbstractLogger } from '@rosen-bridge/abstract-logger';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
-import { OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { BlockInfo, OutputBox } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
 
 import CommitmentAction from '../actions/commitmentAction';
@@ -26,14 +27,14 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
 
   constructor(
     id: string,
-    addresses: Array<string>,
+    protected addresses: Array<string>,
     RWTId: string,
     dataSource: DataSource,
     tokens: TokenMap,
-    initializeOptions: InitializeOptions,
+    initializeOptions: Omit<InitializeOptions, 'address'>,
     logger?: AbstractLogger,
   ) {
-    super(initializeOptions, logger);
+    super({ ...initializeOptions, address: '' }, logger);
     this.id = id;
     this.commitmentsErgoTrees = addresses.map((address) =>
       wasm.Address.from_base58(address).to_ergo_tree().to_base16_bytes(),
@@ -105,6 +106,36 @@ class CommitmentExtractor extends AbstractErgoBoxExtractor<
     } catch {
       // empty
     }
+  };
+
+  /**
+   * initialize the extractor database with data created below the initial height
+   * @param initialBlock
+   */
+  initializeData = async (initialBlock: BlockInfo): Promise<void> => {
+    if (this.initializeOptions && this.initializeOptions.active) {
+      for (const address of this.addresses) {
+        this.logger.debug(
+          `Initializing [${this.getId()}] for address [${address}]`,
+        );
+        const initializer = new ErgoBoxInitializer(
+          this.initializeOptions.type,
+          this.initializeOptions.url,
+          address,
+          this.getId(),
+          this.hasBoxData,
+          this.processTransactions,
+          this.actions,
+          this.initializeOptions.maxParallelRequests,
+          this.logger.child('ergoBoxInitializer'),
+        );
+        await initializer.initializeData(initialBlock);
+        this.logger.info(
+          `Initialized [${this.getId()}] for address [${address}]`,
+        );
+      }
+    } else
+      this.logger.info(`Initialization for [${this.getId()}] is turned off`);
   };
 }
 

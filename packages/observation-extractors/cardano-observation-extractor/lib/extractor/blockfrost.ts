@@ -27,7 +27,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractObservationEx
       new CardanoBlockFrostRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('CardanoBlockFrostRosenExtractor'),
+        logger?.child('cardanoBlockFrostRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -37,7 +37,7 @@ export class CardanoBlockFrostObservationExtractor extends AbstractObservationEx
   /**
    * get Id for current extractor
    */
-  getId = () => 'cardano-blockfrost-extractor';
+  getId = () => 'cardano-observation-extractor';
 
   /**
    * gets transaction id from TransactionType

@@ -177,7 +177,7 @@ export abstract class AbstractErgoBoxExtractor<
         this.processTransactions,
         this.actions,
         this.initializeOptions.maxParallelRequests,
-        this.logger.child('ErgoBoxInitializer'),
+        this.logger.child('ergoBoxInitializer'),
       );
       await initializer.initializeData(initialBlock);
     } else

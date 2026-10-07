@@ -11,4 +11,4 @@ export {
   RoundRobinStrategy,
 } from './scanner/network/connectorSelectionStrategies';
 export { NetworkConnectorManager } from './scanner/network/networkConnectorManager';
-export { ScannerConfig } from './scanner/interfaces';
+export { ScannerConfig, BlockCleanupConfig } from './scanner/interfaces';
