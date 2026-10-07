@@ -1,5 +1,16 @@
 # @rosen-bridge/abstract-scanner
 
+## 4.1.0
+
+### Minor Changes
+
+- Export `BlockCleanupConfig` and make `blockCleanupThresholdDuration` and `blockTrimCountInRound` Optional with default values.
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+
 ## 4.0.0
 
 ### Major Changes

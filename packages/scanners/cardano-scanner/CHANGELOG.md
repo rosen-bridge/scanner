@@ -1,5 +1,13 @@
 # @rosen-bridge/cardano-scanner
 
+## 3.0.2
+
+### Patch Changes
+
+- Make `blockCleanupConfig` optional in the `CardanoOgmiosConfig` interface
+- Update dependencies
+  - @rosen-bridge/abstract-scanner@4.1.0
+
 ## 3.0.1
 
 ### Patch Changes
