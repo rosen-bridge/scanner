@@ -2,4 +2,4 @@
 '@rosen-bridge/cardano-scanner': patch
 ---
 
-Make `blockCleanupConfig` as optional in constructor.
+Make `blockCleanupConfig` optional in the `CardanoOgmiosConfig` interface
