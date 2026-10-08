@@ -1,5 +1,11 @@
 # @rosen-bridge/fraud-extractor
 
+## 3.1.1
+
+### Patch Changes
+
+- Rename `spendTxId`/`spendIndex` migrations to unique timestamps to avoid name collision with `watcher-data-extractor` migrations
+
 ## 3.1.0
 
 ### Minor Changes
