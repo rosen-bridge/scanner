@@ -30,8 +30,11 @@ export abstract class AbstractErgoTxExtractor<
   ExtractedData extends AbstractEntityData,
   ExtractorEntity extends AbstractErgoEntity,
 > extends AbstractErgoExtractor<ExtractedData, ExtractorEntity> {
-  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
-    super(initializeOptions, logger);
+  constructor(
+    protected initializeOptions?: InitializeOptions,
+    logger?: AbstractLogger,
+  ) {
+    super(logger);
   }
 
   /**

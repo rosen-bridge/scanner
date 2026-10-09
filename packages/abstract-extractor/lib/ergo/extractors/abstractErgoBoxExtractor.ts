@@ -42,8 +42,11 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractorEntity
   >;
 
-  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
-    super(initializeOptions, logger);
+  constructor(
+    protected initializeOptions?: InitializeOptions,
+    logger?: AbstractLogger,
+  ) {
+    super(logger);
   }
 
   /**
