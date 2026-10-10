@@ -35,4 +35,4 @@ export class MockedErgoBoxExtractor extends AbstractErgoBoxExtractor<
 export const createMockedErgoBoxExtractor = (
   boxCleanupConfig?: BoxCleanupConfig,
   initializeOptions?: InitializeOptions,
-) => new MockedErgoBoxExtractor(boxCleanupConfig, initializeOptions);
+) => new MockedErgoBoxExtractor(initializeOptions, undefined, boxCleanupConfig);

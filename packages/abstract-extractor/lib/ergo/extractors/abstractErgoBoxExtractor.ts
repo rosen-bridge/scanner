@@ -49,9 +49,9 @@ export abstract class AbstractErgoBoxExtractor<
   private dbBusy = false;
 
   constructor(
-    protected boxCleanupConfig?: BoxCleanupConfig,
     protected initializeOptions?: InitializeOptions,
     logger?: AbstractLogger,
+    protected boxCleanupConfig?: BoxCleanupConfig,
   ) {
     super(logger);
     if (boxCleanupConfig?.active) {
