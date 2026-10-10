@@ -22,7 +22,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
       new CardanoOgmiosRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('CardanoOgmiosRosenExtractor'),
+        logger?.child('cardanoOgmiosRosenExtractor'),
         storeRawData,
       ),
       logger,
@@ -32,7 +32,7 @@ export class CardanoOgmiosObservationExtractor extends AbstractObservationExtrac
   /**
    * get Id for current extractor
    */
-  getId = () => 'cardano-ogmios-extractor';
+  getId = () => 'cardano-observation-extractor';
 
   /**
    * gets transaction id from TransactionType

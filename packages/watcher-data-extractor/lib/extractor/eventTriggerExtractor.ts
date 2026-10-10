@@ -58,7 +58,7 @@ class EventTriggerExtractor extends AbstractErgoBoxExtractor<
     this.RWT = RWT;
     this.actions = new EventTriggerAction(
       dataSource,
-      this.logger.child('EventTriggerAction'),
+      this.logger.child('eventTriggerAction'),
     );
   }
 

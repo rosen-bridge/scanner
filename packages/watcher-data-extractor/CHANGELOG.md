@@ -1,5 +1,17 @@
 # @rosen-bridge/watcher-data-extractor
 
+## 16.1.0
+
+### Minor Changes
+
+- Store `spendTxId` and `spendIndex`
+
+### Patch Changes
+
+- Fix initialize option of `CommitmentExtractor` to initialize all addresses
+- Update dependencies
+  - @rosen-bridge/abstract-extractor@4.1.0
+
 ## 16.0.0
 
 ### Major Changes

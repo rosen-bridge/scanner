@@ -41,7 +41,7 @@ export class EvmTxExtractor extends AbstractExtractor<
     this.id = id;
     this.address = address;
     this.logger = logger;
-    this.action = new TxAction(dataSource, this.logger.child('TxAction'));
+    this.action = new TxAction(dataSource, this.logger.child('txAction'));
     this.provider = authToken
       ? new JsonRpcProvider(`${rpcUrl}/${authToken}`)
       : new JsonRpcProvider(rpcUrl);

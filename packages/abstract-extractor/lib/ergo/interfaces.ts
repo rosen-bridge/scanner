@@ -73,11 +73,10 @@ export interface InitializeOptions {
   url: string;
   address: string;
   maxParallelRequests?: number;
-  boxCleanupConfig?: BoxCleanupConfig;
 }
 
 export interface BoxCleanupConfig {
   active: boolean;
-  spentBoxCleanupThresholdDepth: number;
+  ergoCleanupThresholdDepth: number;
   spentBoxTrimCountInRound: number;
 }

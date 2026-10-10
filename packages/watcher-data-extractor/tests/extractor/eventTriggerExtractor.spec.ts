@@ -115,6 +115,7 @@ describe('EventTriggerExtractor', () => {
         spendBlock: null,
         spendHeight: null,
         spendTxId: null,
+        spendIndex: null,
         result: null,
         paymentTxId: null,
       });

@@ -1,5 +1,18 @@
 # @rosen-bridge/evm-observation-extractor
 
+## 8.0.0
+
+### Major Changes
+
+- Rename and standardize observation extractor ids to `<chain>-observation-extractor` and add a migration to rename the stored ids in `observation_entity` and `extractor_status_entity`:
+  - `ethereum-rpc-extractor` → `ethereum-observation-extractor`
+  - `binance-rpc-extractor` → `binance-observation-extractor`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@3.0.0
+
 ## 7.0.7
 
 ### Patch Changes

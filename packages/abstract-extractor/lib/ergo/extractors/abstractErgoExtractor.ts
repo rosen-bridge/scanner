@@ -12,7 +12,6 @@ import {
   CallbackType,
   CallbackMap,
   CallbackDataMap,
-  InitializeOptions,
 } from '../interfaces';
 
 /**
@@ -43,10 +42,7 @@ export abstract class AbstractErgoExtractor<
   };
   private callbackMutex = new Mutex();
 
-  constructor(
-    protected initializeOptions?: InitializeOptions,
-    protected logger: AbstractLogger = new DummyLogger(),
-  ) {
+  constructor(protected logger: AbstractLogger = new DummyLogger()) {
     super();
   }
 

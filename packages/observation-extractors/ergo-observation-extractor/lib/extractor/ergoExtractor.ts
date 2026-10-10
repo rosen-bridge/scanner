@@ -23,7 +23,7 @@ export class ErgoObservationExtractor extends AbstractObservationExtractor<Trans
       new ErgoNodeRosenExtractor(
         lockAddress,
         tokens,
-        logger?.child('ErgoNodeRosenExtractor'),
+        logger?.child('ergoNodeRosenExtractor'),
         storeRawData,
       ),
       logger,

@@ -20,4 +20,16 @@ export abstract class AbstractErgoBoxEntity extends AbstractErgoEntity {
    */
   @Column({ nullable: true, type: 'int' })
   spendHeight?: number | null;
+
+  /**
+   * Transaction id where this box was spent (null if unspent).
+   */
+  @Column({ nullable: true, type: 'text' })
+  spendTxId?: string | null;
+
+  /**
+   * Input index of this box in the spending transaction (null if unspent).
+   */
+  @Column({ nullable: true, type: 'int' })
+  spendIndex?: number | null;
 }

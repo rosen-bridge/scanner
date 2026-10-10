@@ -2,8 +2,13 @@ import { pick } from 'lodash-es';
 
 import { DataSource, Repository } from '@rosen-bridge/extended-typeorm';
 
-import { SpendInfo } from '../../../lib';
-import { block, block2, sampleEntities } from '../../testData';
+import { SpendInfo, DB_CHUNK_SIZE } from '../../../lib';
+import {
+  block,
+  block2,
+  boxActionTestData,
+  sampleEntities,
+} from '../../testData';
 import { createDatabase, TestBoxEntity } from '../../testUtils';
 import { testData, TestErgoBoxAction } from './abstractErgoBoxAction.mock';
 
@@ -19,7 +24,7 @@ describe('AbstractErgoBoxAction', () => {
 
   describe('updateSpendingInfo', () => {
     /**
-     * @target updateSpendingInfo should set spendBlock and spendHeight for a set of boxes
+     * @target updateSpendingInfo should set spending info for a set of boxes
      * @dependencies
      * - database
      * @scenario
@@ -27,10 +32,11 @@ describe('AbstractErgoBoxAction', () => {
      * - mock spending information for the first box
      * - run test (call `updateSpendingInfo`)
      * @expected
-     * - spend the first box
-     * - return boxId and serialized of spent box
+     * - set spendBlock, spendHeight, spendTxId and spendIndex of the first box
+     * - keep the second box unspent
+     * - return identifier of spent box
      */
-    it(`should set spendBlock and spendHeight for a set of boxes`, async () => {
+    it(`should set spending info for a set of boxes`, async () => {
       await action.storeEntities(
         sampleEntities.slice(0, 2),
         block,
@@ -48,20 +54,223 @@ describe('AbstractErgoBoxAction', () => {
         'extractor1',
       );
 
-      const spentBoxes = await repository.findOneBy({
+      const spentBox = await repository.findOneBy({
         identifier: sampleEntities[0].identifier,
         extractor: 'extractor1',
       });
+      const unspentBox = await repository.findOneBy({
+        identifier: sampleEntities[1].identifier,
+        extractor: 'extractor1',
+      });
 
-      expect(spentBoxes).toMatchObject({
+      expect(spentBox).toMatchObject({
         ...sampleEntities[0],
         block: block.hash,
         height: block.height,
         extractor: 'extractor1',
         spendBlock: spendBlock.hash,
         spendHeight: spendBlock.height,
+        spendTxId: 'txId',
+        spendIndex: 0,
+      });
+      expect(unspentBox).toMatchObject({
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
       });
       expect(spentBoxIds).toEqual([pick(sampleEntities[0], ['identifier'])]);
+    });
+
+    /**
+     * @target updateSpendingInfo should set the matching spendTxId and
+     * spendIndex for each spent box
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert three boxes
+     * - mock spending information for all boxes in different transactions
+     *   and input indexes
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - set spendTxId and spendIndex of each box from its own spend info
+     * - return identifiers of all spent boxes
+     */
+    it(`should set the matching spendTxId and spendIndex for each spent box`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 3),
+        block,
+        'extractor1',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId1', boxId: sampleEntities[0].identifier, index: 1 },
+        { txId: 'txId1', boxId: sampleEntities[1].identifier, index: 2 },
+        { txId: 'txId2', boxId: sampleEntities[2].identifier, index: 1 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      for (const spendInfo of spendInfos) {
+        const box = await repository.findOneBy({
+          identifier: spendInfo.boxId,
+          extractor: 'extractor1',
+        });
+        expect(box).toMatchObject({
+          spendBlock: block2.hash,
+          spendHeight: block2.height,
+          spendTxId: spendInfo.txId,
+          spendIndex: spendInfo.index,
+        });
+      }
+      expect(spentBoxIds).toHaveLength(3);
+      expect(spentBoxIds).toEqual(
+        expect.arrayContaining(
+          sampleEntities
+            .slice(0, 3)
+            .map((entity) => pick(entity, ['identifier'])),
+        ),
+      );
+    });
+
+    /**
+     * @target updateSpendingInfo should only spend stored boxes of the
+     * specified extractor
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert two boxes for extractor1 and one box for extractor2
+     * - mock spending information for an extractor1 box, the extractor2 box
+     *   and a box that is not stored
+     * - run test (call `updateSpendingInfo` for extractor1)
+     * @expected
+     * - spend only the extractor1 box
+     * - keep the extractor2 box unspent
+     * - return only identifier of the extractor1 box
+     */
+    it(`should only spend stored boxes of the specified extractor`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 2),
+        block,
+        'extractor1',
+      );
+      await action.storeEntities(
+        sampleEntities.slice(2, 3),
+        block,
+        'extractor2',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId', boxId: sampleEntities[0].identifier, index: 1 },
+        { txId: 'txId', boxId: sampleEntities[2].identifier, index: 2 },
+        { txId: 'txId', boxId: 'notStoredBoxId', index: 3 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const otherExtractorBox = await repository.findOneBy({
+        identifier: sampleEntities[2].identifier,
+        extractor: 'extractor2',
+      });
+      expect(otherExtractorBox).toMatchObject({
+        spendBlock: null,
+        spendHeight: null,
+        spendTxId: null,
+        spendIndex: null,
+      });
+      expect(spentBoxIds).toEqual([pick(sampleEntities[0], ['identifier'])]);
+    });
+
+    /**
+     * @target updateSpendingInfo should return an empty array when no stored
+     * box is spent
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert two boxes
+     * - mock spending information for boxes that are not stored
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - keep all boxes unspent
+     * - return an empty array
+     */
+    it(`should return an empty array when no stored box is spent`, async () => {
+      await action.storeEntities(
+        sampleEntities.slice(0, 2),
+        block,
+        'extractor1',
+      );
+
+      const spendInfos: Array<SpendInfo> = [
+        { txId: 'txId', boxId: 'notStoredBoxId', index: 1 },
+      ];
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const spentCount = await repository.countBy({
+        spendBlock: block2.hash,
+      });
+      expect(spentCount).toEqual(0);
+      expect(spentBoxIds).toEqual([]);
+    });
+
+    /**
+     * @target updateSpendingInfo should spend boxes in all chunks when spend
+     * infos exceed the chunk size
+     * @dependencies
+     * - database
+     * @scenario
+     * - insert more boxes than the database chunk size
+     * - mock spending information for all boxes
+     * - run test (call `updateSpendingInfo`)
+     * @expected
+     * - set spending info of all boxes
+     * - return identifiers of all boxes
+     */
+    it(`should spend boxes in all chunks when spend infos exceed the chunk size`, async () => {
+      const boxCount = DB_CHUNK_SIZE + 5;
+      const boxes = Array.from({ length: boxCount }, (_, index) => ({
+        identifier: `boxId${index}`,
+        serialized: `serialized${index}`,
+      }));
+      await action.storeEntities(boxes, block, 'extractor1');
+
+      const spendInfos: Array<SpendInfo> = boxes.map((box, index) => ({
+        txId: 'txId',
+        boxId: box.identifier,
+        index,
+      }));
+
+      const spentBoxIds = await action.updateSpendingInfo(
+        spendInfos,
+        block2,
+        'extractor1',
+      );
+
+      const lastBox = await repository.findOneBy({
+        identifier: `boxId${boxCount - 1}`,
+      });
+      expect(lastBox).toMatchObject({
+        spendBlock: block2.hash,
+        spendTxId: 'txId',
+        spendIndex: boxCount - 1,
+      });
+      expect(await repository.countBy({ spendBlock: block2.hash })).toEqual(
+        boxCount,
+      );
+      expect(spentBoxIds).toHaveLength(boxCount);
     });
   });
 
@@ -76,6 +285,7 @@ describe('AbstractErgoBoxAction', () => {
      * - run test(call `revertBlockUpdates` to delete block2)
      * @expected
      * - to update the box spent in block2
+     * - to clear spendTxId and spendIndex of the box spent in block2
      * - to return the updated entity boxId and serialized
      */
     it(`should update the boxes spent in the specified block`, async () => {
@@ -98,6 +308,8 @@ describe('AbstractErgoBoxAction', () => {
       const [rows, rowsCount] = await repository.findAndCount();
       expect(rowsCount).toEqual(4);
       expect(rows.map((row) => row.spendBlock)).not.toContain(block2.hash);
+      expect(rows.map((row) => row.spendTxId)).not.toContain('txId');
+      expect(rows.map((row) => row.spendIndex)).not.toContain(0);
       expect(result).toMatchObject([sampleEntities[0]]);
     });
   });
@@ -143,46 +355,19 @@ describe('AbstractErgoBoxAction', () => {
     const extractorId = 'extractor';
 
     /**
-     * @target removeUnusedBoxesInBatches should remove spent boxes whose spendHeight is at or below the confirmation threshold
+     * @target removeUnusedBoxesInBatches should remove spent boxes whose spendHeight is at or below
+     *  the confirmation threshold
      * @dependencies
      * - database
      * @scenario
-     * - insert spent boxes with different spendHeight values
-     * - run test (call `removeUnusedBoxesInBatches` with a threshold that covers some rows)
+     * - insert three spent boxes with spendHeight values 100, 200 and 300
+     * - run test (call `removeUnusedBoxesInBatches` with threshold = 150)
      * @expected
-     * - only rows with spendHeight <= threshold are removed
-     * - returns the number of removed rows
+     * - only the box with spendHeight 100 is removed
+     * - remaining boxes are the ones with spendHeight 200 and 300
      */
     it('should remove spent boxes whose spendHeight is at or below the confirmation threshold', async () => {
-      await repository.insert([
-        {
-          identifier: '1',
-          extractor: extractorId,
-          block: 'b1',
-          height: 100,
-          serialized: 's1',
-          spendBlock: 'sb1',
-          spendHeight: 100,
-        },
-        {
-          identifier: '2',
-          extractor: extractorId,
-          block: 'b2',
-          height: 200,
-          serialized: 's2',
-          spendBlock: 'sb2',
-          spendHeight: 200,
-        },
-        {
-          identifier: '3',
-          extractor: extractorId,
-          block: 'b3',
-          height: 300,
-          serialized: 's3',
-          spendBlock: 'sb3',
-          spendHeight: 300,
-        },
-      ]);
+      await repository.insert(boxActionTestData.spentBoxes);
 
       const removed = await action.removeUnusedBoxesInBatches(
         150,
@@ -196,27 +381,19 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBoxesInBatches should not remove spent boxes whose spendHeight is above the confirmation threshold
+     * @target removeUnusedBoxesInBatches should not remove spent boxes whose
+     * spendHeight is above the confirmation threshold
      * @dependencies
      * - database
      * @scenario
-     * - insert a spent box with spendHeight above the threshold
-     * - run test (call `removeUnusedBoxesInBatches`)
+     * - insert a spent box with spendHeight 250
+     * - run test (call `removeUnusedBoxesInBatches` with threshold = 100)
      * @expected
-     * - no rows are removed, returns 0
+     * - no rows are removed and the returned count is 0
+     * - the spent box remains in the database
      */
     it('should not remove spent boxes whose spendHeight is above the confirmation threshold', async () => {
-      await repository.insert([
-        {
-          identifier: '1',
-          extractor: extractorId,
-          block: 'b1',
-          height: 100,
-          serialized: 's1',
-          spendBlock: 'sb1',
-          spendHeight: 250,
-        },
-      ]);
+      await repository.insert(boxActionTestData.highSpendHeightBox);
 
       const removed = await action.removeUnusedBoxesInBatches(
         200,
@@ -237,20 +414,10 @@ describe('AbstractErgoBoxAction', () => {
      * - insert an unspent box (spendBlock and spendHeight are null)
      * - run test (call `removeUnusedBoxesInBatches` with a permissive threshold)
      * @expected
-     * - no rows are removed
+     * - no rows are removed and the returned count is 0
      */
     it('should not remove unspent boxes', async () => {
-      await repository.insert([
-        {
-          identifier: '1',
-          extractor: extractorId,
-          block: 'b1',
-          height: 100,
-          serialized: 's1',
-          spendBlock: null,
-          spendHeight: null,
-        },
-      ]);
+      await repository.insert(boxActionTestData.unspentBoxes);
 
       const removed = await action.removeUnusedBoxesInBatches(
         990,
@@ -262,36 +429,19 @@ describe('AbstractErgoBoxAction', () => {
     });
 
     /**
-     * @target removeUnusedBoxesInBatches should not remove boxes belonging to other extractors
+     * @target removeUnusedBoxesInBatches should only remove boxes belonging to
+     * the specified extractor
      * @dependencies
      * - database
      * @scenario
-     * - insert spent boxes for two different extractors
-     * - run test (call `removeUnusedBoxesInBatches` for one extractor)
+     * - insert two spent boxes, one for `target` and one for `other`
+     * - run test (call `removeUnusedBoxesInBatches` for `target`)
      * @expected
-     * - only the target extractor's rows are removed
+     * - only the `target` box is removed
+     * - the `other` box remains in the database
      */
     it('should not remove boxes belonging to other extractors', async () => {
-      await repository.insert([
-        {
-          identifier: '1',
-          extractor: 'target',
-          block: 'b1',
-          height: 100,
-          serialized: 's1',
-          spendBlock: 'sb1',
-          spendHeight: 100,
-        },
-        {
-          identifier: '2',
-          extractor: 'other',
-          block: 'b2',
-          height: 100,
-          serialized: 's2',
-          spendBlock: 'sb2',
-          spendHeight: 100,
-        },
-      ]);
+      await repository.insert(boxActionTestData.multiExtractorBoxes);
 
       const removed = await action.removeUnusedBoxesInBatches(
         200,
@@ -309,22 +459,14 @@ describe('AbstractErgoBoxAction', () => {
      * @dependencies
      * - database
      * @scenario
-     * - call `removeUnusedBoxesInBatches` with currentHeight < confirmationDepth
+     * - insert a spent box with spendHeight 50
+     * - run test (call `removeUnusedBoxesInBatches` with currentHeight = -50)
      * @expected
-     * - return 0 and not delete anything
+     * - no rows are removed and the returned count is 0
+     * - the spent box remains in the database
      */
     it('should return 0 and delete nothing when threshold is negative', async () => {
-      await repository.insert([
-        {
-          identifier: '1',
-          extractor: extractorId,
-          block: 'b1',
-          height: 100,
-          serialized: 's1',
-          spendBlock: 'sb1',
-          spendHeight: 50,
-        },
-      ]);
+      await repository.insert(boxActionTestData.negativeThresholdBox);
 
       const removed = await action.removeUnusedBoxesInBatches(
         -50,
@@ -342,23 +484,14 @@ describe('AbstractErgoBoxAction', () => {
      * @dependencies
      * - database
      * @scenario
-     * - insert 5 eligible spent boxes
-     * - run test with deletedBoxCount = 2
+     * - insert five eligible spent boxes
+     * - run test (call `removeUnusedBoxesInBatches` with deletedBoxCount = 2)
      * @expected
-     * - only 2 rows are removed, at most `deletedBoxCount`
+     * - only 2 rows are removed and the returned count is 2
+     * - three rows remain in the database
      */
     it('should respect the maximum deletion batch size', async () => {
-      await repository.insert(
-        [1, 2, 3, 4, 5].map((i) => ({
-          identifier: `${i}`,
-          extractor: extractorId,
-          block: `b${i}`,
-          height: 100 + i,
-          serialized: `s${i}`,
-          spendBlock: `sb${i}`,
-          spendHeight: 100 + i,
-        })),
-      );
+      await repository.insert(boxActionTestData.bulkSpentBoxes);
 
       const removed = await action.removeUnusedBoxesInBatches(
         990,
@@ -376,22 +509,13 @@ describe('AbstractErgoBoxAction', () => {
      * @dependencies
      * - database
      * @scenario
-     * - insert 3 eligible spent boxes and call the method with a large batch size
+     * - insert three eligible spent boxes
+     * - run test (call `removeUnusedBoxesInBatches` with a large batch size)
      * @expected
-     * - returns 3
+     * - the returned count equals the number of inserted rows (3)
      */
     it('should return the correct count of removed rows', async () => {
-      await repository.insert(
-        [1, 2, 3].map((i) => ({
-          identifier: `${i}`,
-          extractor: extractorId,
-          block: `b${i}`,
-          height: 100,
-          serialized: `s${i}`,
-          spendBlock: `sb${i}`,
-          spendHeight: 100,
-        })),
-      );
+      await repository.insert(boxActionTestData.threeSpentBoxes);
 
       const removed = await action.removeUnusedBoxesInBatches(
         990,

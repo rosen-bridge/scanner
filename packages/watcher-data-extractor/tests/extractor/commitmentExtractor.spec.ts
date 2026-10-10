@@ -1,3 +1,4 @@
+import { ErgoBoxInitializer } from '@rosen-bridge/abstract-extractor';
 import { DataSource } from '@rosen-bridge/extended-typeorm';
 import { ErgoNetworkType } from '@rosen-bridge/scanner-interfaces';
 import { TokenMap } from '@rosen-bridge/tokens';
@@ -7,14 +8,35 @@ import {
   commitmentBox,
   extractedCommitment,
 } from './commitmentExtractorTestData';
-import { commitmentAddress, RWTId } from './testData';
+import {
+  block,
+  commitmentAddress,
+  eventTriggerAddress,
+  RWTId,
+} from './testData';
 import { createDatabase } from './testUtils';
+
+const { mockInitializeData } = vi.hoisted(() => ({
+  mockInitializeData: vi.fn(),
+}));
+vi.mock('@rosen-bridge/abstract-extractor', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@rosen-bridge/abstract-extractor')>();
+  return {
+    ...actual,
+    ErgoBoxInitializer: vi.fn(function () {
+      return { initializeData: mockInitializeData };
+    }),
+  };
+});
 
 let dataSource: DataSource;
 let extractor: CommitmentExtractor;
 
 describe('commitmentExtractor', () => {
   beforeEach(async () => {
+    vi.clearAllMocks();
+    mockInitializeData.mockResolvedValue(undefined);
     dataSource = await createDatabase();
     extractor = new CommitmentExtractor(
       'extractorId',
@@ -26,8 +48,6 @@ describe('commitmentExtractor', () => {
         active: true,
         type: ErgoNetworkType.Explorer,
         url: 'https://explorer.ergoplatform.com/',
-        address:
-          '2Eit2LFRqu2Mo33z3pYTJRHNCMq8F5shBvB1xmwtrGiZohpcoacfYASrP6jyWdbE1iBqAxgTmjFCF5UBPXzwbkuoDKq3PSTEDeCkCxP3GmrPARY4RUX9LvKUShwpSnMoPmxqQEQ54XKy63V1qxp4m5vYA2z7zwvFMcq9Thzr61aXKcRtV24pm2xnuuXUz7cJdghdPipxcvrJSMAhGiMtfZhhHUtCR2Ho4W7tUByNyJanXYPxM9uijstv6D3ryvWT1p1MxGyy1Epx7dSMYQgxq8x1HecAuG65VsykmtdzaDuJFBxiC5QBrfh9CiqT1k6UW798wb7Pa4oGopYXTLEuviFifnUSo6DzrTfaDQkdxPENqXDTF63noiPmRsPYB5wxbDXf2DBSB9359MdXbZLFymcPd8ofdZz7k6xQ9w53EfCg8HMkLf8mgR7e6XnhnB4jQ5q4DYbSw4yfg7fmDwDne5RwcUz8urhLFSba9qt4XJvT4oBuMfk1LRaRVyk4K9xecqSGXEMW6p3mQw2YDpZbGo5hLtpTvTPmrxqYkVpbNfgb6kkV1eKyHWo89jCQnG5zzjrENgmDhTYXUnD6P6stzuaJKXhQBWKGnu6pHZhsZ9WgRAQJP7AcRxJ6Qj77iiE4EqnAiVFaUXKJsd5cr1e8euXvBaaDRXcGezbw9psZ3NthzpWjtJTgyS8PLxKHFdTZyKLkKc',
       },
     );
   });
@@ -199,6 +219,110 @@ describe('commitmentExtractor', () => {
       };
       const data = extractor.hasBoxData(boxWithoutR6);
       expect(data).toEqual(false);
+    });
+  });
+  describe('initializeData', () => {
+    const createExtractor = (addresses: string[], active: boolean) =>
+      new CommitmentExtractor(
+        'extractorId',
+        addresses,
+        RWTId,
+        dataSource,
+        new TokenMap(),
+        {
+          active,
+          type: ErgoNetworkType.Explorer,
+          url: 'https://explorer.ergoplatform.com/',
+          maxParallelRequests: 5,
+        },
+      );
+
+    /**
+     * @target initializeData should run an initializer for each address
+     * @dependencies
+     * - ErgoBoxInitializer
+     * @scenario
+     * - mock ErgoBoxInitializer
+     * - create an active extractor with two addresses
+     * - run test (call `initializeData`)
+     * @expected
+     * - ErgoBoxInitializer to be constructed twice, once per address with
+     *   the extractor's initialize options and callbacks
+     * - initializeData of each initializer to be called with the initial block
+     */
+    it('should run an initializer for each address', async () => {
+      const multiAddressExtractor = createExtractor(
+        [commitmentAddress, eventTriggerAddress],
+        true,
+      );
+
+      await multiAddressExtractor.initializeData(block);
+
+      expect(ErgoBoxInitializer).toHaveBeenCalledTimes(2);
+      [commitmentAddress, eventTriggerAddress].forEach((address, index) => {
+        expect(ErgoBoxInitializer).toHaveBeenNthCalledWith(
+          index + 1,
+          ErgoNetworkType.Explorer,
+          'https://explorer.ergoplatform.com/',
+          address,
+          'extractorId',
+          multiAddressExtractor.hasBoxData,
+          multiAddressExtractor.processTransactions,
+          multiAddressExtractor.actions,
+          5,
+          expect.anything(),
+        );
+      });
+      expect(mockInitializeData).toHaveBeenCalledTimes(2);
+      expect(mockInitializeData).toHaveBeenCalledWith(block);
+    });
+
+    /**
+     * @target initializeData should not initialize when initialization is inactive
+     * @dependencies
+     * - ErgoBoxInitializer
+     * @scenario
+     * - mock ErgoBoxInitializer
+     * - create an inactive extractor
+     * - run test (call `initializeData`)
+     * @expected
+     * - ErgoBoxInitializer not to be constructed
+     * - no initializeData to be called
+     */
+    it('should not initialize when initialization is inactive', async () => {
+      const inactiveExtractor = createExtractor([commitmentAddress], false);
+
+      await inactiveExtractor.initializeData(block);
+
+      expect(ErgoBoxInitializer).not.toHaveBeenCalled();
+      expect(mockInitializeData).not.toHaveBeenCalled();
+    });
+
+    /**
+     * @target initializeData should stop and throw when an address initialization fails
+     * @dependencies
+     * - ErgoBoxInitializer
+     * @scenario
+     * - mock ErgoBoxInitializer to reject on the first address
+     * - create an active extractor with two addresses
+     * - run test (call `initializeData`)
+     * @expected
+     * - initializeData to throw the initializer error
+     * - the second address not to be initialized
+     */
+    it('should stop and throw when an address initialization fails', async () => {
+      mockInitializeData.mockRejectedValueOnce(new Error('network error'));
+      const multiAddressExtractor = createExtractor(
+        [commitmentAddress, eventTriggerAddress],
+        true,
+      );
+
+      await expect(multiAddressExtractor.initializeData(block)).rejects.toThrow(
+        'network error',
+      );
+
+      expect(ErgoBoxInitializer).toHaveBeenCalledTimes(1);
+      expect(mockInitializeData).toHaveBeenCalledTimes(1);
     });
   });
 });

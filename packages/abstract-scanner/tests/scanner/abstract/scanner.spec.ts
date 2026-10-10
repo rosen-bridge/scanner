@@ -1,3 +1,5 @@
+import { expect } from 'vitest';
+
 import {
   DataSource,
   ObjectLiteral,
@@ -5,8 +7,11 @@ import {
 } from '@rosen-bridge/extended-typeorm';
 import { BlockInfo } from '@rosen-bridge/scanner-interfaces';
 
-import { BlockEntity, ExtractorStatusEntity } from '../../../lib';
-import { BlockCleanupConfig } from '../../../lib/scanner/interfaces';
+import {
+  BlockEntity,
+  ExtractorStatusEntity,
+  BlockCleanupConfig,
+} from '../../../lib';
 import {
   ExtractorTest,
   TestAbstractScanner,
@@ -22,6 +27,7 @@ describe('AbstractScanner', () => {
     dataSource = await createDatabase();
   });
   blockCleanupConfig = {
+    active: true,
     blockCleanupThresholdDuration: 1000,
     blockTrimCountInRound: 5,
   };
@@ -468,6 +474,7 @@ describe('AbstractScanner', () => {
      */
     it('should call database action with correct parameters', async () => {
       const customBlockCleanupConfig: BlockCleanupConfig = {
+        active: true,
         blockCleanupThresholdDuration: 3600,
         blockTrimCountInRound: 50,
       };
@@ -534,7 +541,9 @@ describe('AbstractScanner', () => {
         'removeUnusedBlocksInBatches',
       );
 
-      await scanner['removeOldUnusedBlocks'](undefined);
+      await scanner['removeOldUnusedBlocks']({
+        timestamp: 1000,
+      } as BlockEntity);
       expect(removeUnusedBlocksSpy).toBeCalledWith([], 5, 'first', 0);
     });
   });

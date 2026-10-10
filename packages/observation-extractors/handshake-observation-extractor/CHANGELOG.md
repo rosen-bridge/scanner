@@ -1,5 +1,18 @@
 # @rosen-bridge/handshake-observation-extractor
 
+## 2.0.0
+
+### Major Changes
+
+- Rename and standardize observation extractor ids to `<chain>-observation-extractor` and add a migration to rename the stored ids in `observation_entity` and `extractor_status_entity`:
+  - `handshake-rpc-extractor` → `handshake-observation-extractor`
+
+### Patch Changes
+
+- Update dependencies
+  - @rosen-bridge/abstract-observation-extractor@3.0.0
+  - @rosen-bridge/handshake-scanner@1.0.3
+
 ## 1.0.8
 
 ### Patch Changes

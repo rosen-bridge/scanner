@@ -6,10 +6,9 @@ import {
   OutputBox,
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
-import { Mutex } from '@rosen-bridge/semaphore';
 
 import {
-  SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+  ERGO_CLEANUP_THRESHOLD_DEPTH,
   SPENT_BOX_TRIM_COUNT_IN_ROUND,
 } from '../../constants';
 import { AbstractErgoBoxEntity, AbstractErgoBoxAction } from '../database';
@@ -47,19 +46,22 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractedData,
     ExtractorEntity
   >;
-  protected boxCleanupConfig?: BoxCleanupConfig;
-  private cleanupMutex = new Mutex();
+  private dbBusy = false;
 
-  constructor(initializeOptions?: InitializeOptions, logger?: AbstractLogger) {
-    super(initializeOptions, logger);
-    if (initializeOptions?.boxCleanupConfig?.active) {
+  constructor(
+    protected boxCleanupConfig?: BoxCleanupConfig,
+    protected initializeOptions?: InitializeOptions,
+    logger?: AbstractLogger,
+  ) {
+    super(logger);
+    if (boxCleanupConfig?.active) {
       this.boxCleanupConfig = {
         active: true,
-        spentBoxCleanupThresholdDepth:
-          initializeOptions.boxCleanupConfig.spentBoxCleanupThresholdDepth ??
-          SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+        ergoCleanupThresholdDepth:
+          boxCleanupConfig.ergoCleanupThresholdDepth ??
+          ERGO_CLEANUP_THRESHOLD_DEPTH,
         spentBoxTrimCountInRound:
-          initializeOptions.boxCleanupConfig.spentBoxTrimCountInRound ??
+          boxCleanupConfig.spentBoxTrimCountInRound ??
           SPENT_BOX_TRIM_COUNT_IN_ROUND,
       };
     }
@@ -167,7 +169,6 @@ export abstract class AbstractErgoBoxExtractor<
       if (spentData.length > 0) {
         this.triggerCallbacks(CallbackType.Spend, spentData);
       }
-      this.removeOldConfirmedSpentBoxes(block).catch(() => {});
     } catch (e) {
       this.logger.error(
         `Processing transactions failed for ${this.getId()} at the block ${
@@ -179,6 +180,7 @@ export abstract class AbstractErgoBoxExtractor<
       }
       return false;
     }
+    this.removeOldConfirmedSpentBoxes(block).catch(() => {});
     return true;
   };
 
@@ -191,14 +193,17 @@ export abstract class AbstractErgoBoxExtractor<
     block: BlockInfo,
   ): Promise<void> => {
     if (!this.boxCleanupConfig?.active) return;
-
-    const release = await this.cleanupMutex.acquire();
+    if (this.dbBusy) {
+      this.logger.debug(`Skipping cleanup for ${this.getId()}: DB is busy`);
+      return;
+    }
+    this.dbBusy = true;
     try {
       this.logger.debug(
         'Starting the process to remove old confirmed spent boxes',
       );
       const thresholdHeight =
-        block.height - this.boxCleanupConfig.spentBoxCleanupThresholdDepth;
+        block.height - this.boxCleanupConfig.ergoCleanupThresholdDepth;
 
       await this.actions.removeUnusedBoxesInBatches(
         thresholdHeight,
@@ -214,7 +219,7 @@ export abstract class AbstractErgoBoxExtractor<
         this.logger.error(error.stack);
       }
     } finally {
-      release();
+      this.dbBusy = false;
     }
   };
 
@@ -233,7 +238,7 @@ export abstract class AbstractErgoBoxExtractor<
         this.processTransactions,
         this.actions,
         this.initializeOptions.maxParallelRequests,
-        this.logger.child('ErgoBoxInitializer'),
+        this.logger.child('ergoBoxInitializer'),
       );
       await initializer.initializeData(initialBlock);
     } else

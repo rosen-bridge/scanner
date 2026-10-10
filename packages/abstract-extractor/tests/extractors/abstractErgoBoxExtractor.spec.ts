@@ -1,4 +1,4 @@
-import { ErgoNetworkType, OutputBox } from '@rosen-bridge/scanner-interfaces';
+import { OutputBox } from '@rosen-bridge/scanner-interfaces';
 import { V1 } from '@rosen-clients/ergo-explorer';
 
 import {
@@ -6,7 +6,7 @@ import {
   AbstractErgoBoxAction,
   CallbackType,
   AbstractErgoBoxEntity,
-  SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+  ERGO_CLEANUP_THRESHOLD_DEPTH,
   SPENT_BOX_TRIM_COUNT_IN_ROUND,
   BoxCleanupConfig,
 } from '../../lib';
@@ -163,13 +163,6 @@ describe('AbstractErgoBoxExtractor', () => {
     });
   });
   describe('removeOldConfirmedSpentBoxes', () => {
-    const baseOptions = {
-      active: false,
-      type: ErgoNetworkType.Node,
-      url: 'http://test-node-url',
-      address: 'test-address',
-    };
-
     /**
      * @target processTransactions should call removeUnusedBoxesInBatches with configured values when cleanup is active
      * @dependencies
@@ -180,16 +173,13 @@ describe('AbstractErgoBoxExtractor', () => {
      * - run test (call `processTransactions` with an empty block)
      * @expected
      * - to call `removeUnusedBoxesInBatches` with
-     *   (block.height, thresholdDepth, trimCount, extractorId)
+     *   (block.height - thresholdDepth, trimCount, extractorId)
      */
     it('should call removeUnusedBoxesInBatches with configured values when active', async () => {
       const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        boxCleanupConfig: {
-          active: true,
-          spentBoxCleanupThresholdDepth: 42,
-          spentBoxTrimCountInRound: 7,
-        },
+        active: true,
+        ergoCleanupThresholdDepth: 42,
+        spentBoxTrimCountInRound: 7,
       });
 
       const removeSpy = vitest.fn().mockResolvedValue(0);
@@ -254,12 +244,9 @@ describe('AbstractErgoBoxExtractor', () => {
      */
     it('should not call removeUnusedBoxesInBatches when config.active is false', async () => {
       const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        boxCleanupConfig: {
-          active: false,
-          spentBoxCleanupThresholdDepth: 42,
-          spentBoxTrimCountInRound: 7,
-        },
+        active: false,
+        ergoCleanupThresholdDepth: 42,
+        spentBoxTrimCountInRound: 7,
       });
       const removeSpy = vitest.fn().mockResolvedValue(0);
       extractor['actions'] = {
@@ -288,11 +275,8 @@ describe('AbstractErgoBoxExtractor', () => {
      */
     it('should use default constants when threshold/trim are not provided', async () => {
       const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        boxCleanupConfig: {
-          active: true,
-        } as unknown as BoxCleanupConfig,
-      });
+        active: true,
+      } as unknown as BoxCleanupConfig);
       const removeSpy = vitest.fn().mockResolvedValue(0);
       extractor['actions'] = {
         storeEntities: vitest.fn().mockResolvedValue(true),
@@ -307,7 +291,7 @@ describe('AbstractErgoBoxExtractor', () => {
 
       await vi.waitFor(() =>
         expect(removeSpy).toBeCalledWith(
-          block.height - SPENT_BOX_CLEANUP_THRESHOLD_DEPTH,
+          block.height - ERGO_CLEANUP_THRESHOLD_DEPTH,
           SPENT_BOX_TRIM_COUNT_IN_ROUND,
           'TestErgoBoxExtractor',
         ),
@@ -327,12 +311,9 @@ describe('AbstractErgoBoxExtractor', () => {
      */
     it('should return true when removeUnusedBoxesInBatches rejects', async () => {
       const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        boxCleanupConfig: {
-          active: true,
-          spentBoxCleanupThresholdDepth: 10,
-          spentBoxTrimCountInRound: 10,
-        },
+        active: true,
+        ergoCleanupThresholdDepth: 10,
+        spentBoxTrimCountInRound: 10,
       });
 
       const errorSpy = vitest.spyOn(extractor['logger'], 'error');
@@ -366,12 +347,9 @@ describe('AbstractErgoBoxExtractor', () => {
      */
     it('should still process boxes when cleanup is active', async () => {
       const extractor = createMockedErgoBoxExtractor({
-        ...baseOptions,
-        boxCleanupConfig: {
-          active: true,
-          spentBoxCleanupThresholdDepth: 10,
-          spentBoxTrimCountInRound: 10,
-        },
+        active: true,
+        ergoCleanupThresholdDepth: 10,
+        spentBoxTrimCountInRound: 10,
       });
 
       extractor.hasBoxData = (box: V1.OutputInfo | OutputBox) =>
