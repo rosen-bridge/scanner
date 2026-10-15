@@ -146,8 +146,15 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
     while (count !== 0) {
       try {
         const release = await this.mutex.acquire();
-        const blocks = await this.action.getLastSavedBlocks(skip, count);
-        release();
+        let blocks: Awaited<ReturnType<typeof this.action.getLastSavedBlocks>>;
+        try {
+          blocks = await this.action.getLastSavedBlocks(skip, count);
+        } finally {
+          // release the mutex even when the read fails: the catch below
+          // retries with a wider search, and re-acquiring a mutex this
+          // loop still holds would deadlock the scanner for good
+          release();
+        }
         if (blocks.length === 0) count = 0;
         const points =
           blocks.length > 0
@@ -161,7 +168,7 @@ class CardanoOgmiosScanner extends WebSocketScanner<Transaction> {
         let height = 0;
         if (blocks.length) {
           const foundedBlock = blocks.find(
-            (item) => (item.hash = intersectPoint.id),
+            (item) => item.hash === intersectPoint.id,
           );
           if (foundedBlock) {
             height = foundedBlock.height;
