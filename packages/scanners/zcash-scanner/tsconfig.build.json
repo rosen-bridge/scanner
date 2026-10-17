@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib"
+  },
+  "include": ["lib"],
+  "references": [
+    { "path": "../../abstract-scanner/tsconfig.build.json" },
+    { "path": "../../scanner-interfaces/tsconfig.build.json" }
+  ]
+}

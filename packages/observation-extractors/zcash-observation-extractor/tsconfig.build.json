@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./lib"
+  },
+  "include": ["lib"],
+  "references": [
+    { "path": "../../abstract-observation-extractor/tsconfig.build.json" },
+    { "path": "../../scanners/zcash-scanner/tsconfig.build.json" }
+  ]
+}
