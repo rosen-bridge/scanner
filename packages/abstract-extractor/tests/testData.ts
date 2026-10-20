@@ -1,6 +1,6 @@
 import { BlockInfo, InputExtension } from '@rosen-bridge/scanner-interfaces';
 
-import { TestEntity } from './testUtils';
+import { TestBoxEntity, TestEntity } from './testUtils';
 
 export const tx = {
   id: '3b91fbd2b6f4f3f971098655ffa320841001b071908de057cdf8c425cd3b3e61',
@@ -153,3 +153,147 @@ export const sampleEntities2: Omit<TestEntity, 'id'>[] = [
     height: 600,
   },
 ];
+
+/**
+ * Shared fixtures for AbstractErgoBoxAction tests.
+ * These use TestBoxEntity (with spendBlock/spendHeight).
+ */
+export const boxActionTestData = {
+  sampleEntities: [
+    {
+      extractor: 'extractor',
+      identifier: 'id1',
+      serialized: 'serialized1',
+      block: 'blockId1',
+      height: 100,
+    },
+    {
+      extractor: 'extractor',
+      identifier: 'id2',
+      serialized: 'serialized2',
+      block: 'blockId2',
+      height: 200,
+    },
+    {
+      extractor: 'extractor',
+      identifier: 'id3',
+      serialized: 'serialized3',
+      block: 'blockId3',
+      height: 300,
+    },
+    {
+      extractor: 'extractor',
+      identifier: '4',
+      serialized: 'serialized4',
+      block: 'blockId4',
+      height: 400,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  spentBoxes: [
+    {
+      identifier: '1',
+      extractor: 'extractor',
+      block: 'b1',
+      height: 100,
+      serialized: 's1',
+      spendBlock: 'sb1',
+      spendHeight: 100,
+    },
+    {
+      identifier: '2',
+      extractor: 'extractor',
+      block: 'b2',
+      height: 200,
+      serialized: 's2',
+      spendBlock: 'sb2',
+      spendHeight: 200,
+    },
+    {
+      identifier: '3',
+      extractor: 'extractor',
+      block: 'b3',
+      height: 300,
+      serialized: 's3',
+      spendBlock: 'sb3',
+      spendHeight: 300,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  highSpendHeightBox: [
+    {
+      identifier: '1',
+      extractor: 'extractor',
+      block: 'b1',
+      height: 100,
+      serialized: 's1',
+      spendBlock: 'sb1',
+      spendHeight: 250,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  unspentBoxes: [
+    {
+      identifier: '1',
+      extractor: 'extractor',
+      block: 'b1',
+      height: 100,
+      serialized: 's1',
+      spendBlock: null,
+      spendHeight: null,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  multiExtractorBoxes: [
+    {
+      identifier: '1',
+      extractor: 'target',
+      block: 'b1',
+      height: 100,
+      serialized: 's1',
+      spendBlock: 'sb1',
+      spendHeight: 100,
+    },
+    {
+      identifier: '2',
+      extractor: 'other',
+      block: 'b2',
+      height: 100,
+      serialized: 's2',
+      spendBlock: 'sb2',
+      spendHeight: 100,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  negativeThresholdBox: [
+    {
+      identifier: '1',
+      extractor: 'extractor',
+      block: 'b1',
+      height: 100,
+      serialized: 's1',
+      spendBlock: 'sb1',
+      spendHeight: 50,
+    },
+  ] as Omit<TestBoxEntity, 'id'>[],
+
+  bulkSpentBoxes: [1, 2, 3, 4, 5].map((i) => ({
+    identifier: `${i}`,
+    extractor: 'extractor',
+    block: `b${i}`,
+    height: 100 + i,
+    serialized: `s${i}`,
+    spendBlock: `sb${i}`,
+    spendHeight: 100 + i,
+  })) as Omit<TestBoxEntity, 'id'>[],
+
+  threeSpentBoxes: [1, 2, 3].map((i) => ({
+    identifier: `${i}`,
+    extractor: 'extractor',
+    block: `b${i}`,
+    height: 100,
+    serialized: `s${i}`,
+    spendBlock: `sb${i}`,
+    spendHeight: 100,
+  })) as Omit<TestBoxEntity, 'id'>[],
+};

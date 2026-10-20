@@ -7,6 +7,10 @@ import {
   InputExtension,
 } from '@rosen-bridge/scanner-interfaces';
 
+import {
+  ERGO_CLEANUP_THRESHOLD_DEPTH,
+  SPENT_BOX_TRIM_COUNT_IN_ROUND,
+} from '../../constants';
 import { AbstractErgoBoxEntity, AbstractErgoBoxAction } from '../database';
 import { ErgoBoxInitializer } from '../initializers';
 import {
@@ -15,6 +19,7 @@ import {
   CallbackType,
   TxExtra,
   InitializeOptions,
+  BoxCleanupConfig,
 } from '../interfaces';
 import { AbstractErgoExtractor } from './abstractErgoExtractor';
 
@@ -41,12 +46,25 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractedData,
     ExtractorEntity
   >;
+  private cleanupRunning = false;
 
   constructor(
     protected initializeOptions?: InitializeOptions,
     logger?: AbstractLogger,
+    protected boxCleanupConfig?: BoxCleanupConfig,
   ) {
     super(logger);
+    if (boxCleanupConfig?.active) {
+      this.boxCleanupConfig = {
+        active: true,
+        ergoCleanupThresholdDepth:
+          boxCleanupConfig.ergoCleanupThresholdDepth ??
+          ERGO_CLEANUP_THRESHOLD_DEPTH,
+        spentBoxTrimCountInRound:
+          boxCleanupConfig.spentBoxTrimCountInRound ??
+          SPENT_BOX_TRIM_COUNT_IN_ROUND,
+      };
+    }
   }
 
   /**
@@ -162,7 +180,47 @@ export abstract class AbstractErgoBoxExtractor<
       }
       return false;
     }
+    this.removeOldConfirmedSpentBoxes(block).catch(() => {});
     return true;
+  };
+
+  /**
+   * Remove spent boxes that have passed the configured confirmation depth.
+   *
+   * @param block the block currently being processed
+   */
+  protected removeOldConfirmedSpentBoxes = async (
+    block: BlockInfo,
+  ): Promise<void> => {
+    if (!this.boxCleanupConfig?.active) return;
+    if (this.cleanupRunning) {
+      this.logger.debug(`Skipping cleanup for ${this.getId()}: DB is busy`);
+      return;
+    }
+    this.cleanupRunning = true;
+    try {
+      this.logger.debug(
+        'Starting the process to remove old confirmed spent boxes',
+      );
+      const thresholdHeight =
+        block.height - this.boxCleanupConfig.ergoCleanupThresholdDepth;
+
+      await this.actions.removeUnusedBoxesInBatches(
+        thresholdHeight,
+        this.boxCleanupConfig.spentBoxTrimCountInRound,
+        this.getId(),
+      );
+      this.logger.debug('Successfully removed old confirmed spent boxes');
+    } catch (error) {
+      this.logger.error(
+        `An error occurred while removing old confirmed spent boxes: ${error}`,
+      );
+      if (error instanceof Error && error.stack) {
+        this.logger.error(error.stack);
+      }
+    } finally {
+      this.cleanupRunning = false;
+    }
   };
 
   /**

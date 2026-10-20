@@ -6,6 +6,8 @@ import {
   AbstractErgoBoxEntity,
   AbstractErgoBoxAction,
   AbstractErgoBoxExtractor,
+  BoxCleanupConfig,
+  InitializeOptions,
 } from '../../lib';
 
 export class MockedErgoBoxExtractor extends AbstractErgoBoxExtractor<
@@ -29,3 +31,8 @@ export class MockedErgoBoxExtractor extends AbstractErgoBoxExtractor<
     return undefined;
   };
 }
+
+export const createMockedErgoBoxExtractor = (
+  boxCleanupConfig?: BoxCleanupConfig,
+  initializeOptions?: InitializeOptions,
+) => new MockedErgoBoxExtractor(initializeOptions, undefined, boxCleanupConfig);

@@ -74,3 +74,9 @@ export interface InitializeOptions {
   address: string;
   maxParallelRequests?: number;
 }
+
+export interface BoxCleanupConfig {
+  active: boolean;
+  ergoCleanupThresholdDepth: number;
+  spentBoxTrimCountInRound: number;
+}
