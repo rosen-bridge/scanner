@@ -46,7 +46,7 @@ export abstract class AbstractErgoBoxExtractor<
     ExtractedData,
     ExtractorEntity
   >;
-  private dbBusy = false;
+  private cleanupRunning = false;
 
   constructor(
     protected initializeOptions?: InitializeOptions,
@@ -193,11 +193,11 @@ export abstract class AbstractErgoBoxExtractor<
     block: BlockInfo,
   ): Promise<void> => {
     if (!this.boxCleanupConfig?.active) return;
-    if (this.dbBusy) {
+    if (this.cleanupRunning) {
       this.logger.debug(`Skipping cleanup for ${this.getId()}: DB is busy`);
       return;
     }
-    this.dbBusy = true;
+    this.cleanupRunning = true;
     try {
       this.logger.debug(
         'Starting the process to remove old confirmed spent boxes',
@@ -219,7 +219,7 @@ export abstract class AbstractErgoBoxExtractor<
         this.logger.error(error.stack);
       }
     } finally {
-      this.dbBusy = false;
+      this.cleanupRunning = false;
     }
   };
 
