@@ -6,7 +6,7 @@ export default defineConfig({
     coverage: {
       all: true,
       provider: 'istanbul',
-      reporter: 'cobertura',
+      reporter: ['text', 'cobertura'],
       reportsDirectory: './coverage',
     },
     poolOptions: {
